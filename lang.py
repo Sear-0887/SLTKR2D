@@ -15,6 +15,7 @@ class cmd:
             Please use the command !help <cmd> to view what the <cmd> does.
             SLTKR2D by <@697801071208300574>, All right's reserved.
             Bot Since Last restart: %s
+            This bot is open-sourced on Github in [Here](https://github.com/Sear-0887/SLTKR2D).
         """
     class ping:
         alias      = []
