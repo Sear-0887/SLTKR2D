@@ -76,7 +76,16 @@ async def help(ctx, tcmd=None,):
     if not tcmd:
         embed = nextcord.Embed()
         embed.description = cmd.help.blankdisplay % (datetime.datetime.now()-TimeOn)
-        await ctx.send(embed=embed)
+        view = nextcord.ui.View()
+        async def gethelplist(interaction):
+            sembed = nextcord.Embed()
+            sembed.title = "Help List"
+            sembed.description = "Here's a list of commands:\n" + ", ".join([func for func in dir(cmd) if not func.startswith("__")])
+            await interaction.send(ephemeral=True, embed=sembed)
+        getlistbtn = nextcord.ui.Button(style=nextcord.ButtonStyle.blurple, label="Help List")
+        getlistbtn.callback = gethelplist
+        view.add_item(getlistbtn)
+        await ctx.send(embed=embed, view=view)
     else:
         for i in bot.all_commands:
             if tcmd in bot.all_commands[i].aliases:
