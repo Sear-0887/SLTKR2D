@@ -1,0 +1,166 @@
+#MENU_HINT is the the text that displays when you hover over a button
+
+MENU new_game                   =New Game
+MENU_HINT_E new_game            =Create a procedurally generated world and progress through the research tree
+MENU_HINT_D new_game            =Complete a tutorial level before starting a new game
+MENU tutorial                   =Tutorial
+MENU_HINT tutorial              =A linear sequence of levels that introduce mechanics
+MENU load_game                  =Load Game
+MENU options                    =Options
+MENU exit                       =Exit
+MENU_HINT exit                  =Close {title}
+MENU back                       =Back
+MENU_HINT back                  =Pressing [menu_back] or [menu_pause_back] will achieve the same effect as this button
+MENU apply                      =Apply
+MENU restart                    =Restart
+
+MENU name                       =Name
+MENU_HINT generation_name       =New worlds need unique names
+MENU seed                       =Seed
+MENU_HINT seed                  =Leaving this blank will choose a random seed
+MENU cheats                     =cheats
+MENU_HINT cheats                =Enables certain console commands
+MENU skip_early_game            =Skip early game
+MENU_HINT skip_early_game       =Start the game with {RESEARCH automated_crafting} researched and plenty of blocks in your backpack
+MENU type                       =type
+MENU_HINT generation_type       =Normal play is only possible in {ENUM natural} worlds
+
+MENU generate_structures        =Generate Structures
+#"structure" as in a randomly generated building
+MENU_HINT generate_structures   =Normal play is only possible with structures on
+#"structure" as in a randomly generated building
+MENU create                     =Create
+MENU_HINT_D create              =Invalid name
+MENU_HINT generation_modpack    =Optionally select a "custom/(pack name)/generation.smp" to change factors that define natural generation
+
+MENU frame-skip                 =frame-skip
+MENU_HINT frame-skip            =Occasionally drop to 30fps instead of slowing down gameplay
+MENU allow_fractional_zoom      =allow fractional zoom
+MENU_HINT allow_fractional_zoom =Frees zoom levels from being locked to integer scaling
+MENU hold_backpack_position     =hold backpack position
+MENU_HINT hold_backpack_position=When closing and opening the backpack, it will stay in the same location instead of reseting to the center of the screen
+MENU null_cancel_movement       =null cancel movement
+#"null cancel movement" comes from a common source engine game script where holding both left and right keys DONT make the player stop. So stopping ("null") is "cancelled"
+MENU_HINT null_cancel_movement  =Changes the behavior when holding both west and east movement keys
+MENU persistent_WAILA           =persistent {WAILA abbreviation}
+MENU_HINT persistent_WAILA      =Shows you "{WAILA spelled_out}" at all times, instead of only when focus-ing
+MENU persistent_research        =persistent research
+MENU_HINT persistent_research   =Keeps a reminder of research progress on screen
+MENU hints                      =Hints
+MENU_HINT hints                 =When finding a new block for the first time, a tip displays
+MENU reset_hints                =Reset Hints
+MENU_HINT reset_hints           =Allows previously displayed tips to display again
+MENU UI_scale                   =UI Scale
+MENU_HINT UI_scale              =Change how big menu elements appear
+MENU autosave_minimum           =Autosave minutes
+MENU_HINT autosave_minimum      =Change how often worlds automatically save in minutes. Zero turns off autosave
+
+MENU volume                     =Volume
+MENU main                       =main
+MENU UI                         =UI
+MENU player                     =player
+MENU block                      =block
+MENU entities                   ={ENTITY entity|s}
+
+MENU generation                 =Generation
+MENU pack                       =Pack
+#pack as in mod-pack. A collection of files that defines a mod.
+MENU_HINT windowtype            =Press apply to change
+MENU text_style                 =font
+MENU_HINT text_style            =Choose a stylized font instead of a cleaner one
+MENU round_view_position        =round view position
+MENU_HINT round_view_position   =May reduce noise when zoomed out at certain resolutions
+MENU press_key_for              =Press key for
+#a BINDABLE will appear after this. So like "press key for jump"
+MENU_HINT input_box             =ESCAPE to cancel\
+BACKSPACE to clear
+#usually keys will use the [] syntax in localization files, but these specific buttons are hard-coded to escape and backspace
+MENU credits                    =Credits
+
+MENU player_customization       =Customize
+MENU_HINT player_customization  =Change how the player looks
+
+MENU hat        =Hat
+ENUM helmet         =Helmet
+ENUM shield         =Shield
+
+MENU head       =Head
+ENUM focus          =Focus
+ENUM young          =Young
+ENUM pro            =Pro
+ENUM alert          =Alert
+#the names of the different heads are just filler text. Focus and Pro have big noses, young and alert have small/nonexistent noses.
+
+MENU pants      =Pants
+MENU shoes      =Shoes
+MENU torso      =Torso
+ENUM short          =Short
+ENUM tall           =Tall
+
+MENU default_inputs         =Default Inputs
+MENU_HINT default_inputs    =Resets all keybindings to factory settings
+
+MENU resume                 =Resume
+MENU save                   =Save
+MENU quit                   =Quit
+MENU main_menu              =Main Menu
+
+MENU you_have_died          =You have died
+MENU respawn                =Respawn
+MENU_HINT respawn           =Find your corpse and collect your items
+MENU load_previous_save     =Load Previous Save
+MENU quit_without_saving    =Quit Without Saving
+
+MENU tutorial_complete      =Tutorial Complete!
+MENU next_tutorial          =Next Tutorial
+MENU select_tutorial        =Select Tutorial
+MENU_HINT_D next_tutorial   =You have completed all tutorial levels in this section!
+
+MENU completed              =completed
+MENU playtime               =playtime
+
+MENU hover_me               =hover me
+#the "me" is the button that displays this text. This button only exists to tell the player that hovering over things can reveal more information
+MENU_HINT hover_me          =You can hover some things in this menu to learn more
+
+MENU options_graphics       =graphics
+MENU_HINT options_graphics  =options for how the game displays things
+MENU options_gameplay       =gameplay
+MENU_HINT options_gameplay  =various gameplay-altering options
+MENU options_camera         =camera
+MENU_HINT options_camera    =tune how the player's position and mouse position alter the screen's position
+MENU options_input          =input
+MENU_HINT options_input     =change what pressing buttons do
+MENU options_sound          =sound
+MENU_HINT options_sound     =change the volume of different sounds
+MENU options_custom         =custom
+MENU_HINT options_custom    =manage content found in "({title} installation folder)/custom/"\
+A restart might be necessary to implement changes
+
+MENU default_camera                     =Default Camera
+MENU_HINT default_camera                =Resets this {MENU options_camera} menu to factory default
+MENU camera_damp_x                      =damp x
+MENU camera_damp_y                      =damp y
+MENU_HINT camera_damp_x                 =sets how slowly the camera snaps to the player. Zero is instant
+MENU_HINT camera_damp_y                 =sets how slowly the camera snaps to the player. Zero is instant
+MENU camera_vel_predict_x               =predict x
+MENU camera_vel_predict_y               =predict y
+MENU_HINT camera_vel_predict_x          =sets how sensitive the camera is to the player velocity
+MENU_HINT camera_vel_predict_y          =sets how sensitive the camera is to the player velocity
+MENU camera_max_screen_dist_x           =max screen x
+MENU camera_max_screen_dist_y           =max screen y
+MENU_HINT camera_max_screen_dist_x      =sets how far the player can move from the center of the screen, with zero being locked to center, and one being anywhere on the screen
+MENU_HINT camera_max_screen_dist_y      =sets how far the player can move from the center of the screen, with zero being locked to center, and one being anywhere on the screen
+MENU camera_platform_snap               =platform snap
+MENU_HINT camera_platform_snap          =When enabled, the Y position of the camera won't follow the player when they jump
+
+MENU camera_mouse_track_header          =Mouse Track
+MENU_HINT camera_mouse_track_header     =When mouse track factor is enabled, the camera will follow the mouse when it is outside a certain radius from the player
+MENU camera_mouse_track_factor          =track factor
+MENU_HINT camera_mouse_track_factor     =sets how closely the camera tracks the mouse when the mouse is far from the player
+MENU camera_mouse_track_radius_scale    =transition radius
+MENU_HINT camera_mouse_track_radius_scale=sets the minimum radius for the camera to start following the mouse, in max-weld-distance scale
+MENU camera_mouse_track_transition_width=transition scale
+MENU_HINT camera_mouse_track_transition_width=sets how wide the transition from not-mouse-tracking to mouse-tracking is
+MENU camera_mouse_track_circular        =circular range
+MENU_HINT camera_mouse_track_circular   =sets if the mouse range to track the mouse is circular or has independant X and Y

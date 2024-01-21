@@ -1,0 +1,96 @@
+INPUT_CATAGORY player           =Player
+INPUT_CATAGORY building         =Building
+#this is not the build mode "building", its just a category for all the building and welding stuff
+INPUT_CATAGORY inventory        =Inventory
+INPUT_CATAGORY cheats           =Cheats
+INPUT_CATAGORY other            =Other
+
+BINDABLE +west                  =move west
+BINDABLE_HINT +west             =Moves the player towards the left side of the screen.\
+Also used to control {BLOCK chair_pilot|s}
+BINDABLE +east                  =move east
+BINDABLE_HINT +east             =Moves the player towards the right side of the screen.\
+Also used to control {BLOCK chair_pilot|s}
+#Screen left / screen right is called east and west
+
+BINDABLE +up                    =player up
+BINDABLE_HINT +up               =Used to control {BLOCK chair_pilot|s} and noclip flying
+BINDABLE +down                  =player down
+BINDABLE_HINT +down             =Ducking makes you move slower and unfreezes placed blocks.\
+Also used to control {BLOCK chair_pilot|s} and noclip flying
+BINDABLE +jump                  =jump
+BINDABLE_HINT +jump             =Hold to jump higher
+BINDABLE +place                 =place
+BINDABLE_HINT +place            =Moves blocks from your hand to the world or backpack
+BINDABLE +remove                =remove
+BINDABLE_HINT +remove           =Moves blocks from the world or backpack into your hand
+BINDABLE rotate_right           =rotate right
+BINDABLE_HINT rotate_right      =Rearranges the blocks in your hand. When [build_mode_not] is held, it flips instead of rotating
+BINDABLE rotate_left            =rotate left
+BINDABLE_HINT rotate_left       =Rearranges the blocks in your hand. When [build_mode_not] is held, it flips instead of rotating
+BINDABLE adjust                 =adjust
+BINDABLE_HINT adjust            =Interacts with specific blocks
+BINDABLE build_scan             =focus
+BINDABLE_HINT build_scan        =Places a tag on a block so it can be monitored in detail
+BINDABLE hud_slot0              =holster
+BINDABLE_HINT hud_slot0         =Attempts to move anything in your hand into your backpack
+BINDABLE build_mode_weld        =mode weld
+BINDABLE_HINT build_mode_weld   =Puts you in welding mode
+BINDABLE build_mode_build       =mode build
+BINDABLE_HINT build_mode_build  =Puts you in building mode
+BINDABLE +build_mode_not        =mode hold
+BINDABLE_HINT +build_mode_not   =While holding this key, you are in the other building mode
+BINDABLE build_mode_toggle      =mode toggle
+BINDABLE_HINT build_mode_toggle =Toggles build mode
+BINDABLE +build_modifier         =advanced build
+BINDABLE_HINT +build_modifier    =While holding this key, some build actions do more
+BINDABLE exit_chair             =exit chair
+BINDABLE_HINT exit_chair        =The only way to escape from a chair. This is not necessarily the same as the jump key
+BINDABLE open_backpack          =open backpack
+BINDABLE_HINT open_backpack     =Opens and closes a box to store things in. When you pick something up when your hotbar is full or use the holster key, items will automatically end up here
+BINDABLE pick_block             =swap block
+BINDABLE_HINT pick_block        =Trys to pull the type of block the mouse is hovering over out of your backpack. This key also works while interacting with menus, especially the guidebook
+BINDABLE open_guidebook         =open guide
+BINDABLE_HINT open_guidebook    =Opens and closes a menu that shows how to make different blocks
+BINDABLE open_guidebook_hover   =guide this
+BINDABLE_HINT open_guidebook_hover=Opens the guidebook page for the block the mouse is hovering over
+BINDABLE open_research          =open research
+BINDABLE_HINT open_research     =Opens and closes a menu that shows how to unlock new recipes
+BINDABLE noclip                 =noclip
+BINDABLE_HINT noclip            =Allows flight through blocks. Turning this off while in a block can cause suffocation damage
+BINDABLE give_all               =give blocks
+BINDABLE_HINT give_all          =Gives 10 of every block. Repeat presses increase the amount
+BINDABLE build_duplicate        =duplicate
+BINDABLE_HINT build_duplicate   =Increases the stack size of whatever is in your hand
+BINDABLE build_reduce           =reduce
+BINDABLE_HINT build_reduce      =Decreases the stack size of whatever is in your hand. At zero, the blocks get removed
+BINDABLE show_messages          =show messages
+BINDABLE_HINT show_messages     =Toggles between showing all recent messages and hiding them. When recent messages are hidden, new messages still appear as normal
+BINDABLE zoom_in                =zoom in
+BINDABLE_HINT zoom_in           =Moving the camera closer shows more detail
+BINDABLE zoom_out               =zoom out
+BINDABLE_HINT zoom_out          =Moving the camera farther shows less detail
+BINDABLE hud_slot1              =slot 1
+BINDABLE hud_slot2              =slot 2
+BINDABLE hud_slot3              =slot 3
+BINDABLE hud_slot4              =slot 4
+BINDABLE hud_slot5              =slot 5
+BINDABLE hud_slot6              =slot 6
+BINDABLE hud_slot7              =slot 7
+BINDABLE hud_slot8              =slot 8
+BINDABLE hud_slot9              =slot 9
+BINDABLE_HINT hud_slot1         =Selects the 1st slot on the hotbar
+BINDABLE_HINT hud_slot2         =Selects the 2nd slot on the hotbar
+BINDABLE_HINT hud_slot3         =Selects the 3rd slot on the hotbar
+BINDABLE_HINT hud_slot4         =Selects the 4th slot on the hotbar
+BINDABLE_HINT hud_slot5         =Selects the 5th slot on the hotbar
+BINDABLE_HINT hud_slot6         =Selects the 6th slot on the hotbar
+BINDABLE_HINT hud_slot7         =Selects the 7th slot on the hotbar
+BINDABLE_HINT hud_slot8         =Selects the 8th slot on the hotbar
+BINDABLE_HINT hud_slot9         =Selects the 9th slot on the hotbar
+BINDABLE quick_new_world        =fast new world
+#the new world isn't fast, just the creation of the new world is fast because you only press 1 button
+BINDABLE_HINT quick_new_world   =Instantly creates a new world with default settings. Does not save any old world
+BINDABLE gif_ui                 =record a GIF
+#gif as in the standard image format
+BINDABLE_HINT gif_ui            =Opens a menu for recording gifs. You can select the range and time span (in block ticks), and lock the gif camera to a moving block

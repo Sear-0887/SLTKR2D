@@ -1,0 +1,20 @@
+CREDITS roody2d={title}\
+	redinator2000\
+	James Liam Keough
+CREDITS fonts=Fonts\
+	PressStart2P by Cody "CodeMan38" Boisclair\
+	ShareTechMono-Regular by Carrois Apostrophe
+CREDITS sounds=Sound Creators from freesound.org\
+	EminYILDIRIM\
+	ingudios\
+	ivolipa\
+	Owlish Media\
+	PaulMorek\
+	Robinhood76
+CREDITS discord_contributors=Discord Alpha Contributors\
+	asof\
+	Dredonkey\
+	iota\
+	Logistikalism\
+	RbCaVi\
+	Sear

@@ -1,0 +1,148 @@
+CAMPAIGN introduction           =Introduction
+CAMPAIGN_HINT introduction      =Everything you need to know to get started playing
+CAMPAIGN encyclopedia           =Encyclopedia
+CAMPAIGN_HINT encyclopedia      =A showcase of specific mechanics
+#the "encyclopedia" is tedious and unnecessary to start playing, unlike the introduction. The introduction/encyclopedia names should guide players into only playing the introduction at first, and then maybe checking out the encyclopedia later
+
+TEMPLATE_WORLD basics           =Basics
+TUTORIAL basics_level           ={title} has unconventional building mechanics, so building requires unconventional controls.
+
+TUTORIAL movement 1             =Use [+west] or [+east] to move.
+TUTORIAL movement 2             =Use [+jump] to jump. Hold [+jump] to jump higher.
+TUTORIAL adjust 1               =Use [adjust] to interact with {BLOCK toggler|s} with your mouse.
+TUTORIAL adjust 1.5             =Hover your mouse over the {BLOCK toggler} in the wall. It has a red dot and arrows " <-- " point towards it.
+TUTORIAL adjust 2               =You can also use [+place] if your mouse isn't holding any blocks.
+TUTORIAL detector               ={BLOCK detector|^s} turn on when the player or another creature is contacting it.
+TUTORIAL movement 3             =Use [+down] to drop through {BLOCK platform|s}.
+TUTORIAL options                =Pause [menu_pause_back] and open the options to review and change key bindings.
+TUTORIAL movement 4             =Hold [+down] to move slowly.
+
+TUTORIAL building 1             =When your mask is down, you are in welding mode. Hold [+remove] to unweld this wall.
+#"weld"ing is a critical term in Roody:2d. Aligns with BINDABLE_HINT build_mode_weld
+TUTORIAL building 2             =When your mask is up, you are in building mode. Hold [+remove] to pick up these blocks.
+#"building mode" is the opposite of "welding mode". Aligns with BINDABLE build_mode_build
+TUTORIAL building 3             =Modes can be toggled by holding [+build_mode_not] or tapping [build_mode_toggle].
+TUTORIAL building 4             =Building mode makes [+place] place blocks. Welding mode makes [+place] weld blocks.
+
+TUTORIAL building 5             =If you prefer to use SHIFT for changing modes (like I do), I suggest turning off sticky keys or changing the "mode hold" keybinding
+#SHIFT key is the only key with the sticky-keys problem on windows computers
+#this has a more casual tone than other tutorial messages. "I" am personally recommending to use the SHIFT key
+
+TUTORIAL building 6             =When in building mode, the scroll wheel selects the hotbar, an alternative to [hud_slot1],[hud_slot2],[hud_slot3], etc.
+TUTORIAL building 7             =When in welding mode, the scroll wheel acts as a zoom, an alternative to [zoom_in]/[zoom_out].
+
+TUTORIAL building 9             =Build some stairs to get up. Placed blocks will be frozen until you move or duck [+down], so you need to weld them.
+
+TUTORIAL building 10            =You can pick up entire structures [+remove] and then rotate them with [rotate_right] and [rotate_left].
+#"structure" as in a cluster of blocks welded together
+TUTORIAL building 11            =Place structures in your backpack [open_backpack].\
+If they match exactly (including rotation), they will stack in the same slot.
+#"structure" as in a cluster of blocks welded together
+TUTORIAL building 12            =You can also holster with [hud_slot0] to quickly send what you are holding to the backpack.
+
+TEMPLATE_WORLD crafting         =Crafting
+TUTORIAL crafting_level         =This level will teach how to unlock recipes and craft items.
+#there isn't a specific "crafting" mechanic in Roody:2d. "Crafting" is just a broad term for multiple mechanics such as using the combiner, extractor, arc furnace, injector, etc.
+
+RESEARCH research_intro         =Research Intro
+HINT_RESEARCH research_intro    =In the top left of your screen, you can see your next objective to insert into the {BLOCK collector}.
+TUTORIAL mining=Cut out a tunnel to get the {BLOCK iron_vein}.
+RESEARCH extractor              =Extractor
+#should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
+HINT_RESEARCH extractor         =Tap [show_messages] to hide/show recent messages.
+RESEARCH arc_furnace            =Arc Furnace
+#should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
+HINT_RESEARCH arc_furnace       =As you unlock more recipes, they will show up in the guidebook [open_guidebook].
+RESEARCH iron_bar               =Iron Bar
+#should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
+HINT_RESEARCH iron_bar          =The {BLOCK combiner} combines blocks into new blocks. This is how more advanced blocks are created.
+
+TEMPLATE_WORLD wires            =Wires
+TUTORIAL wires_level            =To make fully automatic machines in {title}, you will need to become at least a little bit familiar with the wire {BLOCK_STATE charge} system.\
+This level gives various tips of various usefulness.
+
+TUTORIAL lamp 1                 ={BLOCK lamp|^s} will light an area for a limited amount of time before extinguishing.
+TUTORIAL lamp 2                 =You can pick up and place a {BLOCK lamp} to reset this timer.
+TUTORIAL lamp 3                 =Connecting a {BLOCK lamp} to a {BLOCK_STATE charge} source allows it to stay on indefinitely.
+
+TUTORIAL charge 1               =Many machines either need a wire {BLOCK_STATE charge} to run or change their behavior when given a wire {BLOCK_STATE charge}.
+
+TUTORIAL focus 1                =Hover your mouse over a block to view its information in the {WAILA abbreviation} in the top-right of the screen.\
+("{WAILA spelled_out}")
+TUTORIAL focus 2                =Press [build_scan] on a block so the {WAILA abbreviation} keeps focus on one block.
+TUTORIAL focus 3                =Press [open_guidebook_hover] while hovering over a block to see its function and recipe.
+
+TUTORIAL charge 2               =Wire signals can be modified with circuit components. Most circuit components have a small delay.
+TUTORIAL charge 3               =Wire {BLOCK_STATE charge} decays over lengths of wire.
+TUTORIAL charge 4               =Try different {BLOCK sensor} modes by pressing [adjust] over the {BLOCK sensor}. It will read different aspects of the observed block.
+TUTORIAL matcher                =The {BLOCK matcher} sends a signal if the 2 adjacent blocks are the same.
+
+TUTORIAL wire_connection 1      ={BLOCK wire|^s} need to be welded to work.
+TUTORIAL wire_connection 2      =Some blocks do not interact with {BLOCK wire|s}, even when welded.
+
+TEMPLATE_WORLD natural_processes=Natural Processes
+#grass growing, trees growing, fire spreading: these are all "natural processes"
+
+TUTORIAL grass 1                =Well-lit {BLOCK dirt} will spread grass to other {BLOCK dirt}.
+TUTORIAL grass 2                =(eventually...)
+
+TUTORIAL tree 1                 =Connecting a log and a leaf into some {BLOCK dirt} will grow a tree.
+TUTORIAL tree 2                 =Leaves will some times connect to nearby leaves, even if they belong to another tree.
+TUTORIAL tree 3                 =An {BLOCK arc_furnace} can light leaves on fire. The fire will rapidly destroy all connected leaves.
+
+TUTORIAL chair 1                =When sitting in a {BLOCK chair} [down], time will seem to pass by more quickly. Keep in mind that working on something else is usually better than waiting around.
+
+TEMPLATE_WORLD movement_and_cores=Movement and Cores
+
+TUTORIAL push 1                 =Gravity and some blocks can push individual blocks or welded structures.
+#"structure" as in a cluster of blocks welded together
+TUTORIAL roller 1               =When the center of a {BLOCK roller} isn't fixed to anything, it will spin freely, effectively disabling the {BLOCK roller}.
+TUTORIAL roller 2               ={BLOCK roller|^s} moving in opposition won't push each-other. {BLOCK roller|^s} can't get traction on powder.
+TUTORIAL roller 3               =Blocks immune to gravity won't get traction on top of a {BLOCK roller}.
+TUTORIAL roller 4               ={BLOCK roller|^s} can push blocks in other directions, if they are clamped together.
+TUTORIAL roller 5               ={BLOCK roller|^s} can get traction for an instant when a block slams into it.
+
+TUTORIAL core 1                 =Some cores and {BLOCK residue} can resist some types of movement.
+TUTORIAL core 2                 ={BLOCK refined_core|s^}, {BLOCK boundary|s}, {BLOCK spawner|s}, recently placed bocks, and some naturally generated {BLOCK stone} cannot move at all. Note that you cannot pick up {BLOCK spawner|s}.
+TUTORIAL core 3                 ={BLOCK raw_core|s^} always move with other {BLOCK raw_core|s} 3 blocks away. The {BLOCK telecross} also moves with raw core grids.
+
+TUTORIAL push 2                 =Competing forces are decided by update order. Gravity is always applied last.
+TUTORIAL push 3                 =Update order is often arbitrary, but never random (unless interacting with random blocks like trees, {BLOCK sand}, {BLOCK water}).
+TUTORIAL push 4                 =In this example, the {BLOCK roller} or the {BLOCK magnet} could both simultaneously move the block. If there is an update race like this, the race might be decided by orientation, save/loading, recent movements, or the order a machine was built.
+TUTORIAL push 5                 =I hope these frustrating situations are mostly avoidable, and being an early access game, these behaviors can change in future updates. The "debug_draw" cheat can sometimes help for now.
+#this has a more casual tone than other tutorial messages. "I" am working on developing the early access game
+
+TUTORIAL chair 2                =With {BLOCK roller|s} and a {BLOCK chair_pilot}, you can build a vehicle.
+
+TEMPLATE_WORLD water            =Water
+
+TUTORIAL water 1                ={BLOCK water|^} will flow to always be a consistent volume.
+TUTORIAL water 2                ={BLOCK water|^} will try to take the path of least resistance.
+TUTORIAL water 3                =Most blocks will sink in {BLOCK water}. Dry {BLOCK foam} does not.
+TUTORIAL water 4                =When {BLOCK foam} is forced under {BLOCK water}, it becomes {BLOCK_STATE wet}. This may or may not consume the above {BLOCK water}, depending on a random chance.
+TUTORIAL water 5                ={BLOCK water|^} can be extracted from {BLOCK_STATE wet} {BLOCK foam}. This {BLOCK foam} cycle will eventually produce new {BLOCK water}.
+
+TEMPLATE_WORLD automation       =Automation
+
+TUTORIAL automation 1           =You may find yourself repeating some tasks.
+TUTORIAL building 20            =When dealing with many individual blocks, use [hud_slot0] to holster your hand and [pick_block] to quickly pick a block.
+TUTORIAL automation 2           =Different designs might be cheaper, or smaller, or easier to build, or able to handle inconsistent supply, or faster to turn on/off, or movable, etc.
+TUTORIAL freeze vein            =When you first place an {BLOCK iron_vein}, it will be frozen and cannot be extracted or otherwise interacted. Move or duck [+down] to unfreeze.
+
+TEMPLATE_WORLD research         =Research
+
+TUTORIAL research 1             =Many recipes [open_guidebook] will not initially be available.
+TUTORIAL research 2             =Press [open_research] to view the research tree.
+TUTORIAL research 3             =If a research is available, the {BLOCK collector} will collect. Put 10 sand in the {BLOCK collector}.
+TUTORIAL research 4             =Research objectives can unlock recipes and passive player upgrades. Unlock {RESEARCH rubber} with 5 {BLOCK pulp} and upgrade your jump height.
+TUTORIAL research 5             =The research tree menu [open_research] is only a guide. You select what research to unlock simply by putting correct materials in the {BLOCK collector}.
+TUTORIAL research 6             =Try to unlock everything! Advanced research will require a large amount of materials. Automate it.
+
+TEMPLATE_WORLD demo_world=Demo World
+
+DEMO intro                      =Here you can quickly go through the research tree [open_research] up to {RESEARCH automated_crafting}
+DEMO matcher_furnace            =Can you fix this automatic furnace? Remember you can see the function of a block with [open_guidebook_hover]
+#automatic arc furnace
+DEMO automate                   =There should be enough here to build some machines to automate 100 {BLOCK copper_bar|s}, 100 {BLOCK iron_bar|s}, and 100 {BLOCK wafer|s}.
+DEMO boundary                   =In the full game, you can generate infinite worlds
+#DEMO boundary - appears when the player reaches the edge of the small play space in the demo

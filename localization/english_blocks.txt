@@ -1,0 +1,548 @@
+#the BLOCK_TITLE is just capitalized versions of BLOCK. Used at the top of the guidebook, for example
+BLOCK air                       =air
+BLOCK_TITLE air                 =Air
+BLOCK_TUTORIAL air              =It's empty space for you to build.
+
+BLOCK command_block             =command block
+BLOCK_TITLE command_block       =Command Block
+BLOCK_TUTORIAL command_block    ={GUIDEBOOK_CATEGORY none|^}. Executes a command, usually used for tutorial messages.
+
+BLOCK boundary                  =boundary
+BLOCK_TITLE boundary            =Boundary
+BLOCK_TUTORIAL boundary         ={GUIDEBOOK_CATEGORY none|^}. You can't break it, usually used for tutorial worlds.
+
+BLOCK creator                   =creator
+BLOCK_TITLE creator             =Creator
+BLOCK_TUTORIAL creator          ={GUIDEBOOK_CATEGORY none|^}. Duplicates blocks at an {BLOCK_STATE interval} decided by incoming {BLOCK_STATE charge}, up to 15.
+
+BLOCK spawner                   =spawner
+BLOCK_TITLE spawner             =Spawner
+BLOCK_TUTORIAL spawner          =Spawns {ENTITY entity|s}. Can only be found in large structures along the surface.
+#"structure" as in a large building
+
+
+#natural category
+
+BLOCK dirt                      =dirt
+BLOCK_TITLE dirt                =Dirt
+BLOCK_TUTORIAL dirt             =Grass will spread better with {BLOCK_STATE light}.
+
+BLOCK grass                     =grass
+BLOCK_TITLE grass               =Grass
+BLOCK_TUTORIAL grass            =Plant matter that can be squished into nothing.
+
+BLOCK sediment                  =sediment
+BLOCK_TITLE sediment            =Sediment
+BLOCK_TUTORIAL sediment         =It's not quite {BLOCK dirt} and not quite {BLOCK stone}.
+
+BLOCK stone                     =stone
+BLOCK_TITLE stone               =Stone
+BLOCK_TUTORIAL stone            =You can find valuable resources deep in the {BLOCK stone}. When {BLOCK stone} is naturally generated, it can be immune to movement.
+
+BLOCK iron_vein                 =iron vein
+BLOCK_TITLE iron_vein           =Iron Vein
+BLOCK_TUTORIAL iron_vein        =It's a dense collection of infinite {BLOCK iron_ore} for you to extract.
+
+BLOCK iron_ore                  =iron ore
+BLOCK_TITLE iron_ore            =Iron Ore
+BLOCK_TUTORIAL iron_ore         =This needs to be processed with an {BLOCK arc_furnace} before it's of any use.
+
+BLOCK copper_vein               =copper vein
+BLOCK_TITLE copper_vein         =Copper Vein
+BLOCK_TUTORIAL copper_vein      =It's a dense collection of infinite {BLOCK copper_ore} for you to extract.
+
+BLOCK copper_ore                =copper ore
+BLOCK_TITLE copper_ore          =Copper Ore
+BLOCK_TUTORIAL copper_ore       =This needs to be processed with an {BLOCK arc_furnace} before it's of any use.
+
+BLOCK sand                      =sand
+BLOCK_TITLE sand                =Sand
+BLOCK_TUTORIAL sand             =This block won't connect to any other. Don't try to tower it up too high.\
+Use an {BLOCK arc_furnace} to turn it into {BLOCK silicon} and then {BLOCK glass}.
+#sand, pulp, and sawdust have similar properties
+
+BLOCK leaf_maple                =maple leaf
+BLOCK_TITLE leaf_maple          =Maple Leaf
+BLOCK_TUTORIAL leaf_maple       =Flammable
+
+BLOCK log_maple                 =maple log
+BLOCK_TITLE log_maple           =Maple Log
+BLOCK_TUTORIAL log_maple        =For a rustic look.
+
+BLOCK leaf_pine                 =pine needle
+BLOCK_TITLE leaf_pine           =Pine Needle
+BLOCK_TUTORIAL leaf_pine        =Flammable
+
+BLOCK log_pine                  =pine log
+BLOCK_TITLE log_pine            =Pine Log
+BLOCK_TUTORIAL log_pine         =For a rustic look.
+
+BLOCK water                     =water
+BLOCK_TITLE water               =Water
+BLOCK_TUTORIAL water            =Flows out of the way.\
+Can be found naturally along the world surface before researching {RESEARCH rehydration}.
+
+BLOCK snow                      =snow
+BLOCK_TITLE snow                =Snow
+BLOCK_TUTORIAL snow             =Frozen matter that can be squished into nothing.
+
+#material catagory
+
+BLOCK iron_bar                  =iron bar
+BLOCK_TITLE iron_bar            =Iron Bar
+BLOCK_TUTORIAL iron_bar         =A useful material.
+#this BLOCK_TUTORIAL is useless filler text
+
+BLOCK iron_plate                =iron plate
+BLOCK_TITLE iron_plate          =Iron Plate
+BLOCK_TUTORIAL iron_plate       =A worked material.
+#"A worked material" hints that this is is slightly more complex to make
+
+BLOCK cast_iron                 =cast iron
+BLOCK_TITLE cast_iron           =Cast Iron
+BLOCK_TUTORIAL cast_iron        =A solid material.
+#this BLOCK_TUTORIAL is useless filler text
+
+BLOCK oxide                     =oxide
+BLOCK_TITLE oxide               =Oxide
+BLOCK_TUTORIAL oxide            =A rough material. Needs {BLOCK air}, {BLOCK water}, and time to form.
+#"Rough material" hints that this is used in recipes to make cutting/grinding machines
+
+BLOCK copper_bar                =copper bar
+BLOCK_TITLE copper_bar          =Copper Bar
+BLOCK_TUTORIAL copper_bar       =A heavy material.
+#this BLOCK_TUTORIAL is useless filler text
+
+BLOCK wire_spool                =wire spool
+BLOCK_TITLE wire_spool          =Wire Spool
+BLOCK_TUTORIAL wire_spool       =A packaged material
+#lampshading at the fact that despite only being made out of copper, the sprite appears to have packaging not made out of copper
+
+BLOCK silicon                   =silicon
+BLOCK_TITLE silicon             =Silicon
+BLOCK_TUTORIAL silicon          =A delicate material.
+#hints at the mechanic that silicon shatters if it is dropped and lands on the ground
+
+BLOCK wafer                     =wafer
+BLOCK_TITLE wafer               =Wafer
+BLOCK_TUTORIAL wafer            =A necessary base for electrical components.
+
+BLOCK pulp                      =pulp
+BLOCK_TITLE pulp                =Pulp
+BLOCK_TUTORIAL pulp             =This block won't connect to any other. Don't try to tower it up too high.\
+Use an {BLOCK arc_furnace} to turn it into {BLOCK rubber}.
+#sand, pulp, and sawdust have similar properties
+
+BLOCK rubber                    =rubber
+BLOCK_TITLE rubber              =Rubber
+BLOCK_TUTORIAL rubber           =A non-magnetic material.
+#rubber has a special interaction with the magnet block
+
+BLOCK sawdust                   =sawdust
+BLOCK_TITLE sawdust             =Sawdust
+BLOCK_TUTORIAL sawdust          =This block won't connect to any other. Don't try to tower it up too high.\
+Put into an {BLOCK injector} to fertilize {BLOCK dirt} or turn {BLOCK oxide} into {BLOCK sediment}.
+#sand, pulp, and sawdust have similar properties
+
+BLOCK calcium_bar               =calcium bar
+BLOCK_TITLE calcium_bar         =Calcium Bar
+BLOCK_TUTORIAL calcium_bar      =A spooky material.\
+{ENTITY chomer|^s} can be found by exploring east and west.
+#calcium bar is the bone material in Roody:2d
+#the "spooky" reference is probably very english-western
+#this material is gained by killing the "chomer" monster. Calcium is often associated with bones and skeletons. Skeletons are parts of dead things, and skeletons are "spooky", So calcium bar is spooky.
+#if there isn't an adjective heavily associated with bones and skeletons like "spooky" when localizing, then something generic like "A biological material" would work.
+#"exploring east and west" is literal. Screen left / screen right is called east and west, and the player can only find chomers by going east and west, not up and down
+
+BLOCK peltmellow                =peltmellow
+BLOCK_TITLE peltmellow          =Peltmellow
+BLOCK_TUTORIAL peltmellow       =A spongy material.\
+{ENTITY bushbert|^s} can be found by exploring east and west.
+#"exploring east and west" is literal. Screen left / screen right is called east and west, and the player can only find chomers by going east and west, not up and down
+
+BLOCK compressed_stone          =compressed stone
+BLOCK_TITLE compressed_stone    =Compressed Stone
+BLOCK_TUTORIAL compressed_stone =A way to store large amounts of {BLOCK stone} slightly inefficiently.
+#25 stone can be turned into 1 compressed stone, and 1 compressed stone can be turned into 24 stone. This is "slightly inefficient", and this BLOCK_TUTORIAL should help the player notice this
+
+
+#building catagory
+
+BLOCK frame                     =frame
+BLOCK_TITLE frame               =Frame
+BLOCK_TUTORIAL frame            =It's cheap and it doesn't get in your way.
+
+BLOCK platform                  =platform
+BLOCK_TITLE platform            =Platform
+BLOCK_TUTORIAL platform         =Something to stand on.\
+Fall through with [down].
+
+BLOCK lamp                      =lamp
+BLOCK_TITLE lamp                =Lamp
+BLOCK_TUTORIAL lamp             =Emits a temporary light when placed.\
+Emits a permanent light when {BLOCK_STATE charge|d}.
+
+BLOCK display                   =display
+BLOCK_TITLE display             =Display
+BLOCK_TUTORIAL display          =A single {BLOCK display} shows a single {BLOCK_STATE character}.\
+{BLOCK_STATE charge|^} disables it.\
+Edit with [adjust] [menu_pause_back], or tune with [adjust_decrease] [adjust_increase].
+
+BLOCK cap                       =cap
+BLOCK_TITLE cap                 =Cap
+BLOCK_TUTORIAL cap              =It can only be connected at its base.
+
+BLOCK chair                     =chair
+BLOCK_TITLE chair               =Chair
+BLOCK_TUTORIAL chair            =So relaxing, time just seems to slip away when you sit [down] in it. [exit_chair] to exit.
+#sitting in a chair is the fast forward button in RoodyL:2d
+
+BLOCK chair_pilot               =pilot chair
+BLOCK_TITLE chair_pilot         =Pilot Chair
+BLOCK_TUTORIAL chair_pilot      =Protocol 1: Link to Pilot.\
+[down] [exit_chair]
+#This is a direct quote from Titanfall 2, a mech game https://titanfall2.fandom.com/wiki/BT-7274
+#it hints that the chair_pilot can be used to manually drive a machine "link to pilot", and that the machine could resemble a giant robot
+#the quote is also in a technical/informative tone, so it fits with the rest of the BLOCK_TUTORIAL
+#localizing this line should probably still be a direct quote from the translation Titanfall 2 uses, or be another famous quote about piloting a giant robot.
+
+BLOCK spikes                    =spikes
+BLOCK_TITLE spikes              =Spikes
+BLOCK_TUTORIAL spikes           =Damages {ENTITY entity|s}.
+
+BLOCK foam                      =foam
+BLOCK_TITLE foam                =Foam
+BLOCK_TUTORIAL foam             =Floats on {BLOCK water} unless it gets {BLOCK_STATE wet}.
+
+BLOCK adobe                     =adobe
+BLOCK_TITLE adobe               =Adobe
+BLOCK_TUTORIAL adobe            =A solid foundation.
+#this BLOCK_TUTORIAL is useless filler text
+
+
+#wire catagory
+
+BLOCK wire                      =wire
+BLOCK_TITLE wire                =Wire
+BLOCK_TUTORIAL wire             =A {BLOCK wire} conducts a {BLOCK_STATE charge} up to 255. Decays the input {BLOCK_STATE charge} by 1.
+
+BLOCK wire_board                =wire board
+BLOCK_TITLE wire_board          =Wire Board
+BLOCK_TUTORIAL wire_board       =A {BLOCK wire} with a nice backing.
+
+BLOCK port                      =port
+BLOCK_TITLE port                =Port
+BLOCK_TUTORIAL port             =A {BLOCK port} is a {BLOCK wire} that can connect to another {BLOCK port} without being welded.
+
+BLOCK inductor                  =inductor
+BLOCK_TITLE inductor            =Inductor
+BLOCK_TUTORIAL inductor         ={BLOCK_STATE charge|^s} every block next to it, regardless if they are welded or not.
+
+BLOCK diode                     =diode
+BLOCK_TITLE diode               =Diode
+BLOCK_TUTORIAL diode            =Allows {BLOCK_STATE charge} to only flow in one direction, after a short delay.
+
+BLOCK cascade                   =cascade
+BLOCK_TITLE cascade             =Cascade
+BLOCK_TUTORIAL cascade          =Adds delay to signals.\
+Adjust {BLOCK_STATE delay} with [adjust].
+
+BLOCK potentiometer             =potentiometer
+BLOCK_TITLE potentiometer       =Potentiometer
+BLOCK_TUTORIAL potentiometer    =Allows only a limited amount of {BLOCK_STATE charge} to flow.\
+Adjust {BLOCK_STATE setting} with [adjust].
+
+BLOCK transistor                =transistor
+BLOCK_TITLE transistor          =Transistor
+BLOCK_TUTORIAL transistor       =Inverts signals:\
+When {BLOCK_STATE charge|d} from any of the three input sides, the output is off.
+
+BLOCK latch                     =latch
+BLOCK_TITLE latch               =Latch
+BLOCK_TUTORIAL latch            =The output only changes to the back input when the {BLOCK latch} is {BLOCK_STATE charge|d} from the side.
+
+BLOCK galvanometer              =galvanometer
+BLOCK_TITLE galvanometer        =Galvanometer
+BLOCK_TUTORIAL galvanometer     =If the left and right inputs are imbalanced, it selects the higher {BLOCK_STATE charge} and then subtracts the back input.
+
+BLOCK counter                   =counter
+BLOCK_TITLE counter             =Counter
+BLOCK_TUTORIAL counter          =Counts {BLOCK_STATE charge} pulses entering back side. When the {BLOCK_STATE count} reaches the {BLOCK_STATE setting}, it lets the last pulse through, then resets.\
+Adjust {BLOCK_STATE setting} with [adjust].\
+{BLOCK_STATE charge|^} from the left or right side resets the {BLOCK_STATE count}.
+
+BLOCK capacitor                 =capacitor
+BLOCK_TITLE capacitor           =Capacitor
+BLOCK_TUTORIAL capacitor        =Can hold a {BLOCK_STATE charge} for a time.
+
+
+#sensor catagory
+
+BLOCK toggler                   =toggler
+BLOCK_TITLE toggler             =Toggler
+BLOCK_TUTORIAL toggler          =Take control of your machines and use adjust [adjust] to toggle {BLOCK_STATE charge}.
+
+BLOCK trigger                   =trigger
+BLOCK_TITLE trigger             =Trigger
+BLOCK_TUTORIAL trigger          =Sends a {BLOCK_STATE charge} when it sees a block.\
+Does not detect {BLOCK glass}.
+
+BLOCK sensor                    =sensor
+BLOCK_TITLE sensor              =Sensor
+BLOCK_TUTORIAL sensor           =Read the state of a block.\
+Adjust [adjust] it to change {BLOCK_STATE mode}.
+
+BLOCK detector                  =detector
+BLOCK_TITLE detector            =Detector
+BLOCK_TUTORIAL detector         =Sends a {BLOCK_STATE charge} when a {ENTITY entity} stands inside of it. Also works as a {BLOCK wire}.
+
+BLOCK matcher                   =matcher
+BLOCK_TITLE matcher             =Matcher
+BLOCK_TUTORIAL matcher          =Sends a {BLOCK_STATE charge} when the two adjacent blocks match.
+
+BLOCK accelerometer             =accelerometer
+BLOCK_TITLE accelerometer       =Accelerometer
+BLOCK_TUTORIAL accelerometer    =Sends a {BLOCK_STATE charge} when it's moving along that axis.
+#axis as in x axis or y axis. The accelerometer can be rotated to align with either axis
+
+#machine catagory
+
+BLOCK extractor                 =extractor
+BLOCK_TITLE extractor           =Extractor
+BLOCK_TUTORIAL extractor        =Pulls more refined resources from ore veins and grinds some other blocks.\
+Needs a {BLOCK_STATE charge} to function.
+
+BLOCK arc_furnace               =arc furnace
+BLOCK_TITLE arc_furnace         =Arc Furnace
+BLOCK_TUTORIAL arc_furnace      =Creates an extreme amount of heat, enough to reach the melting temperatures of some useful metals.\
+Provides a {BLOCK_STATE charge} when processing.
+
+BLOCK combiner                  =combiner
+BLOCK_TITLE combiner            =Combiner
+BLOCK_TUTORIAL combiner         =A vital machine used to collapse structures into more advanced blocks.\
+Needs a {BLOCK_STATE charge} to function.
+#"structure" as in a cluster of blocks welded together
+
+BLOCK motor                     =motor
+BLOCK_TITLE motor               =Motor
+BLOCK_TUTORIAL motor            =Rotates loose blocks when given a {BLOCK_STATE charge}.
+
+BLOCK manipulator               =manipulator
+BLOCK_TITLE manipulator         =Manipulator
+BLOCK_TUTORIAL manipulator      =Copies the adjustable [adjust] {BLOCK_STATE setting|s} from one block to another.\
+Disabled when {BLOCK_STATE charge|d} from the side.
+
+BLOCK mantler                   =mantler
+BLOCK_TITLE mantler             =Mantler
+BLOCK_TUTORIAL mantler          =Welds the sides of a block to adjacent blocks.\
+{BLOCK_STATE charge|^} disables it.
+#the mantler is the opposite of the dismantler. it creates welds.
+#"weld" is a very specific jargon term, so the "mantler" gets its own unique word instead of being called the "welder machine"
+
+BLOCK dismantler                =dismantler
+BLOCK_TITLE dismantler          =Dismantler
+BLOCK_TUTORIAL dismantler       =Grinds away any connections on a block.\
+{BLOCK_STATE charge|^} disables it.
+#the dismantler dismantles. it removes welds
+#"unweld" is a very specific jargon term, so the "dismantler" gets its own unique word instead of being called the "unwelder machine"
+
+BLOCK destroyer                 =destroyer
+BLOCK_TITLE destroyer           =Destroyer
+BLOCK_TUTORIAL destroyer        =Grinds away any connections on a block, and the block.\
+Needs a {BLOCK_STATE charge} to function.
+
+BLOCK collector                 =collector
+BLOCK_TITLE collector           =Collector
+BLOCK_TUTORIAL collector        =Collects research samples to find recipes for new blocks.
+
+BLOCK roller                    =roller
+BLOCK_TITLE roller              =Roller
+BLOCK_TUTORIAL roller           =When its center is fixed, it rolls other blocks along.\
+Set {BLOCK_STATE direction} by adjusting it [adjust].\
+{BLOCK_STATE charge|^} disables it.
+
+BLOCK dynamic_roller            =dynamic roller
+BLOCK_TITLE dynamic_roller      =Dynamic Roller
+BLOCK_TUTORIAL dynamic_roller   =Set {BLOCK_STATE base} {BLOCK_STATE direction} by adjusting it [adjust].\
+{BLOCK_STATE charge|^} changes {BLOCK_STATE active} {BLOCK_STATE direction}.
+
+BLOCK ice                       =ice
+BLOCK_TITLE ice                 =Ice
+BLOCK_TUTORIAL ice              =A slippery material.\
+Can be produced infinitely after researching {RESEARCH rehydration} and {RESEARCH refined_core}.
+
+BLOCK magnet                    =magnet
+BLOCK_TITLE magnet              =Magnet
+BLOCK_TUTORIAL magnet           =Pulls other blocks towards itself when given a {BLOCK_STATE charge}.
+
+BLOCK actuator                  =actuator
+BLOCK_TITLE actuator            =Actuator
+BLOCK_TUTORIAL actuator         =Can push a structure of blocks, and if the {BLOCK actuator} is welded, it can pull it back too.
+#"structure" as in a cluster of blocks welded together
+#actuator is similar to a minecraft Piston
+
+BLOCK actuator_base             =actuator base
+BLOCK_TITLE actuator_base       =Actuator Base
+BLOCK_TUTORIAL actuator_base    =Pulls in welded {BLOCK actuator_head|s}.
+#when a actuator_base is welded to a actuator_head, it makes a actuator
+
+BLOCK actuator_head             =actuator head
+BLOCK_TITLE actuator_head       =Actuator Head
+BLOCK_TUTORIAL actuator_head    =The yellow face is great for welding.
+#this hints that the yellow end of the actuator can be welded to stuff, and then pulled
+
+BLOCK teleportore               =teleportore
+BLOCK_TITLE teleportore         =Teleportore
+BLOCK_TUTORIAL teleportore      =Teleports unwelded blocks up to 15 blocks away, depending on the incoming {BLOCK_STATE charge}.
+#teleporters dont exist in reality, and this block is associated with the "core" technology, so it is spelt like "teleport" - "[c]ore"
+
+BLOCK telecross                 =telecross
+BLOCK_TITLE telecross           =Telecross
+BLOCK_TUTORIAL telecross        =Teleports unwelded blocks across itself in 2 directions.\
+Is linked to {BLOCK raw_core|s}.
+#this is a version of the teleportore that can be used to cross streams of blocks. "tele[porter]" "cross"
+
+BLOCK telewall                  =telewall
+BLOCK_TITLE telewall            =Telewall
+BLOCK_TUTORIAL telewall         =Teleports unwelded blocks across itself.\
+{BLOCK_STATE charge|^} disables it.
+#this is a version of the teleportore that can make a wall that blocks teleport through. "tele[porter]" "wall"
+
+
+#beam category
+
+BLOCK flower_magenta            =pink petunia
+BLOCK_TITLE flower_magenta      =Pink Petunia
+BLOCK_TUTORIAL flower_magenta   =Plant matter that can be squished into nothing.
+
+BLOCK flower_yellow             =yellow petunia
+BLOCK_TITLE flower_yellow       =Yellow Petunia
+BLOCK_TUTORIAL flower_yellow    =Plant matter that can be squished into nothing.
+
+BLOCK residue                   =residue
+BLOCK_TITLE residue             =Residue
+BLOCK_TUTORIAL residue          =A floating material that gets left behind from {ENTITY button|s}.\
+These {ENTITY entity|s} can be found by exploring east and west.\
+Nice for ad-hoc mobility.
+
+BLOCK injector                  =injector
+BLOCK_TITLE injector            =Injector
+BLOCK_TUTORIAL injector         =Consumes one block to modify another.
+
+BLOCK glass                     =glass
+BLOCK_TITLE glass               =Glass
+BLOCK_TUTORIAL glass            =A clear material.
+
+BLOCK glass_magenta             =magenta glass
+BLOCK_TITLE glass_magenta       =Magenta Glass
+BLOCK_TUTORIAL glass_magenta    =Filters green light in beams.
+
+BLOCK glass_yellow              =yellow glass
+BLOCK_TITLE glass_yellow        =Yellow Glass
+BLOCK_TUTORIAL glass_yellow     =Filters blue light in beams.
+
+BLOCK glass_cyan                =cyan glass
+BLOCK_TITLE glass_cyan          =Cyan Glass
+BLOCK_TUTORIAL glass_cyan       =Filters red light in beams.
+
+BLOCK beam_core                 =beam core
+BLOCK_TITLE beam_core           =Beam Core
+BLOCK_TUTORIAL beam_core        =Emits a white beam. Colors have unique effects when filtered out.\
+Beams cannot penetrate fog.
+
+BLOCK mirror                    =mirror
+BLOCK_TITLE mirror              =Mirror
+BLOCK_TUTORIAL mirror           =Redirects beams.
+
+BLOCK prism                     =prism
+BLOCK_TITLE prism               =Prism
+BLOCK_TUTORIAL prism            =Seperates different colors of light in beams.
+
+
+#core category
+
+#"core" blocks are rare and have special properties that make them usually found at the center of a machine. The "core" of the machine.
+
+BLOCK core_ore                  =core ore
+BLOCK_TITLE core_ore            =Core Ore
+BLOCK_TUTORIAL core_ore         =Found by sifting through lots of {BLOCK stone}.
+#it is more important that this block has a connection with iron/copper ore/veins than to rhyme.
+
+BLOCK raw_core                  =raw core
+BLOCK_TITLE raw_core            =Raw Core
+BLOCK_TUTORIAL raw_core         =Is linked to other {BLOCK raw_core|s} in certain positions.\
+Hold [+build_modifier] to pick up linked cores.
+#raw cores are cheaper and less polished looking that higher tier cores
+
+BLOCK mass_core                 =mass core
+BLOCK_TITLE mass_core           =Mass Core
+BLOCK_TUTORIAL mass_core        =A new definition of weight.
+#mass cores are immune to gravity, and are crafted by combining together a bunch of blocks. "mass" is chosen because the block must be very dense from how it was created, and because "mass" has connotations with gravity. The BLOCK_TUTORIAL hints at this connection, where a thing with "mass" doesn't have "weight" from gravity
+
+BLOCK rail_core                 =rail core
+BLOCK_TITLE rail_core           =Rail Core
+BLOCK_TUTORIAL rail_core        =Only can move in two directions.
+#this block slides in 2 directions. A "rail" is a thing that makes things slide in 2 directions
+
+BLOCK force_core                =force core
+BLOCK_TITLE force_core          =Force Core
+BLOCK_TUTORIAL force_core       =Emissionless propulsion is yours.
+#"force" in the physics sense, like pushing a heavy object
+
+BLOCK refined_core              =refined core
+BLOCK_TITLE refined_core        =Refined Core
+BLOCK_TUTORIAL refined_core     =It won't budge!
+#"refined" cores are very expensive to craft
+
+BLOCK catalyst_core             =catalyst core
+BLOCK_TITLE catalyst_core       =Catalyst Core
+BLOCK_TUTORIAL catalyst_core    =Welding a {BLOCK catalyst_core} to some machines can increase the speed or range.
+#catalyze as in to speed up a chemical reaction
+
+BLOCK soul_core                 =soul core
+BLOCK_TITLE soul_core           =Soul Core
+BLOCK_TUTORIAL soul_core        =Makes sure your machines keep running when you are absent, especially {BLOCK spawner|s}.
+#the soul core has a unique ability that only the player character themselves shares. It also looks like a big eyeball, and eyes are related to soul. It can watch machines.
+#it is crafted from materials gained by killing monsters, so "soul" has some spiritual connotations. Its like a "spirit core" or "ghost core".
+#Another name could be "watcher core" or "seeing core" if "soul" isn't translatable
+
+BLOCK pedestal                  =pedestal
+BLOCK_TITLE pedestal            =Pedestal
+BLOCK_TUTORIAL pedestal         =Makes a block sitting on top available for {BLOCK summonore|s}.\
+{BLOCK_STATE channel|^} is set with charge. {BLOCK summonore|^s} will only find {BLOCK pedestal|s} with the same {BLOCK_STATE channel}.\
+Functions as a {BLOCK soul_core}.
+#pedestal is a table you leave things on so they can be summoned by a sommonore. "pedestal" was chosen because its a table with slight spiritual connotations
+
+BLOCK summonore                 =summonore
+BLOCK_TITLE summonore           =Summonore
+BLOCK_TUTORIAL summonore        =When {BLOCK_STATE fuel|d} by plant matter, the {BLOCK summonore} will sense the adjacent block, find a {BLOCK pedestal} holding the same type of block, and teleport it to the {BLOCK summonore}.\
+{BLOCK_STATE channel|^} is set with charge. {BLOCK summonore|^s} will only find {BLOCK pedestal|s} with the same {BLOCK_STATE channel}.\
+Functions as a {BLOCK soul_core}.
+#summon could mean "bring to me", but it also has spiritual connotations
+#summonores dont exist in reality, and this block is associated with the "core" technology, so it is spelt like "summon" - "[c]ore"
+
+#if Roody:2d had loading screens, there would be hints there. But there are no loading screens, so hints are dropped when the player finds new items
+
+HINT_GOTBLOCK core_ore          =Cores are the primary resource for high-tier unique blocks. Collecting a large amount of them by hand is tedious.
+#this hints that there might be some way to automatically collec them
+HINT_GOTBLOCK raw_core          =Holding [+place] and dragging in the backpack can split a stack of blocks.
+HINT_GOTBLOCK iron_vein         =Place the {BLOCK iron_vein} and mine it manually with [place] to get {BLOCK iron_ore}.
+HINT_GOTBLOCK copper_vein       =Get {BLOCK copper_ore} by mining directly [place] or using an {BLOCK extractor}.
+HINT_GOTBLOCK extractor         =Use [open_guidebook] to see how to automate infinite {BLOCK iron_ore}.
+HINT_GOTBLOCK arc_furnace       =Use [open_guidebook] to see how to make {BLOCK iron_bar} with the {BLOCK arc_furnace} and {BLOCK iron_ore}.
+HINT_GOTBLOCK combiner          =The {BLOCK combiner} only works on a correctly welded structure.
+#"structure" as in a cluster of blocks welded together
+HINT_GOTBLOCK mantler           =If the {BLOCK mantler} is connecting too many things, try using the {BLOCK cap} block.
+HINT_GOTBLOCK destroyer         =Some good advice: do not destroy your {BLOCK combiner} or {BLOCK arc_furnace}.
+HINT_GOTBLOCK actuator_base     =Connect and actuator base to an {BLOCK actuator_head} and some {BLOCK wire|s} to use.
+HINT_GOTBLOCK display           =Use [menu_pause_back] to stop adjusting.
+HINT_GOTBLOCK catalyst_core     =A single {BLOCK catalyst_core} has 4 sides to boost machines. Make good use of them.
+HINT_GOTBLOCK sensor            =Experiment with different {BLOCK sensor} {BLOCK_STATE mode|s}. Try using two {BLOCK sensor|s} and compare them with a {BLOCK galvanometer}.
+HINT_GOTBLOCK galvanometer      =Remember that you can use [build_scan] on wire components to focus on their {BLOCK_STATE charge}.
+HINT_GOTBLOCK motor             =[pick_block] will attempt to pull that block from your backpack. It even works with the guidebook [open_guidebook]!
+HINT_GOTBLOCK oxide             ={BLOCK oxide|^} can be mixed with {ENTITY entity|s} found in far-off places.
+HINT_GOTBLOCK silicon           ={BLOCK silicon|^} is very fragile! Don't drop it.
+HINT_GOTBLOCK wire_spool        =The locks on the hotbar protect a slot from [pick_block] quick-selection.
+HINT_GOTBLOCK latch             =Holding [build_mode_not] while pressing [rotate_left] or [rotate_right] flips your hand.
+HINT_GOTBLOCK trigger           =Stop a production line from overflowing by turning it off with a {BLOCK trigger} observing the output pile.
+HINT_GOTBLOCK residue           =Filling up the space around a {BLOCK spawner} with solid blocks will prevent {ENTITY entity|s} from spawning.

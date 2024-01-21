@@ -1,0 +1,196 @@
+MESSENGER tutorial          =Tutorial
+MESSENGER scan              =Scan
+MESSENGER hint              =Hint
+MESSENGER system            =System
+MESSENGER user              =User
+MESSENGER sensor_mode       =Sensor Mode
+MESSENGER gif               =GIF
+MESSENGER research          =Research
+
+MESSAGE completed_research  =researched
+RESEARCH spawn              =Spawn
+RESEARCH amenities          =Amenities
+RESEARCH powder_processing  =Powder Processing
+#this research unlocks recipes that deal with sand, sawdust, and pulp. These are all dust/powder type blocks
+RESEARCH wire               =Wire
+RESEARCH automated_control  =Automated Control
+RESEARCH mining             =Mining
+#mining as in the general process of digging, searching for materials, etc
+RESEARCH block_flow         =Block Flow
+RESEARCH rubber             =Rubber
+RESEARCH cable_management   =Cable Management
+#this unlocks the second tier of wire type blocks, most of them don't add functionality, but do help stay organized. A term for organizing a bunch of wires is "Cable Management"
+RESEARCH analog_systems     =Analog Systems
+RESEARCH processing_machines=Processing Machines
+RESEARCH automated_crafting =Automated Crafting
+RESEARCH vehicle            =Vehicle
+RESEARCH automated_organics =Automated Organics
+#this is the kill-monsters-automatically research. So you automatically get a lot of organic material
+RESEARCH rehydration        =Rehydration
+#this research unlocks a way to duplicate water by putting it in a special cycle. "Rehydration" was the word chosen because it sounds like hydration (water) is going in a cycle
+RESEARCH mass_core          =Mass Core
+#should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
+RESEARCH refined_core       =Refined Core
+#should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
+RESEARCH catalyst_core      =Catalyst Core
+#should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
+RESEARCH automated_construction=Automated Construction
+RESEARCH world_manipulation =World Manipulation
+#this research unlocks the high-level ability to load chunks, even if the player isn't nearby. So the player is "manipulating" the game "world"
+RESEARCH motor=Motor
+#should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
+RESEARCH breaking           =Breaking Machines
+#unlocks dismantler and destroyer. "breaking" is a general term for unwelding, dismantler, destroying
+RESEARCH lamp               =Lamp
+#should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
+RESEARCH sensors            =Sensors
+RESEARCH injector           =Injector
+#should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
+RESEARCH core_economy       =Core Economy
+#this research unlocks the ability to infinitly craft core blocks. Now core blocks are much cheaper, so they will be more prolific. "Economy" is a term because cores will be flowing everywhere in a system, and because "economic" can mean cheaper.
+RESEARCH compressed_stone   =Compressed Stone
+#should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
+RESEARCH summonore          =Summonore
+#should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
+RESEARCH prism              =Prism
+#should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
+
+RESEARCH level_completed_tutorial=Completed tutorial level
+
+HINT_RESEARCH powder_processing =The research tree menu [open_research] is only a guide. You select what research to unlock simply by putting correct materials in the {BLOCK collector}.
+HINT_RESEARCH injector          =The {BLOCK injector} can use {BLOCK sawdust} to fertalize {BLOCK dirt} and grow more {BLOCK grass}, {BLOCK flower_magenta|s}, and {BLOCK flower_yellow|s}.
+
+PASSIVE longer_reach            =longer reach
+PASSIVE roller_replication      =a new recipe to replicate {BLOCK roller|s}
+PASSIVE destroyer_everything    =destroyer can destroy critical processing machines
+PASSIVE faster_unwelding        =faster unwelding
+PASSIVE faster_welding          =faster welding
+PASSIVE higher_jump             =higher jump
+PASSIVE bigger_inventory        =bigger backpack
+PASSIVE core_economy            =a new recipe to combine {BLOCK stone} and {BLOCK residue} to make {BLOCK core_ore}
+PASSIVE level_completed_tutorial=this research completes this tutorial level
+PASSIVE level_completed_demo    =finish the demo
+PASSIVE dummy_door              =this research opens a door
+
+RESEARCH_BOOK missing_prerequisites=Needs prerequisites
+RESEARCH_BOOK needs_costs       =Needs materials
+#to unlock a research, the player needs to do 2 things.
+#1: unlock all required prerequisite research.
+#2: enter the correct block cost into a collector block
+RESEARCH_BOOK completed         =Completed
+RESEARCH_BOOK unlocks           =Unlocks
+RESEARCH_BOOK unlocked          =Unlocked
+RESEARCH_BOOK demo_excluded     =This content is only in the full game!\
+Buy the full game here:
+
+GUIDEBOOK unresearched          =Unresearched
+GUIDEBOOK unresearched_spawn_with=Unresearched, but you should have started with one
+GUIDEBOOK_CATEGORY natural      =natural
+GUIDEBOOK_CATEGORY material     =materials
+GUIDEBOOK_CATEGORY building     =building
+GUIDEBOOK_CATEGORY wire         =wires
+GUIDEBOOK_CATEGORY sensor       =sensors
+GUIDEBOOK_CATEGORY machine      =machines
+GUIDEBOOK_CATEGORY movers       =movers
+GUIDEBOOK_CATEGORY beam         =beam
+GUIDEBOOK_CATEGORY core         =cores
+GUIDEBOOK_CATEGORY none         =unobtainable
+GUIDEBOOK_CATEGORY unresearched =unresearched
+
+BLOCK_STATE charge              =charge
+BLOCK_STATE command             =command
+BLOCK_STATE locked              =locked
+BLOCK_STATE setting             =setting
+BLOCK_STATE type                =type
+BLOCK_STATE interval            =interval
+BLOCK_STATE next                =next
+BLOCK_STATE fertility           =fertility
+#fertility in a gardening/plants sense. Like "fertile soil"
+BLOCK_STATE light               =light
+
+BLOCK_STATE base                =base
+BLOCK_STATE active              =active
+#the base state is the internal setting for clockwise/counterclockwise. This can change under certain conditions, but the base stays the same. Thats why there is a "base" and an "active"
+
+BLOCK_STATE direction           =direction
+BLOCK_STATE character           =character
+#character as in letter/number in text
+BLOCK_STATE collapsing          =collapsing
+BLOCK_STATE unbreakable         =unbreakable
+#not unweldable. the welds cannot be removed. invincible. unbreakable.
+BLOCK_STATE wet                 =wet
+#this foam was placed under water and got "wet"
+BLOCK_STATE count               =count
+BLOCK_STATE temp_light          =temp light
+#temporary light
+BLOCK_STATE delay               =delay
+BLOCK_STATE rooted              =rooted
+#as in "this plant has roots in the soil"
+
+BLOCK_STATE beam                =beam
+BLOCK_STATE beam_short          =#
+#to look nice in the WAILA, "beam" is shortened to a single character sometimes
+BLOCK_STATE beam_red            =R
+BLOCK_STATE beam_green          =G
+BLOCK_STATE beam_blue           =B
+#these R G B need to be single characters
+
+BLOCK_STATE mode                =mode
+BLOCK_STATE fuel                =fuel
+#the summonore needs to consume fuel to work. "fuel" is a term for stuff used to power machines, and is also sometimes a term for food. Since it isn't clear if the summonore is a monster or a machine, "fuel" keeps this ambiguity.
+BLOCK_STATE channel             =channel
+BLOCK_STATE can_backpack        =can backpack
+#can [send things to the] backpack
+BLOCK_STATE count               =count
+BLOCK_STATE deactivated         =deactivated
+BLOCK_STATE orientation         =orientation
+#depending on a prism's "orientation", it refracts beam light differently
+BLOCK_STATE layers              =layers
+#snow can stack up in "layers"
+BLOCK_STATE distance            =distance
+
+SCAN stack                      =stack
+#in the inventory, you can store multiple blocks on top of eachother. "stack" is a common video game term for this
+SCAN researched                 =researched
+SCAN unresearched               =unresearched
+SCAN remove_on_research         =press [open_research] to see how to unlock
+#remove_on_research blocks form a door that is opened when a certain research is achieved
+
+SENSOR_SELECTION none               =none
+SENSOR_SELECTION_HINT none              =does not send a signal
+SENSOR_SELECTION depreciated        =depreciated
+SENSOR_SELECTION_HINT depreciated       =invalid mode
+SENSOR_SELECTION any                =any
+SENSOR_SELECTION_HINT any               =sends a maximum signal when it sees any block
+#"any" does not mean "any sensor selection", it means "any block"
+SENSOR_SELECTION moving             =moving
+SENSOR_SELECTION_HINT moving            =sends a signal when the observed block is moving
+SENSOR_SELECTION welded             =welded
+SENSOR_SELECTION_HINT welded            =detects welded sides
+SENSOR_SELECTION facing             =facing
+SENSOR_SELECTION_HINT facing            =detects the orientation
+#something can be facing up, down, east, or west
+#it does not matter that "orientation" is the same term as the prism BLOCK_STATE orientation
+SENSOR_SELECTION natural            =natural
+SENSOR_SELECTION_HINT natural           =sorts out blocks that aren't manufactured
+SENSOR_SELECTION rare_resource      =rare resource
+SENSOR_SELECTION_HINT rare_resource     =detects valuable materials
+#core ores and ore veins are rare things that are useful. They are "rare resources".
+SENSOR_SELECTION solid              =solid
+SENSOR_SELECTION_HINT solid             =detects if the block stops the player's movement
+SENSOR_SELECTION machining          =machining
+SENSOR_SELECTION_HINT machining         =sends a signal when a machine is operating on a block
+#if a machine is doing its machine thing, like cutting, it is "machining".
+SENSOR_SELECTION charge             =charge
+SENSOR_SELECTION_HINT charge            =reads the charge without needing to be welded to the block
+SENSOR_SELECTION adjustment         =adjustment
+SENSOR_SELECTION_HINT adjustment        =turns the adjustment state [adjust] of blocks into a signal
+SENSOR_SELECTION light_level        =light level
+SENSOR_SELECTION_HINT light_level       =detects the light level of the adjacent block
+SENSOR_SELECTION container_count    =container count
+SENSOR_SELECTION_HINT container_count   =detects the number of blocks that are ready to be extruded, + 1
+
+
+
+
+
