@@ -1,3 +1,9 @@
+def strip(s):
+    s=s.lstrip()
+    while len(s)>0 and s[0]=='#':
+        s=(s.split('\n',maxsplit=1)+[''])[1].lstrip()
+    return s
+
 def _smptostr(smp,indented,indent):
     if type(smp) in [str,int]:
         return str(smp),False # do not add newlines around
@@ -20,7 +26,7 @@ def smptostr(smp,indent='  '):
     return _smptostr(smp,'',indent)[0].lstrip('\n')
 
 def _getword(s):
-    s=s.lstrip()
+    s=strip(s)
     i=0
     while i<len(s) and s[i]!='}' and s[i]!=']':
         i=i+1
@@ -33,7 +39,7 @@ def _geterrmessage(err,sinit,s):
     return f'Error at line {line}, column {col}: {err}'
 
 def _getsmpvalue(sinit):
-    s=sinit.lstrip()
+    s=strip(sinit)
     if s.startswith('['):
         # list
         l=[]
@@ -42,8 +48,8 @@ def _getsmpvalue(sinit):
             s2=s1[1:]
             s3,v=_getsmpvalue(s2)
             l.append(v)
-            assert s3.lstrip().startswith(']'),_geterrmessage('missing ]',sinit,s3)
-            s1=s3.lstrip()[1:].lstrip()
+            assert strip(s3).startswith(']'),_geterrmessage('missing ]',sinit,s3)
+            s1=strip(strip(s3)[1:])
         return s1,l
     elif s.startswith('{'):
         # dict
@@ -52,15 +58,15 @@ def _getsmpvalue(sinit):
         while s1.startswith('{'):
             s2=s1[1:]
             s3,k=_getword(s2)
-            assert s3.lstrip().startswith('}'),_geterrmessage('missing }',sinit,s3)
-            s4=s3.lstrip()[1:].lstrip()
+            assert strip(s3).startswith('}'),_geterrmessage('missing }',sinit,s3)
+            s4=strip(strip(s3)[1:])
             assert s4.startswith(':'),_geterrmessage('missing :',sinit,s4)
-            s5=s4[1:].lstrip()
+            s5=strip(s4[1:])
             assert s5.startswith('{'),_geterrmessage('missing {',sinit,s5)
             s6=s5[1:]
             s7,v=_getsmpvalue(s6)
-            assert s7.lstrip().startswith('}'),_geterrmessage('missing }',sinit,s7)
-            s1=s7.lstrip()[1:].lstrip()
+            assert strip(s7).startswith('}'),_geterrmessage('missing }',sinit,s7)
+            s1=strip(strip(s7)[1:])
             d[k]=v
         return s1,d
     else:
