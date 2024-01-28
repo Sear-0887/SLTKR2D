@@ -177,7 +177,7 @@ def get(vss,xi,yi):
 
 wafertypes=["accelerometer","capacitor","diode","galvanometer","latch","matcher","potentiometer","sensor","transistor","wire_board"]
 wiretypes=["detector","port","toggler","trigger","wire"]
-wiredtypes=["lamp",'combiner']+wafertypes+wiretypes
+wiredtypes=['actuator','motor','telewall','injector','pedestal','actuator_base','display',"lamp",'combiner','arc_furnace','extractor','beam_core','creator','destroyer','dismantler','magnet','manipulator','mantler']+wafertypes+wiretypes # that connect to wires
 noweldtypes=["copper_ore","iron_ore","pulp","sand","silicon","spawner","telecross","air"]
 twowaytypes=["wire_spool",'wood',"mirror"]
 
