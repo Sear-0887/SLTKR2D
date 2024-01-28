@@ -143,12 +143,12 @@ async def block(ctx, blk=None):
     else:
         await block(ctx, str(random.randint(0, 101)))
 
-def frs(east, south, west, north, img):
+def frs(east, south, west, north, img, flg):
     wid, hei = img.size
-    east = int(bool(east) and int(bool(east))*16 < wid)*16
-    south = int(bool(south) and int(bool(south))*16 < hei)*16
-    west = int(bool(west) and int(bool(west))*16 < wid)*16
-    north = int(bool(north) and int(bool(north))*16 < hei)*16
+    east = int(bool(east) and int(bool(east))*16 < wid and flg)*16
+    south = int(bool(south) and int(bool(south))*16 < hei and flg)*16
+    west = int(bool(west) and int(bool(west))*16 < wid and flg)*16
+    north = int(bool(north) and int(bool(north))*16 < hei and flg)*16
     return ((west  , north  , west+8  , north+8  ),
             (east+8, north  , east+8+8, north+8  ),
             (west  , south+8, west+8  , south+8+8),
@@ -156,7 +156,7 @@ def frs(east, south, west, north, img):
     
 @bot.command(name="image", description=cmd.image.desc, aliases=cmd.image.alias)
 async def image(ctx, *, x="[[16][20]][[16][16]]"):
-    blockp = [[False]*20 for _ in range(20)]
+    blockp = [[False]*100 for _ in range(100)]
     width, height = 0, 0
     x.replace(" ", "")
     for y, row in enumerate(re.findall(r"\[(\[.*?\])\]+", x)):
@@ -166,8 +166,14 @@ async def image(ctx, *, x="[[16][20]][[16][16]]"):
                 if block.isdigit():
                     block = quickidtable[int(block)]
                 blockp[y][x] = block
-                if block in "wire_board":
+                if block == "wire_board":
                     blockp[y][x] = "wafer,wire"
+                elif block in "capacitor cascade counter diode galvanometer latch potentiometer transistor accelerometer matcher sensor".split():
+                    blockp[y][x] = "wafer,wire,#"+block
+                elif block in "wire detector toggler trigger port":
+                    blockp[y][x] = "frame,wire,#"+block
+                elif block == "actuator":
+                    blockp[y][x] = "#actuator_base,#actuator_head"
         else: 
             width = max(width, x) + 1
     else:
@@ -178,19 +184,17 @@ async def image(ctx, *, x="[[16][20]][[16][16]]"):
             column = blockp[y][x]
             if column : #     e1,0   s0,1   w-1,0  n 0,-1
                 print(column, (x, y))
-                src = Image.new("RGBA", (64, 64))
-                maxw, maxh = 0, 0
                 for fil in column.split(","):
-                    crimg = Image.open("textures/blocks/"+blockinfos[fil]["path"])
-                    src.alpha_composite(crimg)
-                    maxw = max(maxw, crimg.size[0])
-                    maxh = max(maxh, crimg.size[1])
-                src = src.crop((0, 0, maxw, maxh))
-                cord = frs(blockp[y][x+1], blockp[y+1][x], blockp[y][x-1], blockp[y-1][x], src)
-                for e in range(4):
-                    print(cord)
-                    i = src.crop(cord[e])
-                    fin.paste(i, (x*16+(e%2)*8, y*16+(e//2)*8))
+                    flg = True
+                    if fil.startswith("#"):
+                        fil = fil[1:]
+                        flg = not flg
+                    print("textures/blocks/"+blockinfos[fil]["path"])
+                    src = Image.open("textures/blocks/"+blockinfos[fil]["path"]).convert("RGBA")
+                    cord = frs(blockp[y][x+1], blockp[y+1][x], blockp[y][x-1], blockp[y-1][x], src, flg)
+                    # print(cord)
+                    for e, crd in enumerate(cord):
+                        fin.alpha_composite(src.crop(crd), (x*16+(e%2)*8, y*16+(e//2)*8))
     fin = fin.resize((width*16*2, height*16*2), Image.NEAREST)
     fin.save("f.png")
     await ctx.send(file=nextcord.File("f.png", filename="f.png"))
