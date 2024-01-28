@@ -10,6 +10,7 @@ from io import BytesIO
 from PIL import Image
 from nextcord.ext import commands
 from lang import cmd, keywords
+import collections
 
 intents = nextcord.Intents.default()
 intents.members = True
@@ -17,11 +18,11 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 print(cmd.ping.desc)
 quickidtable = ["NIC"]*102
-blockinfos = defaultdict(dict)
+blockinfos = collections.defaultdict(dict)
 def getblockids():
     with open("block_id_.smp") as f:
         data=smp.getsmpvalue(f.read())
-    for name,i in data.items()
+    for name,i in data.items():
         blockinfos[name]["id"] = int(i)
         quickidtable[int(i)] = name
 
