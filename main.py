@@ -144,60 +144,66 @@ async def block(ctx, blk=None):
     else:
         await block(ctx, str(random.randint(0, 101)))
 
-def frs(east, south, west, north, img, flg):
-    wid, hei = img.size
-    east = int(bool(east) and int(bool(east))*16 < wid and flg)*16
-    south = int(bool(south) and int(bool(south))*16 < hei and flg)*16
-    west = int(bool(west) and int(bool(west))*16 < wid and flg)*16
-    north = int(bool(north) and int(bool(north))*16 < hei and flg)*16
+def frs(east, south, west, north, flg):
+    flg = list(map(lambda x: x=="-", list(flg)))
+    east = int(east and flg[0])*16
+    south = int(south and flg[1])*16
+    west = int(west and flg[2])*16
+    north = int(north and flg[3])*16
     return ((west  , north  , west+8  , north+8  ),
             (east+8, north  , east+8+8, north+8  ),
             (west  , south+8, west+8  , south+8+8),
             (east+8, south+8, east+8+8, south+8+8))
     
 @bot.command(name="image", description=cmd.image.desc, aliases=cmd.image.alias)
+#1111 = 15 
 async def image(ctx, *, x="[[16][20]][[16][16]]"):
-    blockp = [[False]*100 for _ in range(100)]
+    blockp = []
+    cordic = []
     width, height = 0, 0
     x.replace(" ", "")
+    x = x.lower()
     for y, row in enumerate(re.findall(r"\[(\[.*?\])\]+", x)):
-        for x, block in enumerate(re.findall(r"\[([\w#]*)\]", row)):
-            print(block, x, y)
+        for x, raw in enumerate(re.findall(r"\[([\w]+)#?([\d]{4}|)\]", row)):
+            block, weldtag = raw
+            if not weldtag: weldtag = "----"
+            print(block, weldtag, x, y)
             if block.isdigit():
                 block = quickidtable[int(block)]
             if block != "NIC" and block != "air":
-                blockp[y][x] = block
                 if block == "wire_board":
-                    blockp[y][x] = "wafer,wire"
+                    blockp += [("wafer", weldtag, x, y), 
+                               ("wire", weldtag, x, y)]
                 elif block in "capacitor cascade counter diode galvanometer latch potentiometer transistor accelerometer matcher".split():
-                    blockp[y][x] = "wafer,wire,#"+block
+                    blockp += [("wafer", weldtag, x, y), 
+                               ("wire", weldtag, x, y), 
+                               (block, "0000", x, y)]
                 elif block == "sensor":
-                    blockp[y][x] = "wafer,wire,#sensor,sensor"
+                    blockp += [("wafer", weldtag, x, y), 
+                               ("wire", weldtag, x, y), 
+                               (block, "0000", x, y), 
+                               (block, "1010", x, y)]
                 elif block in "wire detector toggler trigger port":
-                    blockp[y][x] = "frame,wire,#"+block
+                    blockp += [("frame", weldtag, x, y), 
+                               ("wire", weldtag, x, y), 
+                               (block, "0000", x, y)]
                 elif block == "actuator":
-                    blockp[y][x] = "actuator_base,#actuator_head"
-        else: 
+                    blockp += [("actuator_base", "0001", x, y), 
+                               ("actuator_head","0100", x, y)]
+                else:
+                    blockp += [(block, weldtag, x, y)]
+                cordic += [(x,y)]
             width = max(width, x) + 1
-    else:
         height = max(height, y) + 1
     fin = Image.new("RGBA", (width*16, height*16))
-    for y in range(height):
-        for x in range(width):
-            column = blockp[y][x]
-            if column : #     e1,0   s0,1   w-1,0  n 0,-1
-                print(column, (x, y))
-                for fil in column.split(","):
-                    flg = True
-                    if fil.startswith("#"):
-                        fil = fil[1:]
-                        flg = not flg
-                    print("textures/blocks/"+blockinfos[fil]["path"])
-                    src = Image.open("textures/blocks/"+blockinfos[fil]["path"]).convert("RGBA")
-                    cord = frs(blockp[y][x+1], blockp[y+1][x], blockp[y][x-1], blockp[y-1][x], src, flg)
-                    # print(cord)
-                    for e, crd in enumerate(cord):
-                        fin.alpha_composite(src.crop(crd), (x*16+(e%2)*8, y*16+(e//2)*8))
+    for name, wt, x, y in blockp:#     e1,0   s0,1   w-1,0  n 0,-1 
+        print(name, wt, (x, y))
+        print("textures/blocks/"+blockinfos[name]["path"])
+        src = Image.open("textures/blocks/"+blockinfos[name]["path"]).convert("RGBA")
+        cord = frs((x+1, y) in cordic, (x, y+1) in cordic, (x-1, y) in cordic, (x, y-1) in cordic, wt)
+        # print(cord)
+        for e, crd in enumerate(cord):
+            fin.alpha_composite(src.crop(crd), (x*16+(e%2)*8, y*16+(e//2)*8))
     fin = fin.resize((width*16*2, height*16*2), Image.NEAREST)
     fin.save("f.png")
     await ctx.send(file=nextcord.File("f.png", filename="f.png"))
