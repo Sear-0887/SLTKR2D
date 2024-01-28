@@ -1,6 +1,7 @@
 import PIL
 import PIL.Image
 import smp
+import os
 
 #welded=top,left,bottom,right
 #rotate= 0    1    2      3
@@ -11,6 +12,10 @@ with open("block_textures.smp") as f:
   data=smp.getsmpvalue(f.read())
 for name,texture in data.items():
   blockpaths[name] = texture
+
+def getblockim(block):
+	return PIL.Image.open(os.path.join('textures/blocks',blockpaths[block]))
+
 # https://stackoverflow.com/a/13054570
 class Block:
 	cache = []
@@ -30,8 +35,8 @@ class Block:
 		return block
 
 class NormalBlock(Block):
-	def __init__(self,file,offset=0):
-		self.image=PIL.Image.open(f'blocks/{file}.png').crop((offset,0,offset+32,32)).convert('RGBA')
+	def __init__(self,block,offset=0):
+		self.image=getblockim(block).crop((offset,0,offset+32,32)).convert('RGBA')
 
 	def draw(self,welded,rotate=0,size=128):
 		top,left,bottom,right=rotatewelded(welded,rotate)
@@ -63,8 +68,8 @@ def rotatewelded(welded,rotate):
 		return [welded[i] for i in [2,1,0,3]]
 
 class TwoSideBlock(Block):
-	def __init__(self,file,offset=0):
-		self.image=PIL.Image.open(f'blocks/{file}.png').crop((offset,0,offset+32,32)).convert('RGBA')
+	def __init__(self,block,offset=0):
+		self.image=getblockim(block).crop((offset,0,offset+32,32)).convert('RGBA')
 
 	def draw(self,welded,rotate=0,size=128):
 		if rotate==1:
@@ -80,8 +85,8 @@ class TwoSideBlock(Block):
 		return im.resize((size,size),PIL.Image.NEAREST)
 
 class NoWeldBlock(Block):
-	def __init__(self,file):
-		self.image=PIL.Image.open(f'blocks/noweld/{file}.png').crop((0,0,16,16)).convert('RGBA')
+	def __init__(self,block):
+		self.image=getblockim(block).crop((0,0,16,16)).convert('RGBA')
 
 	def draw(self,_,rotate=0,size=128):
 		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
@@ -89,10 +94,10 @@ class NoWeldBlock(Block):
 		return im.resize((size,size),PIL.Image.NEAREST)
 
 class WaferBlock(Block):
-	def __init__(self,file,base='wafer',offset=0):
-		self.wafer=PIL.Image.open(f'blocks/{base}.png').crop((0,0,32,32)).convert('RGBA')
-		self.wire=PIL.Image.open(f'blocks/wire.png').crop((offset,0,offset+32,32)).convert('RGBA')
-		self.image=PIL.Image.open(f'blocks/{base}/{file}.png').crop((offset,0,offset+32,32)).convert('RGBA')
+	def __init__(self,top,base='wafer',offset=0):
+		self.wafer=getblockim(base).crop((0,0,32,32)).convert('RGBA')
+		self.wire=getblockim('wire').crop((offset,0,offset+32,32)).convert('RGBA')
+		self.image=getblockim(top).crop((offset,0,offset+32,32)).convert('RGBA')
 
 	def draw(self,welded,rotate=0,size=128,offset=(0,0)):
 		top,left,bottom,right=rotatewelded(welded,rotate)
@@ -108,8 +113,8 @@ class WaferBlock(Block):
 
 class WireBlock(Block):
 	def __init__(self,base,offset=0):
-		self.wafer=PIL.Image.open(f'blocks/{base}.png').crop((0,0,32,32)).convert('RGBA')
-		self.image=PIL.Image.open(f'blocks/wire.png').crop((offset,0,offset+32,32)).convert('RGBA')
+		self.wafer=getblockim(base).crop((0,0,32,32)).convert('RGBA')
+		self.image=getblockim('wire').crop((offset,0,offset+32,32)).convert('RGBA')
 
 	def draw(self,welded,rotate=0,size=128,offset=(0,0)):
 		top,left,bottom,right=rotatewelded(welded,rotate)
@@ -124,7 +129,7 @@ class WireBlock(Block):
 
 class PlatformBlock(Block):
 	def __init__(self):
-		self.image=PIL.Image.open(f'blocks/platform.png').convert('RGBA')
+		self.image=getblockim('platform').convert('RGBA')
 		
 	def draw(self,welded,_,size=128,offset=(0,0)):
 		_,left,_,right=welded
@@ -138,8 +143,8 @@ class PlatformBlock(Block):
 
 class ActuatorBlock(Block):
 	def __init__(self,offset=0):
-		self.base=PIL.Image.open(f'blocks/actuator_base.png').crop((0,0,32,32)).convert('RGBA')
-		self.head=PIL.Image.open(f'blocks/actuator_head.png').crop((0,0,32,32)).convert('RGBA')
+		self.base=getblockim('actuator_base').crop((0,0,32,32)).convert('RGBA')
+		self.head=getblockim('actuator_head').crop((0,0,32,32)).convert('RGBA')
 
 	def draw(self,welded,rotate=0,size=128):
 		headtop,baseleft,basebottom,baseright=rotatewelded(welded,rotate)
