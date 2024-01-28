@@ -4,17 +4,17 @@ class cmds:
         syntax = "!help <cmd>"
         desc = """
             Displays what command <cmd> does.
-            if left blank, it will show bot's info.
+            If left blank, shows info about the bot.
         """
-        error = "Please Provide a valid command name."
+        error = "Please provide a valid command name."
         blankdisplay = """
             # SLTK R2D
-            A Roody:2D Utility Bot that displays useful informations.
+            A Roody:2D Utility Bot that displays useful information.
             PREFIX: !
-            Please use the command !help <cmd> to view what the <cmd> does.
-            SLTKR2D by <@697801071208300574>, All right's reserved.
-            Bot Since Last restart: %s
-            This bot is open-sourced on Github in [Here](https://github.com/Sear-0887/SLTKR2D).
+            Please use the command !help <cmd> to view what !<cmd> does.
+            SLTKR2D by <@697801071208300574>, All rights reserved.
+            Time Since Last Restart: %s
+            This bot is open-source on [Github](https://github.com/Sear-0887/SLTKR2D).
         """
     class ping:
         alias      = []
@@ -31,7 +31,7 @@ class cmds:
     class block:
         alias      = ["blk", "blkinfo", "binfo"]
         syntax     = "!block <blk>"
-        desc       = "Allow you to view block <blk>'s properties & icon. if left blank, it gives a random block.\nSupport finding by name or ID."
+        desc       = "Allow you to view <blk>'s properties & icon. if left blank, it gives a random block.\nSupports using name or ID."
         error      = "Unable to find block %s."
     
     class link:
@@ -39,7 +39,7 @@ class cmds:
         syntax     = "!link <keyword>"
         desc       = """
             Allow you to mention various game-related links through <keyword>.
-            Currently Support these links:
+            Currently supports these links:
             %s
         """
         error      = "Unable to find link through %s"
@@ -47,7 +47,8 @@ class cmds:
         alias      = ["img", "i", "blockimg"]
         syntax     = "!image <string>"
         desc       = """
-            Allow you to build in-game recipe through <string> in the format of recipe.smps.
+            Makes an image from <string> in the format of recipe.smp.
+            Can use block name or ID.
             Note that this function is still unfinished.
             Examples: [[cast_iron][wire_spool]][[cast_iron][cast_iron]] - arc_furnace recipe
             Examples: [[16][20]] [[16][20]] - Same recipe
