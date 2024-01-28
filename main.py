@@ -4,6 +4,7 @@ import keep_alive
 import datetime
 import random
 import re
+import smp
 from io import BytesIO
 from PIL import Image
 from nextcord.ext import commands
@@ -15,30 +16,26 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 print(cmd.ping.desc)
 quickidtable = ["NIC"]*102
-blockinfos = {}
+blockinfos = defaultdict(dict)
 def getblockid():
     with open("block_id_.smp") as f:
-        pattern = re.compile(r"\{([a-zA-Z_]*)\}\s*:\s*\{([\d]*)\}")
-        for n, i in re.findall(pattern, f.read()):
-            try: blockinfos[n]
-            except: blockinfos[n] = {}
-            blockinfos[n]["id"] = int(i)
-            quickidtable[int(i)] = n
+        data=smp.getsmpvalue(f.read())
+    for name,i in data.items()
+        blockinfos[name]["id"] = int(i)
+        quickidtable[int(i)] = name
 
 def getblockpath():
     with open("block_textures.smp") as f:
-        pattern = re.compile(r"{(.*)}:{(.*)}")
-        for n, i in re.findall(pattern, f.read()):
-            try: blockinfos[n]
-            except: blockinfos[n] = {}
-            blockinfos[n]["path"] = i         
+        data=smp.getsmpvalue(f.read())
+    for name,texture in data.items()
+        blockinfos[name]["path"] = texture
 
 def getblockcord():
-    with open("block_icons.smp") as gbc:
-        pattern = re.compile(r"\{([a-zA-Z_]*)\}\s*:\s*\{\s*([\d]*),\s*([\d]*)\}")
-        for a, x, y in re.findall(pattern, gbc.read()):
-            blockinfos[a]["iconcord"] = (int(x), int(y))
-    return False
+    with open("block_icons.smp") as f:
+        data=smp.getsmpvalue(f.read())
+    for icon,xy in data.items():
+        x,y=xy.split(',')
+        blockinfos[icon]["iconcord"] = (int(x), int(y))
 
 def getlocal():
     for fnm in "blocks credits hud input menu misc tutorial".split():
