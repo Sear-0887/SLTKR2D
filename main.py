@@ -4,6 +4,7 @@ import keep_alive
 import datetime
 import random
 import re
+import decorator
 from io import BytesIO
 from PIL import Image
 from nextcord.ext import commands
@@ -73,15 +74,17 @@ def getlocal():
     return blockinfos
 
 def command(bot,name):
-    def decorator(cmd):
-        async def fixedcmd(*args,**kwargs):
-            try:
-                await cmd(*args,**kwargs)
-            except Exception as e:
-                print(e)
-                raise e
-        return bot.command(name=name, description=getattr(cmds,name).desc, aliases=getattr(cmds,name).alias)(fixedcmd)
-    return decorator
+    async def _trycmd(cmd,*args,**kwargs):
+        try:
+            await cmd(*args,**kwargs)
+        except Exception as e:
+            print(e)
+            raise e
+    def trycmd(cmd):
+        return decorator.decorate(cmd,_trycmd)
+    def fixcmd(cmd):
+        return bot.command(name=name, description=getattr(cmds,name).desc, aliases=getattr(cmds,name).alias)(trycmd(cmd))
+    return fixcmd
 
 @command(bot,"help")
 async def help(ctx, tcmd=None,):
