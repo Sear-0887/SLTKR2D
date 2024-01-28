@@ -1,5 +1,6 @@
 import os
 import nextcord
+import keep_alive
 import datetime
 import random
 import re
@@ -160,16 +161,18 @@ async def image(ctx, *, x="[[16][20]][[16][16]]"):
     width, height = 0, 0
     x.replace(" ", "")
     for y, row in enumerate(re.findall(r"\[(\[.*?\])\]+", x)):
-        for x, block in enumerate(re.findall(r"\[([\w]*)\]", row)):
+        for x, block in enumerate(re.findall(r"\[([\w#]*)\]", row)):
             print(block, x, y)
-            if block != "NIC":
+            if block != "NIC" and block != "air":
                 if block.isdigit():
                     block = quickidtable[int(block)]
                 blockp[y][x] = block
                 if block == "wire_board":
                     blockp[y][x] = "wafer,wire"
-                elif block in "capacitor cascade counter diode galvanometer latch potentiometer transistor accelerometer matcher sensor".split():
+                elif block in "capacitor cascade counter diode galvanometer latch potentiometer transistor accelerometer matcher".split():
                     blockp[y][x] = "wafer,wire,#"+block
+                elif block == "sensor":
+                    blockp[y][x] = "wafer,wire,#sensor, sensor"
                 elif block in "wire detector toggler trigger port":
                     blockp[y][x] = "frame,wire,#"+block
                 elif block == "actuator":
@@ -223,4 +226,5 @@ getblockcord()
 getlocal()
 print(bot.all_commands["help"].description)
 token = os.environ['token']
+keep_alive.keep_alive()
 bot.run(token)
