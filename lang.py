@@ -1,4 +1,4 @@
-class cmd:
+class cmds:
     class help: 
         alias = ["h"]
         syntax = "!help <cmd>"

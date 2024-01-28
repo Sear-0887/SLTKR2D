@@ -7,13 +7,13 @@ import re
 from io import BytesIO
 from PIL import Image
 from nextcord.ext import commands
-from lang import cmd, keywords
+from lang import cmds, keywords
 
 intents = nextcord.Intents.default()
 intents.members = True
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
-print(cmd.ping.desc)
+print(cmds.ping.desc)
 quickidtable = ["NIC"]*102
 blockinfos = {}
 def getblockid():
@@ -80,18 +80,18 @@ def command(bot,name):
             except Exception as e:
                 print(e)
                 raise e
-        return bot.command(name=name, description=getattr(cmd,name).desc, aliases=getattr(cmd,name).alias)(fixedcmd)
+        return bot.command(name=name, description=getattr(cmds,name).desc, aliases=getattr(cmds,name).alias)(fixedcmd)
 
 @command(bot,"help")
 async def help(ctx, tcmd=None,):
     if not tcmd:
         embed = nextcord.Embed()
-        embed.description = cmd.help.blankdisplay % (datetime.datetime.now()-TimeOn)
+        embed.description = cmds.help.blankdisplay % (datetime.datetime.now()-TimeOn)
         view = nextcord.ui.View()
         async def gethelplist(interaction):
             sembed = nextcord.Embed()
             sembed.title = "Help List"
-            sembed.description = "Here's a list of commands:\n" + ", ".join([func for func in dir(cmd) if not func.startswith("__")])
+            sembed.description = "Here's a list of commands:\n" + ", ".join([cmd for cmd in dir(cmds) if not cmd.startswith("__")])
             await interaction.send(ephemeral=True, embed=sembed)
         getlistbtn = nextcord.ui.Button(style=nextcord.ButtonStyle.blurple, label="Help List")
         getlistbtn.callback = gethelplist
@@ -103,7 +103,7 @@ async def help(ctx, tcmd=None,):
                 tcmd = i
             if tcmd == i:
                 embed = nextcord.Embed()
-                clas = eval(f"cmd.{tcmd}")
+                clas = getattr(cmds,tcmd)
                 desc = clas.desc
                 if tcmd == "link":
                     container = ""
@@ -117,7 +117,7 @@ async def help(ctx, tcmd=None,):
                 await ctx.send(embed=embed)
                 return
         else:
-            await ctx.send(cmd.help.error)
+            await ctx.send(cmds.help.error)
 
 @command(bot,"ping")
 async def ping(ctx):
@@ -151,7 +151,7 @@ async def block(ctx, blk=None):
                 
                 await ctx.send(file=nextcord.File("sed.png", filename="sed.png"), embed=embed)
                 return
-        await ctx.send(cmd.block.error % blk)
+        await ctx.send(cmds.block.error % blk)
     else:
         await block(ctx, str(random.randint(0, 101)))
 
@@ -221,7 +221,7 @@ async def link(ctx, typ="r2d"):
             await ctx.send(f"`{i}` - {keywords[i]["link"]}")
             return
     else:
-        await ctx.send(cmd.link.error % typ)
+        await ctx.send(cmds.link.error % typ)
         
 @bot.event
 async def on_ready():
