@@ -218,7 +218,7 @@ async def image(ctx, *, x="[[16][20]][[16][16]]"):
 async def link(ctx, typ="r2d"):
     for i in keywords:
         if typ in keywords[i]["kw"]:
-            await ctx.send(f"`{i}` - {keywords[i]["link"]}")
+            await ctx.send(f"`{i}` - {keywords[i]['link']}")
             return
     else:
         await ctx.send(cmds.link.error % typ)
