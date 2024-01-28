@@ -87,8 +87,8 @@ def command(bot,name):
     return fixcmd
 
 @command(bot,"help")
-async def help(ctx, tcmd=None,):
-    if not tcmd:
+async def help(ctx, cmdname=None,):
+    if not cmdname:
         embed = nextcord.Embed()
         embed.description = cmds.help.blankdisplay % (datetime.datetime.now()-TimeOn)
         view = nextcord.ui.View()
@@ -103,21 +103,21 @@ async def help(ctx, tcmd=None,):
         await ctx.send(embed=embed, view=view)
     else:
         for i in bot.all_commands:
-            if tcmd in bot.all_commands[i].aliases:
-                tcmd = i
-            if tcmd == i:
+            if cmdname in bot.all_commands[i].aliases:
+                cmdname = i
+            if cmdname == i:
                 embed = nextcord.Embed()
-                clas = getattr(cmds,tcmd)
-                desc = clas.desc
-                if tcmd == "link":
+                cmd = getattr(cmds,cmdname)
+                desc = cmd.desc
+                if cmdname == "link":
                     container = ""
                     for cr in keywords:
                         container += "%s (%s)\nKeywords: %s\n" % (cr, keywords[cr]["link"], ", ".join(keywords[cr]["kw"]))
                     desc = desc % container
-                embed.title = tcmd
+                embed.title = cmdname
                 embed.description = desc
-                embed.add_field(name="Syntax", value=clas.syntax)
-                embed.add_field(name="Aliases", value=",\n".join(clas.alias))
+                embed.add_field(name="Syntax", value=cmd.syntax)
+                embed.add_field(name="Aliases", value=",\n".join(cmd.alias))
                 await ctx.send(embed=embed)
                 return
         else:
