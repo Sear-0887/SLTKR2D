@@ -71,8 +71,18 @@ def getlocal():
                             txt = txt.replace("{%s %s|%s}" % (tartype, tarname, modifier), tx)
                         blockinfos[blkkey][blktype] = txt
     return blockinfos
-    
-@bot.command(name="help", description=cmd.help.desc, aliases=cmd.help.alias)
+
+def command(bot,name):
+    def decorator(cmd):
+        def fixedcmd(*args,**kwargs):
+            try:
+                cmd(*args,**kwargs)
+            except Exception as e:
+                print(e)
+                raise e
+        return bot.command(name=name, description=getattr(cmd,name).desc, aliases=getattr(cmd,name).alias)(fixedcmd)
+
+@command(bot,"help")
 async def help(ctx, tcmd=None,):
     if not tcmd:
         embed = nextcord.Embed()
@@ -109,17 +119,17 @@ async def help(ctx, tcmd=None,):
         else:
             await ctx.send(cmd.help.error)
 
-@bot.command(name="ping", description=cmd.ping.desc, aliases=cmd.ping.alias)
+@command(bot,"ping")
 async def ping(ctx):
     s=f"Pong! ({bot.latency*1000} ms)"
     print(s)
     await ctx.send(s)
     
-@bot.command(name="scream", description=cmd.scream.desc, aliases=cmd.scream.alias)
+@command(bot,"scream")
 async def scream(ctx, n:int=32):
     await ctx.send("A"*n)
    
-@bot.command(name="block", description=cmd.block.desc, aliases=cmd.block.alias)
+@command(bot,"block")
 async def block(ctx, blk=None):
     if blk:
         for key, ite in blockinfos.items():
@@ -156,7 +166,7 @@ def frs(east, south, west, north, img, flg):
             (west  , south+8, west+8  , south+8+8),
             (east+8, south+8, east+8+8, south+8+8))
     
-@bot.command(name="image", description=cmd.image.desc, aliases=cmd.image.alias)
+@command(bot,"image")
 async def image(ctx, *, x="[[16][20]][[16][16]]"):
     blockp = [[False]*100 for _ in range(100)]
     width, height = 0, 0
@@ -204,7 +214,7 @@ async def image(ctx, *, x="[[16][20]][[16][16]]"):
     await ctx.send(file=nextcord.File("f.png", filename="f.png"))
             
 
-@bot.command(name="link", description=cmd.link.desc, aliases=cmd.link.alias)
+@command(bot,"link")
 async def link(ctx, typ="r2d"):
     for i in keywords:
         if typ in keywords[i]["kw"]:
