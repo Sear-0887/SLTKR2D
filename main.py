@@ -74,13 +74,14 @@ def getlocal():
 
 def command(bot,name):
     def decorator(cmd):
-        def fixedcmd(*args,**kwargs):
+        async def fixedcmd(*args,**kwargs):
             try:
-                cmd(*args,**kwargs)
+                await cmd(*args,**kwargs)
             except Exception as e:
                 print(e)
                 raise e
         return bot.command(name=name, description=getattr(cmds,name).desc, aliases=getattr(cmds,name).alias)(fixedcmd)
+    return decorator
 
 @command(bot,"help")
 async def help(ctx, tcmd=None,):
