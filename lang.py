@@ -6,7 +6,6 @@ class cmd:
             Displays what command <cmd> does.
             if left blank, it will show bot's info.
         """
-        cmddisplay = "/"
         error = "Please Provide a valid command name."
         blankdisplay = """
             # SLTK R2D
@@ -21,21 +20,18 @@ class cmd:
         alias      = []
         syntax     = "!ping"
         desc       = "Pong! + Display the latency of bot in ms."
-        cmddisplay = "Pong! (%s ms)"
         error      = "This is a error message"
 
     class scream:
         alias      = ["AAAAA"]
         syntax     = "!scream"
         desc       = "*It symboilizes my sanity*"
-        cmddisplay = "/"
         error      = "This is a error message"
 
     class block:
         alias      = ["blk", "blkinfo", "binfo"]
         syntax     = "!block <blk>"
         desc       = "Allow you to view block <blk>'s properties & icon. if left blank, it gives a random block.\nSupport finding by name or ID."
-        cmddisplay = "/"
         error      = "Unable to find block %s."
     
     class link:
@@ -46,7 +42,6 @@ class cmd:
             Currently Support these links:
             %s
         """
-        cmddisplay = "`%s` - %s"
         error      = "Unable to find link through %s"
     class image:
         alias      = ["img", "i", "blockimg"]
@@ -57,7 +52,6 @@ class cmd:
             Examples: [[cast_iron][wire_spool]][[cast_iron][cast_iron]] - arc_furnace recipe
             Examples: [[16][20]] [[16][20]] - Same recipe
         """
-        cmddisplay = "/"
         error      = "Unable to form image."
 
 keywords = {

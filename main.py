@@ -111,8 +111,9 @@ async def help(ctx, tcmd=None,):
 
 @bot.command(name="ping", description=cmd.ping.desc, aliases=cmd.ping.alias)
 async def ping(ctx):
-    print(cmd.ping.cmddisplay % (bot.latency*1000))
-    await ctx.send(cmd.ping.cmddisplay % (bot.latency*1000))
+    s=f"Pong! ({bot.latency*1000} ms)"
+    print(s)
+    await ctx.send(s)
     
 @bot.command(name="scream", description=cmd.scream.desc, aliases=cmd.scream.alias)
 async def scream(ctx, n:int=32):
@@ -207,7 +208,7 @@ async def image(ctx, *, x="[[16][20]][[16][16]]"):
 async def link(ctx, typ="r2d"):
     for i in keywords:
         if typ in keywords[i]["kw"]:
-            await ctx.send(cmd.link.cmddisplay % (i, keywords[i]["link"]))
+            await ctx.send(f"`{i}` - {keywords[i]["link"]}")
             return
     else:
         await ctx.send(cmd.link.error % typ)
