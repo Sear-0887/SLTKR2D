@@ -18,7 +18,7 @@ bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 print(cmd.ping.desc)
 quickidtable = ["NIC"]*102
 blockinfos = defaultdict(dict)
-def getblockid():
+def getblockids():
     with open("block_id_.smp") as f:
         data=smp.getsmpvalue(f.read())
     for name,i in data.items()
@@ -31,12 +31,12 @@ def getblockpath():
     for name,texture in data.items()
         blockinfos[name]["path"] = texture
 
-def getblockcord():
+def geticoncoords():
     with open("block_icons.smp") as f:
         data=smp.getsmpvalue(f.read())
     for icon,xy in data.items():
         x,y=xy.split(',')
-        blockinfos[icon]["iconcord"] = (int(x), int(y))
+        blockinfos[icon]["iconcoord"] = (int(x), int(y))
 
 def getlocal():
     for fnm in "blocks credits hud input menu misc tutorial".split():
@@ -127,7 +127,7 @@ async def block(ctx, blk=None):
                 embed = nextcord.Embed()
                 
                 img = Image.open("block_zoo.png")
-                icox, icoy = blockinfos[key]["iconcord"]
+                icox, icoy = blockinfos[key]["iconcoord"]
                 img = img.crop((16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))).resize((128, 128), Image.NEAREST)
                 img.save("sed.png")
                 embed.title = ite["BLOCK_TITLE"]
@@ -187,9 +187,9 @@ async def on_ready():
     TimeOn = datetime.datetime.now()
     
     
-getblockid()
 getblockpath()
-getblockcord()
+getblockids()
+geticoncoords()
 getlocal()
 print(bot.all_commands["help"].description)
 token = os.environ['token']
