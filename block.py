@@ -1,9 +1,16 @@
 import PIL
 import PIL.Image
+import smp
 
 #welded=top,left,bottom,right
 #rotate= 0    1    2      3
 
+blockpaths={}
+
+with open("block_textures.smp") as f:
+  data=smp.getsmpvalue(f.read())
+for name,texture in data.items():
+  blockpaths[name] = texture
 # https://stackoverflow.com/a/13054570
 class Block:
 	cache = []

@@ -26,12 +26,6 @@ def getblockids():
         blockinfos[name]["id"] = int(i)
         quickidtable[int(i)] = name
 
-def getblockpath():
-    with open("block_textures.smp") as f:
-        data=smp.getsmpvalue(f.read())
-    for name,texture in data.items()
-        blockinfos[name]["path"] = texture
-
 def geticoncoords():
     with open("block_icons.smp") as f:
         data=smp.getsmpvalue(f.read())
@@ -188,7 +182,6 @@ async def on_ready():
     TimeOn = datetime.datetime.now()
     
     
-getblockpath()
 getblockids()
 geticoncoords()
 getlocal()
