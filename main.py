@@ -5,6 +5,7 @@ import datetime
 import random
 import re
 import smp
+from block import makeimage as blockmakeimage
 from io import BytesIO
 from PIL import Image
 from nextcord.ext import commands
@@ -154,49 +155,18 @@ def frs(east, south, west, north, img, flg):
     
 @bot.command(name="image", description=cmd.image.desc, aliases=cmd.image.alias)
 async def image(ctx, *, x="[[16][20]][[16][16]]"):
-    blockp = [[False]*100 for _ in range(100)]
-    width, height = 0, 0
-    x.replace(" ", "")
-    for y, row in enumerate(re.findall(r"\[(\[.*?\])\]+", x)):
-        for x, block in enumerate(re.findall(r"\[([\w#]*)\]", row)):
-            print(block, x, y)
-            if block != "NIC" and block != "air":
-                if block.isdigit():
-                    block = quickidtable[int(block)]
-                blockp[y][x] = block
-                if block == "wire_board":
-                    blockp[y][x] = "wafer,wire"
-                elif block in "capacitor cascade counter diode galvanometer latch potentiometer transistor accelerometer matcher".split():
-                    blockp[y][x] = "wafer,wire,#"+block
-                elif block == "sensor":
-                    blockp[y][x] = "wafer,wire,#sensor, sensor"
-                elif block in "wire detector toggler trigger port":
-                    blockp[y][x] = "frame,wire,#"+block
-                elif block == "actuator":
-                    blockp[y][x] = "#actuator_base,#actuator_head"
-        else: 
-            width = max(width, x) + 1
-    else:
-        height = max(height, y) + 1
-    fin = Image.new("RGBA", (width*16, height*16))
-    for y in range(height):
-        for x in range(width):
-            column = blockp[y][x]
-            if column : #     e1,0   s0,1   w-1,0  n 0,-1
-                print(column, (x, y))
-                for fil in column.split(","):
-                    flg = True
-                    if fil.startswith("#"):
-                        fil = fil[1:]
-                        flg = not flg
-                    print("textures/blocks/"+blockinfos[fil]["path"])
-                    src = Image.open("textures/blocks/"+blockinfos[fil]["path"]).convert("RGBA")
-                    cord = frs(blockp[y][x+1], blockp[y+1][x], blockp[y][x-1], blockp[y-1][x], src, flg)
-                    # print(cord)
-                    for e, crd in enumerate(cord):
-                        fin.alpha_composite(src.crop(crd), (x*16+(e%2)*8, y*16+(e//2)*8))
-    fin = fin.resize((width*16*2, height*16*2), Image.NEAREST)
-    fin.save("f.png")
+    blocks=smp.getsmpvalue(x)
+    for y,row in enumerate(blocks):
+        for x,b in enumerate(row):
+            print(b, x, y)
+            b=b.lower()
+            if b=='nic':
+                b='air'
+            if b.isdigit():
+                b = quickidtable[int(b)]
+            blocks[y][x] = b
+    im=blockmakeimage(blocks,32)
+    im.save("f.png")
     await ctx.send(file=nextcord.File("f.png", filename="f.png"))
             
 
