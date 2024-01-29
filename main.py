@@ -144,11 +144,20 @@ async def image(ctx, *, x="[[16][20]][[16][16]]"):
         for x,b in enumerate(row):
             print(b, x, y)
             b=b.lower()
+            turn=0
+            weld=[True,True,True,True]
+            if '#' in b:
+                b,weld=b.split('#',maxsplit=1)
+                if weld[0] in 'eswn':
+                    turn='nwse'.index(weld[0])
+                    weld=weld[1:]
+                assert len(weld)==4
+                weld=[c=='1' for c in reversed(weld)]
             if b=='nic':
                 b='air'
             if b.isdigit():
                 b = quickidtable[int(b)]
-            blocks[y][x] = b
+            blocks[y][x] = {"type":b,"rotate":turn,"weld":weld}
     im=blockmakeimage(blocks,32)
     im.save("f.png")
     await ctx.send(file=nextcord.File("f.png", filename="f.png"))

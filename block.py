@@ -199,9 +199,9 @@ def canweld(side,block):
 		sides=[False,True,True,True]
 	else:
 		return True
-	i={'top':0,'bottom':2,'left':1,'right':3}[side]+block['rotate']
+	i={'top':0,'bottom':2,'left':1,'right':3}[side]+4-block['rotate']
 	i=i%4
-	return sides[i]
+	return sides[i] and block['weld'][{'top':0,'bottom':2,'left':1,'right':3}[side]]
 
 
 def makeimage(blocks,bsize=128,autoweld=True,debug=False):
