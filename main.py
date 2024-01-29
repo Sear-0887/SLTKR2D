@@ -136,17 +136,6 @@ async def block(ctx, blk=None):
         await ctx.send(cmd.block.error % blk)
     else:
         await block(ctx, str(random.randint(0, 101)))
-
-def frs(east, south, west, north, img, flg):
-    wid, hei = img.size
-    east = int(bool(east) and int(bool(east))*16 < wid and flg)*16
-    south = int(bool(south) and int(bool(south))*16 < hei and flg)*16
-    west = int(bool(west) and int(bool(west))*16 < wid and flg)*16
-    north = int(bool(north) and int(bool(north))*16 < hei and flg)*16
-    return ((west  , north  , west+8  , north+8  ),
-            (east+8, north  , east+8+8, north+8  ),
-            (west  , south+8, west+8  , south+8+8),
-            (east+8, south+8, east+8+8, south+8+8))
     
 @bot.command(name="image", description=cmd.image.desc, aliases=cmd.image.alias)
 async def image(ctx, *, x="[[16][20]][[16][16]]"):
