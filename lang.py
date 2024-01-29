@@ -1,3 +1,23 @@
+keywords = {
+    "Roody:2D Game Discord Server": {
+        "link": "https://discord.gg/gbEkBNt",
+        "kw": ["r2d", "roody2d", "roody:2d", "game", "gameser", "gamedc"]
+    },
+    "SLTK Wiki Server": {
+        "link": "https://discord.gg/cDAUYrtjzV",
+        "kw": ["sltk", "wikiser", "wikidc", "r2dwiki", "r2dwikiser"]
+    },
+    "SLTK Wiki Page": {
+        "link": "https://roody2d.wiki.gg",
+        "kw": ["wiki", "sltkwiki", "wikipage", "r2dwiki"]
+    }
+}
+
+linksstr="".join([
+    f"{name} ({data['link']})\nKeywords: {', '.join(data['kw'])}\n"
+    for name,data in keywords.items()
+])
+
 class cmds:
     class help: 
         alias = ["h"]
@@ -25,7 +45,7 @@ class cmds:
     class scream:
         alias      = ["AAAAA"]
         syntax     = "!scream"
-        desc       = "*It symboilizes my sanity*"
+        desc       = "*It symbolizes my sanity*"
         error      = "This is a error message"
 
     class block:
@@ -37,10 +57,10 @@ class cmds:
     class link:
         alias      = ["l", "lnk", "www"]
         syntax     = "!link <keyword>"
-        desc       = """
+        desc       = f"""
             Allow you to mention various game-related links through <keyword>.
             Currently supports these links:
-            %s
+            {linksstr}
         """
         error      = "Unable to find link through %s"
     class image:
@@ -54,18 +74,3 @@ class cmds:
             Examples: [[16][20]] [[16][20]] - Same recipe
         """
         error      = "Unable to form image."
-
-keywords = {
-    "Roody:2D Game Discord Server": {
-        "link": "https://discord.gg/gbEkBNt",
-        "kw": ["r2d", "roody2d", "roody:2d", "game", "gameser", "gamedc"]
-    },
-    "SLTK Wiki Server": {
-        "link": "https://discord.gg/cDAUYrtjzV",
-        "kw": ["sltk", "wikiser", "wikidc", "r2dwiki", "r2dwikiser"]
-    },
-    "SLTK Wiki Page": {
-        "link": "https://roody2d.wiki.gg",
-        "kw": ["wiki", "sltkwiki", "wikipage", "r2dwiki"]
-    }
-}
