@@ -187,7 +187,7 @@ async def block(ctx, block=None):
         
         await ctx.send(file=nextcord.File("blockim.png", filename="blockim.png"), embed=embed)
     else:
-        await block(ctx, str(random.randint(0, 101)))
+        await block(ctx, str(random.choice(idtoblock.keys())))
 
 def frs(east, south, west, north, img, flg):
     wid, hei = img.size
