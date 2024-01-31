@@ -16,7 +16,36 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 print(cmds.ping.desc)
 quickidtable = ["NIC"]*102
+
 blockinfos = {}
+
+locale={}
+
+localedir='localization'
+lang='english'
+
+def capitalize(s):
+    s=s[0].upper()+s[1:]
+    return s
+
+def plural(s):
+    if s.endswith('y'): # just in case
+        s=s[:-1]+'ie'
+    s+="s"
+    return s
+
+def past(s):
+    if s.endswith('e'):
+        s=s[:-1]
+    s+="ed"
+    return s
+
+modifiers={
+    '^':capitalize,
+    's':plural,
+    'd':past,
+}
+
 def getblockid():
     with open("block_id_.smp") as f:
         pattern = re.compile(r"\{([a-zA-Z_]*)\}\s*:\s*\{([\d]*)\}")
