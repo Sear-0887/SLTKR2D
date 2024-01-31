@@ -170,28 +170,24 @@ async def scream(ctx, n:int=32):
     await ctx.send("A"*n)
    
 @command(bot,"block")
-async def block(ctx, blk=None):
-    if blk:
-        for key, ite in blockinfos.items():
-            try: str(ite["id"])
-            except: break
-            val = str(ite["id"])
-            if blk == key or blk == val:
-                embed = nextcord.Embed()
-                
-                img = Image.open("block_zoo.png")
-                icox, icoy = blockinfos[key]["iconcord"]
-                img = img.crop((16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))).resize((128, 128), Image.NEAREST)
-                img.save("sed.png")
-                embed.title = ite["BLOCK_TITLE"]
-                embed.add_field(name="Block name", value=key)
-                embed.add_field(name="Block ID", value=val)
-                embed.add_field(name="Block Tutorial", value=re.sub(r"\\", r"\n", ite["BLOCK_TUTORIAL"]))
-                embed.set_image(url="attachment://sed.png")
-                
-                await ctx.send(file=nextcord.File("sed.png", filename="sed.png"), embed=embed)
-                return
-        await ctx.send(cmds.block.error % blk)
+async def block(ctx, block=None):
+    if block:
+        if block.isdigit():
+            block = quickidtable[int(block)] # numeric id to string
+        binfo=blockinfos[block]
+        embed = nextcord.Embed()
+        
+        img = Image.open("block_zoo.png")
+        icox, icoy = binfo["iconcord"]
+        img = img.crop((16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))).resize((128, 128), Image.NEAREST)
+        img.save("blockim.png")
+        embed.title = locale[("BLOCK_TITLE",block)]
+        embed.add_field(name="Block name", value=block)
+        embed.add_field(name="Block ID", value=binfo['id'])
+        embed.add_field(name="Block Tutorial", value=re.sub(r"\\", r"\n", locale[("BLOCK_TUTORIAL",block)]))
+        embed.set_image(url="attachment://blockim.png")
+        
+        await ctx.send(file=nextcord.File("blockim.png", filename="blockim.png"), embed=embed)
     else:
         await block(ctx, str(random.randint(0, 101)))
 
