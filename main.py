@@ -44,7 +44,7 @@ modifiers={
     'd':past,
 }
 
-def getblockid():
+def getblockids():
     with open("block_id_.smp") as f:
         pattern = re.compile(r"\{([a-zA-Z_]*)\}\s*:\s*\{([\d]*)\}")
         for n, i in re.findall(pattern, f.read()):
@@ -53,7 +53,7 @@ def getblockid():
             blockinfos[n]["id"] = int(i)
             idtoblock[int(i)] = n
 
-def getblockpath():
+def getblocktextures():
     with open("block_textures.smp") as f:
         pattern = re.compile(r"{(.*)}:{(.*)}")
         for n, i in re.findall(pattern, f.read()):
@@ -61,12 +61,11 @@ def getblockpath():
             except: blockinfos[n] = {}
             blockinfos[n]["path"] = i         
 
-def getblockcord():
+def getblockcoords():
     with open("block_icons.smp") as gbc:
         pattern = re.compile(r"\{([a-zA-Z_]*)\}\s*:\s*\{\s*([\d]*),\s*([\d]*)\}")
         for a, x, y in re.findall(pattern, gbc.read()):
             blockinfos[a]["iconcord"] = (int(x), int(y))
-    return False
 
 def substitutelocale(s):
     i=0 # the index to look for the next opening bracket at
@@ -91,7 +90,7 @@ def substitutelocale(s):
             s=p1+localized+p3
     return s
 
-def getlocal():
+def getlocale():
     for fname in os.listdir(localedir):
         if not fname.startswith(lang):
             continue # skip files for a different language
@@ -110,7 +109,6 @@ def getlocal():
 
     for key,s in locale.items():
         locale[key]=substitutelocale(s)
-    return locale
 
 def command(bot,name):
     async def _trycmd(cmd,ctx,*args,**kwargs):
@@ -265,10 +263,10 @@ async def on_ready():
     TimeOn = datetime.datetime.now()
     
     
-getblockid()
-getblockpath()
-getblockcord()
-getlocal()
+getblockids()
+getblocktextures()
+getblockcoords()
+getlocale()
 print(bot.all_commands["help"].description)
 token = os.environ['token']
 bot.run(token)
