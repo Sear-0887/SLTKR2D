@@ -20,7 +20,7 @@ linksstr="".join([
 
 class cmds:
     class help: 
-        alias = ["h"]
+        aliases = ["h"]
         syntax = "!help <cmd>"
         desc = """
             Displays what command <cmd> does.
@@ -37,25 +37,25 @@ class cmds:
             This bot is open-source on [Github](https://github.com/Sear-0887/SLTKR2D).
         """
     class ping:
-        alias      = []
+        aliases      = []
         syntax     = "!ping"
         desc       = "Pong! + Display the latency of bot in ms."
         error      = "This is a error message"
 
     class scream:
-        alias      = ["AAAAA"]
+        aliases      = ["AAAAA"]
         syntax     = "!scream"
         desc       = "*It symbolizes my sanity*"
         error      = "This is a error message"
 
     class block:
-        alias      = ["blk", "blkinfo", "binfo"]
+        aliases      = ["blk", "blkinfo", "binfo"]
         syntax     = "!block <blk>"
         desc       = "Allow you to view <blk>'s properties & icon. if left blank, it gives a random block.\nSupports using name or ID."
         error      = "Unable to find block %s."
     
     class link:
-        alias      = ["l", "lnk", "www"]
+        aliases      = ["l", "lnk", "www"]
         syntax     = "!link <keyword>"
         desc       = f"""
             Allow you to mention various game-related links through <keyword>.
@@ -64,7 +64,7 @@ class cmds:
         """
         error      = "Unable to find link through %s"
     class image:
-        alias      = ["img", "i", "blockimg"]
+        aliases      = ["img", "i", "blockimg"]
         syntax     = "!image <string>"
         desc       = """
             Makes an image from <string> in the format of recipe.smp.

@@ -83,7 +83,7 @@ def command(bot,name):
     def trycmd(cmd):
         return decorator.decorate(cmd,_trycmd)
     def fixcmd(cmd):
-        return bot.command(name=name, description=getattr(cmds,name).desc, aliases=getattr(cmds,name).alias)(trycmd(cmd))
+        return bot.command(name=name, description=getattr(cmds,name).desc, aliases=getattr(cmds,name).aliases)(trycmd(cmd))
     return fixcmd
 
 @command(bot,"help")
@@ -111,7 +111,7 @@ async def help(ctx, cmdname=None,):
                 embed.title = cmdname
                 embed.description = cmd.desc
                 embed.add_field(name="Syntax", value=cmd.syntax)
-                embed.add_field(name="Aliases", value=",\n".join(cmd.alias))
+                embed.add_field(name="Aliases", value=",\n".join(cmd.aliases))
                 await ctx.send(embed=embed)
                 return
         else:
