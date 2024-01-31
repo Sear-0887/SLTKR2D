@@ -13,7 +13,7 @@ intents.members = True
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 print(cmds.ping.desc)
-quickidtable = ["NIC"]*102
+idtoblock = {}
 
 blockinfos = {}
 
@@ -51,7 +51,7 @@ def getblockid():
             try: blockinfos[n]
             except: blockinfos[n] = {}
             blockinfos[n]["id"] = int(i)
-            quickidtable[int(i)] = n
+            idtoblock[int(i)] = n
 
 def getblockpath():
     with open("block_textures.smp") as f:
@@ -171,7 +171,7 @@ async def scream(ctx, n:int=32):
 async def block(ctx, block=None):
     if block:
         if block.isdigit():
-            block = quickidtable[int(block)] # numeric id to string
+            block = idtoblock.get(int(block),'NIC') # numeric id to string
         binfo=blockinfos[block]
         embed = nextcord.Embed()
         
@@ -210,7 +210,7 @@ async def image(ctx, *, x="[[16][20]][[16][16]]"):
             print(block, x, y)
             if block != "NIC" and block != "air":
                 if block.isdigit():
-                    block = quickidtable[int(block)]
+                    block = idtoblock.get(int(block),'NIC')
                 blockp[y][x] = block
                 if block == "wire_board":
                     blockp[y][x] = "wafer,wire"
