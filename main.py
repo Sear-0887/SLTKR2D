@@ -69,7 +69,7 @@ def getlocal():
                             elif i == "d": tx = tx + "ed"
                             elif i == "p": tx = tx + "'s"
                             elif i == "b": tx = "{" + tx + "}"
-                            txt = txt.replace("{%s %s|%s}" % (tartype, tarname, modifier), tx)
+                        txt = txt.replace("{%s %s|%s}" % (tartype, tarname, modifier), tx)
                         blockinfos[blkkey][blktype] = txt
     return blockinfos
 
