@@ -69,12 +69,12 @@ def getblockcord():
     return False
 
 def substitutelocale(s):
-    i=0 # the index to look for another bracket at
+    i=0 # the index to look for the next opening bracket at
     while '{' in s[i:]:
         i1=s.index('{',i)
         i2=s.find('}',i1)
-        if i2==-1:
-            break # there is no closing bracket
+        if i2==-1: # there is no closing bracket
+            break
         p1=s[:i1]
         p2=s[i1+1:i2]
         p3=s[i2+1:]
