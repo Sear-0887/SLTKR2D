@@ -1,6 +1,6 @@
 import os
 import nextcord
-import keep_alive
+#import keep_alive
 import datetime
 import random
 import re
@@ -264,5 +264,5 @@ getblockcord()
 getlocal()
 print(bot.all_commands["help"].description)
 token = os.environ['token']
-keep_alive.keep_alive()
+#keep_alive.keep_alive()
 bot.run(token)
