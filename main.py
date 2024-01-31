@@ -115,10 +115,11 @@ def getlocal():
     return locale
 
 def command(bot,name):
-    async def _trycmd(cmd,*args,**kwargs):
+    async def _trycmd(cmd,ctx,*args,**kwargs):
         try:
-            await cmd(*args,**kwargs)
+            await cmd(ctx,*args,**kwargs)
         except Exception as e:
+            await ctx.send(getattr(cmds,name).error % args)
             print(e)
             raise e
     def trycmd(cmd):
