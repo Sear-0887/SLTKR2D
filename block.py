@@ -31,7 +31,7 @@ class Block:
 		if existing is not None:
 			return existing
 		block = super(Block, cls).__new__(cls)
-		cls.cache.append([[args,kwargs],block])
+		cls.cache.append([[str(cls),args,kwargs],block])
 		return block
 
 class NormalBlock(Block):
