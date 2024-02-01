@@ -47,6 +47,18 @@ class NormalBlock(Block):
 		im=rotateblock(im,rotate)
 		return im.resize((size,size),PIL.Image.NEAREST)
 
+class NoRotateBlock(Block):
+	def __init__(self,block,offset=0):
+		self.image=getblockim(block).crop((offset,0,offset+32,32)).convert('RGBA')
+
+	def draw(self,welded,_=0,size=128):
+		top,left,bottom,right=welded
+		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
+		for x,xside in [(0,left),(8,right)]:
+			for y,yside in [(0,top),(8,bottom)]:
+				im.alpha_composite(self.image.crop((x+16*xside,y+16*yside,x+16*xside+8,y+16*yside+8)),(x,y))
+		return im.resize((size,size),PIL.Image.NEAREST)
+
 def rotateblock(im,rotate):
 	if rotate==0:
 		return im
@@ -88,9 +100,19 @@ class NoWeldBlock(Block):
 	def __init__(self,block):
 		self.image=getblockim(block).crop((0,0,16,16)).convert('RGBA')
 
+	def draw(self,_,__=0,size=128):
+		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
+		im.alpha_composite(self.image.crop((0,0,16,16)))
+		return im.resize((size,size),PIL.Image.NEAREST)
+
+class TelecrossBlock(Block):
+	def __init__(self):
+		self.image=getblockim('telecross').crop((0,0,16,16)).convert('RGBA')
+
 	def draw(self,_,rotate=0,size=128):
 		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 		im.alpha_composite(self.image.crop((0,0,16,16)))
+		im=rotateblock(im,rotate)
 		return im.resize((size,size),PIL.Image.NEAREST)
 
 class WaferBlock(Block):
@@ -183,7 +205,8 @@ def get(vss,xi,yi):
 wafertypes=["accelerometer","capacitor","diode","galvanometer","latch","matcher","potentiometer","sensor","transistor","wire_board"]
 wiretypes=["detector","port","toggler","trigger","wire"]
 wiredtypes=['actuator','motor','telewall','injector','pedestal','actuator_base','display',"lamp",'combiner','arc_furnace','extractor','beam_core','creator','destroyer','dismantler','magnet','manipulator','mantler']+wafertypes+wiretypes # that connect to wires
-noweldtypes=["copper_ore","iron_ore","pulp","sand","silicon","spawner","telecross","air"]
+noweldtypes=["copper_ore","iron_ore","pulp","sand","silicon","spawner","air"]
+norotatetypes=['dirt','sediment','stone','rubber','leaf_maple','iron_vein','iron_bar','iron_plate','cast_iron','copper_vein','copper_bar','frame','toggler','capacitor','inductor','roller','dynamic_roller','chair','chair_pilot','display','core_ore','raw_core','mass_core','refined_core','catalyst_core','command_block','boundary','spawner','calcium_bar','water','foam','oxide','soul_core','adobe','peltmellow','glass','glass_cyan','glass_magenta','glass_yellow','grass','flower_magenta','flower_yellow','residue','ice','compressed_stone']
 twowaytypes=["wire_spool",'wood',"mirror"]
 
 def canweld(side,block):
@@ -238,6 +261,8 @@ def makeimage(blocks,bsize=128,autoweld=True,debug=False):
 				b=WaferBlock(block['type'],'frame')
 			elif block['type'] in twowaytypes:
 				b=TwoSideBlock(block['type'])
+			elif block['type'] in norotatetypes:
+				b=NoRotateBlock(block['type'])
 			elif block['type'] in noweldtypes:
 				b=NoWeldBlock(block['type'])
 			elif block['type']=='platform':
@@ -246,6 +271,8 @@ def makeimage(blocks,bsize=128,autoweld=True,debug=False):
 				b=PlatformBlock()
 			elif block['type']=='actuator':
 				b=ActuatorBlock()
+			elif block['type']=='telecross':
+				b=TelecrossBlock()
 			else:
 				b=NormalBlock(block['type'])
 			if block['type'] in wiredtypes:
