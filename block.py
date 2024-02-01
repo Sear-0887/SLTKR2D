@@ -100,7 +100,7 @@ class WaferBlock(Block):
 		self.image=getblockim(top).crop((offset,0,offset+32,32)).convert('RGBA')
 
 	def draw(self,welded,rotate=0,size=128,offset=(0,0)):
-		top,left,bottom,right=rotatewelded(welded,rotate)
+		top,left,bottom,right=welded
 		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 		for x,xside in [(0,left),(8,right)]:
 			for y,yside in [(0,top),(8,bottom)]:
@@ -116,8 +116,8 @@ class WireBlock(Block):
 		self.wafer=getblockim(base).crop((0,0,32,32)).convert('RGBA')
 		self.image=getblockim('wire').crop((offset,0,offset+32,32)).convert('RGBA')
 
-	def draw(self,welded,rotate=0,size=128,offset=(0,0)):
-		top,left,bottom,right=rotatewelded(welded,rotate)
+	def draw(self,welded,_=0,size=128,offset=(0,0)):
+		top,left,bottom,right=welded
 		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 		for x,xside in [(0,left),(8,right)]:
 			for y,yside in [(0,top),(8,bottom)]:
@@ -228,11 +228,10 @@ def makeimage(blocks,bsize=128,autoweld=True,debug=False):
 				weldbottom=canweld('bottom',block) and canweld('top',get(newblocks,xi,yi+1))
 				weldtop=canweld('top',block) and canweld('bottom',get(newblocks,xi,yi-1))
 				block['weld']=[[b and w,print(f'welded side {i} not allowed on {block}\n'*(not w and debug),end='')][0] for i,b,w in zip(range(4),block['weld'],[weldtop,weldleft,weldbottom,weldright])]
-			if block['type']=='wire_board' or block['type']=='wire':
-				if block['type']=='wire':
-					b=WireBlock('frame')
-				else:
-					b=WireBlock('wafer')
+			if block['type']=='wire':
+				b=WireBlock('frame')
+			elif block['type']=='wire_board':
+				b=WireBlock('wafer')
 			elif block['type'] in wafertypes:
 				b=WaferBlock(block['type'])
 			elif block['type'] in wiretypes:
@@ -249,7 +248,7 @@ def makeimage(blocks,bsize=128,autoweld=True,debug=False):
 				b=ActuatorBlock()
 			else:
 				b=NormalBlock(block['type'])
-			if block['type'] in wafertypes+wiretypes:
+			if block['type'] in wiredtypes:
 				block['weld'][0]=block['weld'][0] and (2 if get(newblocks,xi,yi-1)['type'] in wiredtypes else True)
 				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type'] in wiredtypes else True)
 				block['weld'][2]=block['weld'][2] and (2 if get(newblocks,xi,yi+1)['type'] in wiredtypes else True)
