@@ -8,6 +8,7 @@ from io import BytesIO
 from PIL import Image
 from nextcord.ext import commands
 from lang import cmd, keywords
+import block_extra as be
 
 intents = nextcord.Intents.default()
 intents.members = True
@@ -144,64 +145,82 @@ async def block(ctx, blk=None):
     else:
         await block(ctx, str(random.randint(0, 101)))
 
-def frs(east, south, west, north, flg):
-    flg = list(map(lambda x: x=="-", list(flg)))
-    east = int(east and flg[0])*16
-    south = int(south and flg[1])*16
-    west = int(west and flg[2])*16
-    north = int(north and flg[3])*16
+def frs(east, south, west, north, wt, flg):
+    wt = int(wt, 2)
+    info = int(east)*8+int(south)*4+int(west)*2+int(north)
+    print(info, east, south, west, north, flg, wt)
+    info = info & wt & flg 
+    print(str(bin(info))[2:].zfill(4))
+    info = list(str(bin(info))[2:].zfill(4))
+    print(flg, info)
+    east = int(east and info[0])*16
+    south = int(south and info[1])*16
+    west = int(west and info[2])*16
+    north = int(north and info[3])*16
     return ((west  , north  , west+8  , north+8  ),
             (east+8, north  , east+8+8, north+8  ),
             (west  , south+8, west+8  , south+8+8),
             (east+8, south+8, east+8+8, south+8+8))
     
 @bot.command(name="image", description=cmd.image.desc, aliases=cmd.image.alias)
-#1111 = 15 
-async def image(ctx, *, x="[[16][20]][[16][16]]"):
-    blockp = []
+#eswn
+async def image(ctx, dt="[[16][20]][[16][16]]"):
+    blockp = []#3layer
     cordic = []
-    width, height = 0, 0
-    x.replace(" ", "")
-    x = x.lower()
-    for y, row in enumerate(re.findall(r"\[(\[.*?\])\]+", x)):
-        for x, raw in enumerate(re.findall(r"\[([\w]+)#?([\d]{4}|)\]", row)):
-            block, weldtag = raw
-            if not weldtag: weldtag = "----"
-            print(block, weldtag, x, y)
+    cordwr = []
+    width, height = 0, 0 
+    dt.replace(" ", "")
+    dt = dt.lower()
+    for y, row in enumerate(re.findall(r"\[(\[.*?\])\]+", dt)):
+        for x, raw in enumerate(re.findall(r"\[([\w]+)#?([\d]{4}|)#?([\d]{1}|)\]", row)):
+            block, weldtag, rotation = raw
+            if not weldtag: weldtag = "1111"
             if block.isdigit():
                 block = quickidtable[int(block)]
+                print(block, weldtag, rotation, x, y)
             if block != "NIC" and block != "air":
-                if block == "wire_board":
-                    blockp += [("wafer", weldtag, x, y), 
-                               ("wire", weldtag, x, y)]
-                elif block in "capacitor cascade counter diode galvanometer latch potentiometer transistor accelerometer matcher".split():
-                    blockp += [("wafer", weldtag, x, y), 
-                               ("wire", weldtag, x, y), 
-                               (block, "0000", x, y)]
-                elif block == "sensor":
-                    blockp += [("wafer", weldtag, x, y), 
-                               ("wire", weldtag, x, y), 
-                               (block, "0000", x, y), 
-                               (block, "1010", x, y)]
-                elif block in "wire detector toggler trigger port":
-                    blockp += [("frame", weldtag, x, y), 
-                               ("wire", weldtag, x, y), 
-                               (block, "0000", x, y)]
-                elif block == "actuator":
-                    blockp += [("actuator_base", "0001", x, y), 
-                               ("actuator_head","0100", x, y)]
+                if block in be.wiredtypes:
+                    if block in be.wafertypes:
+                        blockp += [("wafer", weldtag, x, y),
+                                    (block, "0000", x, y)]
+                        blockp += [("wire", weldtag, x, y)]
+                    if block in be.frametypes:
+                        blockp += [("frame", weldtag, x, y), 
+                                    (block, "0000", x, y)]
+                        blockp += [("wire", weldtag, x, y)]
+                    if block == "actuator":
+                        blockp += [("actuator_base", "0001", x, y), 
+                                ("actuator_head", "1111", x, y)]
+                    cordwr += [(x,y)]
+                    
                 else:
                     blockp += [(block, weldtag, x, y)]
-                cordic += [(x,y)]
-            width = max(width, x) + 1
-        height = max(height, y) + 1
+                    print("T")
+            cordic += [(x, y)]
+        width = max(width, x+1)
+    height = max(height, y+1)
+    print("WIDTH, HEIGHT =", width, height)
     fin = Image.new("RGBA", (width*16, height*16))
+    print(blockp)
     for name, wt, x, y in blockp:#     e1,0   s0,1   w-1,0  n 0,-1 
-        print(name, wt, (x, y))
-        print("textures/blocks/"+blockinfos[name]["path"])
+        print("")
+        print("name,wt,(x,y)", name, wt, (x, y))
+        print("BLOCKPATH = textures/blocks/"+blockinfos[name]["path"])
         src = Image.open("textures/blocks/"+blockinfos[name]["path"]).convert("RGBA")
-        cord = frs((x+1, y) in cordic, (x, y+1) in cordic, (x-1, y) in cordic, (x, y-1) in cordic, wt)
-        # print(cord)
+        spflg = "1111"
+        findcord = cordwr if name == "wire" else cordic
+        for i, j in be.weldspr.items():
+            if name in j: 
+                spflg = i
+        
+        cord = frs(
+            (x+1, y) in findcord, 
+            (x, y+1) in findcord, 
+            (x-1, y) in findcord, 
+            (x, y-1) in findcord, 
+            wt,
+            int(spflg, 2))
+        print(cord, spflg)
         for e, crd in enumerate(cord):
             fin.alpha_composite(src.crop(crd), (x*16+(e%2)*8, y*16+(e//2)*8))
     fin = fin.resize((width*16*2, height*16*2), Image.NEAREST)
