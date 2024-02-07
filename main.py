@@ -1,9 +1,9 @@
 import os
 import nextcord
-import keep_alive
 import datetime
 import random
 import re
+import decorator
 import smp
 from block import makeimage as blockmakeimage
 from io import BytesIO
@@ -16,65 +16,128 @@ intents = nextcord.Intents.default()
 intents.members = True
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
-print(cmd.ping.desc)
-quickidtable = ["NIC"]*102
-blockinfos = collections.defaultdict(dict)
+print(cmds.ping.desc)
+idtoblock = {}
+
+blockinfos = {}
+
+locale={}
+
+localedir='localization'
+lang='english'
+
+def capitalize(s):
+    s=s[0].upper()+s[1:]
+    return s
+
+def plural(s):
+    if s.endswith('y'): # just in case
+        s=s[:-1]+'ie'
+    s+="s"
+    return s
+
+def past(s):
+    if s.endswith('e'):
+        s=s[:-1]
+    s+="ed"
+    return s
+
+modifiers={
+    '^':capitalize,
+    's':plural,
+    'd':past,
+}
+
 def getblockids():
     with open("block_id_.smp") as f:
-        data=smp.getsmpvalue(f.read())
-    for name,i in data.items():
-        blockinfos[name]["id"] = int(i)
-        quickidtable[int(i)] = name
+        pattern = re.compile(r"\{([a-zA-Z_]*)\}\s*:\s*\{([\d]*)\}")
+        for n, i in re.findall(pattern, f.read()):
+            try: blockinfos[n]
+            except: blockinfos[n] = {}
+            blockinfos[n]["id"] = int(i)
+            idtoblock[int(i)] = n
 
-def geticoncoords():
-    with open("block_icons.smp") as f:
-        data=smp.getsmpvalue(f.read())
-    for icon,xy in data.items():
-        x,y=xy.split(',')
-        blockinfos[icon]["iconcoord"] = (int(x), int(y))
+def getblocktextures():
+    with open("block_textures.smp") as f:
+        pattern = re.compile(r"{(.*)}:{(.*)}")
+        for n, i in re.findall(pattern, f.read()):
+            try: blockinfos[n]
+            except: blockinfos[n] = {}
+            blockinfos[n]["path"] = i         
 
-def getlocal():
-    for fnm in "blocks credits hud input menu misc tutorial".split():
-        print(fnm)
-        with open("localization/english_%s.txt" % fnm, "r") as f:
-            fc = re.sub(r"\\\s*\n", r"\\", f.read())
-            for line in fc.split("\n"):
-                for a, n, v in re.findall(r"^(\w*?) (\w*)\s*=\s*(.*)", line):
-                    try: blockinfos[n]
-                    except: blockinfos[n] = {}
-                    blockinfos[n][a] = v
-    for blkkey, item in blockinfos.items():
-        for blktype, txt in item.items():
-            for tartype, tarname in re.findall("{(\w+) (\w+)}", str(txt)):
-                if blockinfos[tarname]: 
-                    if blockinfos[tarname][tartype]:
-                        txt = re.sub("{%s %s}" % (tartype, tarname), blockinfos[tarname][tartype], txt)
-                        blockinfos[blkkey][blktype] = txt
-            for tartype, tarname, modifier in re.findall(r"{(\w+) (\w+)\|?([\^vsdbp]*)?}", str(txt)):
-                if blockinfos[tarname]:
-                    if blockinfos[tarname][tartype]:
-                        tx = blockinfos[tarname][tartype]
-                        for i in list(modifier):
-                            if   i == "^": tx = tx[0].upper()+tx[1:]
-                            elif i == "v": tx = tx[0].lower()+tx[1:]
-                            elif i == "s": tx = tx + "s"
-                            elif i == "d": tx = tx + "ed"
-                            elif i == "p": tx = tx + "'s"
-                            elif i == "b": tx = "{" + tx + "}"
-                            txt = txt.replace("{%s %s|%s}" % (tartype, tarname, modifier), tx)
-                        blockinfos[blkkey][blktype] = txt
-    return blockinfos
-    
-@bot.command(name="help", description=cmd.help.desc, aliases=cmd.help.alias)
-async def help(ctx, tcmd=None,):
-    if not tcmd:
+def getblockcoords():
+    with open("block_icons.smp") as gbc:
+        pattern = re.compile(r"\{([a-zA-Z_]*)\}\s*:\s*\{\s*([\d]*),\s*([\d]*)\}")
+        for a, x, y in re.findall(pattern, gbc.read()):
+            blockinfos[a]["iconcord"] = (int(x), int(y))
+
+def substitutelocale(s):
+    i=0 # the index to look for the next opening bracket at
+    while '{' in s[i:]:
+        i1=s.index('{',i)
+        i2=s.find('}',i1)
+        if i2==-1: # there is no closing bracket
+            break
+        p1=s[:i1]
+        p2=s[i1+1:i2]
+        p3=s[i2+1:]
+        i=i1+1
+        if '|' in p2:
+            p2,modifier=p2.split('|',maxsplit=1)
+        else:
+            modifier=''
+        key=tuple(part.strip() for part in p2.split())
+        if key in locale:
+            localized=locale[key]
+            for mod in modifier:
+                localized=modifiers[mod](localized)
+            s=p1+localized+p3
+    return s
+
+def getlocale():
+    for fname in os.listdir(localedir):
+        if not fname.startswith(lang):
+            continue # skip files for a different language
+        with open(os.path.join(localedir,fname), "r") as f:
+            linesiter=iter(f)
+            for line in linesiter:
+                while line.endswith('\\\n'):
+                    line=line[:-1]+next(linesiter) # add the next line to this if this line ends with a backslash
+                line=re.sub('#.*$','',line) # remove comments
+                if '=' not in line:
+                    continue
+                key,value=line.split('=',maxsplit=1)
+                key=tuple(key.split())
+                value=value.strip()
+                locale[key]=value
+
+    for key,s in locale.items():
+        locale[key]=substitutelocale(s)
+
+def command(bot,name):
+    async def _trycmd(cmd,ctx,*args,**kwargs):
+        try:
+            await cmd(ctx,*args,**kwargs)
+        except Exception as e:
+            await ctx.send(getattr(cmds,name).error % args)
+            print(e)
+            raise e
+    def trycmd(cmd):
+        return decorator.decorate(cmd,_trycmd)
+    def fixcmd(cmd):
+        return bot.command(name=name, description=getattr(cmds,name).desc, aliases=getattr(cmds,name).aliases)(trycmd(cmd))
+    return fixcmd
+
+@command(bot,"help")
+async def help(ctx, cmdname=None,):
+    if not cmdname:
         embed = nextcord.Embed()
-        embed.description = cmd.help.blankdisplay % (datetime.datetime.now()-TimeOn)
+        embed.description = cmds.help.blankdisplay % (datetime.datetime.now()-TimeOn)
         view = nextcord.ui.View()
         async def gethelplist(interaction):
             sembed = nextcord.Embed()
             sembed.title = "Help List"
-            sembed.description = "Here's a list of commands:\n" + ", ".join([func for func in dir(cmd) if not func.startswith("__")])
+            sembed.description = "Here's a list of commands:\n" + ", ".join([cmd for cmd in dir(cmds) if not cmd.startswith("__")])
             await interaction.send(ephemeral=True, embed=sembed)
         getlistbtn = nextcord.ui.Button(style=nextcord.ButtonStyle.blurple, label="Help List")
         getlistbtn.callback = gethelplist
@@ -82,32 +145,27 @@ async def help(ctx, tcmd=None,):
         await ctx.send(embed=embed, view=view)
     else:
         for i in bot.all_commands:
-            if tcmd in bot.all_commands[i].aliases:
-                tcmd = i
-            if tcmd == i:
+            if cmdname in bot.all_commands[i].aliases:
+                cmdname = i
+            if cmdname == i:
                 embed = nextcord.Embed()
-                clas = eval(f"cmd.{tcmd}")
-                desc = clas.desc
-                if tcmd == "link":
-                    container = ""
-                    for cr in keywords:
-                        container += "%s (%s)\nKeywords: %s\n" % (cr, keywords[cr]["link"], ", ".join(keywords[cr]["kw"]))
-                    desc = desc % container
-                embed.title = tcmd
-                embed.description = desc
-                embed.add_field(name="Syntax", value=clas.syntax)
-                embed.add_field(name="Aliases", value=",\n".join(clas.alias))
+                cmd = getattr(cmds,cmdname)
+                embed.title = cmdname
+                embed.description = cmd.desc
+                embed.add_field(name="Syntax", value=cmd.syntax)
+                embed.add_field(name="Aliases", value=",\n".join(cmd.aliases))
                 await ctx.send(embed=embed)
                 return
         else:
-            await ctx.send(cmd.help.error)
+            await ctx.send(cmds.help.error)
 
-@bot.command(name="ping", description=cmd.ping.desc, aliases=cmd.ping.alias)
+@command(bot,"ping")
 async def ping(ctx):
-    print(cmd.ping.cmddisplay % (bot.latency*1000))
-    await ctx.send(cmd.ping.cmddisplay % (bot.latency*1000))
+    s=f"Pong! ({bot.latency*1000} ms)"
+    print(s)
+    await ctx.send(s)
     
-@bot.command(name="scream", description=cmd.scream.desc, aliases=cmd.scream.alias)
+@command(bot,"scream")
 async def scream(ctx, n:int=32):
     await ctx.send("A"*n)
    
@@ -137,7 +195,7 @@ async def block(ctx, blk=None):
     else:
         await block(ctx, str(random.randint(0, 101)))
     
-@bot.command(name="image", description=cmd.image.desc, aliases=cmd.image.alias)
+@command(bot,"image")
 async def image(ctx, *, x="[[16][20]][[16][16]]"):
     blocks=smp.getsmpvalue(x)
     for y,row in enumerate(blocks):
@@ -163,14 +221,14 @@ async def image(ctx, *, x="[[16][20]][[16][16]]"):
     await ctx.send(file=nextcord.File("f.png", filename="f.png"))
             
 
-@bot.command(name="link", description=cmd.link.desc, aliases=cmd.link.alias)
+@command(bot,"link")
 async def link(ctx, typ="r2d"):
     for i in keywords:
         if typ in keywords[i]["kw"]:
-            await ctx.send(cmd.link.cmddisplay % (i, keywords[i]["link"]))
+            await ctx.send(f"`{i}` - {keywords[i]['link']}")
             return
     else:
-        await ctx.send(cmd.link.error % typ)
+        await ctx.send(cmds.link.error % typ)
         
 @bot.event
 async def on_ready():
@@ -182,8 +240,7 @@ async def on_ready():
     
 getblockids()
 geticoncoords()
-getlocal()
+getlocale()
 print(bot.all_commands["help"].description)
 token = os.environ['token']
-keep_alive.keep_alive()
 bot.run(token)
