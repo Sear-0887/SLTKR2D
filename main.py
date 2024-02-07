@@ -6,6 +6,7 @@ import keep_alive
 import datetime
 import random
 import re
+from dotenv import dotenv_values
 from io import BytesIO
 from PIL import Image
 from nextcord.ext import commands
@@ -85,7 +86,7 @@ async def on_ready():
 # def returniscog(cogname):
 #     return bot.get_cog(cogname)
 
-token = os.environ['token']
+token = dotenv_values("cred/.env")['TOKEN']
 for cog_name in glob.glob("cog_*.py"):
     print(cog_name, "LOAD")
     bot.load_extension(cog_name[:-3])
