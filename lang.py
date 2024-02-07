@@ -59,6 +59,16 @@ class cmd:
         """
         cmddisplay = "/"
         error      = "Unable to form image."
+    
+    class viewcog:
+        alias      = ["cg", "vcg", "cog"]
+        syntax     = "!viewcog"
+        desc       = """
+            Read the current status of cogs detected.
+            Admin-Only Command.
+        """
+        cmddisplay = "%s - %s (%s)"
+        error      = "Unable to reach all cogs."
 
 keywords = {
     "Roody:2D Game Discord Server": {
