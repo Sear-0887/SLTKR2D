@@ -1,0 +1,4 @@
+nextcord
+flask
+Pillow
+python-dotenv
