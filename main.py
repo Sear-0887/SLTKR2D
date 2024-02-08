@@ -50,26 +50,17 @@ modifiers={
 
 def getblockids():
     with open("block_id_.smp") as f:
-        pattern = re.compile(r"\{([a-zA-Z_]*)\}\s*:\s*\{([\d]*)\}")
-        for n, i in re.findall(pattern, f.read()):
-            try: blockinfos[n]
-            except: blockinfos[n] = {}
-            blockinfos[n]["id"] = int(i)
-            idtoblock[int(i)] = n
+        data=smp.getsmpvalue(f.read())
+    for name,i in data.items():
+        blockinfos[name]["id"] = int(i)
+        idtoblock[int(i)] = name
 
-def getblocktextures():
-    with open("block_textures.smp") as f:
-        pattern = re.compile(r"{(.*)}:{(.*)}")
-        for n, i in re.findall(pattern, f.read()):
-            try: blockinfos[n]
-            except: blockinfos[n] = {}
-            blockinfos[n]["path"] = i         
-
-def getblockcoords():
-    with open("block_icons.smp") as gbc:
-        pattern = re.compile(r"\{([a-zA-Z_]*)\}\s*:\s*\{\s*([\d]*),\s*([\d]*)\}")
-        for a, x, y in re.findall(pattern, gbc.read()):
-            blockinfos[a]["iconcord"] = (int(x), int(y))
+def geticoncoords():
+    with open("block_icons.smp") as f:
+        data=smp.getsmpvalue(f.read())
+    for icon,xy in data.items():
+        x,y=xy.split(',')
+        blockinfos[icon]["iconcoord"] = (int(x), int(y))
 
 def substitutelocale(s):
     i=0 # the index to look for the next opening bracket at
