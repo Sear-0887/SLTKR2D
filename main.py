@@ -9,7 +9,7 @@ from block import makeimage as blockmakeimage
 from io import BytesIO
 from PIL import Image
 from nextcord.ext import commands
-from lang import cmd, keywords
+from lang import cmds, keywords
 import collections
 
 intents = nextcord.Intents.default()
@@ -19,7 +19,7 @@ bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 print(cmds.ping.desc)
 idtoblock = {}
 
-blockinfos = {}
+blockinfos = collections.defaultdict(dict)
 
 locale={}
 
@@ -160,7 +160,7 @@ async def ping(ctx):
 async def scream(ctx, n:int=32):
     await ctx.send("A"*n)
    
-@bot.command(name="block", description=cmd.block.desc, aliases=cmd.block.alias)
+@command(bot,"block")
 async def block(ctx, blk=None):
     if blk:
         for key, ite in blockinfos.items():
@@ -205,7 +205,7 @@ async def image(ctx, *, x="[[16][20]][[16][16]]"):
             if b=='nic':
                 b='air'
             if b.isdigit():
-                b = quickidtable[int(b)]
+                b = idtoblock[int(b)]
             blocks[y][x] = {"type":b,"rotate":turn,"weld":weld}
     im=blockmakeimage(blocks,32)
     im.save("f.png")
