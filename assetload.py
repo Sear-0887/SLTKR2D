@@ -6,7 +6,7 @@ blockinfos = collections.defaultdict(dict)
 
 locale={}
 
-localedir='localization'
+localedir='assets/localization'
 lang='english'
 
 def capitalize(s):
@@ -32,14 +32,14 @@ modifiers={
 }
 
 def getblockids():
-    with open("block_id_.smp") as f:
+    with open("assets/block_id_.smp") as f:
         data=smp.getsmpvalue(f.read())
     for name,i in data.items():
         blockinfos[name]["id"] = int(i)
         idtoblock[int(i)] = name
 
 def geticoncoords():
-    with open("block_icons.smp") as f:
+    with open("assets/block_icons.smp") as f:
         data=smp.getsmpvalue(f.read())
     for icon,xy in data.items():
         x,y=xy.split(',')

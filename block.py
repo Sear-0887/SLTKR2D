@@ -8,13 +8,13 @@ import os
 
 blockpaths={}
 
-with open("block_textures.smp") as f:
+with open("assets/block_textures.smp") as f:
   data=smp.getsmpvalue(f.read())
 for name,texture in data.items():
   blockpaths[name] = texture
 
 def getblockim(block):
-	return PIL.Image.open(os.path.join('textures/blocks',blockpaths[block]))
+	return PIL.Image.open(os.path.join('assets/textures/blocks',blockpaths[block]))
 
 # https://stackoverflow.com/a/13054570
 class Block:
