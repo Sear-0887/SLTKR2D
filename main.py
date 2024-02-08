@@ -7,12 +7,12 @@ import re
 import decorator
 import smp
 from block import makeimage as blockmakeimage
-from dotenv import dotenv_values
 from PIL import Image
 from nextcord.ext import commands
 from lang import cmds, keywords
 import collections
 from assetload import idtoblock,blockinfos,locale,init
+from gettoken import gettoken
 
 intents = nextcord.Intents.default()
 intents.members = True
@@ -144,7 +144,7 @@ async def on_ready():
 # def returniscog(cogname):
 #     return bot.get_cog(cogname)
 
-token = dotenv_values("cred/.env")['TOKEN']
+token = gettoken()
 for cog_name in glob.glob("cog_*.py"):
     print(cog_name, "LOAD")
     bot.load_extension(cog_name[:-3])
