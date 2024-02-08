@@ -1,4 +1,5 @@
 import os
+import glob
 import nextcord
 import datetime
 import random
@@ -6,7 +7,7 @@ import re
 import decorator
 import smp
 from block import makeimage as blockmakeimage
-from io import BytesIO
+from dotenv import dotenv_values
 from PIL import Image
 from nextcord.ext import commands
 from lang import cmds, keywords
@@ -140,10 +141,11 @@ async def on_ready():
     global TimeOn
     TimeOn = datetime.datetime.now()
     
-    
-getblockids()
-geticoncoords()
-getlocale()
-print(bot.all_commands["help"].description)
-token = os.environ['token']
+# def returniscog(cogname):
+#     return bot.get_cog(cogname)
+
+token = dotenv_values("cred/.env")['TOKEN']
+for cog_name in glob.glob("cog_*.py"):
+    print(cog_name, "LOAD")
+    bot.load_extension(cog_name[:-3])
 bot.run(token)
