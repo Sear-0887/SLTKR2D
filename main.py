@@ -3,13 +3,13 @@ import nextcord
 import datetime
 import random
 import re
-import decorator
 from block import makeimage as blockmakeimage
 from PIL import Image
 from nextcord.ext import commands
 from lang import cmds, keywords
 from assetload import idtoblock,blockinfos,locale,init
 from gettoken import gettoken
+from commanddec import command
 
 intents = nextcord.Intents.default()
 intents.members = True
@@ -18,20 +18,6 @@ bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 print(cmds.ping.desc)
 
 init()
-
-def command(bot,name):
-    async def _trycmd(cmd,ctx,*args,**kwargs):
-        try:
-            await cmd(ctx,*args,**kwargs)
-        except Exception as e:
-            await ctx.send(getattr(cmds,name).error % args)
-            print(e)
-            raise e
-    def trycmd(cmd):
-        return decorator.decorate(cmd,_trycmd)
-    def fixcmd(cmd):
-        return bot.command(name=name, description=getattr(cmds,name).desc, aliases=getattr(cmds,name).aliases)(trycmd(cmd))
-    return fixcmd
 
 @command(bot,"help")
 async def help(ctx, cmdname=None,):
