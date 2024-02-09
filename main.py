@@ -59,54 +59,6 @@ async def ping(ctx):
 @command(bot,"scream")
 async def scream(ctx, n:int=32):
     await ctx.send("A"*n)
-   
-@command(bot,"block")
-async def block(ctx, block=None):
-    if block:
-        if block.isdigit():
-            block = idtoblock.get(int(block),'NIC') # numeric id to string
-        binfo=blockinfos[block]
-        embed = nextcord.Embed()
-        
-        img = Image.open("block_zoo.png")
-        icox, icoy = binfo["iconcord"]
-        img = img.crop((16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))).resize((128, 128), Image.NEAREST)
-        img.save("blockim.png")
-        embed.title = locale[("BLOCK_TITLE",block)]
-        embed.add_field(name="Block name", value=block)
-        embed.add_field(name="Block ID", value=binfo['id'])
-        embed.add_field(name="Block Tutorial", value=locale[("BLOCK_TUTORIAL",block)])
-        embed.set_image(url="attachment://blockim.png")
-        
-        await ctx.send(file=nextcord.File("blockim.png", filename="blockim.png"), embed=embed)
-    else:
-        await block(ctx, str(random.choice(idtoblock.keys())))
-    
-@command(bot,"image")
-async def image(ctx, *, x="[[16][20]][[16][16]]"):
-    blocks=smp.getsmpvalue(x)
-    for y,row in enumerate(blocks):
-        for x,b in enumerate(row):
-            print(b, x, y)
-            b=b.lower()
-            turn=0
-            weld=[True,True,True,True]
-            if '#' in b:
-                b,weld=b.split('#',maxsplit=1)
-                if weld[0] in 'eswn':
-                    turn='nwse'.index(weld[0])
-                    weld=weld[1:]
-                assert len(weld)==4
-                weld=[c=='1' for c in reversed(weld)]
-            if b=='nic':
-                b='air'
-            if b.isdigit():
-                b = idtoblock[int(b)]
-            blocks[y][x] = {"type":b,"rotate":turn,"weld":weld}
-    im=blockmakeimage(blocks,32)
-    im.save("f.png")
-    await ctx.send(file=nextcord.File("f.png", filename="f.png"))
-            
 
 @command(bot,"link")
 async def link(ctx, typ="r2d"):
