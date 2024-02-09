@@ -1,17 +1,17 @@
-from assetload import blockinfos, quickidtable, frs
+from assetload import blockinfos, idtoblock as quickidtable, frs
 import nextcord
 import random
 import re
 from PIL import Image
 from nextcord.ext import commands
-from lang import cmd, keywords
+from lang import cmds
 import block_extra as be
 
 class Block(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         
-    @commands.command(name="block", description=cmd.block.desc, aliases=cmd.block.alias)
+    @commands.command(name="block", description=cmds.block.desc, aliases=cmds.block.alias)
     async def block(self, ctx, blk=None):
         if blk:
             for key, ite in blockinfos.items():
@@ -33,13 +33,13 @@ class Block(commands.Cog):
                     
                     await ctx.send(file=nextcord.File("sed.png", filename="sed.png"), embed=embed)
                     return
-            await ctx.send(cmd.block.error % blk)
+            await ctx.send(cmds.block.error % blk)
         else:
             await self.block(ctx, str(random.randint(0, 101)))
 
     
         
-    @commands.command(name="image", description=cmd.image.desc, aliases=cmd.image.alias)
+    @commands.command(name="image", description=cmds.image.desc, aliases=cmds.image.alias)
     #eswn
     async def image(self, ctx, dt="[[16][20]][[16][16]]"):
         blockp = []#3layer
