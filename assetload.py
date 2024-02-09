@@ -79,7 +79,7 @@ def getlocale():
             linesiter=iter(f)
             for line in linesiter:
                 while line.endswith('\\\n'):
-                    line=line[:-1]+next(linesiter) # add the next line to this if this line ends with a backslash
+                    line=line[:-2]+'\n'+next(linesiter) # add the next line to this if this line ends with a backslash
                 line=re.sub('#.*$','',line) # remove comments
                 if '=' not in line:
                     continue
