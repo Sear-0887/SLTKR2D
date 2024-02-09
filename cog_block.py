@@ -57,23 +57,23 @@ class Block(commands.Cog):
                     print(block, weldtag, rotation, x, y)
                 if block != "NIC" and block != "air":
                     if block in be.wiredtypes:
+                        cordwr += [(x,y)]
                         if block in be.wafertypes:
+                            block = "air" if block == "wire_board" else block
                             blockp += [("wafer", weldtag, x, y),
                                         (block, "0000", x, y)]
                             blockp += [("wire", weldtag, x, y)]
+                            continue
                         if block in be.frametypes:
                             blockp += [("frame", weldtag, x, y), 
                                         (block, "0000", x, y)]
                             blockp += [("wire", weldtag, x, y)]
+                            continue
                         if block == "actuator":
                             blockp += [("actuator_base", "0001", x, y), 
                                     ("actuator_head", "1111", x, y)]
-                        cordwr += [(x,y)]
-                        
-                    else:
-                        blockp += [(block, weldtag, x, y)]
-                        print("T")
-                cordic += [(x, y)]
+                            continue
+                    blockp += [(block, weldtag, x, y)]
             width = max(width, x+1)
         height = max(height, y+1)
         print("WIDTH, HEIGHT =", width, height)

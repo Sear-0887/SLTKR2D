@@ -76,6 +76,49 @@ async def link(ctx, typ="r2d"):
     else:
         await ctx.send(cmd.link.error % typ)
         
+@commands.has_permissions(administrator=True)
+@bot.command(name="viewcog", description=cmd.viewcog.desc, aliases=cmd.viewcog.alias)
+async def viewcog(ctx):
+    embed = nextcord.Embed()
+    embed.description = ""
+    for cog_name in glob.glob("cog_*.py"):
+        print([dir(o) for i, o in bot.cogs.items()])
+        print([o.__cog_name__ for i, o in bot.cogs.items()])
+        embed.description += "| %s \n" % cog_name[:-3]
+    await ctx.send(embed=embed)
+@commands.has_permissions(administrator=True)
+@bot.command(name="cog_load", description=cmd.loadcog.desc, aliases=cmd.loadcog.alias)
+async def loadcog(ctx, tar):
+    try:
+        bot.load_extension("cog_"+tar)
+        await ctx.send("LOADED "+"cog_"+tar+".py")
+    except commands.errors.ExtensionAlreadyLoaded:
+        await ctx.send("cog_"+tar+".py is already loaded.")
+    except commands.errors.ExtensionNotFound:
+        await ctx.send("cog_"+tar+".py not found.")
+        
+@commands.has_permissions(administrator=True)
+@bot.command(name="cog_unload", description=cmd.unloadcog.desc, aliases=cmd.unloadcog.alias)
+async def unloadcog(ctx, tar):
+    try:
+        if tar == "cog_admin": raise commands.errors.ExtensionNotFound # prevent softlock
+        bot.unload_extension("cog_"+tar)
+        await ctx.send("UNLOADED "+"cog_"+tar+".py")
+    except commands.errors.ExtensionAlreadyLoaded:
+        await ctx.send("cog_"+tar+".py is already unloaded.")
+    except commands.errors.ExtensionNotFound:
+        await ctx.send("cog_"+tar+".py not found.")
+        
+@commands.has_permissions(administrator=True)
+@bot.command(name="cog_reload", description=cmd.reloadcog.desc, aliases=cmd.reloadcog.alias)
+async def unloadcog(ctx, tar):
+    try:
+        bot.unload_extension("cog_"+tar)
+        await ctx.send("RELOADED "+"cog_"+tar+".py")
+    except commands.errors.ExtensionNotFound:
+        await ctx.send("cog_"+tar+".py not found.")        
+        
+
 @bot.event
 async def on_ready():
     print("ONLINE as %s, id %s." % (bot.user, bot.user.id))
@@ -90,5 +133,6 @@ token = dotenv_values("cred/.env")['TOKEN']
 for cog_name in glob.glob("cog_*.py"):
     print(cog_name, "LOAD")
     bot.load_extension(cog_name[:-3])
+    print(bot.cogs)
 keep_alive.keep_alive()
 bot.run(token)
