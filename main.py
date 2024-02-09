@@ -1,13 +1,9 @@
 import glob
 import nextcord
 import datetime
-import random
-import re
-from block import makeimage as blockmakeimage
-from PIL import Image
+from assetload import init
 from nextcord.ext import commands
 from lang import cmds, keywords
-from assetload import idtoblock,blockinfos,locale,init
 from gettoken import gettoken
 from commanddec import command
 

@@ -8,6 +8,8 @@ from lang import cmds
 import block_extra as be
 from commanddec import command2
 from assetload import idtoblock
+from block import makeimage as blockmakeimage
+import smp
 
 class Block(commands.Cog):
     def __init__(self, bot):
