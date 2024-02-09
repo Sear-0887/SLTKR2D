@@ -1,16 +1,13 @@
-import os
 import glob
 import nextcord
 import datetime
 import random
 import re
 import decorator
-import smp
 from block import makeimage as blockmakeimage
 from PIL import Image
 from nextcord.ext import commands
 from lang import cmds, keywords
-import collections
 from assetload import idtoblock,blockinfos,locale,init
 from gettoken import gettoken
 
@@ -92,7 +89,7 @@ async def block(ctx, block=None):
         embed.title = locale[("BLOCK_TITLE",block)]
         embed.add_field(name="Block name", value=block)
         embed.add_field(name="Block ID", value=binfo['id'])
-        embed.add_field(name="Block Tutorial", value=re.sub(r"\\", r"\n", locale[("BLOCK_TUTORIAL",block)]))
+        embed.add_field(name="Block Tutorial", value=locale[("BLOCK_TUTORIAL",block)])
         embed.set_image(url="attachment://blockim.png")
         
         await ctx.send(file=nextcord.File("blockim.png", filename="blockim.png"), embed=embed)

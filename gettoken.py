@@ -5,7 +5,7 @@ def gettoken():
 	except:
 		pass
 	try:
-		with open('creds/token') as f
+		with open('creds/token') as f:
 			token=f.read()
 		return token
 	except:
@@ -13,3 +13,5 @@ def gettoken():
 	try:
 		import os
 		return os.environ['token']
+	except:
+		pass
