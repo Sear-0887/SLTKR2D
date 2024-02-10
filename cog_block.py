@@ -62,8 +62,8 @@ class Block(commands.Cog):
                     b = idtoblock[int(b)]
                 blocks[y][x] = {"type":b,"rotate":turn,"weld":weld}
         im=blockmakeimage(blocks,32)
-        im.save("f.png")
-        await ctx.send(file=nextcord.File("f.png", filename="f.png"))
+        im.save("blocks.png")
+        await ctx.send(file=nextcord.File("blocks.png", filename="f.png"))
         
 def setup(bot):
 	bot.add_cog(Block(bot))
