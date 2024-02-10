@@ -70,6 +70,36 @@ class cmd:
         cmddisplay = "%s - %s (%s)"
         error      = "Unable to reach all cogs."
 
+    class loadcog:
+        alias      = ["cgl", "cogload"]
+        syntax     = "!loadcog"
+        desc       = """
+            Loads the cog specified.
+            Admin-Only Command.
+        """
+        cmddisplay = "%s - %s (%s)"
+        error      = "Unable to reach all cogs."
+        
+    class unloadcog:
+        alias      = ["cgu", "cogunload"]
+        syntax     = "!unloadcog"
+        desc       = """
+            Unloads the cog specified.
+            Admin-Only Command.
+        """
+        cmddisplay = "%s - %s (%s)"
+        error      = "Unable to reach all cogs."
+        
+    class reloadcog:
+        alias      = ["cgr", "cogreload"]
+        syntax     = "!reloadcog"
+        desc       = """
+            Reloads the cog specified.
+            Admin-Only Command.
+        """
+        cmddisplay = "%s - %s (%s)"
+        error      = "Unable to reach all cogs."
+        
 keywords = {
     "Roody:2D Game Discord Server": {
         "link": "https://discord.gg/gbEkBNt",
