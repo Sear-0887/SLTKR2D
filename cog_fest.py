@@ -1,11 +1,8 @@
-from assetload import blockinfos, quickidtable, frs
 import nextcord
 import random
-import re
 from PIL import Image
 from nextcord.ext import commands
-from lang import cmd, keywords
-import block_extra as be
+from assetload import blockinfos, idtoblock as quickidtable
 # 0~101, win = 103
 # 10 day
 # each day 8 chance
