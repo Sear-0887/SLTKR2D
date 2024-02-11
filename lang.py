@@ -75,7 +75,7 @@ class cmds:
         """
         error      = "Unable to form image."
     class viewcog:
-        alias      = ["cg", "vcg", "cog"]
+        aliases    = ["cg", "vcg", "cog"]
         syntax     = "!viewcog"
         desc       = """
             Read the current status of cogs detected.
@@ -84,7 +84,7 @@ class cmds:
         cmddisplay = "%s - %s (%s)"
         error      = "Unable to reach all cogs."
     class loadcog:
-        alias      = ["cgl", "cogload"]
+        aliases    = ["cgl", "cogload"]
         syntax     = "!loadcog"
         desc       = """
             Loads the cog specified.
@@ -93,7 +93,7 @@ class cmds:
         cmddisplay = "%s - %s (%s)"
         error      = "Unable to reach all cogs."
     class unloadcog:
-        alias      = ["cgu", "cogunload"]
+        aliases    = ["cgu", "cogunload"]
         syntax     = "!unloadcog"
         desc       = """
             Unloads the cog specified.
@@ -102,7 +102,7 @@ class cmds:
         cmddisplay = "%s - %s (%s)"
         error      = "Unable to reach all cogs."
     class reloadcog:
-        alias      = ["cgr", "cogreload"]
+        aliases    = ["cgr", "cogreload"]
         syntax     = "!reloadcog"
         desc       = """
             Reloads the cog specified.
