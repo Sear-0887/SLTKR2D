@@ -24,6 +24,7 @@ def command2(name,classname=None):
         try:
             await cmd(ctx,*args,**kwargs)
         except Exception as e:
+            print(cmdclass.error % args)
             await ctx.send(cmdclass.error % args)
             print(e)
             raise e
