@@ -106,3 +106,11 @@ class cmds:
             Admin-Only Command.
         """
         error      = "Unable to reach all cogs."
+    class test:
+        aliases    = []
+        syntax     = "!test"
+        desc       = """
+            Test some commands
+            Admin-Only Command.
+        """
+        error      = "Unable to test."

@@ -66,6 +66,11 @@ async def link(ctx, typ="r2d"):
         raise Exception('')
         #await ctx.send(cmds.link.error % typ)
 
+@commands.has_permissions(administrator=True)
+@command(bot,'test')
+async def test(ctx):
+    await ctx.send('!help')
+
 @bot.event
 async def on_ready():
     print(f"ONLINE as {bot.user}, id {bot.user.id}.")
