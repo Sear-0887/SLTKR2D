@@ -33,7 +33,7 @@ class cmds:
             PREFIX: !
             Please use the command !help <cmd> to view what !<cmd> does.
             SLTKR2D by <@697801071208300574>, All rights reserved.
-            Time Since Last Restart: %s
+            Time Since Last Restart: {}
             This bot is open-source on [Github](https://github.com/Sear-0887/SLTKR2D).
         """
     class ping:
@@ -52,7 +52,7 @@ class cmds:
         aliases      = ["blk", "blkinfo", "binfo"]
         syntax     = "!block <blk>"
         desc       = "Allow you to view <blk>'s properties & icon. if left blank, it gives a random block.\nSupports using name or ID."
-        error      = "Unable to find block %s."
+        error      = "Unable to find block {}."
     
     class link:
         aliases      = ["l", "lnk", "www"]
@@ -62,7 +62,7 @@ class cmds:
             Currently supports these links:
             {linksstr}
         """
-        error      = "Unable to find link through %s"
+        error      = "Unable to find link through v"
     class image:
         aliases      = ["img", "i", "blockimg"]
         syntax     = "!image <string>"
@@ -81,7 +81,6 @@ class cmds:
             Read the current status of cogs detected.
             Admin-Only Command.
         """
-        cmddisplay = "%s - %s (%s)"
         error      = "Unable to reach all cogs."
     class loadcog:
         aliases    = ["cgl", "cogload"]
@@ -90,7 +89,6 @@ class cmds:
             Loads the cog specified.
             Admin-Only Command.
         """
-        cmddisplay = "%s - %s (%s)"
         error      = "Unable to reach all cogs."
     class unloadcog:
         aliases    = ["cgu", "cogunload"]
@@ -99,7 +97,6 @@ class cmds:
             Unloads the cog specified.
             Admin-Only Command.
         """
-        cmddisplay = "%s - %s (%s)"
         error      = "Unable to reach all cogs."
     class reloadcog:
         aliases    = ["cgr", "cogreload"]
@@ -108,5 +105,4 @@ class cmds:
             Reloads the cog specified.
             Admin-Only Command.
         """
-        cmddisplay = "%s - %s (%s)"
         error      = "Unable to reach all cogs."

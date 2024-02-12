@@ -7,15 +7,6 @@ from commanddec import command2
 class Admin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        
-    # @commands.has_permissions(administrator=True)
-    # @command2("viewcog",classname="viewcog")
-    # async def viewcog(self, ctx):
-    #     embed = nextcord.Embed()
-    #     embed.description = ""
-    #     for cog_name in glob.glob("cog_*.py"):
-    #         embed.description += "| %s \n" % cog_name[:-3]
-    #     await ctx.send(embed=embed)
 
     @commands.has_permissions(administrator=True)
     @command2("viewcog",classname="viewcog")
@@ -25,7 +16,7 @@ class Admin(commands.Cog):
         for cog_name in glob.glob("cog_*.py"):
             print([dir(o) for i, o in self.bot.cogs.items()])
             print([o.__cog_name__ for i, o in self.bot.cogs.items()])
-            embed.description += "| %s \n" % cog_name[:-3]
+            embed.description += f"| {cog_name[:-3]} \n"
         await ctx.send(embed=embed)
 
     @commands.has_permissions(administrator=True)

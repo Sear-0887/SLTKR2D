@@ -19,7 +19,7 @@ init()
 async def help(ctx, cmdname=None,):
     if not cmdname:
         embed = nextcord.Embed()
-        embed.description = cmds.help.blankdisplay % (datetime.datetime.now()-TimeOn)
+        embed.description = cmds.help.blankdisplay.format(datetime.datetime.now()-TimeOn)
         view = nextcord.ui.View()
         async def gethelplist(interaction):
             sembed = nextcord.Embed()
@@ -63,11 +63,12 @@ async def link(ctx, typ="r2d"):
             await ctx.send(f"`{i}` - {keywords[i]['link']}")
             return
     else:
-        await ctx.send(cmds.link.error % typ)
-        
+        raise Exception('')
+        #await ctx.send(cmds.link.error % typ)
+
 @bot.event
 async def on_ready():
-    print("ONLINE as %s, id %s." % (bot.user, bot.user.id))
+    print(f"ONLINE as {bot.user}, id {bot.user.id}.")
     print("Done.")
     global TimeOn
     TimeOn = datetime.datetime.now()

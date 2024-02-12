@@ -7,7 +7,7 @@ def command(bot,name):
         try:
             await cmd(ctx,*args,**kwargs)
         except Exception as e:
-            await ctx.send(getattr(cmds,name).error % args)
+            await ctx.send(getattr(cmds,name).error.format(*args[1:]))
             print(e)
             raise e
     def trycmd(cmd):
@@ -24,8 +24,8 @@ def command2(name,classname=None):
         try:
             await cmd(ctx,*args,**kwargs)
         except Exception as e:
-            print(cmdclass.error % args)
-            await ctx.send(cmdclass.error % args)
+            print(cmdclass.error.format(*args[1:]))
+            await ctx.send(cmdclass.error.format(*args[1:]))
             print(e)
             raise e
     def trycmd(cmd):

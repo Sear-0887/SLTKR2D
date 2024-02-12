@@ -26,7 +26,7 @@ class Fest(commands.Cog):
             img = img.crop((16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))).resize((128, 128), Image.NEAREST)
             img.save("sed.png")
             embed.title = "Mission Failed, We'll get them next time."
-            embed.description = "Here's a %s to calm you :)" % key.replace("_", " ")
+            embed.description = f"Here's a {key.replace("_", " ")} to calm you :)"
             embed.set_image(url="attachment://sed.png")
             embed.set_footer(text=ctx.author.name)
             await ctx.send(file=nextcord.File("sed.png", filename="sed.png"), embed=embed)
@@ -44,6 +44,6 @@ class Fest(commands.Cog):
         print(error)
         if isinstance(error, commands.CommandOnCooldown):
             print("ERR", cog)
-            await ctx.send('This command is on cooldown, you can use it in %ss.' % round(error.retry_after, 2))
+            await ctx.send(f'This command is on cooldown, you can use it in {round(error.retry_after, 2)}s.')
 def setup(bot):
 	bot.add_cog(Fest(bot))
