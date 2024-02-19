@@ -46,16 +46,21 @@ class Block(commands.Cog):
         for y,row in enumerate(blocks):
             for x,b in enumerate(row):
                 print(b, x, y)
-                b=b.lower()
+                b=b.lower().strip()
+                b=''.join(b.split()) # remove all whitespace
                 turn=0
                 weld=[True,True,True,True]
-                if '#' in b:
-                    b,weld=b.split('#',maxsplit=1)
-                    if weld[0] in 'eswn':
-                        turn='nwse'.index(weld[0])
-                        weld=weld[1:]
-                    assert len(weld)==4
-                    weld=[c=='1' for c in reversed(weld)]
+                match=re.fullmatch('(?:([^]#]+)(?:#([eswn])?([01]{4})?)?)|#([^]]+)',b)
+                if match is None:
+                    raise Exception(f'Invalid block: {b}')
+                b,turnm,weldm,unwelded=match.groups()
+                if unwelded is not None:
+                    weld=[False,False,False,False]
+                    b=unwelded
+                if turnm is not None:
+                    turn='nwse'.index(turnm)
+                if weldm is not None:
+                    weld=[c=='1' for c in reversed(weldm)]
                 if b=='nic':
                     b='air'
                 if b.isdigit():
