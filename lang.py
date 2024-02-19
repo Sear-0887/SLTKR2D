@@ -73,7 +73,7 @@ class cmds:
             Examples: [[cast_iron][wire_spool]][[cast_iron][cast_iron]] - arc_furnace recipe
             Examples: [[16][20]] [[16][20]] - Same recipe
         """
-        error      = "Unable to form image."
+        error      = "Unable to make image from {x}."
     class viewcog:
         aliases    = ["cg", "vcg", "cog"]
         syntax     = "!viewcog"

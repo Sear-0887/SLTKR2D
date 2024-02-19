@@ -22,7 +22,7 @@ class Fest(commands.Cog):
             key = "air" if key=="NIC" else key
             embed = nextcord.Embed()
             img = Image.open("assets/block_zoo.png")
-            icox, icoy = blockinfos[key]["iconcord"]
+            icox, icoy = blockinfos[key]["iconcoord"]
             img = img.crop((16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))).resize((128, 128), Image.NEAREST)
             img.save("sed.png")
             embed.title = "Mission Failed, We'll get them next time."
