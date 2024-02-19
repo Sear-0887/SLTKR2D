@@ -62,7 +62,7 @@ class cmds:
             Currently supports these links:
             {linksstr}
         """
-        error      = "Unable to find link through v"
+        error      = "Unable to find link for {}"
     class image:
         aliases      = ["img", "i", "blockimg"]
         syntax     = "!image <string>"
