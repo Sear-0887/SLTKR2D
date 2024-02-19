@@ -11,7 +11,12 @@ def command(bot,name,classname=None):
             await cmd(ctx,*args,**kwargs)
         except Exception as e:
             print('the thing:',e,type(e))
-            await ctx.send(cmdclass.error.format(*args[1:]))
+            print('the thing:',ctx,args,kwargs)
+            try:
+                s=cmdclass.error.format(*args,**kwargs)
+            except:
+                s=cmdclass.error
+            await ctx.send(s)
             print('the thing again:',e)
             raise e
     def trycmd(cmd):
@@ -26,11 +31,15 @@ def command2(name,classname=None):
     cmdclass=getattr(cmds,classname)
     async def _trycmd(cmd,self,ctx,*args,**kwargs):
         try:
-            await cmd(ctx,self,*args,**kwargs)
+            await cmd(self,ctx,*args,**kwargs)
         except Exception as e:
             print('the thing:',e,type(e))
             print('the thing:',self,ctx,args,kwargs)
-            await ctx.send(cmdclass.error.format(*args[1:]))
+            try:
+                s=cmdclass.error.format(*args,**kwargs)
+            except:
+                s=cmdclass.error
+            await ctx.send(s)
             print('the thing again:',e)
             raise e
     def trycmd(cmd):
