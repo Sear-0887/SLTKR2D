@@ -8,7 +8,7 @@ import os
 
 blockpaths={}
 
-with open("assets/block_textures.smp") as f:
+with open(config.blocktextures) as f:
   data=smp.getsmpvalue(f.read())
 for name,texture in data.items():
   blockpaths[name] = texture
