@@ -10,6 +10,7 @@ from commanddec import command2
 from assetload import idtoblock
 from block import makeimage as blockmakeimage
 import smp
+import config
 
 class Block(commands.Cog):
     def __init__(self, bot):
@@ -23,7 +24,7 @@ class Block(commands.Cog):
             binfo=blockinfos[block]
             embed = nextcord.Embed()
             
-            img = Image.open("assets/block_zoo.png")
+            img = Image.open(config.blockicons)
             icox, icoy = binfo["iconcoord"]
             img = img.crop((16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))).resize((128, 128), Image.NEAREST)
             img.save("cache/blockim.png")
