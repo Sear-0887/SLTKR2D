@@ -1,11 +1,9 @@
 import decorator
-from lang import cmds
+from lang import cmdi
 from nextcord.ext import commands
 
-def command(bot,name,classname=None):
-    if classname is None:
-        classname=name
-    cmdclass=getattr(cmds,classname)
+def command(bot,name):
+    cmdclass = cmdi[name]
     async def _trycmd(cmd,ctx,*args,**kwargs):
         try:
             await cmd(ctx,*args,**kwargs)
@@ -13,22 +11,21 @@ def command(bot,name,classname=None):
             print('the thing:',e,type(e))
             print('the thing:',ctx,args,kwargs)
             try:
-                s=cmdclass.error.format(*args,**kwargs)
+                s=cmdclass["error"].format(*args,**kwargs)
             except:
-                s=cmdclass.error
+                s=cmdclass["error"]
             await ctx.send(s)
             print('the thing again:',e)
             raise e
     def trycmd(cmd):
         return decorator.decorate(cmd,_trycmd)
     def fixcmd(cmd):
-        return bot.command(name=name, description=cmdclass.desc, aliases=cmdclass.aliases)(trycmd(cmd))
+        print(cmdclass["aliases"])
+        return bot.command(name=name, description=cmdclass["desc"], aliases=cmdclass["aliases"])(trycmd(cmd))
     return fixcmd
 
-def command2(name,classname=None):
-    if classname is None:
-        classname=name
-    cmdclass=getattr(cmds,classname)
+def command2(name):
+    cmdclass = cmdi[name]
     async def _trycmd(cmd,self,ctx,*args,**kwargs):
         try:
             await cmd(self,ctx,*args,**kwargs)
@@ -45,5 +42,5 @@ def command2(name,classname=None):
     def trycmd(cmd):
         return decorator.decorate(cmd,_trycmd)
     def fixcmd(cmd):
-        return commands.command(name=name, description=cmdclass.desc, aliases=cmdclass.aliases)(trycmd(cmd))
+        return commands.command(name=name, description=cmdclass["desc"], aliases=cmdclass["aliases"])(trycmd(cmd))
     return fixcmd

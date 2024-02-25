@@ -3,7 +3,7 @@ import nextcord
 import datetime
 from assetload import init
 from nextcord.ext import commands
-from lang import cmds, keywords
+from lang import keywords, phraser, cmdi, evl
 from gettoken import gettoken
 from commanddec import command
 
@@ -11,20 +11,21 @@ intents = nextcord.Intents.default()
 intents.members = True
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
-print(cmds.ping.desc)
 
+phraser()
 init()
+
 
 @command(bot,"help")
 async def help(ctx, cmdname=None,):
     if not cmdname:
         embed = nextcord.Embed()
-        embed.description = cmds.help.blankdisplay.format(datetime.datetime.now()-TimeOn)
+        embed.description = evl("help.blankdisplay").format(datetime.datetime.now()-TimeOn)
         view = nextcord.ui.View()
         async def gethelplist(interaction):
             sembed = nextcord.Embed()
             sembed.title = "Help List"
-            sembed.description = "Here's a list of commands:\n" + ", ".join([cmd for cmd in dir(cmds) if not cmd.startswith("__")])
+            sembed.description = "Here's a list of commands:\n" + ", ".join(cmdi.keys())
             await interaction.send(ephemeral=True, embed=sembed)
         getlistbtn = nextcord.ui.Button(style=nextcord.ButtonStyle.blurple, label="Help List")
         getlistbtn.callback = gethelplist
@@ -36,15 +37,14 @@ async def help(ctx, cmdname=None,):
                 cmdname = i
             if cmdname == i:
                 embed = nextcord.Embed()
-                cmd = getattr(cmds,cmdname)
                 embed.title = cmdname
-                embed.description = cmd.desc
-                embed.add_field(name="Syntax", value=cmd.syntax)
-                embed.add_field(name="Aliases", value=",\n".join(cmd.aliases))
+                embed.description = evl(f"{cmdname}.desc")
+                embed.add_field(name="Syntax", value=evl(f"{cmdname}.syntax"))
+                embed.add_field(name="Aliases", value=",\n".join(evl(f"{cmdname}.aliases")))
                 await ctx.send(embed=embed)
                 return
         else:
-            await ctx.send(cmds.help.error)
+            await ctx.send(evl(f"{cmdname}.error"))
 
 @command(bot,"ping")
 async def ping(ctx):

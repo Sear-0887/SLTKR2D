@@ -1,5 +1,9 @@
 __pycache__/
-creds/
-token
-blockim.png
-blocks.png
+.vscode/
+cred/
+assets/OLD/
+cache/
+db/
+
+_cog_*.py
+.gitignore

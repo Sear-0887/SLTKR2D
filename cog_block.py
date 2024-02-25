@@ -4,7 +4,7 @@ import random
 import re
 from PIL import Image
 from nextcord.ext import commands
-from lang import cmds
+from lang import evl
 import block_extra as be
 from commanddec import command2
 from assetload import idtoblock
@@ -26,14 +26,14 @@ class Block(commands.Cog):
             img = Image.open("assets/block_zoo.png")
             icox, icoy = binfo["iconcoord"]
             img = img.crop((16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))).resize((128, 128), Image.NEAREST)
-            img.save("blockim.png")
+            img.save("cache/blockim.png")
             embed.title = locale[("BLOCK_TITLE",block)]
             embed.add_field(name="Block name", value=block)
             embed.add_field(name="Block ID", value=binfo['id'])
             embed.add_field(name="Block Tutorial", value=locale[("BLOCK_TUTORIAL",block)])
             embed.set_image(url="attachment://blockim.png")
             
-            await ctx.send(file=nextcord.File("blockim.png", filename="blockim.png"), embed=embed)
+            await ctx.send(file=nextcord.File("cache/blockim.png", filename="blockim.png"), embed=embed)
         else:
             await self.block(ctx, str(random.choice([*idtoblock.keys()])))
 
@@ -67,8 +67,8 @@ class Block(commands.Cog):
                     b = idtoblock[int(b)]
                 blocks[y][x] = {"type":b,"rotate":turn,"weld":weld}
         im=blockmakeimage(blocks,32)
-        im.save("blocks.png")
-        await ctx.send(file=nextcord.File("blocks.png", filename="f.png"))
+        im.save("cache/blocks.png")
+        await ctx.send(file=nextcord.File("cache/blocks.png", filename="f.png"))
         
 def setup(bot):
 	bot.add_cog(Block(bot))
