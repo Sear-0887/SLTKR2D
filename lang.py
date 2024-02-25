@@ -1,6 +1,6 @@
-import glob
 import re
 import collections
+import os
 
 keywords = {
     "Roody:2D Game Discord Server": {
@@ -27,20 +27,8 @@ def recursiveddict():
 
 cmdi = recursiveddict()
 
-# delete 
-# def repri(): # USED FOR MIGRATING FROM CLASS METHOD TO .TXT FILES
-#     for cmdname in dir(cmds): 
-#         if not cmdname.startswith('__'):
-#             clas = getattr(cmds, cmdname)
-#             for cmdattr in dir(clas):
-#                 if not cmdattr.startswith('__'):
-#                     print(f"{cmdname}.{cmdattr} = {getattr(clas, cmdattr)}")
-#             print("\n")
-
-# ???
-
 def phraser():
-    for fname in os.listdir(config.cmdlocaledir):
+    for fname in os.listdir(config.cmdlocaledir): # you could filter for only .txt files
         with open(fname) as f:
             linesiter=iter(f)
             for line in linesiter:
@@ -60,8 +48,8 @@ def phraser():
     cmdi["link"]["desc"] = cmdi["link"]["desc"].format(linksstr) # aaaaaaaaaaaaaaaaaaaaaaaaaa
 
 def evl(target):
-    target = target.split(".") # why this when cmdi always has two levels
-    root = cmdi
+    target = target.split(".")
+    out = cmdi
     for i in target:
-        root = root[i]
-    return root
+        out = out[i]
+    return out
