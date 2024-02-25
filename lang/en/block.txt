@@ -1,0 +1,17 @@
+## block
+block.aliases = [blk, blkinfo, binfo]
+block.desc = Allow you to view <blk>'s properties & icon. if left blank, it gives a random block. \
+Supports using name or ID.
+block.error = Unable to find block {}.
+block.syntax = !block <blk>
+
+## image
+image.aliases = [img, i, blockimg]
+image.desc = Makes an image from <string> in the format of recipe.smp. \
+Can use block name or ID. \
+Note that this function is still unfinished. \
+Examples: [[cast_iron][wire_spool]][[cast_iron][cast_iron]] - arc_furnace recipe \
+Examples: [[16][20]] [[16][20]] - Same recipe
+
+image.error = Unable to make image from {x}.
+image.syntax = !image <string>

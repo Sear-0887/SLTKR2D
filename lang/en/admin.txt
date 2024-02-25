@@ -1,0 +1,31 @@
+## unloadcog
+unloadcog.aliases = [cgu, cogunload]
+unloadcog.desc = Unloads the cog specified. \
+Admin-Only Command.
+
+unloadcog.error = Unable to reach all cogs.
+unloadcog.syntax = !unloadcog
+
+## viewcog
+viewcog.aliases = [cg, vcg, cog]
+viewcog.desc = Read the current status of cogs detected. \
+Admin-Only Command.
+
+viewcog.error = Unable to reach all cogs.
+viewcog.syntax = !viewcog
+
+## reloadcog
+reloadcog.aliases = [cgr, cogreload]
+reloadcog.desc = Reloads the cog specified. \
+Admin-Only Command.
+
+reloadcog.error = Unable to reach all cogs.
+reloadcog.syntax = !reloadcog
+
+## loadcog
+loadcog.aliases = [cgl, cogload]
+loadcog.desc = Loads the cog specified.\
+Admin-Only Command.
+
+loadcog.error = Unable to reach all cogs.
+loadcog.syntax = !loadcog

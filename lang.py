@@ -1,105 +1,3 @@
-class cmd:
-    class help: 
-        alias = ["h"]
-        syntax = "!help <cmd>"
-        desc = """
-            Displays what command <cmd> does.
-            if left blank, it will show bot's info.
-        """
-        cmddisplay = "/"
-        error = "Please Provide a valid command name."
-        blankdisplay = """
-            # SLTK R2D
-            A Roody:2D Utility Bot that displays useful informations.
-            PREFIX: !
-            Please use the command !help <cmd> to view what the <cmd> does.
-            SLTKR2D by <@697801071208300574>, All right's reserved.
-            Bot Since Last restart: %s
-            This bot is open-sourced on Github in [Here](https://github.com/Sear-0887/SLTKR2D).
-        """
-    class ping:
-        alias      = []
-        syntax     = "!ping"
-        desc       = "Pong! + Display the latency of bot in ms."
-        cmddisplay = "Pong! (%s ms)"
-        error      = "This is a error message"
-
-    class scream:
-        alias      = ["AAAAA"]
-        syntax     = "!scream"
-        desc       = "*It symboilizes my sanity*"
-        cmddisplay = "/"
-        error      = "This is a error message"
-
-    class block:
-        alias      = ["blk", "blkinfo", "binfo"]
-        syntax     = "!block <blk>"
-        desc       = "Allow you to view block <blk>'s properties & icon. if left blank, it gives a random block.\nSupport finding by name or ID."
-        cmddisplay = "/"
-        error      = "Unable to find block %s."
-    
-    class link:
-        alias      = ["l", "lnk", "www"]
-        syntax     = "!link <keyword>"
-        desc       = """
-            Allow you to mention various game-related links through <keyword>.
-            Currently Support these links:
-            %s
-        """
-        cmddisplay = "`%s` - %s"
-        error      = "Unable to find link through %s"
-    class image:
-        alias      = ["img", "i", "blockimg"]
-        syntax     = "!image <string>"
-        desc       = """
-            Allow you to build in-game recipe through <string> in the format of recipe.smps.
-            Note that this function is still unfinished.
-            Examples: [[cast_iron][wire_spool]][[cast_iron][cast_iron]] - arc_furnace recipe
-            Examples: [[16][20]] [[16][20]] - Same recipe
-        """
-        cmddisplay = "/"
-        error      = "Unable to form image."
-    
-    class viewcog:
-        alias      = ["cg", "vcg", "cog"]
-        syntax     = "!viewcog"
-        desc       = """
-            Read the current status of cogs detected.
-            Admin-Only Command.
-        """
-        cmddisplay = "%s - %s (%s)"
-        error      = "Unable to reach all cogs."
-
-    class loadcog:
-        alias      = ["cgl", "cogload"]
-        syntax     = "!loadcog"
-        desc       = """
-            Loads the cog specified.
-            Admin-Only Command.
-        """
-        cmddisplay = "%s - %s (%s)"
-        error      = "Unable to reach all cogs."
-        
-    class unloadcog:
-        alias      = ["cgu", "cogunload"]
-        syntax     = "!unloadcog"
-        desc       = """
-            Unloads the cog specified.
-            Admin-Only Command.
-        """
-        cmddisplay = "%s - %s (%s)"
-        error      = "Unable to reach all cogs."
-        
-    class reloadcog:
-        alias      = ["cgr", "cogreload"]
-        syntax     = "!reloadcog"
-        desc       = """
-            Reloads the cog specified.
-            Admin-Only Command.
-        """
-        cmddisplay = "%s - %s (%s)"
-        error      = "Unable to reach all cogs."
-        
 keywords = {
     "Roody:2D Game Discord Server": {
         "link": "https://discord.gg/gbEkBNt",
@@ -114,3 +12,48 @@ keywords = {
         "kw": ["wiki", "sltkwiki", "wikipage", "r2dwiki"]
     }
 }
+
+linksstr="".join([
+    f"{name} ({data['link']})\nKeywords: `{'`, `'.join(data['kw'])}`\n"
+    for name,data in keywords.items()
+])
+
+
+
+import glob
+import re
+cmdi = {}
+
+# def repri(): # USED FOR MIGRATING FROM CLASS METHOD TO .TXT FILES
+#     for cmdname in dir(cmds): 
+#         if not cmdname.startswith('__'):
+#             clas = getattr(cmds, cmdname)
+#             for cmdattr in dir(clas):
+#                 if not cmdattr.startswith('__'):
+#                     print(f"{cmdname}.{cmdattr} = {getattr(clas, cmdattr)}")
+#             print("\n")
+                    
+def phraser():
+    for i in glob.glob("lang/en/*.txt"):
+        with open(i , "r") as f:
+            fc = re.sub(r"\\\s*\n", r"\\", f.read())
+            for line in fc.split("\n"):
+                if line.startswith("##"): continue
+                for cmd, ele, val in re.findall(r"^(\w+).(\w+)\s*=\s*(.+)", line):
+                    val = val.replace("\\", "\n")
+                    if re.match(r"^\[.*\]$", val):
+                        val = val[1:-1].split(", ")
+                        if val == ['']: val = []
+                    try: cmdi[cmd]
+                    except: cmdi[cmd] = {}
+                    cmdi[cmd][ele] = val
+    print(cmdi["help"]["aliases"])
+    # EXCEPTIONS
+    cmdi["link"]["desc"] = cmdi["link"]["desc"].format(linksstr)
+
+def evl(target):
+    target = target.split(".")
+    root = cmdi
+    for i in target:
+        root = root[i]
+    return root
