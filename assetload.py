@@ -33,14 +33,14 @@ modifiers={
 }
 
 def getblockids():
-    with open("assets/block_id_.smp") as f:
+    with open(config.blockidfile) as f:
         data=smp.getsmpvalue(f.read())
     for name,i in data.items():
         blockinfos[name]["id"] = int(i)
         idtoblock[int(i)] = name
 
 def geticoncoords():
-    with open("assets/block_icons.smp") as f:
+    with open(config.blockcoordfile) as f:
         data=smp.getsmpvalue(f.read())
     for icon,xy in data.items():
         x,y=xy.split(',')
