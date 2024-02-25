@@ -1,6 +1,7 @@
 import re
 import collections
 import os
+import config
 
 keywords = {
     "Roody:2D Game Discord Server": {
@@ -29,7 +30,7 @@ cmdi = recursiveddict()
 
 def phraser():
     for fname in os.listdir(config.cmdlocaledir): # you could filter for only .txt files
-        with open(fname) as f:
+        with open(os.path.join(config.cmdlocaledir,fname)) as f:
             linesiter=iter(f)
             for line in linesiter:
                 while line.endswith('\\\n'):
@@ -38,11 +39,15 @@ def phraser():
                 if '=' not in line:
                     continue
                 key,value=line.split('=',maxsplit=1)
-                key=tuple(key.split('.'))
+                value=value.strip()
+                if value.startswith('[') and value.endswith(']'):
+                    value=[v.strip() for v in value[1:-1].split(',') if len(v.strip())>0]
+                key=tuple(key.strip().split('.'))
                 target=cmdi
+                print(key)
                 for k in key[:-1]:
                     target=target[k]
-                target[k[-1]]=value.strip()
+                target[key[-1]]=value
     #print(cmdi["help"]["aliases"])
     # EXCEPTIONS
     cmdi["link"]["desc"] = cmdi["link"]["desc"].format(linksstr) # aaaaaaaaaaaaaaaaaaaaaaaaaa
