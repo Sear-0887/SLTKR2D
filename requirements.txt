@@ -2,3 +2,4 @@ nextcord
 flask
 Pillow
 python-dotenv
+decorator
