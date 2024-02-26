@@ -28,19 +28,21 @@ class Math(commands.Cog):
             return formu
         while True:
             print(f">>> {formu=}")
-            for operator in "*/+-":
+            result = None
+            for operator in "^*/+-":
                 formu = removexcessbracket(formu)
-                result = re.findall(rf"(\-?[\d\.]+)([\+\-\*\/])(\-?[\d\.]+)", formu)
+                result = re.findall(rf"(\-?[\d\.]+)([\+\-\*\/\^])(\-?[\d\.]+)", formu)
                 if result == []: continue
                 f, operator, s = result[0]
                 print(f, operator, s)
+                if   operator == "^": operated = float(f) ** float(s)
                 if   operator == "*": operated = float(f) * float(s)
                 elif operator == "/": operated = float(f) / float(s)
                 elif operator == "+": operated = float(f) + float(s)
                 elif operator == "-": operated = float(f) - float(s)
                 formu = formu.replace(f"{f}{operator}{s}", str(operated))
                 formu = removexcessbracket(formu)
-            if not re.findall(rf"(\-?[\d\.]+)([\+\-\*\/])(\-?[\d\.]+)", formu):
+            if not result:
                 print("PROPERE")
                 break
                 

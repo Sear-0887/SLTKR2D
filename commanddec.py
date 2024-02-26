@@ -33,6 +33,7 @@ f'''
 {RESET}{'-'*20}
 '''
     )
+    await ctx.send(expecterr)
     # raise e
 
 def MainCommand(bot,name):
