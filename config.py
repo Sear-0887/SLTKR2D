@@ -1,6 +1,5 @@
 creddir='cred/'
 
-
 localedir='assets/localization'
 lang='english'
 
