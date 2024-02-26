@@ -4,6 +4,7 @@ from nextcord.ext import commands
 from commanddec import command2
 import inspect
 import json
+import collections
 
 class Admin(commands.Cog):
     def __init__(self, bot):
@@ -14,9 +15,9 @@ class Admin(commands.Cog):
     async def viewcog(self,ctx):
         embed = nextcord.Embed()
         embed.description = ""
-        data={
-            i:(
-                { # cog class name
+        data1={
+            i:( # cog class name
+                {
                     c.name:inspect.getfile(c._callback.__wrapped__) # command name and source file
                     for c in o.__cog_commands__ # for each command in a cog
                 },
@@ -24,7 +25,10 @@ class Admin(commands.Cog):
             )
             for i, o in self.bot.cogs.items() # for all cogs in the bot
         }
-        print(json.dumps(data,indent=2))
+        data2=collections.defaultdict(dict)
+        for cogclass,(cogdata,cogfile) in data1.items():
+            data2[cogfile][cogclass]=[*cogdata.keys()]
+        embed.description += json.dumps(data2,indent=2)+"\n"
         for cog_name in glob.glob("cog_*.py"):
             embed.description += f"| {cog_name[:-3]} \n"
         await ctx.send(embed=embed)
