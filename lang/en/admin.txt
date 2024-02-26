@@ -7,7 +7,7 @@ unloadcog.error = Unable to reach all cogs.
 unloadcog.syntax = !unloadcog
 
 ## viewcog
-viewcog.aliases = [cg, vcg, cog]
+viewcog.aliases = [cg, cgv, cog]
 viewcog.desc = Read the current status of cogs detected. \
 Admin-Only Command.
 

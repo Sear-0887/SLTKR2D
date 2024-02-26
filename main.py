@@ -5,7 +5,7 @@ from assetload import init
 from nextcord.ext import commands
 from lang import keywords, phraser, cmdi, evl
 from gettoken import gettoken
-from commanddec import command
+from commanddec import MainCommand
 
 intents = nextcord.Intents.default()
 intents.members = True
@@ -16,7 +16,7 @@ phraser()
 init()
 
 
-@command(bot,"help")
+@MainCommand(bot,"help")
 async def help(ctx, cmdname=None,):
     if not cmdname:
         embed = nextcord.Embed()
@@ -46,17 +46,17 @@ async def help(ctx, cmdname=None,):
         else:
             await ctx.send(evl(f"{cmdname}.error"))
 
-@command(bot,"ping")
+@MainCommand(bot,"ping")
 async def ping(ctx):
     s=f"Pong! ({bot.latency*1000} ms)"
     print(s)
     await ctx.send(s)
     
-@command(bot,"scream")
+@MainCommand(bot,"scream")
 async def scream(ctx, n:int=32):
     await ctx.send("A"*n)
 
-@command(bot,"link")
+@MainCommand(bot,"link")
 async def link(ctx, typ="r2d"):
     for i in keywords:
         if typ in keywords[i]["kw"]:
@@ -67,7 +67,7 @@ async def link(ctx, typ="r2d"):
         #await ctx.send(cmds.link.error % typ)
 
 @commands.has_permissions(administrator=True)
-@command(bot,'test')
+@MainCommand(bot,'test')
 async def test(ctx):
     await ctx.send('!help')
 

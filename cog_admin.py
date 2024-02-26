@@ -2,14 +2,14 @@ import glob
 import nextcord
 from nextcord.ext import commands
 from lang import evl
-from commanddec import command2
+from commanddec import CogCommand
 
 class Admin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.has_permissions(administrator=True)
-    @command2("viewcog")
+    @CogCommand("viewcog")
     async def viewcog(self,ctx):
         embed = nextcord.Embed()
         embed.description = ""
@@ -20,7 +20,7 @@ class Admin(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.has_permissions(administrator=True)
-    @command2("loadcog")
+    @CogCommand("loadcog")
     async def loadcog(self,ctx, tar):
         try:
             self.bot.load_extension("cog_"+tar)
@@ -31,7 +31,7 @@ class Admin(commands.Cog):
             await ctx.send("cog_"+tar+".py not found.")
             
     @commands.has_permissions(administrator=True)
-    @command2("unloadcog")
+    @CogCommand("unloadcog")
     async def unloadcog(self,ctx, tar):
         try:
             if tar == "cog_admin":
@@ -45,7 +45,7 @@ class Admin(commands.Cog):
             await ctx.send("cog_"+tar+".py not found.")
             
     @commands.has_permissions(administrator=True)
-    @command2("reloadcog")
+    @CogCommand("reloadcog")
     async def reloadcog(self,ctx, tar):
         try:
             self.bot.unload_extension("cog_"+tar)
