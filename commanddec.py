@@ -13,7 +13,7 @@ RESET = Fore.RESET
 
 
 async def ErrorHandler(name, ctx, e, args, kwargs):
-    expecterr = evl(f"{name}.error")
+    expecterr = cmdi[name]["error"]
     try:
         expecterr = expecterr.format(*args, **kwargs)
     except:
