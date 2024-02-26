@@ -1,0 +1,7 @@
+# eval
+eval.aliases = [ev]
+eval.desc = Evaluate simple arithmetic expressions.\
+Only supports +, -, *, /.
+
+eval.error = Unable to evaluate {}.
+eval.syntax = !eval <expressionformula>
