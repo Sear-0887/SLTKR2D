@@ -33,7 +33,7 @@ class Admin(commands.Cog):
     @command2("unloadcog")
     async def unloadcog(self,ctx, tar):
         try:
-            if tar == "cog_admin":
+            if tar == "admin":
                 await ctx.send("You can't unload cog_admin!") # prevent softlock
                 return
             self.bot.unload_extension("cog_"+tar)
@@ -51,7 +51,7 @@ class Admin(commands.Cog):
             self.bot.load_extension("cog_"+tar)
             await ctx.send("RELOADED "+"cog_"+tar+".py")
         except commands.errors.ExtensionNotFound:
-            await ctx.send("cog_"+tar+".py not found.")    
+            await ctx.send("cog_"+tar+".py not found.")
     
 def setup(bot):
 	bot.add_cog(Admin(bot))
