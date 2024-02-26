@@ -3,6 +3,7 @@ import nextcord
 from nextcord.ext import commands
 from commanddec import command2
 import inspect
+import json
 
 class Admin(commands.Cog):
     def __init__(self, bot):
@@ -13,14 +14,17 @@ class Admin(commands.Cog):
     async def viewcog(self,ctx):
         embed = nextcord.Embed()
         embed.description = ""
-        print([o.__dict__ for i, o in self.bot.cogs.items()])
-        print([o.__cog_commands__ for i, o in self.bot.cogs.items()])
-        print([o.__cog_commands__[0].name for i, o in self.bot.cogs.items()])
-        print([type(o.__cog_commands__[0]) for i, o in self.bot.cogs.items()])
-        print([type(o.__cog_commands__[0]._callback) for i, o in self.bot.cogs.items()])
-        print([inspect.getfile(o.__cog_commands__[0]._callback) for i, o in self.bot.cogs.items()])
-        print({i:{c.name:inspect.getfile(c._callback.__wrapped__) for c in o.__cog_commands__} for i, o in self.bot.cogs.items()})
-        print([o.__cog_name__ for i, o in self.bot.cogs.items()])
+        data={
+            i:(
+                { # cog class name
+                    c.name:inspect.getfile(c._callback.__wrapped__) # command name and source file
+                    for c in o.__cog_commands__ # for each command in a cog
+                },
+                inspect.getfile(o.__class__) # cog file
+            )
+            for i, o in self.bot.cogs.items() # for all cogs in the bot
+        }
+        print(json.dumps(data,indent=2))
         for cog_name in glob.glob("cog_*.py"):
             embed.description += f"| {cog_name[:-3]} \n"
         await ctx.send(embed=embed)
