@@ -1,6 +1,40 @@
+import datetime
 import decorator
+import sys
 from lang import cmdi
+from colorama import Fore, init
 from nextcord.ext import commands
+
+init()
+RED = Fore.RED
+BLUE = Fore.BLUE
+GREEN = Fore.GREEN
+RESET = Fore.RESET
+
+
+async def ErrorHandler(name, ctx, e, args, kwargs):
+    expecterr = evl(f"{name}.error")
+    try:
+        expecterr = expecterr.format(*args, **kwargs)
+    except:
+        pass
+    print(
+f'''
+{'-'*20}
+{RED}Exception: " {BLUE}{e} {RED}" 
+{RED}on {name} ({type(e)}).
+
+{BLUE}Passed Parameters:
+{ctx = },
+{args = },
+{kwargs = } 
+
+{GREEN}Expected Error: "{expecterr}"
+{RESET}{'-'*20}
+'''
+    )
+    await ctx.send(expecterr)
+    # raise e
 
 def MainCommand(bot,name):
     cmdclass = cmdi[name]
@@ -8,15 +42,7 @@ def MainCommand(bot,name):
         try:
             await cmd(ctx,*args,**kwargs)
         except Exception as e:
-            print('the thing:',e,type(e))
-            print('the thing:',ctx,args,kwargs)
-            try:
-                s=cmdclass["error"].format(*args,**kwargs)
-            except:
-                s=cmdclass["error"]
-            await ctx.send(s)
-            print('the thing again:',e)
-            raise e
+            await ErrorHandler(name, ctx, e, args, kwargs)
     def trycmd(cmd):
         return decorator.decorate(cmd,_trycmd)
     def fixcmd(cmd):
@@ -30,15 +56,7 @@ def CogCommand(name):
         try:
             await cmd(self,ctx,*args,**kwargs)
         except Exception as e:
-            print('the thing:',e,type(e))
-            print('the thing:',self,ctx,args,kwargs)
-            try:
-                s=cmdclass["error"].format(*args,**kwargs)
-            except:
-                s=cmdclass["error"]
-            await ctx.send(s)
-            print('the thing again:',e)
-            raise e
+            await ErrorHandler(name, ctx, e, args, kwargs)
     def trycmd(cmd):
         return decorator.decorate(cmd,_trycmd)
     def fixcmd(cmd):

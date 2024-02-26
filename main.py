@@ -16,6 +16,11 @@ bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 phraser()
 init()
 
+@MainCommand(bot, "reloadlocal")
+async def reloadlocal(ctx):
+    phraser()
+    await ctx.send("Done.")
+
 @MainCommand(bot,"help")
 async def help(ctx, cmdname=None,):
     if not cmdname:

@@ -42,3 +42,10 @@ Admin-Only Command.
 
 test.error = Unable to test.
 test.syntax = !test
+
+# reloadlocal
+reloadlocal.aliases = []
+reloadlocal.desc = Reloads Locals
+
+reloadlocal.error = Unable to Reload?
+reloadlocal.syntax = !reloadlocal
