@@ -3,8 +3,8 @@ import nextcord
 from nextcord.ext import commands
 from commanddec import command2
 import inspect
-import json
 import collections
+import os
 
 class Admin(commands.Cog):
     def __init__(self, bot):
@@ -28,9 +28,12 @@ class Admin(commands.Cog):
         data2=collections.defaultdict(dict)
         for cogclass,(cogdata,cogfile) in data1.items():
             data2[cogfile][cogclass]=[*cogdata.keys()]
-        embed.description += json.dumps(data2,indent=2)+"\n"
-        for cog_name in glob.glob("cog_*.py"):
-            embed.description += f"| {cog_name[:-3]} \n"
+        for cogfile,cogdata in data2.items():
+            embed.description += f"- {os.path.basename(cogfile)[:-3]} \n"
+            for cogclass,cogcmds in cogdata.items():
+                embed.description += f"  - {cogclass} \n"
+                for cogcmd in cogcmds:
+                    embed.description += f"    - {cogcmd} \n"
         await ctx.send(embed=embed)
 
     @commands.has_permissions(administrator=True)
