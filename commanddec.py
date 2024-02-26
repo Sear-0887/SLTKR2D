@@ -33,9 +33,9 @@ def command2(name):
             print('the thing:',e,type(e))
             print('the thing:',self,ctx,args,kwargs)
             try:
-                s=cmdclass.error.format(*args,**kwargs)
+                s=cmdclass["error"].format(*args,**kwargs)
             except:
-                s=cmdclass.error
+                s=cmdclass["error"]
             await ctx.send(s)
             print('the thing again:',e)
             raise e

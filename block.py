@@ -2,6 +2,7 @@ import PIL
 import PIL.Image
 import smp
 import os
+import config
 
 #welded=top,left,bottom,right
 #rotate= 0    1    2      3
