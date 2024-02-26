@@ -50,11 +50,5 @@ def phraser():
                 target[key[-1]]=value
     #print(cmdi["help"]["aliases"])
     # EXCEPTIONS
+    # nooo not the exceptions
     cmdi["link"]["desc"] = cmdi["link"]["desc"].format(linksstr) # aaaaaaaaaaaaaaaaaaaaaaaaaa
-
-def evl(target):
-    target = target.split(".")
-    out = cmdi
-    for i in target:
-        out = out[i]
-    return out

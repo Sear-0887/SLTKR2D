@@ -1,7 +1,6 @@
 import glob
 import nextcord
 from nextcord.ext import commands
-from lang import evl
 from commanddec import command2
 
 class Admin(commands.Cog):

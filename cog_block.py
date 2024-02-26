@@ -4,7 +4,6 @@ import random
 import re
 from PIL import Image
 from nextcord.ext import commands
-from lang import evl
 import block_extra as be
 from commanddec import command2
 from assetload import idtoblock

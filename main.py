@@ -3,7 +3,7 @@ import nextcord
 import datetime
 from assetload import init
 from nextcord.ext import commands
-from lang import keywords, phraser, cmdi, evl
+from lang import keywords, phraser, cmdi
 from gettoken import gettoken
 from commanddec import command
 import os
@@ -16,12 +16,11 @@ bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 phraser()
 init()
 
-
 @command(bot,"help")
 async def help(ctx, cmdname=None,):
     if not cmdname:
         embed = nextcord.Embed()
-        embed.description = evl("help.blankdisplay").format(datetime.datetime.now()-TimeOn)
+        embed.description = cmdi["help"]["blankdisplay"].format(datetime.datetime.now()-TimeOn)
         view = nextcord.ui.View()
         async def gethelplist(interaction):
             sembed = nextcord.Embed()
@@ -39,13 +38,13 @@ async def help(ctx, cmdname=None,):
             if cmdname == i:
                 embed = nextcord.Embed()
                 embed.title = cmdname
-                embed.description = evl(f"{cmdname}.desc")
-                embed.add_field(name="Syntax", value=evl(f"{cmdname}.syntax"))
-                embed.add_field(name="Aliases", value=",\n".join(evl(f"{cmdname}.aliases")))
+                embed.description = cmdi[cmdname]["desc"]
+                embed.add_field(name="Syntax", value=cmdi[cmdname]["syntax"])
+                embed.add_field(name="Aliases", value=",\n".join(cmdi[cmdname]["aliases"]))
                 await ctx.send(embed=embed)
                 return
         else:
-            await ctx.send(evl(f"{cmdname}.error"))
+            raise Exception('') # the decorator will handle it
 
 @command(bot,"ping")
 async def ping(ctx):
