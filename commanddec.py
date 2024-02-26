@@ -2,7 +2,7 @@ import decorator
 from lang import cmdi
 from nextcord.ext import commands
 
-def command(bot,name):
+def MainCommand(bot,name):
     cmdclass = cmdi[name]
     async def _trycmd(cmd,ctx,*args,**kwargs):
         try:
@@ -24,7 +24,7 @@ def command(bot,name):
         return bot.command(name=name, description=cmdclass["desc"], aliases=cmdclass["aliases"])(trycmd(cmd))
     return fixcmd
 
-def command2(name):
+def CogCommand(name):
     cmdclass = cmdi[name]
     async def _trycmd(cmd,self,ctx,*args,**kwargs):
         try:

@@ -5,7 +5,7 @@ import re
 from PIL import Image
 from nextcord.ext import commands
 import block_extra as be
-from commanddec import command2
+from commanddec import CogCommand
 from assetload import idtoblock
 from block import makeimage as blockmakeimage
 import smp
@@ -15,7 +15,7 @@ class Block(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         
-    @command2("block")
+    @CogCommand("block")
     async def block(self,ctx, block=None):
         if block:
             if block.isdigit():
@@ -40,7 +40,7 @@ class Block(commands.Cog):
     
         
     #eswn
-    @command2("image")
+    @CogCommand("image")
     async def image(self,ctx, *, x="[[16][20]][[16][16]]"):
         blocks=smp.getsmpvalue(x)
         for y,row in enumerate(blocks):
