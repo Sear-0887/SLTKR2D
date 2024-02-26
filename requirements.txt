@@ -3,3 +3,4 @@ flask
 Pillow
 python-dotenv
 decorator
+colorama
