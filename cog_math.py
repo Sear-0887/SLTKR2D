@@ -16,6 +16,7 @@ class Math(commands.Cog):
     async def evalu(self, ctx:commands.Context, *, formulae="3 * ( 1 + 2 )"):
         global formu
         formu = formulae.replace(" ", "")
+        def dif(x): return int(x) if int(float(x)) == float(x) else float(x)
         def removexcessbracket(formu):
             while True:
                 elimb = re.findall(rf"\((\-?[\d\.]+)\)", formu)
@@ -35,20 +36,18 @@ class Math(commands.Cog):
                 if result == []: continue
                 f, operator, s = result[0]
                 print(f, operator, s)
-                if   operator == "^": operated = float(f) ** float(s)
-                if   operator == "*": operated = float(f) * float(s)
-                elif operator == "/": operated = float(f) / float(s)
-                elif operator == "+": operated = float(f) + float(s)
-                elif operator == "-": operated = float(f) - float(s)
+                if   operator == "^": operated = dif(f) ** dif(s)
+                if   operator == "*": operated = dif(f) *  dif(s)
+                elif operator == "/": operated = dif(f) /  dif(s)
+                elif operator == "+": operated = dif(f) +  dif(s)
+                elif operator == "-": operated = dif(f) -  dif(s)
                 formu = formu.replace(f"{f}{operator}{s}", str(operated))
                 formu = removexcessbracket(formu)
             if not result:
                 print("PROPERE")
                 break
-                
-        formu = float(formu)
-        if int(formu) == float(formu):
-            formu = int(formu)
+            formu = dif(formu)
+            
         await ctx.send(f"{formulae} = {formu}")   
             
         # global formu
