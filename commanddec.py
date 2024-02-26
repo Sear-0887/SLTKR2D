@@ -25,9 +25,9 @@ f'''
 {RED}on {name} ({type(e)}).
 
 {BLUE}Passed Parameters:
-{ctx = },
-{args = },
-{kwargs = } 
+ctx = {ctx},
+args = {args},
+kwargs = {kwargs} 
 
 {GREEN}Expected Error: "{expecterr}"
 {RESET}{'-'*20}
