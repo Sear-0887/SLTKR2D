@@ -137,8 +137,6 @@ def getToken(s,lastType):
       return [NUM,num],snew
     sym,snew=getSym(ss)
     if sym is not None:
-      if sym in symbols:
-        return [NUM,symbols[sym]],snew
       return [SYM,sym],snew
     raise Exception('no token: '+s)
 
@@ -176,6 +174,10 @@ def evaluate(expr):
       ops.append(token)
     if token[0]==CALL: # left paren of function
       ops.append(token)
+    else:
+      if len(ops)>0 and values[-1][0]==SYM:
+        if ops[-1][1] in symbols:
+          values[-1]=[NUM,symbols[values[-1][1]]]
     if token[0]==UOP: # unary operator
       ops.append(token)
     if token[0]==RPAR: # right paren
