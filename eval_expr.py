@@ -210,6 +210,10 @@ def evaluate(expr):
         assert v1[0]==SYM # the function should always be a symbol
         values.append(applyfunc(v1[1],v2))
       ops=ops[:-1] # pop the left paren as well
+      while len(ops)>0 and ops[-1][0]==UOP: # apply all unary operators on the stack
+        op=ops[-1]
+        ops=ops[:-1]
+        values[-1]=applyuop(op,values[-1])
     if token[0]==OP:
       while len(ops)>0 and ops[-1][0] not in [LPAR,CALL] and precedence(ops[-1])>=precedence(token):
         # apply all operators to the left with a lower precedence
