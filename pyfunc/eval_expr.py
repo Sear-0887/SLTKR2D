@@ -58,6 +58,8 @@ def applyfunc(f,v):
   if v[0]!=NUM:
     return[EXPR,'(',f,v]
   if f=='log':
+    return [NUM,math.log(v[1],10)]
+  if f=='ln':
     return [NUM,math.log(v[1])]
   if f=='sqrt':
     return [NUM,sqrt(v[1])]
