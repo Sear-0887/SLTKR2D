@@ -1,7 +1,7 @@
 import datetime
 import decorator
 import sys
-from lang import cmdi
+from lang import getcmdlocale
 from colorama import Fore, init
 from nextcord.ext import commands
 

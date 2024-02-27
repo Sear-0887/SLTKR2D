@@ -34,6 +34,9 @@ def recursiveddict():
 cmdi = recursiveddict()
 
 def getcmdlocale(cmd,key):
+    #print(cmd,key)
+    #print(cmdi[cmd])
+    #print(cmdi[cmd][key])
     return cmdi[cmd][key]
 
 # if you want to have multiple levels
@@ -45,6 +48,7 @@ def getcmdlocale(cmd,key):
 
 # load the command locale
 def phraser():
+    global cmdi
     cmdi = recursiveddict()
     for fname in os.listdir(config.cmdlocaledir): # you could filter for only .txt files
         with open(os.path.join(config.cmdlocaledir,fname)) as f:
@@ -68,4 +72,5 @@ def phraser():
     #print(getcmdlocale("help","aliases"))
     # EXCEPTIONS
     # nooo not the exceptions
+    #print(cmdi)
     cmdi["link"]["desc"] = getcmdlocale("link","desc").format(linksstr) # aaaaaaaaaaaaaaaaaaaaaaaaaa
