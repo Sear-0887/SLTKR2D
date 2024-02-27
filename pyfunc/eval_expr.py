@@ -60,6 +60,7 @@ def getNum(s):
   return None,s
 
 symbols={
+  'pi':math.pi,
   'π':math.pi,
   'e':math.e,
   'i':1j,
@@ -67,7 +68,7 @@ symbols={
 
 def getSym(s):
   # a symbol
-  m=re.match('[a-zA-Z][0-9]*',s)
+  m=re.match('[a-zA-Z][a-zA-Z0-9]*',s)
   if m:
     return s[:m.end()],s[m.end():]
   for symbol in symbols:
