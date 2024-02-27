@@ -32,7 +32,7 @@ def apply(op,v1,v2):
   # apply op to v1 and v2
   # remember, they are all [type,value] pairs
   if v1[0]!=NUM or v2[0]!=NUM:
-    return [EXP,op[1],v1,v2]
+    return [EXPR,op[1],v1,v2]
   if op[1]=='+':
     return [NUM,v1[1]+v2[1]]
   if op[1]=='-':
@@ -49,7 +49,7 @@ def applyuop(op,v):
   # apply op to v
   # remember, they are both [type,value] pairs
   if v[0]!=NUM:
-    return [EXP,op[1],v]
+    return [EXPR,op[1],v]
   if op[1]=='-':
     return [NUM,-v[1]]
   raise Exception('unrecognized unary operator '+op[1])
@@ -62,7 +62,7 @@ RPAR='RPAR'
 OP='OP'
 UOP='UOP'
 SYM='SYM'
-EXP='EXP'
+EXPR='EXPR'
 
 # from cpython Tokenize.py
 def group(*choices): return '(' + '|'.join(choices) + ')'
@@ -161,7 +161,7 @@ def evaluate(expr):
     token,s=getToken(s,lastType)
     if token[0] in [NUM,SYM]: # number or symbol token
       values.append(token)
-    if token[0] in [NUM,SYM,EXP]: # number, symbol, or expression
+    if token[0] in [NUM,SYM,EXPR]: # number, symbol, or expression
       while len(ops)>0 and ops[-1][0]==UOP: # apply all unary operators on the stack
         op=ops[-1]
         ops=ops[:-1]
@@ -214,8 +214,8 @@ def stringifyexpr(e):
   if len(e)==4:
     _,op,left,right=e
     p1=precedence(e)
-    pleft=precedence(left) if left[0] in [OP,EXP] else math.inf
-    pright=precedence(right) if right[0] in [OP,EXP] else math.inf
+    pleft=precedence(left) if left[0] in [OP,EXPR] else math.inf
+    pright=precedence(right) if right[0] in [OP,EXPR] else math.inf
     leftparen=pleft<p1 or (pleft==p1 and rightassoc(op))
     rightparen=pright<p1 or (pright==p1 and leftassoc(op))
     sleft=stringifyexpr(left)
