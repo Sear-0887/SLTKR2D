@@ -59,7 +59,11 @@ def getNum(s):
     return int(s[:m.end()]),s[m.end():]
   return None,s
 
-symbols='πe'
+symbols={
+  'π':math.pi,
+  'e':math.e,
+  'i':1j,
+}
 
 def getSym(s):
   # a symbol
@@ -98,6 +102,8 @@ def getToken(s,lastType):
       return [NUM,num],snew
     sym,snew=getSym(ss)
     if sym is not None:
+      if sym in symbols:
+        return [NUM,symbols[sym]],snew
       return [SYM,sym],snew
     raise Exception('no token: '+s)
 
