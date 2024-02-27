@@ -9,7 +9,7 @@
 
 import math
 
-ops=['+','-','*','/','^']
+ops=['+','-','**','*','/','^']
 
 uops=['-']
 
@@ -19,6 +19,7 @@ precedences={
   '*':2,
   '/':2,
   '^':3,
+  '**':3,
 }
 
 symbols={
@@ -39,6 +40,8 @@ def apply(op,v1,v2):
     return [NUM,v1[1]-v2[1]]
   if op[1]=='*':
     return [NUM,v1[1]*v2[1]]
+  if op[1]=='**':
+    return [NUM,v1[1]**v2[1]]
   if op[1]=='/':
     return [NUM,v1[1]/v2[1]]
   if op[1]=='^':
