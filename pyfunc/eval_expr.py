@@ -24,6 +24,8 @@ LPAR='LPAR'
 RPAR='RPAR'
 OP='OP'
 UOP='UOP'
+SYM='SYM'
+EXP='EXP'
 
 # from cpython Tokenize.py
 def group(*choices): return '(' + '|'.join(choices) + ')'
@@ -55,6 +57,18 @@ def getNum(s):
     return int(s[:m.end()]),s[m.end():]
   return None,s
 
+symbols='πe'
+
+def getSym(s):
+  # a symbol
+  m=re.match('[a-zA-Z][0-9]*',s)
+  if m:
+    return s[:m.end()],s[m.end():]
+  for symbol in symbols:
+    if s[0]==symbol:
+      return symbol,s[1:]
+  return None,s
+
 def moreTokens(s):
   # are there more tokens?
   return s.strip()!=''
@@ -64,7 +78,7 @@ def getToken(s,lastType):
   # types accepted depand on last token
   # for example, can't have op after lpar
   ss=s.lstrip()
-  if lastType in [NUM,RPAR]:
+  if lastType in [NUM,SYM,RPAR]:
     for op in ops:
       if ss.startswith(op):
         return [OP,op],ss[len(op):]
@@ -80,11 +94,16 @@ def getToken(s,lastType):
     num,snew=getNum(ss)
     if num is not None:
       return [NUM,num],snew
+    sym,snew=getSym(ss)
+    if sym is not None:
+      return [SYM,sym],snew
     raise Exception('no token: '+s)
 
 def apply(op,v1,v2):
   # apply op to v1 and v2
   # remember, they are all [type,value] pairs
+  if v1[0]!=NUM or v2[0]!=NUM:
+    return [EXP,op[1],v1,v2]
   if op[1]=='+':
     return [NUM,v1[1]+v2[1]]
   if op[1]=='-':
@@ -100,6 +119,8 @@ def apply(op,v1,v2):
 def applyuop(op,v):
   # apply op to v
   # remember, they are both [type,value] pairs
+  if v[0]!=NUM:
+    return [EXP,op[1],v]
   if op[1]=='-':
     return [NUM,-v[1]]
   raise Exception('unrecognized unary operator '+op[1])
@@ -117,10 +138,13 @@ def evaluate(expr):
   # basic shunting yard parser
   lastType=OP # a valid expression can always come after an operator
   while moreTokens(s): # parse all the tokens
+    #print('s1',s)
+    #print('o1',ops)
+    #print('v1',values)
     token,s=getToken(s,lastType)
-    if token[0]==NUM: # number token
+    if token[0] in [NUM,SYM]: # number or symbol token
       values.append(token)
-    if token[0]==NUM: # number or variable (not added yet) token
+    if token[0] in [NUM,SYM,EXP]: # number, symbol, or expression
       while len(ops)>0 and ops[-1][0]==UOP: # apply all unary operators on the stack
         op=ops[-1]
         ops=ops[:-1]
@@ -147,6 +171,9 @@ def evaluate(expr):
         values.append(apply(op,v1,v2))
       ops.append(token) # push this operator
     lastType=token[0] # type of last token
+    #print('s',s)
+    #print('o',ops)
+    #print('v',values)
   while len(ops)>0: # apply the rest of the operators
     op=ops[-1]
     ops=ops[:-1]
