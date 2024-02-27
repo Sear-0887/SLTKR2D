@@ -56,7 +56,7 @@ def applyuop(op,v):
 
 def applyfunc(f,v):
   if v[0]!=NUM:
-    return[EXPR,'(',f,v]
+    return [EXPR,'(',f,v]
   if f=='log':
     return [NUM,math.log(v[1],10)]
   if f=='ln':
@@ -65,7 +65,8 @@ def applyfunc(f,v):
     return [NUM,sqrt(v[1])]
   if f=='√':
     return [NUM,sqrt(v[1])]
-  raise Exception('unrecognized function '+f)
+  return [EXPR,'(',f,v]
+  #raise Exception('unrecognized function '+f)
 
 # here starts my code
 # please know what you are doing
