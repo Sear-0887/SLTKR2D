@@ -62,9 +62,9 @@ def applyfunc(f,v):
   if f=='ln':
     return [NUM,math.log(v[1])]
   if f=='sqrt':
-    return [NUM,sqrt(v[1])]
+    return [NUM,math.sqrt(v[1])]
   if f=='√':
-    return [NUM,sqrt(v[1])]
+    return [NUM,math.sqrt(v[1])]
   return [EXPR,'(',f,v]
   #raise Exception('unrecognized function '+f)
 
@@ -189,7 +189,7 @@ def evaluate(expr):
     if token[0]==CALL: # left paren of function
       ops.append(token)
     else:
-      if len(ops)>0 and values[-1][0]==SYM:
+      if len(values)>0 and values[-1][0]==SYM:
         if values[-1][1] in symbols:
           values[-1]=[NUM,symbols[values[-1][1]]]
     if token[0]==UOP: # unary operator
