@@ -63,6 +63,7 @@ OP='OP'
 UOP='UOP'
 SYM='SYM'
 EXPR='EXPR'
+CALL='CALL'
 
 # from cpython Tokenize.py
 def group(*choices): return '(' + '|'.join(choices) + ')'
@@ -119,6 +120,9 @@ def getToken(s,lastType):
         return [OP,op],ss[len(op):]
     if ss.startswith(')'):
       return [RPAR],ss[1:]
+    if lastType==SYM:
+      if ss.startswith('('):
+        return [CALL],ss[1:]
     raise Exception('no token: '+s)
   if lastType in [LPAR,OP,UOP]:
     if ss.startswith('('):
@@ -168,16 +172,22 @@ def evaluate(expr):
         values[-1]=applyuop(op,values[-1])
     if token[0]==LPAR: # left paren
       ops.append(token)
+    if token[0]==CALL: # left paren of function
+      ops.append(token)
     if token[0]==UOP: # unary operator
       ops.append(token)
     if token[0]==RPAR: # right paren
-      while ops[-1][0]!=LPAR: # finish the parenthesized expression
+      while ops[-1][0] not in [LPAR,CALL]: # finish the parenthesized expression
         op=ops[-1]
         ops=ops[:-1]
         v1,v2=values[-2:]
         values=values[:-2]
         values.append(apply(op,v1,v2))
       ops=ops[:-1] # pop the left paren as well
+      if ops[-1][0]==CALL:
+        v1,v2=values[-2:]
+        values=values[:-2]
+        values.append([EXPR,'(',v1,v2])
     if token[0]==OP:
       while len(ops)>0 and ops[-1][0]!=LPAR and precedence(ops[-1])>=precedence(token):
         # apply all operators to the left with a lower precedence
