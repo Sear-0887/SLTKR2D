@@ -26,7 +26,7 @@ async def help(ctx, cmdname=None,):
     if not cmdname:
         # send an info embed about the bot
         embed = nextcord.Embed()
-        embed.description = cmdi["help"]["blankdisplay"].format(datetime.datetime.now()-TimeOn)
+        embed.description = getcmdlocale("help","blankdisplay").format(datetime.datetime.now()-TimeOn)
         view = nextcord.ui.View()
         async def gethelplist(interaction):
             sembed = nextcord.Embed()
@@ -45,9 +45,9 @@ async def help(ctx, cmdname=None,):
             if cmdname == i:
                 embed = nextcord.Embed()
                 embed.title = cmdname
-                embed.description = cmdi[cmdname]["desc"]
-                embed.add_field(name="Syntax", value=cmdi[cmdname]["syntax"])
-                embed.add_field(name="Aliases", value=",\n".join(cmdi[cmdname]["aliases"]))
+                embed.description = getcmdlocale(cmdname,"desc")
+                embed.add_field(name="Syntax", value=getcmdlocale(cmdname,"syntax"))
+                embed.add_field(name="Aliases", value=",\n".join(getcmdlocale(cmdname,"aliases")))
                 await ctx.send(embed=embed)
                 return
         else:

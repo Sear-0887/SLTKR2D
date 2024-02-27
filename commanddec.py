@@ -16,7 +16,7 @@ async def ErrorHandler(name, ctx, e, args, kwargs):
     # handle the error e
     # from a function call f(ctx,*args,**kwargs)
     # print a message with cool colors to the console
-    expecterr = cmdi[name]["error"]
+    expecterr = getcmdlocale(name,"error")
     try:
         expecterr = expecterr.format(*args, **kwargs)
     except:
@@ -41,7 +41,6 @@ kwargs = {kwargs}
 
 def MainCommand(bot,name):
     # bot command
-    cmdclass = cmdi[name]
     async def _trycmd(cmd,ctx,*args,**kwargs):
         try:
             await cmd(ctx,*args,**kwargs)
@@ -50,14 +49,12 @@ def MainCommand(bot,name):
     def trycmd(cmd):
         return decorator.decorate(cmd,_trycmd) # decorator preserves the signature of cmd
     def fixcmd(cmd):
-        print(cmdclass["aliases"])
-        return bot.command(name=name, description=cmdclass["desc"], aliases=cmdclass["aliases"])(trycmd(cmd))
+        return bot.command(name=name, description=getcmdlocale(name,"desc"), aliases=getcmdlocale(name,"aliases"))(trycmd(cmd))
     return fixcmd
 
 def CogCommand(name):
     # cog command
     # command gets a self argument as well
-    cmdclass = cmdi[name]
     async def _trycmd(cmd,self,ctx,*args,**kwargs):
         try:
             await cmd(self,ctx,*args,**kwargs)
@@ -66,5 +63,5 @@ def CogCommand(name):
     def trycmd(cmd):
         return decorator.decorate(cmd,_trycmd)
     def fixcmd(cmd):
-        return commands.command(name=name, description=cmdclass["desc"], aliases=cmdclass["aliases"])(trycmd(cmd))
+        return commands.command(name=name, description=getcmdlocale(name,"desc"), aliases=getcmdlocale(name,"aliases"))(trycmd(cmd))
     return fixcmd

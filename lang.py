@@ -33,6 +33,16 @@ def recursiveddict():
 
 cmdi = recursiveddict()
 
+def getcmdlocale(cmd,key):
+    return cmdi[cmd][key]
+
+# if you want to have multiple levels
+# def getcmdlocale(*args):
+#     out=cmdi
+#     for key in args:
+#         out=out[key]
+#     return out
+
 # load the command locale
 def phraser():
     cmdi = recursiveddict()
@@ -55,7 +65,7 @@ def phraser():
                 for k in key[:-1]:
                     target=target[k]
                 target[key[-1]]=value
-    #print(cmdi["help"]["aliases"])
+    #print(getcmdlocale("help","aliases"))
     # EXCEPTIONS
     # nooo not the exceptions
-    cmdi["link"]["desc"] = cmdi["link"]["desc"].format(linksstr) # aaaaaaaaaaaaaaaaaaaaaaaaaa
+    cmdi["link"]["desc"] = getcmdlocale("link","desc").format(linksstr) # aaaaaaaaaaaaaaaaaaaaaaaaaa
