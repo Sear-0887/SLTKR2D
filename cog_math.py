@@ -8,7 +8,7 @@ class Math(commands.Cog):
         self.bot = bot
         
     @CogCommand("eval")
-    async def evalu(self, ctx:commands.Context, *, formulae="3 * ( 1 + 2 )"):
+    async def eval(self, ctx:commands.Context, *, formulae="3 * ( 1 + 2 )"):
         result=evaluate(formulae)
         await ctx.send(f"`{formulae} = {stringifyexpr(result)}`")
         

@@ -1,12 +1,12 @@
-creddir='cred/'
+creddir='cred/' # credentials, only token right now
 
-localedir='assets/localization'
-lang='english'
+localedir='assets/localization' # roody locale dir
+lang='english' # prefix to filter locale files by
 
-blockicons="assets/block_zoo.png"
-blocktextures="assets/block_textures.smp"
+blockicons="assets/block_zoo.png" # the block icons
+blocktextures="assets/block_textures.smp" # the images of blocks
 
-blockidfile="assets/block_id_.smp"
-blockcoordfile="assets/block_icons.smp"
+blockidfile="assets/block_id_.smp" # a map of block to id
+blockcoordfile="assets/block_icons.smp" # a map of block to xy position in blockicons
 
-cmdlocaledir='lang/en'
+cmdlocaledir='lang/en' # directory that command localization is in

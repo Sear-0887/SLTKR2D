@@ -3,6 +3,10 @@ import collections
 import os
 import config
 
+# the links
+# key is link name
+# value['link'] is the url
+# value['kw'] is the keywords !link recognizes
 keywords = {
     "Roody:2D Game Discord Server": {
         "link": "https://discord.gg/gbEkBNt",
@@ -18,6 +22,7 @@ keywords = {
     }
 }
 
+# the links as one string
 linksstr="".join([
     f"{name} ({data['link']})\nKeywords: `{'`, `'.join(data['kw'])}`\n"
     for name,data in keywords.items()
@@ -28,7 +33,9 @@ def recursiveddict():
 
 cmdi = recursiveddict()
 
+# load the command locale
 def phraser():
+    cmdi = recursiveddict()
     for fname in os.listdir(config.cmdlocaledir): # you could filter for only .txt files
         with open(os.path.join(config.cmdlocaledir,fname)) as f:
             linesiter=iter(f)

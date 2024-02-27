@@ -18,6 +18,10 @@ def getblockim(block):
 
 # https://stackoverflow.com/a/13054570
 class Block:
+	# a class that i'm mot sure i need
+	# maybe replace with functions?
+	# has a draw(welds,direction,size) method
+	# with all the special cases, i'm not sure classes is easier
 	cache = []
 
 	@classmethod
@@ -34,6 +38,8 @@ class Block:
 		cls.cache.append([[str(cls),args,kwargs],block])
 		return block
 
+# just a normal block
+# no wire, 4 way rotation, etc
 class NormalBlock(Block):
 	def __init__(self,block,offset=0):
 		self.image=getblockim(block).crop((offset,0,offset+32,32)).convert('RGBA')
@@ -47,6 +53,7 @@ class NormalBlock(Block):
 		im=rotateblock(im,rotate)
 		return im.resize((size,size),PIL.Image.NEAREST)
 
+# a block that welds but doesn't rotate (pedestal)
 class NoRotateBlock(Block):
 	def __init__(self,block,offset=0):
 		self.image=getblockim(block).crop((offset,0,offset+32,32)).convert('RGBA')
@@ -59,6 +66,7 @@ class NoRotateBlock(Block):
 				im.alpha_composite(self.image.crop((x+16*xside,y+16*yside,x+16*xside+8,y+16*yside+8)),(x,y))
 		return im.resize((size,size),PIL.Image.NEAREST)
 
+# rotate an image of a block by rotate
 def rotateblock(im,rotate):
 	if rotate==0:
 		return im
@@ -69,6 +77,7 @@ def rotateblock(im,rotate):
 	if rotate==2:
 		return im.transpose(PIL.Image.FLIP_TOP_BOTTOM)
 
+# rotate the welds so they are in the right place when rotated by rotateblock
 def rotatewelded(welded,rotate):
 	if rotate==0:
 		return welded
@@ -79,6 +88,8 @@ def rotatewelded(welded,rotate):
 	if rotate==2:
 		return [welded[i] for i in [2,1,0,3]]
 
+# mirror and wood
+# 2 rotations instead of 4
 class TwoSideBlock(Block):
 	def __init__(self,block,offset=0):
 		self.image=getblockim(block).crop((offset,0,offset+32,32)).convert('RGBA')
@@ -96,6 +107,8 @@ class TwoSideBlock(Block):
 		im=rotateblock(im,rotate)
 		return im.resize((size,size),PIL.Image.NEAREST)
 
+# sand
+# unweldable
 class NoWeldBlock(Block):
 	def __init__(self,block):
 		self.image=getblockim(block).crop((0,0,16,16)).convert('RGBA')
@@ -105,6 +118,7 @@ class NoWeldBlock(Block):
 		im.alpha_composite(self.image.crop((0,0,16,16)))
 		return im.resize((size,size),PIL.Image.NEAREST)
 
+# literally just telecross
 class TelecrossBlock(Block):
 	def __init__(self):
 		self.image=getblockim('telecross').crop((0,0,16,16)).convert('RGBA')
@@ -115,6 +129,7 @@ class TelecrossBlock(Block):
 		im=rotateblock(im,rotate)
 		return im.resize((size,size),PIL.Image.NEAREST)
 
+# all wire components (transistor, latch, etc)
 class WaferBlock(Block):
 	def __init__(self,top,base='wafer',offset=0):
 		self.wafer=getblockim(base).crop((0,0,32,32)).convert('RGBA')
@@ -133,6 +148,7 @@ class WaferBlock(Block):
 		im.alpha_composite(self.image.crop((16*offset[0],16*offset[1],16*(offset[0]+1),16*(offset[1]+1))).rotate(90*rotate))
 		return im.resize((size,size),PIL.Image.NEAREST)
 
+# wire board and wire
 class WireBlock(Block):
 	def __init__(self,base,offset=0):
 		self.wafer=getblockim(base).crop((0,0,32,32)).convert('RGBA')
@@ -149,6 +165,7 @@ class WireBlock(Block):
 				im.alpha_composite(self.image.crop((x+16*(xside//2+offset[0]),y+16*(yside//2+offset[1]),x+16*(xside//2+offset[0])+8,y+16*(yside//2+offset[1])+8)),(x,y))
 		return im.resize((size,size),PIL.Image.NEAREST)
 
+# platform
 class PlatformBlock(Block):
 	def __init__(self):
 		self.image=getblockim('platform').convert('RGBA')
@@ -163,6 +180,7 @@ class PlatformBlock(Block):
 			im.alpha_composite(self.image.crop((x+16*xside,y,x+16*xside+8,y+16)),(x,0))
 		return im.resize((size,size),PIL.Image.NEAREST)
 
+# actuator
 class ActuatorBlock(Block):
 	def __init__(self,offset=0):
 		self.base=getblockim('actuator_base').crop((0,0,32,32)).convert('RGBA')
@@ -181,6 +199,8 @@ class ActuatorBlock(Block):
 		im=rotateblock(im,rotate)
 		return im.resize((size,size),PIL.Image.NEAREST)
 
+# convert blocks into a standardized format
+# for easy processing
 def normalize(block):
 	if block is None:
 		return {"type":'air',"rotate":0,"weld":'all'}
@@ -194,6 +214,8 @@ def normalize(block):
 	out.update(block)
 	return out
 
+# get a block from a grid
+# if the coordinates are outside the grid, return air
 def get(vss,xi,yi):
 	if xi<0 or yi<0 or yi>=len(vss):
 		return normalize("air");
@@ -202,13 +224,20 @@ def get(vss,xi,yi):
 		return normalize("air");
 	return vs[xi]
 
+# wire components on a wafer
 wafertypes=["accelerometer","capacitor","diode","galvanometer","latch","matcher","potentiometer","sensor","transistor","wire_board"]
+# wire components on a frame
 wiretypes=["detector","port","toggler","trigger","wire"]
+# all blocks that connect to wire
 wiredtypes=['actuator','motor','telewall','injector','pedestal','actuator_base','display',"lamp",'combiner','arc_furnace','extractor','beam_core','creator','destroyer','dismantler','magnet','manipulator','mantler']+wafertypes+wiretypes # that connect to wires
+# unweldable blocks
 noweldtypes=["copper_ore","iron_ore","pulp","sand","silicon","spawner","air"]
-norotatetypes=['dirt','sediment','stone','rubber','leaf_maple','iron_vein','iron_bar','iron_plate','cast_iron','copper_vein','copper_bar','frame','toggler','capacitor','inductor','roller','dynamic_roller','chair','chair_pilot','display','core_ore','raw_core','mass_core','refined_core','catalyst_core','command_block','boundary','spawner','calcium_bar','water','foam','oxide','soul_core','adobe','peltmellow','glass','glass_cyan','glass_magenta','glass_yellow','grass','flower_magenta','flower_yellow','residue','ice','compressed_stone']
+# blocks that only face one direction
+norotatetypes=['pedestal','dirt','sediment','stone','rubber','leaf_maple','iron_vein','iron_bar','iron_plate','cast_iron','copper_vein','copper_bar','frame','toggler','capacitor','inductor','roller','dynamic_roller','chair','chair_pilot','display','core_ore','raw_core','mass_core','refined_core','catalyst_core','command_block','boundary','spawner','calcium_bar','water','foam','oxide','soul_core','adobe','peltmellow','glass','glass_cyan','glass_magenta','glass_yellow','grass','flower_magenta','flower_yellow','residue','ice','compressed_stone']
+# blocks that only face two directions
 twowaytypes=["wire_spool",'wood',"mirror"]
 
+# can this block weld on this side?
 def canweld(side,block):
 	if block['type'] in noweldtypes:
 		return False
@@ -218,7 +247,7 @@ def canweld(side,block):
 		sides=[True,False,True,False]
 	elif block['type'] in ['combiner','extractor','injector','platform']: # no top/bottom
 		sides=[False,True,False,True]
-	elif block['type'] in ['arc_furnace','beam_core','collector','creator','destroyer','dismantler','magnet','manipulator','mantler','teleportore']:#no top
+	elif block['type'] in ['arc_furnace','beam_core','collector','creator','destroyer','dismantler','magnet','manipulator','mantler','teleportore']: # no top
 		sides=[False,True,True,True]
 	else:
 		return True
@@ -226,7 +255,10 @@ def canweld(side,block):
 	i=i%4
 	return sides[i] and block['weld'][{'top':0,'bottom':2,'left':1,'right':3}[side]]
 
-
+# the main method
+# blocks is a grid of blocks
+# autoweld makes it weld all possible unspecified welds
+# autoweld=False makes welds not autocorrect (for rendering roody structures)
 def makeimage(blocks,bsize=128,autoweld=True,debug=False):
 	xsize=max(map(len,blocks))
 	ysize=len(blocks)
@@ -250,7 +282,15 @@ def makeimage(blocks,bsize=128,autoweld=True,debug=False):
 				weldleft=canweld('left',block) and canweld('right',get(newblocks,xi-1,yi))
 				weldbottom=canweld('bottom',block) and canweld('top',get(newblocks,xi,yi+1))
 				weldtop=canweld('top',block) and canweld('bottom',get(newblocks,xi,yi-1))
-				block['weld']=[[b and w,print(f'welded side {i} not allowed on {block}\n'*(not w and debug),end='')][0] for i,b,w in zip(range(4),block['weld'],[weldtop,weldleft,weldbottom,weldright])]
+				# cursed code
+				block['weld']=[
+					[
+						b and w,
+						print(f'welded side {i} not allowed on {block}\n'*(not w and debug),end='') # why
+					][0]
+					for i,b,w in
+					zip(range(4),block['weld'],[weldtop,weldleft,weldbottom,weldright])
+				]
 			if block['type']=='wire':
 				b=WireBlock('frame')
 			elif block['type']=='wire_board':
@@ -265,7 +305,8 @@ def makeimage(blocks,bsize=128,autoweld=True,debug=False):
 				b=NoRotateBlock(block['type'])
 			elif block['type'] in noweldtypes:
 				b=NoWeldBlock(block['type'])
-			elif block['type']=='platform':
+			elif block['type']=='platform': # special case
+				# check if sides are platform
 				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type']!='platform' else True)
 				block['weld'][3]=block['weld'][3] and (2 if get(newblocks,xi+1,yi)['type']!='platform' else True)
 				b=PlatformBlock()
@@ -276,6 +317,7 @@ def makeimage(blocks,bsize=128,autoweld=True,debug=False):
 			else:
 				b=NormalBlock(block['type'])
 			if block['type'] in wiredtypes:
+				# check if sides are wired
 				block['weld'][0]=block['weld'][0] and (2 if get(newblocks,xi,yi-1)['type'] in wiredtypes else True)
 				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type'] in wiredtypes else True)
 				block['weld'][2]=block['weld'][2] and (2 if get(newblocks,xi,yi+1)['type'] in wiredtypes else True)
@@ -285,7 +327,7 @@ def makeimage(blocks,bsize=128,autoweld=True,debug=False):
 				#block['weld'][2]=block['weld'][2] and 2
 				#block['weld'][3]=block['weld'][3] and 2
 			bim=b.draw(block['weld'],block['rotate'],size=bsize)
-			im.alpha_composite(bim,(xi*bsize,yi*bsize))
+			im.alpha_composite(bim,(xi*bsize,yi*bsize)) # paste the block
 	return im
 
 if __name__=='__main__':

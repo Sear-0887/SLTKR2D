@@ -47,6 +47,10 @@ def geticoncoords():
         blockinfos[icon]["iconcoord"] = (int(x), int(y))
 
 def substitutelocale(s):
+    # substitute locale entries into others
+    # used in descriptions
+    # a reference is {category name|mods}
+    # mods is optional and is a string containing one or more of ^, s, or d
     i=0 # the index to look for the next opening bracket at
     while '{' in s[i:]:
         i1=s.index('{',i)
@@ -70,6 +74,11 @@ def substitutelocale(s):
     return s
 
 def getlocale():
+    # get locale entries from config.localedir
+    # a locale entry is 
+    # category name = value
+    # value can be continued across lines with a backslash (\)
+    # comments beginning with # are ignored
     for fname in os.listdir(config.localedir):
         if not fname.startswith(config.lang):
             continue # skip files for a different language
