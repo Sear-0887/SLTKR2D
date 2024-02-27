@@ -7,6 +7,8 @@
 # add it to the uops list
 # add a case in applyuop()
 
+import math
+
 ops=['+','-','*','/','^']
 
 uops=['-']
@@ -129,6 +131,12 @@ def precedence(token):
   # get the precedence of a binary operator
   return precedences[token[1]]
 
+def rightassoc(op):
+  return False
+
+def leftassoc(op):
+  return True
+
 def evaluate(expr):
   values=[]
   ops=[]
@@ -185,3 +193,25 @@ def evaluate(expr):
   if len(values)==0: # how
     raise Exception('empty expression')
   return values[0]
+
+def stringifyexpr(e):
+  if e[0] in [SYM,NUM]:
+    return str(e[1])
+  if len(e)==3:
+    if len(e[2])==4:
+      return f'{e[1]}({stringifyexpr(e[2])})' # -(a+b)
+    return f'{e[1]}{stringifyexpr(e[2])}' # a
+  if len(e)==4:
+    _,op,left,right=e
+    p1=precedence(e)
+    pleft=precedence(left) if left[0] in [OP,EXP] else math.inf
+    pright=precedence(right) if right[0] in [OP,EXP] else math.inf
+    leftparen=pleft<p1 or (pleft==p1 and rightassoc(op))
+    rightparen=pright<p1 or (pright==p1 and leftassoc(op))
+    sleft=stringifyexpr(left)
+    if leftparen:
+      sleft=f'({sleft})'
+    sright=stringifyexpr(right)
+    if rightparen:
+      sright=f'({sright})'
+    return f'{sleft}{op}{sright}'
