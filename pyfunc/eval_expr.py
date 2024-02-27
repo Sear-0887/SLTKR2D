@@ -124,7 +124,7 @@ def getToken(s,lastType):
       if ss.startswith('('):
         return [CALL],ss[1:]
     raise Exception('no token: '+s)
-  if lastType in [LPAR,OP,UOP]:
+  if lastType in [LPAR,CALL,OP,UOP]:
     if ss.startswith('('):
       return [LPAR],ss[1:]
     for uop in uops:
@@ -183,13 +183,13 @@ def evaluate(expr):
         v1,v2=values[-2:]
         values=values[:-2]
         values.append(apply(op,v1,v2))
-      ops=ops[:-1] # pop the left paren as well
       if ops[-1][0]==CALL:
         v1,v2=values[-2:]
         values=values[:-2]
         values.append([EXPR,'(',v1,v2])
+      ops=ops[:-1] # pop the left paren as well
     if token[0]==OP:
-      while len(ops)>0 and ops[-1][0]!=LPAR and precedence(ops[-1])>=precedence(token):
+      while len(ops)>0 and ops[-1][0] not in [LPAR,CALL] and precedence(ops[-1])>=precedence(token):
         # apply all operators to the left with a lower precedence
         op=ops[-1]
         ops=ops[:-1]
