@@ -10,8 +10,8 @@ class Math(commands.Cog):
     @CogCommand("eval")
     async def evalu(self, ctx:commands.Context, *, formulae="3 * ( 1 + 2 )"):
         result=evaluate(formulae)
-        if result[0]!=NUM:
-            raise Exception('didn\'t output a number')
+        #if result[0]!=NUM:
+        #    raise Exception('didn\'t output a number')
         await ctx.send(f"{formulae} = {result[1]}")
         
         
