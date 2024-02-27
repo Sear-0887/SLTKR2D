@@ -176,7 +176,7 @@ def evaluate(expr):
       ops.append(token)
     else:
       if len(ops)>0 and values[-1][0]==SYM:
-        if ops[-1][1] in symbols:
+        if values[-1][1] in symbols:
           values[-1]=[NUM,symbols[values[-1][1]]]
     if token[0]==UOP: # unary operator
       ops.append(token)
@@ -190,7 +190,8 @@ def evaluate(expr):
       if ops[-1][0]==CALL:
         v1,v2=values[-2:]
         values=values[:-2]
-        values.append([EXPR,'(',v1,v2])
+        assert v1[0]==SYM # the function should always be a symbol
+        values.append([EXPR,'(',v1[1],v2])
       ops=ops[:-1] # pop the left paren as well
     if token[0]==OP:
       while len(ops)>0 and ops[-1][0] not in [LPAR,CALL] and precedence(ops[-1])>=precedence(token):
@@ -221,6 +222,8 @@ def stringifyexpr(e):
   # convert an expr from evaluate to a string, so evaluate on that string will probably give back the same expr
   if e[0] in [SYM,NUM]:
     return str(e[1])
+  if e[1]=='(':
+    return f'{e[2]}({','.join(map(stringifyexpr,e[3:]))})'
   if len(e)==3:
     if len(e[2])==4:
       return f'{e[1]}({stringifyexpr(e[2])})' # -(a+b)
