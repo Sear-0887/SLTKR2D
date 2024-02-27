@@ -56,14 +56,16 @@ def applyuop(op,v):
 
 # here starts my code
 # please know what you are doing
-NUM='NUM'
-LPAR='LPAR'
-RPAR='RPAR'
-OP='OP'
-UOP='UOP'
-SYM='SYM'
-EXPR='EXPR'
-CALL='CALL'
+
+# token types
+NUM='NUM'   # number
+LPAR='LPAR' # left paren
+RPAR='RPAR' # right paren
+OP='OP'     # binary operator
+UOP='UOP'   # unary operator
+SYM='SYM'   # symbol (variable or function)
+EXPR='EXPR' # expression (output of evaluate)
+CALL='CALL' # left paren after function name
 
 # from cpython Tokenize.py
 def group(*choices): return '(' + '|'.join(choices) + ')'
