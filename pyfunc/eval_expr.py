@@ -54,6 +54,17 @@ def applyuop(op,v):
     return [NUM,-v[1]]
   raise Exception('unrecognized unary operator '+op[1])
 
+def applyfunc(f,v):
+  if v[0]!=NUM:
+    return[EXPR,'(',f,v]
+  if f=='log':
+    return [NUM,math.log(v[1])]
+  if f=='sqrt':
+    return [NUM,sqrt(v[1])]
+  if f=='√':
+    return [NUM,sqrt(v[1])]
+  raise Exception('unrecognized function '+f)
+
 # here starts my code
 # please know what you are doing
 
@@ -191,7 +202,7 @@ def evaluate(expr):
         v1,v2=values[-2:]
         values=values[:-2]
         assert v1[0]==SYM # the function should always be a symbol
-        values.append([EXPR,'(',v1[1],v2])
+        values.append(applyfunc(v1[1],v2))
       ops=ops[:-1] # pop the left paren as well
     if token[0]==OP:
       while len(ops)>0 and ops[-1][0] not in [LPAR,CALL] and precedence(ops[-1])>=precedence(token):
