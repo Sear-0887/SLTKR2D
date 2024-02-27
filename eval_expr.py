@@ -1,4 +1,13 @@
-ops=[*'+-*/^']
+# to add a binary operator:
+# add it to the ops list
+# add it to precedences
+# add a case in apply()
+
+# to add an unary operator:
+# add it to the uops list
+# add a case in applyuop()
+
+ops=['+','-','*','/','^']
 
 uops=['-']
 
@@ -31,10 +40,13 @@ Pointfloat = group(r'[0-9](?:_?[0-9])*\.(?:[0-9](?:_?[0-9])*)?',
 Expfloat = r'[0-9](?:_?[0-9])*' + Exponent
 Floatnumber = group(Pointfloat, Expfloat)
 Number = group(Floatnumber, Intnumber)
+# end from cpython Tokenize.py
 
 import re
 
 def getNum(s):
+  # an actual number
+  # not a variable
   m=re.match(Floatnumber,s)
   if m:
     return float(s[:m.end()]),s[m.end():]
@@ -44,9 +56,13 @@ def getNum(s):
   return None,s
 
 def moreTokens(s):
+  # are there more tokens?
   return s.strip()!=''
 
 def getToken(s,lastType):
+  # get one token
+  # types accepted depand on last token
+  # for example, can't have op after lpar
   ss=s.lstrip()
   if lastType in [NUM,RPAR]:
     for op in ops:
@@ -67,6 +83,8 @@ def getToken(s,lastType):
     raise Exception('no token: '+s)
 
 def apply(op,v1,v2):
+  # apply op to v1 and v2
+  # remember, they are all [type,value] pairs
   if op[1]=='+':
     return [NUM,v1[1]+v2[1]]
   if op[1]=='-':
@@ -80,11 +98,14 @@ def apply(op,v1,v2):
   raise Exception('unrecognized binary operator '+op[1])
 
 def applyuop(op,v):
+  # apply op to v
+  # remember, they are both [type,value] pairs
   if op[1]=='-':
     return [NUM,-v[1]]
   raise Exception('unrecognized unary operator '+op[1])
 
 def precedence(token):
+  # get the precedence of a binary operator
   return precedences[token[1]]
 
 def evaluate(expr):
@@ -93,46 +114,47 @@ def evaluate(expr):
 
   s=expr
 
-  lastType=OP
-  while moreTokens(s):
+  # basic shunting yard parser
+  lastType=OP # a valid expression can always come after an operator
+  while moreTokens(s): # parse all the tokens
     token,s=getToken(s,lastType)
-    #print(token,values,ops)
-    if token[0]==NUM:
+    if token[0]==NUM: # number token
       values.append(token)
-    if token[0]==NUM:
-      while len(ops)>0 and ops[-1][0]==UOP:
+    if token[0]==NUM: # number or variable (not added yet) token
+      while len(ops)>0 and ops[-1][0]==UOP: # apply all unary operators on the stack
         op=ops[-1]
         ops=ops[:-1]
         values[-1]=applyuop(op,values[-1])
-    if token[0]==LPAR:
+    if token[0]==LPAR: # left paren
       ops.append(token)
-    if token[0]==UOP:
+    if token[0]==UOP: # unary operator
       ops.append(token)
-    if token[0]==RPAR:
-      while ops[-1][0]!=LPAR:
+    if token[0]==RPAR: # right paren
+      while ops[-1][0]!=LPAR: # finish the parenthesized expression
         op=ops[-1]
         ops=ops[:-1]
         v1,v2=values[-2:]
         values=values[:-2]
         values.append(apply(op,v1,v2))
-      ops=ops[:-1]
+      ops=ops[:-1] # pop the left paren as well
     if token[0]==OP:
       while len(ops)>0 and ops[-1][0]!=LPAR and precedence(ops[-1])>=precedence(token):
+        # apply all operators to the left with a lower precedence
         op=ops[-1]
         ops=ops[:-1]
         v1,v2=values[-2:]
         values=values[:-2]
         values.append(apply(op,v1,v2))
-      ops.append(token)
-    lastType=token[0]
-  while len(ops)>0:
+      ops.append(token) # push this operator
+    lastType=token[0] # type of last token
+  while len(ops)>0: # apply the rest of the operators
     op=ops[-1]
     ops=ops[:-1]
     v1,v2=values[-2:]
     values=values[:-2]
     values.append(apply(op,v1,v2))
-  if len(values)>1:
+  if len(values)>1: # each operator reduces the number of values by 1
     raise Exception('not enough operators')
-  if len(values)==0:
+  if len(values)==0: # how
     raise Exception('empty expression')
   return values[0]
