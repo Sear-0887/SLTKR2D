@@ -119,7 +119,7 @@ def mypow(a,b):
       base=10
       digits=reversed(numberToBase(b,base)) # low to high place value
       print(digits)
-      n=1
+      n=a
       out=1
       for i,digit in enumerate(digits):
         with time_it(f'basepow-rev-loop-{i}'):
@@ -134,7 +134,7 @@ def mypow(a,b):
       base=4
       digits=reversed(numberToBase(b,base)) # low to high place value
       print(digits)
-      n=1
+      n=a
       out=1
       for i,digit in enumerate(digits):
         with time_it(f'basepow4-rev-loop-{i}'):
@@ -149,7 +149,7 @@ def mypow(a,b):
       base=16
       digits=reversed(numberToBase(b,base)) # low to high place value
       print(digits)
-      n=1
+      n=a
       out=1
       for i,digit in enumerate(digits):
         with time_it(f'basepow16-rev-loop-{i}'):
@@ -164,7 +164,7 @@ def mypow(a,b):
       base=16
       digits=reversed(numberToBase(b,base)) # low to high place value
       print(digits)
-      n=1
+      n=a
       out=1
       for i,digit in enumerate(digits):
         with time_it(f'basepow16-rev-loop-{i}'):
