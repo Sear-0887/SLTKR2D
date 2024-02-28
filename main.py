@@ -3,7 +3,7 @@ import nextcord
 import datetime
 from assetload import init
 from nextcord.ext import commands
-from lang import keywords, phraser, cmdi
+from lang import keywords, phraser, cmdi, getcmdlocale
 from gettoken import gettoken
 from commanddec import MainCommand
 import os
