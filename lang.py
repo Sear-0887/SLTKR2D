@@ -31,8 +31,6 @@ linksstr="".join([
 def recursiveddict():
     return collections.defaultdict(recursiveddict)
 
-cmdi = recursiveddict()
-
 def getcmdlocale(cmd,key):
     #print(cmd,key)
     #print(cmdi[cmd])
@@ -74,3 +72,7 @@ def phraser():
     # nooo not the exceptions
     #print(cmdi)
     cmdi["link"]["desc"] = getcmdlocale("link","desc").format(linksstr) # aaaaaaaaaaaaaaaaaaaaaaaaaa
+
+#print('pre',cmdi)
+phraser()
+#print('post',cmdi)

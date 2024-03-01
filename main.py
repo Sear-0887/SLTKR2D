@@ -13,7 +13,6 @@ intents.members = True
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 
-phraser()
 init()
 
 @MainCommand(bot, "reloadlocale")
@@ -23,6 +22,7 @@ async def reloadlocale(ctx):
 
 @MainCommand(bot,"help")
 async def help(ctx, cmdname=None,):
+    #print('help',cmdi)
     if not cmdname:
         # send an info embed about the bot
         embed = nextcord.Embed()
@@ -31,6 +31,8 @@ async def help(ctx, cmdname=None,):
         async def gethelplist(interaction):
             sembed = nextcord.Embed()
             sembed.title = "Help List"
+            #print(cmdi)
+            #print(cmdi.keys())
             sembed.description = "Here's a list of commands:\n" + ", ".join(cmdi.keys())
             await interaction.send(ephemeral=True, embed=sembed)
         getlistbtn = nextcord.ui.Button(style=nextcord.ButtonStyle.blurple, label="Help List")
