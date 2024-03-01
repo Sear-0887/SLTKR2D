@@ -29,6 +29,11 @@ symbols={
   'i':1j,
 }
 
+def mypow(a,b):
+  if b>100000: # or maybe timeout
+    raise Exception('power too large')
+  return a**b
+
 def apply(op,v1,v2):
   # apply op to v1 and v2
   # remember, they are all [type,value] pairs
@@ -40,12 +45,13 @@ def apply(op,v1,v2):
     return [NUM,v1[1]-v2[1]]
   if op[1]=='*':
     return [NUM,v1[1]*v2[1]]
-  if op[1]=='**':
-    return [NUM,v1[1]**v2[1]]
   if op[1]=='/':
     return [NUM,v1[1]/v2[1]]
+  if op[1]=='**':
+    return [NUM,mypow(v1[1],v2[1])]
   if op[1]=='^':
     return [NUM,v1[1]**v2[1]]
+    return [NUM,mypow(v1[1],v2[1])]
   raise Exception('unrecognized binary operator '+op[1])
 
 def applyuop(op,v):
