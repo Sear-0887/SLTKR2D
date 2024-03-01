@@ -54,6 +54,8 @@ def numberToBase(n, b):
     return digits[::-1]
 
 def mypow(a,b):
+  if b>100000: # or maybe timeout
+    raise Exception('power too large')
   # if b==int(b): # b is an integer
   #   with time_it('binpow'):
   #     n=1
