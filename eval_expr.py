@@ -54,126 +54,126 @@ def numberToBase(n, b):
     return digits[::-1]
 
 def mypow(a,b):
-  if b==int(b): # b is an integer
-    with time_it('binpow'):
-      n=1
-      for i,bit in enumerate(bin(b)[2:]):
-        with time_it(f'binpow-loop-{i}'):
-          bit=bit=='1'
-          if bit:
-            n*=a
-          n=n*n
-      out=n
-    try:
-      print(out)
-    except:
-      pass
-  if b==int(b): # b is an integer
-    with time_it('basepow'):
-      base=10
-      factors=[a**i for i in range(base)]
-      n=1
-      for i,digit in enumerate(numberToBase(b,base)):
-        with time_it(f'basepow-loop-{i}'):
-          n*=factors[digit]
-          n=n**base
-      out=n
-    try:
-      print(out)
-    except:
-      pass
-  if b==int(b): # b is an integer
-    with time_it('basepow4'):
-      base=4
-      factors=[a**i for i in range(base)]
-      n=1
-      for i,digit in enumerate(numberToBase(b,base)):
-        with time_it(f'basepow4-loop-{i}'):
-          n*=factors[digit]
-          n=n*n
-          n=n*n
-      out=n
-    try:
-      print(out)
-    except:
-      pass
-  if b==int(b): # b is an integer
-    with time_it('basepow16'):
-      base=16
-      factors=[a**i for i in range(base)]
-      n=1
-      for i,digit in enumerate(numberToBase(b,base)):
-        with time_it(f'basepow16-loop-{i}'):
-          n*=factors[digit]
-          n=n*n
-          n=n*n
-          n=n*n
-          n=n*n
-      out=n
-    try:
-      print(out)
-    except:
-      pass
-  if b==int(b): # b is an integer
-    with time_it('basepow-rev'):
-      base=10
-      digits=reversed(numberToBase(b,base)) # low to high place value
-      print(digits)
-      n=a
-      out=1
-      for i,digit in enumerate(digits):
-        with time_it(f'basepow-rev-loop-{i}'):
-          n=n**base
-          out*=n**digit
-    try:
-      print(out)
-    except:
-      pass
-  if b==int(b): # b is an integer
-    with time_it('basepow4-rev'):
-      base=4
-      digits=reversed(numberToBase(b,base)) # low to high place value
-      print(digits)
-      n=a
-      out=1
-      for i,digit in enumerate(digits):
-        with time_it(f'basepow4-rev-loop-{i}'):
-          n=n**base
-          out*=n**digit
-    try:
-      print(out)
-    except:
-      pass
-  if b==int(b): # b is an integer
-    with time_it('basepow16-rev'):
-      base=16
-      digits=reversed(numberToBase(b,base)) # low to high place value
-      print(digits)
-      n=a
-      out=1
-      for i,digit in enumerate(digits):
-        with time_it(f'basepow16-rev-loop-{i}'):
-          n=n**base
-          out*=n**digit
-    try:
-      print(out)
-    except:
-      pass
-  if b==int(b): # b is an integer
-    with time_it('binpow-rev'):
-      base=16
-      digits=reversed(numberToBase(b,base)) # low to high place value
-      print(digits)
-      n=a
-      out=1
-      for i,digit in enumerate(digits):
-        with time_it(f'basepow16-rev-loop-{i}'):
-          n=n**base
-          out*=n**digit
-    try:
-      print(out)
-    except:
-      pass
+  # if b==int(b): # b is an integer
+  #   with time_it('binpow'):
+  #     n=1
+  #     for i,bit in enumerate(bin(b)[2:]):
+  #       with time_it(f'binpow-loop-{i}'):
+  #         bit=bit=='1'
+  #         if bit:
+  #           n*=a
+  #         n=n*n
+  #     out=n
+  #   try:
+  #     print(out)
+  #   except:
+  #     pass
+  # if b==int(b): # b is an integer
+  #   with time_it('basepow'):
+  #     base=10
+  #     factors=[a**i for i in range(base)]
+  #     n=1
+  #     for i,digit in enumerate(numberToBase(b,base)):
+  #       with time_it(f'basepow-loop-{i}'):
+  #         n*=factors[digit]
+  #         n=n**base
+  #     out=n
+  #   try:
+  #     print(out)
+  #   except:
+  #     pass
+  # if b==int(b): # b is an integer
+  #   with time_it('basepow4'):
+  #     base=4
+  #     factors=[a**i for i in range(base)]
+  #     n=1
+  #     for i,digit in enumerate(numberToBase(b,base)):
+  #       with time_it(f'basepow4-loop-{i}'):
+  #         n*=factors[digit]
+  #         n=n*n
+  #         n=n*n
+  #     out=n
+  #   try:
+  #     print(out)
+  #   except:
+  #     pass
+  # if b==int(b): # b is an integer
+  #   with time_it('basepow16'):
+  #     base=16
+  #     factors=[a**i for i in range(base)]
+  #     n=1
+  #     for i,digit in enumerate(numberToBase(b,base)):
+  #       with time_it(f'basepow16-loop-{i}'):
+  #         n*=factors[digit]
+  #         n=n*n
+  #         n=n*n
+  #         n=n*n
+  #         n=n*n
+  #     out=n
+  #   try:
+  #     print(out)
+  #   except:
+  #     pass
+  # if b==int(b): # b is an integer
+  #   with time_it('basepow-rev'):
+  #     base=10
+  #     digits=reversed(numberToBase(b,base)) # low to high place value
+  #     print(digits)
+  #     n=a
+  #     out=1
+  #     for i,digit in enumerate(digits):
+  #       with time_it(f'basepow-rev-loop-{i}'):
+  #         n=n**base
+  #         out*=n**digit
+  #   try:
+  #     print(out)
+  #   except:
+  #     pass
+  # if b==int(b): # b is an integer
+  #   with time_it('basepow4-rev'):
+  #     base=4
+  #     digits=reversed(numberToBase(b,base)) # low to high place value
+  #     print(digits)
+  #     n=a
+  #     out=1
+  #     for i,digit in enumerate(digits):
+  #       with time_it(f'basepow4-rev-loop-{i}'):
+  #         n=n**base
+  #         out*=n**digit
+  #   try:
+  #     print(out)
+  #   except:
+  #     pass
+  # if b==int(b): # b is an integer
+  #   with time_it('basepow16-rev'):
+  #     base=16
+  #     digits=reversed(numberToBase(b,base)) # low to high place value
+  #     print(digits)
+  #     n=a
+  #     out=1
+  #     for i,digit in enumerate(digits):
+  #       with time_it(f'basepow16-rev-loop-{i}'):
+  #         n=n**base
+  #         out*=n**digit
+  #   try:
+  #     print(out)
+  #   except:
+  #     pass
+  # if b==int(b): # b is an integer
+  #   with time_it('binpow-rev'):
+  #     base=16
+  #     digits=reversed(numberToBase(b,base)) # low to high place value
+  #     print(digits)
+  #     n=a
+  #     out=1
+  #     for i,digit in enumerate(digits):
+  #       with time_it(f'basepow16-rev-loop-{i}'):
+  #         n=n**base
+  #         out*=n**digit
+  #   try:
+  #     print(out)
+  #   except:
+  #     pass
   with time_it('builtinpow'):
     out=a**b
   return out
