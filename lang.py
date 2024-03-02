@@ -19,41 +19,49 @@ linksstr="".join([
 ])
 
 
-
+import time
+from datetime import datetime
 import glob
 import re
 cmdi = {}
 
-# def repri(): # USED FOR MIGRATING FROM CLASS METHOD TO .TXT FILES
-#     for cmdname in dir(cmds): 
-#         if not cmdname.startswith('__'):
-#             clas = getattr(cmds, cmdname)
-#             for cmdattr in dir(clas):
-#                 if not cmdattr.startswith('__'):
-#                     print(f"{cmdname}.{cmdattr} = {getattr(clas, cmdattr)}")
-#             print("\n")
+# write_to_log, basically similar to print, with extra steps...
+# ptnt is print_to_normal_terminal, ats is add_timestamp
+def lprint(*values: object, sep: str | None = " ",end: str | None = "\n", ptnt: bool = False, ats: bool = True) -> None:
+    with open(f"cache/log/cache-{datetime.now():%d-%m-%Y}.txt", "a") as fil:
+        values = sep.join(values) + end
+        if ats:
+            values = time.strftime("%H:%M:%S", time.localtime()) + " | " + values
+        fil.write(values)
+    if ptnt:
+        print(values)
+        
                     
 def phraser():
-    for i in glob.glob("lang/en/*.txt"):
-        with open(i , "r") as f:
-            fc = re.sub(r"\\\s*\n", r"\\", f.read())
-            for line in fc.split("\n"):
-                if line.startswith("##"): continue
-                for cmd, ele, val in re.findall(r"^(\w+).(\w+)\s*=\s*(.+)", line):
-                    val = val.replace("\\", "\n")
-                    if re.match(r"^\[.*\]$", val):
-                        val = val[1:-1].split(", ")
-                        if val == ['']: val = []
-                    try: cmdi[cmd]
-                    except: cmdi[cmd] = {}
-                    cmdi[cmd][ele] = val
-    print(cmdi["help"]["aliases"])
+    for langpth in glob.glob("lang/*"):
+        lang = langpth[5:]
+        try: cmdi[lang]
+        except: cmdi[lang] = {}
+        for i in glob.glob("lang/en/*.txt"):
+            with open(i , "r") as f:
+                fc = re.sub(r"\\\s*\n", r"\\", f.read())
+                for line in fc.split("\n"):
+                    if line.startswith("##"): continue
+                    for expr, val in re.findall(r"^([\w.]+)\s*=\s*(.+)", line):
+                        val = val.replace("\\", "\n")
+                        if re.match(r"^\[.*\]$", val):
+                            val = val[1:-1].split(", ")
+                            if val == ['']: val = []
+                        cmdi[lang][expr] = val
+                        lprint(f"{(expr, val) =}")
+                    
+                        
+    print(cmdi['en']["help.aliases"])
     # EXCEPTIONS
-    cmdi["link"]["desc"] = cmdi["link"]["desc"].format(linksstr)
+    cmdi['en']["link.desc"] = cmdi['en']["link.desc"].format(linksstr)
 
-def evl(target):
-    target = target.split(".")
-    root = cmdi
-    for i in target:
-        root = root[i]
-    return root
+def evl(target, lang="en") -> str | list:
+    try:
+        return cmdi[lang][target]
+    except:
+        return ""

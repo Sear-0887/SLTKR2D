@@ -13,6 +13,9 @@ If left blank, shows info about the bot.
 
 help.error = Please provide a valid command name.
 help.syntax = !help <cmd>
+help.helplist.title = Command List
+help.helplist.desc = Here's a list of commands: \
+{}
 
 ## link
 link.aliases = [l, lnk, www]
