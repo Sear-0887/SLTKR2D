@@ -7,7 +7,7 @@ import math
 import re
 from PIL import Image
 from nextcord.ext import commands
-
+from lang import lprint
 from commanddec import CogCommand
 
 
@@ -74,6 +74,7 @@ class Math(commands.Cog):
         i = 2
         c = {}
         def inc(num):
+            lprint(num, end=" ")
             try: c[str(num)]
             except: c[str(num)] = 0
             c[str(num)] += 1
@@ -87,8 +88,7 @@ class Math(commands.Cog):
                 inc(i)
             else:
                 i += 1
-        if n >= 1:
-            inc(n)
+        inc(n)
             
         await ctx.send(f"{r} = {' * '.join([f'{base}{handleexpo(expo)}' for base, expo in c.items()])}")
         
