@@ -36,16 +36,14 @@ class Math(commands.Cog):
             for operator in "^*/+-":
                 formu = removexcessbracket(formu)
                 result = re.findall(rf"(\-?[\d\.]+)([\+\-\*\/\^])(\-?[\d\.]+)", formu)
-                if result == []: continue
-                f, operator, s = result[0]
-                print(f, operator, s)
-                if   operator == "^": operated = dif(f) ** dif(s)
-                if   operator == "*": operated = dif(f) *  dif(s)
-                elif operator == "/": operated = dif(f) /  dif(s)
-                elif operator == "+": operated = dif(f) +  dif(s)
-                elif operator == "-": operated = dif(f) -  dif(s)
-                formu = formu.replace(f"{f}{operator}{s}", str(operated))
-                formu = removexcessbracket(formu)
+                for f, operator, s in result:
+                    print(f, operator, s)
+                    if   operator == "^": operated = dif(f) ** dif(s)
+                    elif operator == "*": operated = dif(f) *  dif(s)
+                    elif operator == "/": operated = dif(f) /  dif(s)
+                    elif operator == "+": operated = dif(f) +  dif(s)
+                    elif operator == "-": operated = dif(f) -  dif(s)
+                    formu = formu.replace(f"{f}{operator}{s}", f"{operated}", 1)
             if not result:
                 print("PROPERE")
                 break
@@ -74,17 +72,26 @@ class Math(commands.Cog):
         if n < 0: raise Exception('Negetive Value')
         r = n
         i = 2
-        c = []
+        c = {}
+        def inc(num):
+            try: c[str(num)]
+            except: c[str(num)] = 0
+            c[str(num)] += 1
+        def handleexpo(expo) -> str:
+            cvexp = ''.join(list("⁰¹²³⁴⁵⁶⁷⁸⁹")[int(digit)] for digit in str(expo))
+            if cvexp == "¹": return ""
+            else: return cvexp
         while i*i<=n:
             if n % i == 0:
                 n //= i
-                c.append(str(i))
+                inc(i)
             else:
                 i += 1
-
         if n >= 1:
-            c.append(str(i))
-        await ctx.send(f"{r} = {' * '.join(c)}")
+            inc(n)
+            
+        await ctx.send(f"{r} = {' * '.join([f'{base}{handleexpo(expo)}' for base, expo in c.items()])}")
+        
     # Near Same tested as !prime 
     @CogCommand("factor")
     async def factor(self, ctx:commands.Context, n:int=12):
