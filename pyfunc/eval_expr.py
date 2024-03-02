@@ -21,6 +21,41 @@ precedences={
   '^':1,
 }
 
+symbols={
+  'pi':math.pi,
+  'π':math.pi,
+  'e':math.e,
+  'i':1j,
+}
+
+def apply(op,v1,v2):
+  # apply op to v1 and v2
+  # remember, they are all [type,value] pairs
+  if v1[0]!=NUM or v2[0]!=NUM:
+    return [EXP,op[1],v1,v2]
+  if op[1]=='+':
+    return [NUM,v1[1]+v2[1]]
+  if op[1]=='-':
+    return [NUM,v1[1]-v2[1]]
+  if op[1]=='*':
+    return [NUM,v1[1]*v2[1]]
+  if op[1]=='/':
+    return [NUM,v1[1]/v2[1]]
+  if op[1]=='^':
+    return [NUM,v1[1]**v2[1]]
+  raise Exception('unrecognized binary operator '+op[1])
+
+def applyuop(op,v):
+  # apply op to v
+  # remember, they are both [type,value] pairs
+  if v[0]!=NUM:
+    return [EXP,op[1],v]
+  if op[1]=='-':
+    return [NUM,-v[1]]
+  raise Exception('unrecognized unary operator '+op[1])
+
+# here starts my code
+# please know what you are doing
 NUM='NUM'
 LPAR='LPAR'
 RPAR='RPAR'
@@ -58,13 +93,6 @@ def getNum(s):
   if m:
     return int(s[:m.end()]),s[m.end():]
   return None,s
-
-symbols={
-  'pi':math.pi,
-  'π':math.pi,
-  'e':math.e,
-  'i':1j,
-}
 
 def getSym(s):
   # a symbol
@@ -107,32 +135,6 @@ def getToken(s,lastType):
         return [NUM,symbols[sym]],snew
       return [SYM,sym],snew
     raise Exception('no token: '+s)
-
-def apply(op,v1,v2):
-  # apply op to v1 and v2
-  # remember, they are all [type,value] pairs
-  if v1[0]!=NUM or v2[0]!=NUM:
-    return [EXP,op[1],v1,v2]
-  if op[1]=='+':
-    return [NUM,v1[1]+v2[1]]
-  if op[1]=='-':
-    return [NUM,v1[1]-v2[1]]
-  if op[1]=='*':
-    return [NUM,v1[1]*v2[1]]
-  if op[1]=='/':
-    return [NUM,v1[1]/v2[1]]
-  if op[1]=='^':
-    return [NUM,v1[1]**v2[1]]
-  raise Exception('unrecognized binary operator '+op[1])
-
-def applyuop(op,v):
-  # apply op to v
-  # remember, they are both [type,value] pairs
-  if v[0]!=NUM:
-    return [EXP,op[1],v]
-  if op[1]=='-':
-    return [NUM,-v[1]]
-  raise Exception('unrecognized unary operator '+op[1])
 
 def precedence(token):
   # get the precedence of a binary operator
@@ -202,6 +204,7 @@ def evaluate(expr):
   return values[0]
 
 def stringifyexpr(e):
+  # convert an expr from evaluate to a string, so evaluate on that string will probably give back the same expr
   if e[0] in [SYM,NUM]:
     return str(e[1])
   if len(e)==3:
