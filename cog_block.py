@@ -1,11 +1,9 @@
-from assetload import blockinfos, idtoblock as quickidtable,locale
+from assetload import blockinfos,locale
 import nextcord
 import random
 import re
 from PIL import Image
 from nextcord.ext import commands
-from lang import evl
-import block_extra as be
 from commanddec import CogCommand
 from assetload import idtoblock
 from block import makeimage as blockmakeimage

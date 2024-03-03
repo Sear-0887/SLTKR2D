@@ -1,4 +1,3 @@
-import PIL
 import PIL.Image
 import smp
 import os
