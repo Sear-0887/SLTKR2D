@@ -40,26 +40,30 @@ def recursiveddict():
 cmdi = recursiveddict()
 
 def phraser():
-    for fname in os.listdir(config.cmdlocaledir): # you could filter for only .txt files
-        with open(os.path.join(config.cmdlocaledir,fname)) as f:
-            linesiter=iter(f)
-            for line in linesiter:
-                while line.endswith('\\\n'):
-                    line=line[:-2].strip()+'\n'+next(linesiter) # add the next line to this if this line ends with a backslash
-                line=re.sub('#.*$','',line) # remove comments
-                if '=' not in line:
-                    continue
-                key,value=line.split('=',maxsplit=1)
-                value=value.strip()
-                if value.startswith('[') and value.endswith(']'):
-                    value=[v.strip() for v in value[1:-1].split(',') if len(v.strip())>0]
-                key=tuple(key.strip().split('.'))
-                target=cmdi
-                print(key)
-                for k in key[:-1]:
-                    target=target[k]
-                target[key[-1]]=value
+    for lang in os.listdir(config.cmdlocaledir): # you could filter for only .txt files
+        for fname in os.listdir(os.path.join(config.cmdlocaledir,lang)): # you could filter for only .txt files
+            with open(os.path.join(config.cmdlocaledir,lang,fname)) as f:
+                linesiter=iter(f)
+                for line in linesiter:
+                    while line.endswith('\\\n'):
+                        line=line[:-2].strip()+'\n'+next(linesiter) # add the next line to this if this line ends with a backslash
+                    line=re.sub('#.*$','',line) # remove comments
+                    if '=' not in line:
+                        continue
+                    key,value=line.split('=',maxsplit=1)
+                    value=value.strip()
+                    if value.startswith('[') and value.endswith(']'):
+                        value=[v.strip() for v in value[1:-1].split(',') if len(v.strip())>0]
+                    key=tuple(key.strip().split('.'))
+                    target=cmdi[lang]
+                    print(key)
+                    for k in key[:-1]:
+                        target=target[k]
+                    target[key[-1]]=value
     #print(cmdi["help"]["aliases"])
     # EXCEPTIONS
     # nooo not the exceptions
-    cmdi["link"]["desc"] = cmdi["link"]["desc"].format(linksstr) # aaaaaaaaaaaaaaaaaaaaaaaaaa
+    for lang in cmdi:
+        cmdi[lang]["link"]["desc"] = cmdi[lang]["link"]["desc"].format(linksstr) # aaaaaaaaaaaaaaaaaaaaaaaaaa
+
+    cmdi=cmdi['en'] # temporary
