@@ -1,7 +1,7 @@
 import datetime
 import decorator
 import sys
-from lang import cmdi, evl
+from lang import cmdi
 from colorama import Fore, init
 from nextcord.ext import commands
 
@@ -37,6 +37,7 @@ f'''
     # raise e
 
 def MainCommand(bot,name):
+    cmdclass = cmdi[name]
     async def _trycmd(cmd,ctx,*args,**kwargs):
         try:
             await cmd(ctx,*args,**kwargs)
@@ -45,25 +46,19 @@ def MainCommand(bot,name):
     def trycmd(cmd):
         return decorator.decorate(cmd,_trycmd)
     def fixcmd(cmd):
-        return bot.command(
-            name        =        name, 
-            description = evl(f"{name}.desc"), 
-            aliases     = evl(f"{name}.aliases")
-        )( trycmd(cmd) )
+        print(cmdclass["aliases"])
+        return bot.command(name=name, description=cmdclass["desc"], aliases=cmdclass["aliases"])(trycmd(cmd))
     return fixcmd
 
 def CogCommand(name):
-    async def _trycmd(cmd, self, ctx:commands.Context ,*args,**kwargs):
+    cmdclass = cmdi[name]
+    async def _trycmd(cmd,self,ctx,*args,**kwargs):
         try:
-            await cmd(self, ctx,*args,**kwargs)
+            await cmd(self,ctx,*args,**kwargs)
         except Exception as e:
             await ErrorHandler(name, ctx, e, args, kwargs)
     def trycmd(cmd):
         return decorator.decorate(cmd,_trycmd)
     def fixcmd(cmd):
-        return commands.command(
-            name        =        name, 
-            description = evl(f"{name}.desc"), 
-            aliases     = evl(f"{name}.aliases")
-        )( trycmd(cmd) )
+        return commands.command(name=name, description=cmdclass["desc"], aliases=cmdclass["aliases"])(trycmd(cmd))
     return fixcmd
