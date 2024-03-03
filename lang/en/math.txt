@@ -5,3 +5,23 @@ Only supports +, -, *, /, ^.
 
 eval.error = Unable to evaluate {formulae}.
 eval.syntax = !eval <expressionformula>
+
+# plot
+plot.aliases = [linear]
+plot.desc = Plots the formula `y = <m>x + <c>`, where m is slope and c is the y-intercept. \
+The plot will be ranging from <min> to <max>.
+
+plot.error = Unable to plot `y = {m}x + {c}`, ranging from {min_} to {max_}.
+plot.syntax = !plot <m> <c> <min> <max>
+
+# prime
+prime.aliases = [pfac]
+prime.desc = Find <n>'s Prime Factor.
+prime.error = Cannot factor {n}.
+prime.syntax = !prime <n> 
+
+# factor
+factor.aliases = [fac]
+factor.desc = Find <n>'s All Factor.
+factor.error = Cannot factor {n}.
+factor.syntax = !factor <n> 
