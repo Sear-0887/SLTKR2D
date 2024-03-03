@@ -45,8 +45,8 @@ def getcmdlocale(*args,lang='en'):
         out=out[key]
     return out
 
-def getlocalizedcommands():
-    return cmdi.keys()
+def getlocalizedcommands(lang='en'):
+    return cmdi[lang].keys()
 
 def phraser():
     for lang in os.listdir(config.cmdlocaledir): # you could filter for only .txt files
