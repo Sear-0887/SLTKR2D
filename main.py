@@ -12,10 +12,16 @@ intents = nextcord.Intents.default()
 intents.members = True
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
+TimeOn = datetime.datetime.now()
 
-phraser()
-init()
+def botinit():
+    os.makedirs("cache", exist_ok=True)
+    os.makedirs("cache/log", exist_ok=True)
+    phraser()
+    init() #assetload
 
+botinit()
+    
 @MainCommand(bot, "reloadlocal")
 async def reloadlocal(ctx):
     phraser()
@@ -75,13 +81,6 @@ async def link(ctx, typ="r2d"):
 async def on_ready():
     print(f"ONLINE as {bot.user}, id {bot.user.id}.")
     print("Done.")
-    global TimeOn
-    TimeOn = datetime.datetime.now()
-    
-# def returniscog(cogname):
-#     return bot.get_cog(cogname)
-
-os.makedirs('cache',exist_ok=True)
 
 token = gettoken()
 for cog_name in glob.glob("cog_*.py"):
