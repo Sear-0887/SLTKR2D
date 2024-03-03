@@ -1,11 +1,3 @@
-## unloadcog
-unloadcog.aliases = [cgu, cogunload]
-unloadcog.desc = Unloads the cog specified. \
-Admin-Only Command.
-
-unloadcog.error = Unable to reach all cogs.
-unloadcog.syntax = !unloadcog
-
 ## viewcog
 viewcog.aliases = [cg, cgv, cog]
 viewcog.desc = Read the current status of cogs detected. \
@@ -29,3 +21,19 @@ Admin-Only Command.
 
 loadcog.error = Unable to reach all cogs.
 loadcog.syntax = !loadcog
+
+## unloadcog
+unloadcog.aliases = [cgu, cogunload]
+unloadcog.desc = Unloads the cog specified. \
+Admin-Only Command.
+
+unloadcog.error = Unable to reach all cogs.
+unloadcog.syntax = !unloadcog
+
+## deletelog
+deletelog.aliases = [delog]
+deletelog.desc = Clear Log files. \
+Admin-Only Command.
+
+deletelog.error = Unable to delete All logs.
+deletelog.syntax = !deletelog

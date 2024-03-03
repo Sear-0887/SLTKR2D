@@ -70,5 +70,12 @@ class Admin(commands.Cog):
         except commands.errors.ExtensionNotFound:
             await ctx.send("cog_"+tar+".py not found.")
     
+    @commands.has_permissions(administrator=True)
+    @CogCommand("deletelog")
+    async def delog(self, ctx):
+        for cachef in glob.glob("cache/log/cache-??-??-????.txt"):
+            os.remove(cachef)
+        await ctx.send("Done.")
+
 def setup(bot):
 	bot.add_cog(Admin(bot))
