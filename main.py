@@ -25,6 +25,8 @@ botinit()
 @MainCommand(bot, "reloadlocal")
 async def reloadlocal(ctx):
     phraser()
+    for i in bot.commands:
+        i.update()
     await ctx.send("Done.")
 
 @MainCommand(bot,"help")
