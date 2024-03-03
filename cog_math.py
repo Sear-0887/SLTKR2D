@@ -21,12 +21,12 @@ def primefactor(n):
     factors=defaultdict(int) # a dict of primes to powers, all 0
     for prime in smallprimes:
         while n%prime==0: # assumes 1 isn't in the list
-            n/=prime
+            n//=prime
             factors[prime]+=1
-    p=max(primes) # assumes the maximum prime is odd
+    p=max(smallprimes) # assumes the maximum prime is odd
     while n>1:
         while n%p==0:
-            n/=p
+            n//=p
             factors[p]+=1
         p+=2 # 100% faster!
         if p*p>n: # sqrt is a bit slower
@@ -95,6 +95,10 @@ class Math(commands.Cog):
     @CogCommand("prime")
     async def prime(self, ctx:commands.Context, n:int=12):
         if n <= 0: raise Exception('Cannot Factor Nonpositive Value')
+        def handleexpo(expo) -> str:
+            if expo==1:
+                return ''
+            return ''.join(list("⁰¹²³⁴⁵⁶⁷⁸⁹")[int(digit)] for digit in str(expo))
         await ctx.send(f"{n} = {' * '.join([f'{p}{handleexpo(e)}' for p, e in primefactor(n).items()])}")
         
     @CogCommand("factor")
@@ -103,12 +107,14 @@ class Math(commands.Cog):
         pfactors=primefactor(n)
         factors=[1]
         for p,e in pfactors.items():
+            #print(p,e,factors)
             newfactors=[]
-            for i in range(e):
+            for i in range(e+1): # inclusive
                 factor=p**i
                 newfactors+=[factor*f for f in factors]
             factors=newfactors
-        await ctx.send(f"{n} has {len(factors)} factors: \n{', '.join(factors)}")
+        factors.sort() # in place sort
+        await ctx.send(f"{n} has {len(factors)} factors: \n{', '.join(map(str,factors))}")
         
 def setup(bot):
 	bot.add_cog(Math(bot))
