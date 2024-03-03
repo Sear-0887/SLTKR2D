@@ -2,15 +2,13 @@ import re
 import collections
 import smp
 import os
+import config
 
 idtoblock = {}
 
 blockinfos = collections.defaultdict(dict)
 
 locale={}
-
-localedir='assets/localization'
-lang='english'
 
 def capitalize(s):
     s=s[0].upper()+s[1:]
@@ -35,14 +33,14 @@ modifiers={
 }
 
 def getblockids():
-    with open("assets/block_id_.smp") as f:
+    with open(config.blockidfile) as f:
         data=smp.getsmpvalue(f.read())
     for name,i in data.items():
         blockinfos[name]["id"] = int(i)
         idtoblock[int(i)] = name
 
 def geticoncoords():
-    with open("assets/block_icons.smp") as f:
+    with open(config.blockcoordfile) as f:
         data=smp.getsmpvalue(f.read())
     for icon,xy in data.items():
         x,y=xy.split(',')
@@ -72,10 +70,10 @@ def substitutelocale(s):
     return s
 
 def getlocale():
-    for fname in os.listdir(localedir):
-        if not fname.startswith(lang):
+    for fname in os.listdir(config.localedir):
+        if not fname.startswith(config.lang):
             continue # skip files for a different language
-        with open(os.path.join(localedir,fname), "r") as f:
+        with open(os.path.join(config.localedir,fname), "r") as f:
             linesiter=iter(f)
             for line in linesiter:
                 while line.endswith('\\\n'):

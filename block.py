@@ -2,13 +2,14 @@ import PIL
 import PIL.Image
 import smp
 import os
+import config
 
 #welded=top,left,bottom,right
 #rotate= 0    1    2      3
 
 blockpaths={}
 
-with open("assets/block_textures.smp") as f:
+with open(config.blocktextures) as f:
   data=smp.getsmpvalue(f.read())
 for name,texture in data.items():
   blockpaths[name] = texture
