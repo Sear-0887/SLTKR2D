@@ -6,6 +6,7 @@ from nextcord.ext import commands
 from lang import keywords, phraser, cmdi, evl
 from gettoken import gettoken
 from commanddec import MainCommand
+import os
 
 intents = nextcord.Intents.default()
 intents.members = True
@@ -14,6 +15,7 @@ bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 
 phraser()
 init()
+
 @MainCommand(bot, "reloadlocal")
 async def reloadlocal(ctx):
     phraser()
@@ -83,6 +85,8 @@ async def on_ready():
     
 # def returniscog(cogname):
 #     return bot.get_cog(cogname)
+
+os.makedirs('cache',exist_ok=True)
 
 token = gettoken()
 for cog_name in glob.glob("cog_*.py"):
