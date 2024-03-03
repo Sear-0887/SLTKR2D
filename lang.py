@@ -39,6 +39,15 @@ def recursiveddict():
 
 cmdi = recursiveddict()
 
+def getcmdlocale(*args,lang='en'):
+    out=cmdi[lang]
+    for key in args:
+        out=out[key]
+    return out
+
+def getlocalizedcommands():
+    return cmdi.keys()
+
 def phraser():
     for lang in os.listdir(config.cmdlocaledir): # you could filter for only .txt files
         for fname in os.listdir(os.path.join(config.cmdlocaledir,lang)): # you could filter for only .txt files
@@ -65,5 +74,3 @@ def phraser():
     # nooo not the exceptions
     for lang in cmdi:
         cmdi[lang]["link"]["desc"] = cmdi[lang]["link"]["desc"].format(linksstr) # aaaaaaaaaaaaaaaaaaaaaaaaaa
-
-    cmdi=cmdi['en'] # temporary

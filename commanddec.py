@@ -1,7 +1,7 @@
 import datetime
 import decorator
 import sys
-from lang import cmdi
+from lang import getcmdlocale
 from colorama import Fore, init
 from nextcord.ext import commands
 
@@ -13,7 +13,7 @@ RESET = Fore.RESET
 
 
 async def ErrorHandler(name, ctx, e, args, kwargs):
-    expecterr = evl(f"{name}.error")
+    expecterr = getcmdlocale(f"{name}.error")
     try:
         expecterr = expecterr.format(*args, **kwargs)
     except:
@@ -37,7 +37,6 @@ f'''
     # raise e
 
 def MainCommand(bot,name):
-    cmdclass = cmdi[name]
     async def _trycmd(cmd,ctx,*args,**kwargs):
         try:
             await cmd(ctx,*args,**kwargs)
@@ -46,12 +45,11 @@ def MainCommand(bot,name):
     def trycmd(cmd):
         return decorator.decorate(cmd,_trycmd)
     def fixcmd(cmd):
-        print(cmdclass["aliases"])
-        return bot.command(name=name, description=cmdclass["desc"], aliases=cmdclass["aliases"])(trycmd(cmd))
+        print(getcmdlocale(name,"aliases"))
+        return bot.command(name=name, description=getcmdlocale(name,"desc"), aliases=getcmdlocale(name,"aliases"))(trycmd(cmd))
     return fixcmd
 
 def CogCommand(name):
-    cmdclass = cmdi[name]
     async def _trycmd(cmd,self,ctx,*args,**kwargs):
         try:
             await cmd(self,ctx,*args,**kwargs)
@@ -60,5 +58,5 @@ def CogCommand(name):
     def trycmd(cmd):
         return decorator.decorate(cmd,_trycmd)
     def fixcmd(cmd):
-        return commands.command(name=name, description=cmdclass["desc"], aliases=cmdclass["aliases"])(trycmd(cmd))
+        return commands.command(name=name, description=getcmdlocale(name,"desc"), aliases=getcmdlocale(name,"aliases"))(trycmd(cmd))
     return fixcmd

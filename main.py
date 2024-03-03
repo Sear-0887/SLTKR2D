@@ -3,7 +3,7 @@ import nextcord
 import datetime
 from assetload import init
 from nextcord.ext import commands
-from lang import keywords, phraser, cmdi
+from lang import keywords, phraser, getcmdlocale, getlocalizedcommands
 from gettoken import gettoken
 from commanddec import MainCommand
 import os
@@ -34,7 +34,7 @@ async def help(ctx, cmdname=None,):
     async def gethelplist(interaction):
         sembed = nextcord.Embed()
         sembed.title = "Help List"
-        sembed.description = "Here's a list of commands:\n" + ", ".join(cmdi.keys())
+        sembed.description = "Here's a list of commands:\n" + ", ".join(getlocalizedcommands())
         await interaction.send(ephemeral=True, embed=sembed)
     async def gethelplist(interaction:nextcord.Interaction, helplist:list|str=[]):
         author = interaction.user
@@ -44,13 +44,13 @@ async def help(ctx, cmdname=None,):
                 preparedlist.append(f"### {key.name} ({'/'.join(key.aliases)})")
                 preparedlist.append(f"{key.description}")
         sembed = nextcord.Embed()
-        sembed.title = evl("help","helplist","title")
-        sembed.description = evl("help","helplist","desc").format("\n".join(preparedlist))
+        sembed.title = getcmdlocale("help","helplist","title")
+        sembed.description = getcmdlocale("help","helplist","desc").format("\n".join(preparedlist))
         
         await interaction.send(ephemeral=True, embed=sembed)
     if not cmdname:
         embed = nextcord.Embed()
-        embed.description = cmdi["help"]["blankdisplay"].format(datetime.datetime.now()-TimeOn)
+        embed.description = getcmdlocale("help","blankdisplay").format(datetime.datetime.now()-TimeOn)
         view = nextcord.ui.View()
         getlistbtn = nextcord.ui.Button(style=nextcord.ButtonStyle.blurple, label="Help List")
         getlistbtn.callback = gethelplist
@@ -61,8 +61,8 @@ async def help(ctx, cmdname=None,):
             if cmdname in cmd.aliases or cmdname == cmd.name:
                 embed = nextcord.Embed()
                 embed.title = cmd.name
-                embed.description = evl(cmd.name,"desc")
-                embed.add_field(name="Syntax", value=evl(cmd.name,"syntax"))
+                embed.description = getcmdlocale(cmd.name,"desc")
+                embed.add_field(name="Syntax", value=getcmdlocale(cmd.name,"syntax"))
                 embed.add_field(name="Aliases", value=",\n".join(cmd.aliases))
                 embed.add_field(name="Cog", value='Main' if cmd.cog_name == None else cmd.cog_name)
         else:
