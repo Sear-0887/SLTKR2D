@@ -26,8 +26,8 @@ linksstr="".join([
 # write_to_log, basically similar to print, with extra steps...
 # ptnt is print_to_normal_terminal, ats is add_timestamp
 def lprint(*values: object, sep: str | None = " ",end: str | None = "\n", ptnt: bool = False, ats: bool = True) -> None:
-    with open(f"cache/log/cache-{datetime.now():%d-%m-%Y}.txt", "a") as fil:
-        values = sep.join(values) + end
+    with open(f"cache/log/cache-{datetime.now():%d-%m-%Y}.txt", "a+") as fil:
+        values = sep.join(list(map(str, values))) + end
         if ats:
             values = time.strftime("%H:%M:%S", time.localtime()) + " | " + values
         fil.write(values)
