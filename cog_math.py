@@ -7,9 +7,33 @@ import math
 import re
 from PIL import Image
 from nextcord.ext import commands
-
+from collections import defaultdict
 from commanddec import CogCommand
 
+# rbcavi implementation
+smallprimes=[2,3,5,7,11,13,17,19] # i hope i didn't miss any
+# you can add more primes
+# just don't skip any
+
+def primefactor(n):
+    if n==1:
+        return {1:1}
+    factors=defaultdict(int) # a dict of primes to powers, all 0
+    for prime in smallprimes:
+        while n%prime==0: # assumes 1 isn't in the list
+            n/=prime
+            factors[prime]+=1
+    p=max(primes) # assumes the maximum prime is odd
+    while n>1:
+        while n%p==0:
+            n/=p
+            factors[p]+=1
+        p+=2 # 100% faster!
+        if p*p>n: # sqrt is a bit slower
+            # n is now prime
+            factors[n]+=1
+            break
+    return factors
 
 class Math(commands.Cog):
     def __init__(self, bot):
@@ -51,7 +75,7 @@ class Math(commands.Cog):
                 break
             formu = dif(formu)
             
-        await ctx.send(f"{formulae} = {formu}")   
+        await ctx.send(f"{formulae} = {formu}")
     
     @CogCommand("plot")
     async def plot(self, ctx:commands.Context, slope:int=3, yinter:int=3, min_:int=-20, max_:int=20):
@@ -68,47 +92,23 @@ class Math(commands.Cog):
         await ctx.send(file=nextcord.File("cache/plot.png", filename=f"{showy}.png"))
         plt.close()
     
-    # Copied from my old code, should run N (2≤N≤10^9) within 1 sec
     @CogCommand("prime")
     async def prime(self, ctx:commands.Context, n:int=12):
-        if n < 0: raise Exception('Negetive Value')
-        r = n
-        i = 2
-        c = {}
-        def inc(num):
-            try: c[str(num)]
-            except: c[str(num)] = 0
-            c[str(num)] += 1
-        def handleexpo(expo) -> str:
-            cvexp = ''.join(list("⁰¹²³⁴⁵⁶⁷⁸⁹")[int(digit)] for digit in str(expo))
-            if cvexp == "¹": return ""
-            else: return cvexp
-        while i*i<=n:
-            if n % i == 0:
-                n //= i
-                inc(i)
-            else:
-                i += 1
-        if n >= 1:
-            inc(n)
-            
-        await ctx.send(f"{r} = {' * '.join([f'{base}{handleexpo(expo)}' for base, expo in c.items()])}")
+        if n <= 0: raise Exception('Cannot Factor Nonpositive Value')
+        await ctx.send(f"{n} = {' * '.join([f'{p}{handleexpo(e)}' for p, e in primefactor(n).items()])}")
         
-    # Near Same tested as !prime 
     @CogCommand("factor")
     async def factor(self, ctx:commands.Context, n:int=12):
-        r = n
-        m = int(math.sqrt(n))
-        factor = []
-        for i in range(1, m + 1):
-            if n % i == 0:
-                factor.append(str(i))
-        if m * m == n:
-            m -= 1
-        for i in range(m, 0, -1):
-            if n % i == 0:
-                factor.append(str(n // i))
-        await ctx.send(f"{r} has {len(factor)} factors: \n{', '.join(factor)}")
+        if n <= 0: raise Exception('Cannot Factor Nonpositive Value')
+        pfactors=primefactor(n)
+        factors=[1]
+        for p,e in pfactors.items():
+            newfactors=[]
+            for i in range(e):
+                factor=p**i
+                newfactors+=[factor*f for f in factors]
+            factors=newfactors
+        await ctx.send(f"{n} has {len(factors)} factors: \n{', '.join(factors)}")
         
 def setup(bot):
 	bot.add_cog(Math(bot))
