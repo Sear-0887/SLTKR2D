@@ -1,3 +1,8 @@
+import re
+import collections
+import os
+import config
+
 keywords = {
     "Roody:2D Game Discord Server": {
         "link": "https://discord.gg/gbEkBNt",
@@ -18,42 +23,32 @@ linksstr="".join([
     for name,data in keywords.items()
 ])
 
+def recursiveddict():
+    return collections.defaultdict(recursiveddict)
 
+cmdi = recursiveddict()
 
-import glob
-import re
-cmdi = {}
-
-# def repri(): # USED FOR MIGRATING FROM CLASS METHOD TO .TXT FILES
-#     for cmdname in dir(cmds): 
-#         if not cmdname.startswith('__'):
-#             clas = getattr(cmds, cmdname)
-#             for cmdattr in dir(clas):
-#                 if not cmdattr.startswith('__'):
-#                     print(f"{cmdname}.{cmdattr} = {getattr(clas, cmdattr)}")
-#             print("\n")
-                    
 def phraser():
-    for i in glob.glob("lang/en/*.txt"):
-        with open(i , "r") as f:
-            fc = re.sub(r"\\\s*\n", r"\\", f.read())
-            for line in fc.split("\n"):
-                if line.startswith("##"): continue
-                for cmd, ele, val in re.findall(r"^(\w+).(\w+)\s*=\s*(.+)", line):
-                    val = val.replace("\\", "\n")
-                    if re.match(r"^\[.*\]$", val):
-                        val = val[1:-1].split(", ")
-                        if val == ['']: val = []
-                    try: cmdi[cmd]
-                    except: cmdi[cmd] = {}
-                    cmdi[cmd][ele] = val
-    print(cmdi["help"]["aliases"])
+    for fname in os.listdir(config.cmdlocaledir): # you could filter for only .txt files
+        with open(os.path.join(config.cmdlocaledir,fname)) as f:
+            linesiter=iter(f)
+            for line in linesiter:
+                while line.endswith('\\\n'):
+                    line=line[:-2].strip()+'\n'+next(linesiter) # add the next line to this if this line ends with a backslash
+                line=re.sub('#.*$','',line) # remove comments
+                if '=' not in line:
+                    continue
+                key,value=line.split('=',maxsplit=1)
+                value=value.strip()
+                if value.startswith('[') and value.endswith(']'):
+                    value=[v.strip() for v in value[1:-1].split(',') if len(v.strip())>0]
+                key=tuple(key.strip().split('.'))
+                target=cmdi
+                print(key)
+                for k in key[:-1]:
+                    target=target[k]
+                target[key[-1]]=value
+    #print(cmdi["help"]["aliases"])
     # EXCEPTIONS
-    cmdi["link"]["desc"] = cmdi["link"]["desc"].format(linksstr)
-
-def evl(target):
-    target = target.split(".")
-    root = cmdi
-    for i in target:
-        root = root[i]
-    return root
+    # nooo not the exceptions
+    cmdi["link"]["desc"] = cmdi["link"]["desc"].format(linksstr) # aaaaaaaaaaaaaaaaaaaaaaaaaa
