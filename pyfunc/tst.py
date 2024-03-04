@@ -1,7 +1,7 @@
 import re
 from PIL import Image
-from lang import cmd, keywords
-import block_extra as be
+from pyfunc.lang import cmd, keywords
+import pyfunc.block_extra as be
 
 quickidtable = ["NIC"]*102
 blockinfos = {}

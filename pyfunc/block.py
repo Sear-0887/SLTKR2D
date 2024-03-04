@@ -1,6 +1,6 @@
 import PIL
 import PIL.Image
-import smp
+import pyfunc.smp as smp
 import os
 
 #welded=top,left,bottom,right

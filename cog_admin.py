@@ -2,8 +2,8 @@ import glob
 import os
 import nextcord
 from nextcord.ext import commands
-from lang import evl
-from commanddec import CogCommand
+from pyfunc.lang import evl
+from pyfunc.commanddec import CogCommand
 
 class Admin(commands.Cog):
     def __init__(self, bot: commands.Bot):

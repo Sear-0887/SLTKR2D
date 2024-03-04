@@ -1,4 +1,4 @@
-from assetload import blockinfos, idtoblock as quickidtable,locale
+from pyfunc.assetload import blockinfos, idtoblock as quickidtable,locale
 import matplotlib.pyplot as plt
 import numpy
 import nextcord
@@ -7,8 +7,8 @@ import math
 import re
 from PIL import Image
 from nextcord.ext import commands
-from lang import lprint
-from commanddec import CogCommand
+from pyfunc.lang import lprint
+from pyfunc.commanddec import CogCommand
 
 
 class Math(commands.Cog):

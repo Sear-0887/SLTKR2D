@@ -1,15 +1,15 @@
-from assetload import blockinfos, idtoblock as quickidtable,locale
+from pyfunc.assetload import blockinfos, idtoblock as quickidtable,locale
 import nextcord
 import random
 import re
 from PIL import Image
 from nextcord.ext import commands
-from lang import evl
-import block_extra as be
-from commanddec import CogCommand
-from assetload import idtoblock
-from block import makeimage as blockmakeimage
-import smp
+from pyfunc.lang import evl
+import pyfunc.block_extra as be
+from pyfunc.commanddec import CogCommand
+from pyfunc.assetload import idtoblock
+from pyfunc.block import makeimage as blockmakeimage
+import pyfunc.smp as smp
 
 class Block(commands.Cog):
     def __init__(self, bot):

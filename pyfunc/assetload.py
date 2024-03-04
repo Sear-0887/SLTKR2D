@@ -1,8 +1,8 @@
 import re
 import collections
-import smp
+import pyfunc.smp as smp
 import glob
-from lang import cfg, loadconfig
+from pyfunc.lang import cfg, loadconfig
 
 idtoblock = {}
 

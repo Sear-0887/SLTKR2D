@@ -2,11 +2,11 @@ import glob
 import os
 import nextcord
 import datetime
-from assetload import init
+from pyfunc.assetload import init
 from nextcord.ext import commands
-from lang import cfg, cmdi, config, evl, keywords, loadconfig, phraser
-from gettoken import gettoken
-from commanddec import MainCommand
+from pyfunc.lang import cfg, cmdi, config, evl, keywords, loadconfig, phraser
+from pyfunc.gettoken import gettoken
+from pyfunc.commanddec import MainCommand
 
 intents = nextcord.Intents.default()
 intents.members = True
