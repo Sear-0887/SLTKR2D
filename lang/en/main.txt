@@ -42,10 +42,7 @@ scream.syntax = !scream
 credit.aliases = [credits]
 credit.desc = Crediting the Contributors of this project.
 credit.display = # Contributors \
-### [Sear]({}) \
-Main Founder of the bot, contributing the bot's development and serval projects. \
-### [RbCaVi]({}) \
-Optimizes / refactors major part of codes. 
+{}
 
 credit.error = Failed :<
 credit.syntax = !credit

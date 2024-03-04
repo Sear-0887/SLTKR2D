@@ -85,8 +85,9 @@ async def link(ctx, typ="r2d"):
 
 @MainCommand(bot,'credit')
 async def credit(ctx):
-    dev = config['bot_info']['Developer']
-    await ctx.send(evl("credit.display").format(dev[0]['github_link'], dev[1]['github_link']))
+    devs = config['bot_info']['Developer']
+    devstr = '\n'.join([f'### [{dev["name"]}]({dev["github_link"]})\n{dev["desc"]}' for dev in devs])
+    await ctx.send(evl("credit.display").format(devstr))
 
 @bot.event
 async def on_ready():
