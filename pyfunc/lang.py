@@ -24,7 +24,8 @@ import json
 from datetime import datetime
 import glob
 import re
-cmdi = {}
+import collections
+import os
 # config:dict = {}
 
 # write_to_log, basically similar to print, with extra steps...
@@ -39,34 +40,36 @@ def lprint(*values: object, sep: str | None = " ",end: str | None = "\n", ptnt: 
         print(values)
         
                     
-def phraser():
-    for langpth in glob.glob("lang/*"):
-        lang = langpth[5:]
-        try: cmdi[lang]
-        except: cmdi[lang] = {}
-        for i in glob.glob("lang/en/*.txt"):
-            with open(i , "r") as f:
-                fc = re.sub(r"\\\s*\n", r"\\", f.read())
-                for line in fc.split("\n"):
-                    if line.startswith("##"): continue
-                    for expr, val in re.findall(r"^([\w.]+)\s*=\s*(.+)", line):
-                        val = val.replace("\\", "\n")
-                        if re.match(r"^\[.*\]$", val):
-                            val = val[1:-1].split(", ")
-                            if val == ['']: val = []
-                        cmdi[lang][expr] = val
-                        lprint(f"{(expr, val) =}")
-                    
-                        
-    print(cmdi['en']["help.aliases"])
-    # EXCEPTIONS
-    cmdi['en']["link.desc"] = cmdi['en']["link.desc"].format(linksstr)
+def recursiveddict():
+    return collections.defaultdict(recursiveddict)
 
-def evl(target, lang="en") -> str | list:
-    try:
-        return cmdi[lang][target]
-    except:
-        return ""
+cmdi = recursiveddict()
+
+def phraser():
+    for lang in os.listdir(cfg('local.localPath')): # you could filter for only .txt files
+        for fname in os.listdir(os.path.join(cfg('local.localPath'),lang)): # you could filter for only .txt files
+            with open(os.path.join(cfg('local.localPath'),lang,fname)) as f:
+                linesiter=iter(f)
+                for line in linesiter:
+                    while line.endswith('\\\n'):
+                        line=line[:-2].strip()+'\n'+next(linesiter) # add the next line to this if this line ends with a backslash
+                    line=re.sub('#.*$','',line) # remove comments
+                    if '=' not in line:
+                        continue
+                    key,value=line.split('=',maxsplit=1)
+                    value=value.strip()
+                    if value.startswith('[') and value.endswith(']'):
+                        value=[v.strip() for v in value[1:-1].split(',') if len(v.strip())>0]
+                    key=key.strip()
+                    cmdi[lang][key]=value
+        print(lang,cmdi[lang]["help.aliases"])
+    # EXCEPTIONS
+    # nooo not the exceptions
+    for lang in cmdi:
+        cmdi[lang]["link.desc"] = cmdi[lang]["link.desc"].format(linksstr) # aaaaaaaaaaaaaaaaaaaaaaaaaa
+
+def evl(key,lang='en'):
+    return cmdi[lang][key]
 
 def loadconfig():
     with open("config.json") as f:
