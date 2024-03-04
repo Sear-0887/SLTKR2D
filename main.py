@@ -29,14 +29,16 @@ async def reloadlocal(ctx):
     await ctx.send("Done.")
 
 @MainCommand(bot,"help")
-async def help(ctx, cmdname=None,):
-    async def gethelplist(interaction:nextcord.Interaction, helplist:list|str=[]):
-        author = interaction.user
+async def help(ctx, cmdname=None):
+    async def gethelplist(interaction:nextcord.Interaction):
         preparedlist = []
-        for key in bot.commands:
-            if key.name in helplist or helplist == []:
-                preparedlist.append(f"### {key.name} ({'/'.join(key.aliases)})")
-                preparedlist.append(f"{key.description}")
+        for cmd in bot.commands:
+            s=f"### !{cmd.name}"
+            if len(cmd.aliases)>0: # don't have empty parens
+                s+=f" ({'/'.join(cmd.aliases)})"
+            s+=f"\n"
+            s+=f"{cmd.description}"
+            preparedlist.append(s)
         sembed = nextcord.Embed()
         sembed.title = evl("help.helplist.title")
         sembed.description = evl("help.helplist.desc").format("\n".join(preparedlist))
@@ -62,7 +64,7 @@ async def help(ctx, cmdname=None,):
                 await ctx.send(embed=embed)
                 return
         else:
-            await ctx.send(evl(f"{cmdname}.error"))
+            raise Exception("Couldn't find the command") # the decorator will handle it
 
 @MainCommand(bot,"ping")
 async def ping(ctx):
