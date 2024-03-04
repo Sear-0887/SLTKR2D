@@ -221,7 +221,7 @@ def canweld(side,block):
 	elif block['type'] in ['arc_furnace','beam_core','collector','creator','destroyer','dismantler','magnet','manipulator','mantler','teleportore']:#no top
 		sides=[False,True,True,True]
 	else:
-		return True
+		sides=[True,True,True,True]
 	i={'top':0,'bottom':2,'left':1,'right':3}[side]+4-block['rotate']
 	i=i%4
 	return sides[i] and block['weld'][{'top':0,'bottom':2,'left':1,'right':3}[side]]
