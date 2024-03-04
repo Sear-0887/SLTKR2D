@@ -6,7 +6,7 @@ from lang import evl
 from commanddec import CogCommand
 
 class Admin(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.has_permissions(administrator=True)
@@ -14,10 +14,10 @@ class Admin(commands.Cog):
     async def viewcog(self,ctx):
         embed = nextcord.Embed()
         embed.description = ""
-        for cog_name in glob.glob("cog_*.py"):
-            print([dir(o) for i, o in self.bot.cogs.items()])
-            print([o.__cog_name__ for i, o in self.bot.cogs.items()])
-            embed.description += f"| {cog_name[:-3]} \n"
+        for cogname, cogins in self.bot.cogs.items():
+            embed.description += f"### {cogname} (*{cogins.__class__.__module__}.py*) \n"
+            for command in cogins.walk_commands():
+                embed.description += f"‖ {command} \n"
         await ctx.send(embed=embed)
 
     @commands.has_permissions(administrator=True)

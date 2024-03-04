@@ -38,13 +38,17 @@ scream.desc = *It symbolizes my sanity*
 scream.error = This is a error message
 scream.syntax = !scream
 
-# test
-test.aliases = []
-test.desc = Test some commands \
-Admin-Only Command.
+# credit
+credit.aliases = [credits]
+credit.desc = Crediting the Contributors of this project.
+credit.display = # Contributors \
+### [Sear]({}) \
+Main Founder of the bot, contributing the bot's development and serval projects. \
+### [RbCaVi]({}) \
+Optimizes / refactors major part of codes. 
 
-test.error = Unable to test.
-test.syntax = !test
+credit.error = Failed :<
+credit.syntax = !credit
 
 # reloadlocal
 reloadlocal.aliases = []

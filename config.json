@@ -1,0 +1,37 @@
+{
+    "bot_info": {
+        "id": 1195952074861584514,
+        "Developer": [
+            {
+                "name": "Sear",
+                "id": 697801071208300574,
+                "github_link": "https://github.com/Sear-0887"
+            },
+            {
+                "name": "RbCaVi",
+                "id": 953758541666209852,
+                "github_link": "https://github.com/RbCaVi"
+            }
+        ]
+    },
+    "local": {
+        "fblang": "en",
+        "localPath": "lang/"  
+    },
+    "local_game": {
+        "language_path": {
+            "english": "assets/localization/english_*.txt"
+        },
+        "texture": {
+            "texturepathfolder": "assets/textures/",
+            "block_texture_path_file_path": "assets/block_textures.smp",
+            "block_zoo_path": "assets/block_zoo.png",
+            "block_id_path": "assets/block_id_.smp",
+            "block_icons_path": "assets/block_icons.smp"
+        }
+    },
+    "TOKENPATH": "cred/.env",
+    "cache_folder": "cache/",
+    "log_folder": "cache/log",
+    "config_path": "config.json"
+}

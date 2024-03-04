@@ -4,7 +4,7 @@ import nextcord
 import datetime
 from assetload import init
 from nextcord.ext import commands
-from lang import keywords, phraser, cmdi, evl
+from lang import cfg, cmdi, config, evl, keywords, loadconfig, phraser
 from gettoken import gettoken
 from commanddec import MainCommand
 
@@ -14,8 +14,8 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 TimeOn = datetime.datetime.now()
 def botinit():
-    os.makedirs("cache", exist_ok=True)
-    os.makedirs("cache/log", exist_ok=True)
+    os.makedirs(cfg('cache_folder'), exist_ok=True)
+    os.makedirs(cfg('log_folder'), exist_ok=True)
     phraser()
     init() #assetload
 
@@ -82,12 +82,11 @@ async def link(ctx, typ="r2d"):
             return
     else:
         raise Exception('')
-        #await ctx.send(cmds.link.error % typ)
 
-@commands.has_permissions(administrator=True)
-@MainCommand(bot,'test')
-async def test(ctx):
-    await ctx.send('!help')
+@MainCommand(bot,'credit')
+async def credit(ctx):
+    dev = config['bot_info']['Developer']
+    await ctx.send(evl("credit.display").format(dev[0]['github_link'], dev[1]['github_link']))
 
 @bot.event
 async def on_ready():

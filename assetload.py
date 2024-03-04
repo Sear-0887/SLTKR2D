@@ -1,16 +1,17 @@
 import re
 import collections
 import smp
-import os
+import glob
+from lang import cfg, loadconfig
 
 idtoblock = {}
 
 blockinfos = collections.defaultdict(dict)
 
-locale={}
+locale = {}
 
-localedir='assets/localization'
-lang='english'
+loadconfig()
+lang = cfg("local_game.language_path")
 
 def capitalize(s):
     s=s[0].upper()+s[1:]
@@ -72,21 +73,20 @@ def substitutelocale(s):
     return s
 
 def getlocale():
-    for fname in os.listdir(localedir):
-        if not fname.startswith(lang):
-            continue # skip files for a different language
-        with open(os.path.join(localedir,fname), "r") as f:
-            linesiter=iter(f)
-            for line in linesiter:
-                while line.endswith('\\\n'):
-                    line=line[:-2]+'\n'+next(linesiter) # add the next line to this if this line ends with a backslash
-                line=re.sub('#.*$','',line) # remove comments
-                if '=' not in line:
-                    continue
-                key,value=line.split('=',maxsplit=1)
-                key=tuple(key.split())
-                value=value.strip()
-                locale[key]=value
+    for langname, langpath in lang.items():
+        for fname in glob.glob(langpath):
+            with open(fname, "r") as f:
+                linesiter=iter(f)
+                for line in linesiter:
+                    while line.endswith('\\\n'):
+                        line=line[:-2]+'\n'+next(linesiter) # add the next line to this if this line ends with a backslash
+                    line=re.sub('#.*$','',line) # remove comments
+                    if '=' not in line:
+                        continue
+                    key,value=line.split('=',maxsplit=1)
+                    key=tuple(key.split())
+                    value=value.strip()
+                    locale[key]=value
 
     for key,s in locale.items():
         locale[key]=substitutelocale(s)

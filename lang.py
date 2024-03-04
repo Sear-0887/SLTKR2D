@@ -20,10 +20,12 @@ linksstr="".join([
 
 
 import time
+import json
 from datetime import datetime
 import glob
 import re
 cmdi = {}
+# config:dict = {}
 
 # write_to_log, basically similar to print, with extra steps...
 # ptnt is print_to_normal_terminal, ats is add_timestamp
@@ -65,3 +67,15 @@ def evl(target, lang="en") -> str | list:
         return cmdi[lang][target]
     except:
         return ""
+
+def loadconfig():
+    with open("config.json") as f:
+        global config
+        config = json.load(f)
+    return config
+
+def cfg(target):
+    base = config
+    for tv in target.split("."):
+        base = base[tv]
+    return base
