@@ -1,20 +1,20 @@
-import PIL
 import PIL.Image
 import pyfunc.smp as smp
 import os
+import lang
 
 #welded=top,left,bottom,right
 #rotate= 0    1    2      3
 
 blockpaths={}
 
-with open("assets/block_textures.smp") as f:
+with open(lang.cfg('local_game.texture.block_texture_path_file_path')) as f:
   data=smp.getsmpvalue(f.read())
 for name,texture in data.items():
   blockpaths[name] = texture
 
 def getblockim(block):
-	return PIL.Image.open(os.path.join('assets/textures/blocks',blockpaths[block]))
+	return PIL.Image.open(os.path.join(lang.cfg('local_game.texture.texturepathfolder'),blockpaths[block]))
 
 # https://stackoverflow.com/a/13054570
 class Block:
