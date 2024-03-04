@@ -2,7 +2,7 @@ import glob
 import os
 import nextcord
 import datetime
-from pyfunc.assetload import init
+from pyfunc.assetload import init,devs
 from nextcord.ext import commands
 from pyfunc.lang import cfg, cmdi, config, evl, keywords, loadconfig, phraser
 from pyfunc.gettoken import gettoken
@@ -85,7 +85,6 @@ async def link(ctx, typ="r2d"):
 
 @MainCommand(bot,'credit')
 async def credit(ctx):
-    devs = config['bot_info']['Developer']
     devstr = '\n'.join([f'### [{dev["name"]}]({dev["github_link"]})\n{dev["desc"]}' for dev in devs])
     await ctx.send(evl("credit.display").format(devstr))
 

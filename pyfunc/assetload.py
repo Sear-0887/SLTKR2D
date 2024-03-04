@@ -3,12 +3,20 @@ import collections
 import pyfunc.smp as smp
 import glob
 from pyfunc.lang import cfg, loadconfig
+from pyfunc.devs import loaddevs
 
 idtoblock = {}
 
 blockinfos = collections.defaultdict(dict)
 
 locale = {}
+
+devs = None
+
+def getdevs():
+    with open("devs.json") as f:
+        global devs
+        devs = json.load(f)
 
 loadconfig()
 lang = cfg("local_game.language_path")
@@ -95,3 +103,4 @@ def init():
     getblockids()
     geticoncoords()
     getlocale()
+    getdevs()

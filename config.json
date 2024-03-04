@@ -1,20 +1,6 @@
 {
     "bot_info": {
-        "id": 1195952074861584514,
-        "Developer": [
-            {
-                "name": "Sear",
-                "id": 697801071208300574,
-                "github_link": "https://github.com/Sear-0887",
-                "desc": "Main Founder of the bot, contributing the bot's development and serval projects."
-            },
-            {
-                "name": "RbCaVi",
-                "id": 953758541666209852,
-                "github_link": "https://github.com/RbCaVi",
-                "desc": "Optimizes / refactors major part of codes."
-            }
-        ]
+        "id": 1195952074861584514
     },
     "local": {
         "fblang": "en",
