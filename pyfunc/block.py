@@ -287,7 +287,7 @@ def makeimage(blocks,bsize=128,autoweld=True):
 				b=TelecrossBlock()
 			else:
 				b=NormalBlock(block['type'])
-			if block['type'] in wiredtypes:
+			if block['type'] in wiretypes+wafertypes:
 				block['weld'][0]=block['weld'][0] and (2 if get(newblocks,xi,yi-1)['type'] in wiredtypes else True)
 				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type'] in wiredtypes else True)
 				block['weld'][2]=block['weld'][2] and (2 if get(newblocks,xi,yi+1)['type'] in wiredtypes else True)
