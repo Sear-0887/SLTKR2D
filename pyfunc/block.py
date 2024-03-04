@@ -227,7 +227,7 @@ def canweld(side,block):
 	return sides[i] and block['weld'][{'top':0,'bottom':2,'left':1,'right':3}[side]]
 
 
-def makeimage(blocks,bsize=128,autoweld=True,debug=False):
+def makeimage(blocks,bsize=128,autoweld=True):
 	xsize=max(map(len,blocks))
 	ysize=len(blocks)
 
@@ -250,7 +250,19 @@ def makeimage(blocks,bsize=128,autoweld=True,debug=False):
 				weldleft=canweld('left',block) and canweld('right',get(newblocks,xi-1,yi))
 				weldbottom=canweld('bottom',block) and canweld('top',get(newblocks,xi,yi+1))
 				weldtop=canweld('top',block) and canweld('bottom',get(newblocks,xi,yi-1))
-				block['weld']=[[b and w,print(f'welded side {i} not allowed on {block}\n'*(not w and debug),end='')][0] for i,b,w in zip(range(4),block['weld'],[weldtop,weldleft,weldbottom,weldright])]
+				block['weld']=[
+					b and w for b,w in 
+					zip(
+						block['weld'],
+						[weldtop,weldleft,weldbottom,weldright]
+					)
+				]
+				for i,b,w in zip(
+					range(4),
+					block['weld'],
+					[weldtop,weldleft,weldbottom,weldright]
+				):
+					print(f'welded side {i} not allowed on {block}\n'*(not w and b),end='')
 			if block['type']=='wire':
 				b=WireBlock('frame')
 			elif block['type']=='wire_board':
@@ -280,10 +292,6 @@ def makeimage(blocks,bsize=128,autoweld=True,debug=False):
 				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type'] in wiredtypes else True)
 				block['weld'][2]=block['weld'][2] and (2 if get(newblocks,xi,yi+1)['type'] in wiredtypes else True)
 				block['weld'][3]=block['weld'][3] and (2 if get(newblocks,xi+1,yi)['type'] in wiredtypes else True)
-				#block['weld'][0]=block['weld'][0] and 2
-				#block['weld'][1]=block['weld'][1] and 2
-				#block['weld'][2]=block['weld'][2] and 2
-				#block['weld'][3]=block['weld'][3] and 2
 			bim=b.draw(block['weld'],block['rotate'],size=bsize)
 			im.alpha_composite(bim,(xi*bsize,yi*bsize))
 	return im
