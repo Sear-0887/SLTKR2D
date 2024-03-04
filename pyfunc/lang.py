@@ -60,16 +60,23 @@ def phraser():
                     value=value.strip()
                     if value.startswith('[') and value.endswith(']'):
                         value=[v.strip() for v in value[1:-1].split(',') if len(v.strip())>0]
-                    key=key.strip()
-                    cmdi[lang][key]=value
+                    key=tuple(key.strip().split('.'))
+                    target=cmdi[lang]
+                    print(key)
+                    for k in key[:-1]:
+                        target=target[k]
+                    target[key[-1]]=value
         print(lang,cmdi[lang]["help.aliases"])
     # EXCEPTIONS
     # nooo not the exceptions
     for lang in cmdi:
         cmdi[lang]["link.desc"] = cmdi[lang]["link.desc"].format(linksstr) # aaaaaaaaaaaaaaaaaaaaaaaaaa
 
-def evl(key,lang='en'):
-    return cmdi[lang][key]
+def evl(*args,lang='en'):
+    out=cmdi[lang]
+    for key in args:
+        out=out[key]
+    return out
 
 def loadconfig():
     with open("config.json") as f:
