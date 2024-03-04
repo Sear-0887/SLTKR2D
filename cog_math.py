@@ -9,7 +9,7 @@ from PIL import Image
 from nextcord.ext import commands
 from pyfunc.lang import lprint
 from pyfunc.commanddec import CogCommand
-from eval_expr import evaluate,NUM
+from eval_expr import evaluate,stringifyexpr
 
 
 class Math(commands.Cog):
@@ -19,9 +19,7 @@ class Math(commands.Cog):
     @CogCommand("eval")
     async def evalu(self, ctx:commands.Context, *, formulae="3 * ( 1 + 2 )"):
         result=evaluate(formulae)
-        #if result[0]!=NUM:
-        #    raise Exception('didn\'t output a number')
-        await ctx.send(f"{formulae} = {result[1]}")
+        await ctx.send(f"`{formulae} = {stringifyexpr(result)}`")
     
     @CogCommand("plot")
     async def plot(self, ctx:commands.Context, slope:int=3, yinter:int=3, min_:int=-20, max_:int=20):
