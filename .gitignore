@@ -1,10 +1,5 @@
-__pycache__/
+*cache*/
 .vscode/
 cred/
-assets/OLD/
-cache/
-db/
-cog_db.py
 
-_cog_*.py
-.gitignorej
+.gitignore
