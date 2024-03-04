@@ -5,7 +5,6 @@ import re
 from PIL import Image
 from nextcord.ext import commands
 from pyfunc.lang import evl
-import pyfunc.block_extra as be
 from pyfunc.commanddec import CogCommand
 from pyfunc.assetload import idtoblock
 from pyfunc.block import makeimage as blockmakeimage
