@@ -21,8 +21,8 @@ def botinit():
 
 botinit()
     
-@MainCommand(bot, "reloadlocal")
-async def reloadlocal(ctx):
+@MainCommand(bot, "reloadlocale")
+async def reloadlocale(ctx):
     phraser()
     for i in bot.commands:
         i.update()
