@@ -35,10 +35,10 @@ Number = group(Floatnumber, Intnumber)
 import re
 
 def getNum(s):
-  m=re.match(FloatNumber,s)
+  m=re.match(Floatnumber,s)
   if m:
     return float(s[:m.end()]),s[m.end():]
-  m=re.match(IntNumber,s)
+  m=re.match(Intnumber,s)
   if m:
     return int(s[:m.end()]),s[m.end():]
   return None,s
@@ -76,7 +76,7 @@ def apply(op,v1,v2):
   if op[1]=='/':
     return [NUM,v1[1]/v2[1]]
   if op[1]=='^':
-    return [NUM,v1[1]^v2[1]]
+    return [NUM,v1[1]**v2[1]]
   raise Exception('unrecognized binary operator '+op[1])
 
 def applyuop(op,v):
