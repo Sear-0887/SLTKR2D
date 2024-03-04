@@ -74,8 +74,8 @@ def loadconfig():
         config = json.load(f)
     return config
 
-def cfg(target):
-    base = config
-    for tv in target.split("."):
-        base = base[tv]
-    return base
+def cfg(*args):
+    target = config
+    for key in args:
+        target = target[key]
+    return target

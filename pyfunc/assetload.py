@@ -11,7 +11,7 @@ blockinfos = collections.defaultdict(dict)
 locale = {}
 
 loadconfig()
-lang = cfg("local_game.language_path")
+lang = cfg("local_game","language_path")
 
 def capitalize(s):
     s=s[0].upper()+s[1:]
