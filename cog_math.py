@@ -71,10 +71,10 @@ class Math(commands.Cog):
     async def prime(self, ctx:commands.Context, n:int=12):
         if n < 0: raise Exception('Negetive Value')
         r = n
-        i = 2
+        i = 3
         c = {}
         def inc(num):
-            lprint(num, end=" ")
+            print(num, end=" ")
             try: c[str(num)]
             except: c[str(num)] = 0
             c[str(num)] += 1
@@ -82,14 +82,19 @@ class Math(commands.Cog):
             cvexp = ''.join(list("⁰¹²³⁴⁵⁶⁷⁸⁹")[int(digit)] for digit in str(expo))
             if cvexp == "¹": return ""
             else: return cvexp
-        while i*i<=n:
-            if n % i == 0:
+        while n % 2 == 0:
+            n //= 2
+            inc(2)
+        maxi = int(math.sqrt(n))+1
+        for i in range(3, maxi, 2):
+            # print(maxi, i)
+            while n % i == 0:
                 n //= i
                 inc(i)
-            else:
-                i += 1
-        inc(n)
-            
+            if maxi < i: break
+        if n > 1:
+            inc(n)
+        print("DONE CALCULATING, HANDLING")
         await ctx.send(f"{r} = {' * '.join([f'{base}{handleexpo(expo)}' for base, expo in c.items()])}")
         
     # Near Same tested as !prime 
