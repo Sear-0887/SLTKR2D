@@ -5,7 +5,9 @@ import nextcord
 import random
 import math
 import re
+import time
 from PIL import Image
+from collections import defaultdict
 from nextcord.ext import commands
 from pyfunc.lang import lprint
 from pyfunc.commanddec import CogCommand
@@ -68,35 +70,33 @@ class Math(commands.Cog):
     
     # Copied from my old code, should run N (2≤N≤10^9) within 1 sec
     @CogCommand("prime")
-    async def prime(self, ctx:commands.Context, n:int=12):
-        if n < 0: raise Exception('Negetive Value')
-        r = n
-        i = 3
-        c = {}
-        def inc(num):
-            print(num, end=" ")
-            try: c[str(num)]
-            except: c[str(num)] = 0
-            c[str(num)] += 1
+    async def prime(self, ctx, n:int=12):
         def handleexpo(expo) -> str:
-            cvexp = ''.join(list("⁰¹²³⁴⁵⁶⁷⁸⁹")[int(digit)] for digit in str(expo))
-            if cvexp == "¹": return ""
-            else: return cvexp
-        while n % 2 == 0:
-            n //= 2
-            inc(2)
-        maxi = int(math.sqrt(n))+1
-        for i in range(3, maxi, 2):
-            # print(maxi, i)
-            while n % i == 0:
-                n //= i
-                inc(i)
-            if maxi < i: break
-        if n > 1 or (n == 1 and n == r):
-            inc(n)
+            if expo == 1: return ""
+            cvexp = ''.join(['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹'][int(digit)] for digit in str(expo))
+            return cvexp
+        start = time.perf_counter()
+        r = n
+        c = defaultdict(int)
+        if n <= 1:
+            c[n] = 1
+        else:
+            while n % 2 == 0:
+                n //= 2
+                c[2] += 1
+            i = 1
+            while n > 1:
+                i += 2
+                if i * i > n:
+                    c[n] += 1
+                    break
+                while n % i == 0:
+                    n //= i
+                    c[i] += 1
+        end = time.perf_counter()
         print("DONE CALCULATING, HANDLING")
         await ctx.send(f"{r} = {' * '.join([f'{base}{handleexpo(expo)}' for base, expo in c.items()])}")
-        
+        print(f"{1000*(end - start):.3f} ms") 
     # Near Same tested as !prime 
     @CogCommand("factor")
     async def factor(self, ctx:commands.Context, n:int=12):
