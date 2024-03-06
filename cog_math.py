@@ -32,7 +32,8 @@ def primefactor(n):
         p+=2 # 100% faster!
         if p*p>n: # sqrt is a bit slower
             # n is now prime
-            factors[n]+=1
+            if n!=1:
+                factors[n]+=1
             break
     return factors
 
@@ -106,6 +107,8 @@ class Math(commands.Cog):
         pfactors=primefactor(n)
         factors=[1]
         for p,e in pfactors.items():
+            if p==1: # don't duplicate entries when 1 is present
+                continue
             #print(p,e,factors)
             newfactors=[]
             for i in range(e+1): # inclusive
