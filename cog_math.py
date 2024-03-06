@@ -92,7 +92,7 @@ class Math(commands.Cog):
                 n //= i
                 inc(i)
             if maxi < i: break
-        if n > 1:
+        if n > 1 or (n == 1 and n == r):
             inc(n)
         print("DONE CALCULATING, HANDLING")
         await ctx.send(f"{r} = {' * '.join([f'{base}{handleexpo(expo)}' for base, expo in c.items()])}")
