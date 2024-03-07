@@ -6,8 +6,11 @@ PREFIX: ! \
 Please use the command !help <cmd> to view what !<cmd> does. \
 SLTKR2D by <@697801071208300574>, All rights reserved. \
 Time Since Last Restart: {} \
+{} \ 
 This bot is open-source on [Github](https://github.com/Sear-0887/SLTKR2D).
 
+help.blankdisplay.server = ***Note: Bot is currently hosting in <@{}>'s Server.*** \
+***Keep in mind that commands might be unstable or subject to change.***
 help.desc = Displays what command <cmd> does. \
 If left blank, shows info about the bot.
 

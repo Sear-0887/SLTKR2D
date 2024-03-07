@@ -3,6 +3,14 @@ keywords = {
         "link": "https://discord.gg/gbEkBNt",
         "kw": ["r2d", "roody2d", "roody:2d", "game", "gameser", "gamedc"]
     },
+    "Redinator PitBottom": {
+        "link": "https://pitbottom.com/",
+        "kw": ["pitbottom", "ptbtm", "redinator", "r2dauthor"]
+    },
+    "Roody:2D Game Steam Page": {
+        "link": "https://steamcommunity.com/app/2345220",
+        "kw": ["steam", "steampage", "gamepage", "r2dsteam"]
+    },
     "SLTK Wiki Server": {
         "link": "https://discord.gg/cDAUYrtjzV",
         "kw": ["sltk", "wikiser", "wikidc", "r2dwiki", "r2dwikiser"]
@@ -24,6 +32,7 @@ import json
 from datetime import datetime
 import glob
 import re
+from dotenv import dotenv_values
 cmdi = {}
 # config:dict = {}
 
@@ -67,11 +76,25 @@ def evl(target, lang="en") -> str | list:
         return cmdi[lang][target]
     except:
         return ""
+def handlehostid():
+    raw = ""
+    try:
+        raw = dotenv_values("cred/client.env")['HOSTID']
+    except Exception as e:
+        print(f"ReadingHostID Failed {e}")
+        raw = "CLIENT--0"
+    auid, setting = re.fullmatch(r"^CLIENT\-(\w*)\-(.*)", raw).groups()
+    if not auid: auid = "0"
+    returntup = ( int(auid, 16), list(map(lambda x:x=="1", list(setting))) )
+    return returntup
 
 def loadconfig():
     with open("config.json") as f:
         global config
         config = json.load(f)
+        hostid, settings = handlehostid()
+        config['ShowHost'] = settings[0]
+        config['HostDCID'] = hostid
     return config
 
 def cfg(target):

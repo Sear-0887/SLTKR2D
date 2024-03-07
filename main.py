@@ -40,11 +40,15 @@ async def help(ctx, cmdname=None,):
         sembed = nextcord.Embed()
         sembed.title = evl("help.helplist.title")
         sembed.description = evl("help.helplist.desc").format("\n".join(preparedlist))
-        
         await interaction.send(ephemeral=True, embed=sembed)
+        
     if not cmdname:
         embed = nextcord.Embed()
-        embed.description = evl("help.blankdisplay").format(datetime.datetime.now()-TimeOn)
+        if cfg('ShowHost'):
+            showdisplay = evl("help.blankdisplay.server").format(cfg('HostDCID'))
+        else:
+            showdisplay = ""
+        embed.description = evl("help.blankdisplay").format(datetime.datetime.now()-TimeOn, showdisplay)
         view = nextcord.ui.View()
         getlistbtn = nextcord.ui.Button(style=nextcord.ButtonStyle.blurple, label="Help List")
         getlistbtn.callback = gethelplist
