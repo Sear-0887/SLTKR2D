@@ -105,11 +105,12 @@ class Math(commands.Cog):
     async def factor(self, ctx:commands.Context, n:int=12):
         if n <= 0: raise Exception('Cannot Factor Nonpositive Value')
         pfactors=primefactor(n)
+        if math.prod([x+1 for x in pfactors.values()])>1_000_000:
+            raise Exception('Too Many Factors')
         factors=[1]
         for p,e in pfactors.items():
             if p==1: # don't duplicate entries when 1 is present
                 continue
-            #print(p,e,factors)
             newfactors=[]
             for i in range(e+1): # inclusive
                 factor=p**i
