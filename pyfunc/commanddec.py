@@ -34,6 +34,18 @@ f'''
 '''
     )
     await ctx.send(expecterr)
+    with open(f"cache/log/error-{ctx.author}-{datetime.now():%d-%m-%Y}.txt", "a+") as fil:
+        userstr = f'user-:{ctx.author.username}\n'
+        userstr += f'user-:{ctx.author.global_name}\n'
+        userstr += f'user-:{ctx.author.id}'
+        timestr = f'time-:{time.strftime("%H:%M:%S", time.localtime())}'
+        cmdstr = 'cmd-:{ctx.message.clean_content}'
+        argsstr = '\n'.join([f'arg-{i}:'+s for i,arg in enumerate(args) for s in repr(arg).split('\n')])
+        kwargsstr = '\n'.join([k+':'+s for i,(k,v) in enumerate(kwargs.items()) for s in repr(v).split('\n')])
+        exctbstr = '\n'.join(['exc-:'+s for s in traceback.format_exception(e).split('\n')])
+        f.write('\n'.join([userstr,timestr,cmdstr,argsstr,kwargsstr,exctbstr]))
+        f.write('\n')
+        values = sep.join(list(map(str, values))) + end
     # raise e
 
 def MainCommand(bot,name):
