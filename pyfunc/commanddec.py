@@ -45,9 +45,9 @@ f'''
         argsstr = '\n'.join([f'arg-{i}:'+s for i,arg in enumerate(args) for s in repr(arg).split('\n')])
         kwargsstr = '\n'.join([k+':'+s for i,(k,v) in enumerate(kwargs.items()) for s in repr(v).split('\n')])
         exctbstr = '\n'.join(['exc-:'+s for s in traceback.format_exception(e).split('\n')])
-        f.write('\n'.join([userstr,timestr,cmdstr,argsstr,kwargsstr,exctbstr]))
-        f.write('\n')
         values = sep.join(list(map(str, values))) + end
+        fil.write('\n'.join([userstr,timestr,cmdstr,argsstr,kwargsstr,exctbstr]))
+        fil.write('\n')
     # raise e
 
 def MainCommand(bot,name):
