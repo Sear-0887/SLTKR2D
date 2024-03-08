@@ -34,7 +34,7 @@ f'''
 '''
     )
     await ctx.send(expecterr)
-    with open(f"cache/log/error-{ctx.author}-{datetime.now():%d-%m-%Y}.txt", "a+") as fil:
+    with open(f"cache/log/error-{ctx.author.username}-{datetime.now():%d-%m-%Y}.txt", "a+") as fil:
         userstr = f'user-:{ctx.author.username}\n'
         userstr += f'user-:{ctx.author.global_name}\n'
         userstr += f'user-:{ctx.author.id}'
