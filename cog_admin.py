@@ -61,6 +61,26 @@ class Admin(commands.Cog):
         for cachef in glob.glob("cache/log/cache-??-??-????.txt"):
             os.remove(cachef)
         await ctx.send("Done.")
+    
+    @commands.has_permissions(administrator=True)
+    @CogCommand("deleteerr")
+    async def delog(self, ctx):
+        for errf in glob.glob("cache/log/error-*-??-??-????.txt"):
+            os.remove(errf)
+        await ctx.send("Done.")
+    
+    @commands.has_permissions(administrator=True)
+    @CogCommand("viewerr")
+    async def delog(self, ctx, user: nextcord.User=None):
+        if user is None:
+            username=ctx.author.global_name
+        else:
+            username=user.global_name
+        for errf in glob.glob(f"cache/log/error-{ctx.author.global_name}-??-??-????.txt"):
+            #with open(errf) as f:
+            #    await ctx.send('```\n'+f.read()+'\n```')
+            file = nextcord.File(errf, filename="error.txt")
+            await ctx.send(file=file)
 
             
     
