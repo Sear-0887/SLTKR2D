@@ -53,9 +53,9 @@ Optimizes / refactors major part of codes.
 credit.error = Failed :<
 credit.syntax = !credit
 
-# reloadlocal
-reloadlocal.aliases = []
-reloadlocal.desc = Reloads Locals
+# reloadlocale
+reloadlocale.aliases = []
+reloadlocale.desc = Reloads Locale
 
-reloadlocal.error = Unable to Reload?
-reloadlocal.syntax = !reloadlocal
+reloadlocale.error = Unable to Reload?
+reloadlocale.syntax = !reloadlocale
