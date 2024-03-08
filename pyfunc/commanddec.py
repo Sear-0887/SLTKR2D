@@ -41,7 +41,7 @@ f'''
         userstr += f'user-:{ctx.author.global_name}\n'
         userstr += f'user-:{ctx.author.id}'
         timestr = f'time-:{time.strftime("%H:%M:%S", time.localtime())}'
-        cmdstr = 'cmd-:{ctx.message.clean_content}'
+        cmdstr = f'cmd-:{ctx.message.clean_content}'
         argsstr = '\n'.join([f'arg-{i}:'+s for i,arg in enumerate(args) for s in repr(arg).split('\n')])
         kwargsstr = '\n'.join([k+':'+s for i,(k,v) in enumerate(kwargs.items()) for s in repr(v).split('\n')])
         exctbstr = '\n'.join(['exc-:'+s for s in '\n'.join(traceback.format_exception(e)).split('\n')])
