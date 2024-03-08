@@ -64,14 +64,14 @@ class Admin(commands.Cog):
     
     @commands.has_permissions(administrator=True)
     @CogCommand("deleteerr")
-    async def delog(self, ctx):
+    async def deleteerr(self, ctx):
         for errf in glob.glob("cache/log/error-*-??-??-????.txt"):
             os.remove(errf)
         await ctx.send("Done.")
     
     @commands.has_permissions(administrator=True)
     @CogCommand("viewerr")
-    async def delog(self, ctx, user: nextcord.User=None):
+    async def viewerr(self, ctx, user: nextcord.User=None):
         if user is None:
             username=ctx.author.global_name
         else:
