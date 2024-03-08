@@ -77,10 +77,10 @@ class Admin(commands.Cog):
         else:
             username=user.global_name
         for errf in glob.glob(f"cache/log/error-{ctx.author.global_name}-??-??-????.txt"):
-            #with open(errf) as f:
-            #    await ctx.send('```\n'+f.read()+'\n```')
-            file = nextcord.File(errf, filename="error.txt")
-            await ctx.send(file=file)
+            with open(errf) as f:
+                parts=f.read().split('\n####:####\n')[:-1]
+                for part in parts:
+                    await ctx.send('```\n'+part+'\n```')
 
             
     
