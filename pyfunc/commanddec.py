@@ -4,6 +4,8 @@ import sys
 from pyfunc.lang import cmdi, evl
 from colorama import Fore, init
 from nextcord.ext import commands
+import time
+import traceback
 
 init()
 RED = Fore.RED
@@ -34,8 +36,8 @@ f'''
 '''
     )
     await ctx.send(expecterr)
-    with open(f"cache/log/error-{ctx.author.username}-{datetime.now():%d-%m-%Y}.txt", "a+") as fil:
-        userstr = f'user-:{ctx.author.username}\n'
+    with open(f"cache/log/error-{ctx.author.global_name}-{datetime.date.today():%d-%m-%Y}.txt", "a+") as fil:
+        userstr = f'user-:{ctx.author.display_name}\n'
         userstr += f'user-:{ctx.author.global_name}\n'
         userstr += f'user-:{ctx.author.id}'
         timestr = f'time-:{time.strftime("%H:%M:%S", time.localtime())}'
