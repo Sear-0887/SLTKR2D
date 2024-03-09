@@ -80,7 +80,11 @@ class Admin(commands.Cog):
             with open(errf) as f:
                 parts=f.read().split('\n####:####\n')[:-1]
                 for part in parts:
-                    await ctx.send('```\n'+part+'\n```')
+                    try:
+                        await ctx.send('```\n'+part+'\n```')
+                    except nextcord.errors.HTTPException: # the error was too long
+                        part='\n'.join([x for x in part.split() if not x.startswith('exctb-')])
+                        await ctx.send('```\n'+part+'\n```')
 
             
     
