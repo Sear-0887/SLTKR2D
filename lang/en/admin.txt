@@ -48,8 +48,7 @@ deleteerr.syntax = !deleteerr
 
 ## viewerr
 viewerr.aliases = [verr]
-viewerr.desc = View all Error files. \
-Admin-Only Command.
+viewerr.desc = View all Error files.
 
 viewerr.error = Unable to view.
 viewerr.syntax = !viewerr

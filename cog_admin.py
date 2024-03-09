@@ -69,7 +69,6 @@ class Admin(commands.Cog):
             os.remove(errf)
         await ctx.send("Done.")
     
-    @commands.has_permissions(administrator=True)
     @CogCommand("viewerr")
     async def viewerr(self, ctx, user: nextcord.User=None):
         if user is None:
