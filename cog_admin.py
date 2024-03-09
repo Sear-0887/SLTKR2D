@@ -76,7 +76,7 @@ class Admin(commands.Cog):
             username=ctx.author.global_name
         else:
             username=user.global_name
-        for errf in glob.glob(f"cache/log/error-{ctx.author.global_name}-??-??-????.txt"):
+        for errf in glob.glob(f"cache/log/error-{username}-??-??-????.txt"):
             with open(errf) as f:
                 parts=f.read().split('\n####:####\n')[:-1]
                 for part in parts:
