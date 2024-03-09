@@ -83,8 +83,11 @@ class Admin(commands.Cog):
                     try:
                         await ctx.send('```\n'+part+'\n```')
                     except nextcord.errors.HTTPException: # the error was too long
-                        part='\n'.join([x for x in part.split() if not x.startswith('exctb-')])
-                        await ctx.send('```\n'+part+'\n```')
+                        part='\n'.join([x for x in part.split('\n') if not x.startswith('exctb-')])
+                        try:
+                            await ctx.send('```\n'+part+'\n```')
+                        except nextcord.errors.HTTPException: # the error was still too long
+                                await ctx.send('Error was too long.')
 
             
     
