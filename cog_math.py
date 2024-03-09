@@ -9,7 +9,7 @@ from PIL import Image
 from nextcord.ext import commands
 from pyfunc.lang import lprint
 from pyfunc.commanddec import CogCommand
-from eval_expr import evaluate,stringifyexpr
+from pyfunc.eval_expr import evaluate,stringifyexpr
 
 
 class Math(commands.Cog):
