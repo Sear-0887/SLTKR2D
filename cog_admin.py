@@ -80,6 +80,7 @@ class Admin(commands.Cog):
             with open(errf) as f:
                 parts=f.read().split('\n####:####\n')[:-1]
                 for part in parts:
+                    part=part.replace('`','ˋ') # nobody will notice
                     try:
                         await ctx.send('```\n'+part+'\n```')
                     except nextcord.errors.HTTPException: # the error was too long
