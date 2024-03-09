@@ -46,7 +46,7 @@ f'''
         kwargsstr = '\n'.join([k+':'+s for i,(k,v) in enumerate(kwargs.items()) for s in repr(v).split('\n')])
         exctbstr = '\n'.join(['exctb-:'+s for s in '\n'.join(traceback.format_exception(e)).split('\n')])
         excstr = '\n'.join([f'exc-:{s}' for s in str(e).split('\n')])
-        fil.write('\n'.join([userstr,timestr,cmdstr,argsstr,kwargsstr,exctbstr]))
+        fil.write('\n'.join([userstr,timestr,cmdstr,argsstr,kwargsstr,exctbstr,excstr]))
         fil.write('\n####:####\n') # record separator
     # raise e
 
