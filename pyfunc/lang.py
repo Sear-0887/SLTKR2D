@@ -1,3 +1,7 @@
+# the links
+# key is link name
+# value['link'] is the url
+# value['kw'] is the keywords !link recognizes
 keywords = {
     "Roody:2D Game Discord Server": {
         "link": "https://discord.gg/gbEkBNt",
@@ -21,6 +25,7 @@ keywords = {
     }
 }
 
+# the links as one string (used to format into !link description)
 linksstr="".join([
     f"{name} ({data['link']})\nKeywords: `{'`, `'.join(data['kw'])}`\n"
     for name,data in keywords.items()
@@ -48,6 +53,7 @@ def lprint(*values: object, sep: str | None = " ",end: str | None = "\n", ptnt: 
         print(values)
         
                     
+# load the command locale
 def phraser():
     for langpth in glob.glob("lang/*"):
         lang = langpth[5:]
@@ -71,6 +77,7 @@ def phraser():
     # EXCEPTIONS
     cmdi['en']["link.desc"] = cmdi['en']["link.desc"].format(linksstr)
 
+# get a locale entry
 def evl(target, lang="en") -> str | list:
     try:
         return cmdi[lang][target]
