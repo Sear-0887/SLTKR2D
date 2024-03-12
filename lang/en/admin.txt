@@ -1,6 +1,6 @@
 ## viewcog
-viewcog.aliases = [cg, cgv, cog]
-viewcog.desc = Read the current status of cogs detected. \
+viewcog.aliases = [cg, cgv, cog, cogs]
+viewcog.desc = View all cogs. \
 Admin-Only Command.
 
 viewcog.error = Unable to reach all cogs.
@@ -31,11 +31,11 @@ unloadcog.error = Unable to reach all cogs.
 unloadcog.syntax = !unloadcog
 
 ## deletelog
-deletelog.aliases = [delog]
+deletelog.aliases = [delog, lgd, lgdelete]
 deletelog.desc = Clear Log files. \
 Admin-Only Command.
 
-deletelog.error = Unable to delete All logs.
+deletelog.error = Unable to delete all logs.
 deletelog.syntax = !deletelog
 
 

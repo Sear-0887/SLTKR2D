@@ -1,7 +1,19 @@
+# the links
+# key is link name
+# value['link'] is the url
+# value['kw'] is the keywords !link recognizes
 keywords = {
     "Roody:2D Game Discord Server": {
         "link": "https://discord.gg/gbEkBNt",
         "kw": ["r2d", "roody2d", "roody:2d", "game", "gameser", "gamedc"]
+    },
+    "Redinator PitBottom": {
+        "link": "https://pitbottom.com/",
+        "kw": ["pitbottom", "ptbtm", "redinator", "r2dauthor"]
+    },
+    "Roody:2D Game Steam Page": {
+        "link": "https://steamcommunity.com/app/2345220",
+        "kw": ["steam", "steampage", "gamepage", "r2dsteam"]
     },
     "SLTK Wiki Server": {
         "link": "https://discord.gg/cDAUYrtjzV",
@@ -13,6 +25,7 @@ keywords = {
     }
 }
 
+# the links as one string (used to format into !link description)
 linksstr="".join([
     f"{name} ({data['link']})\nKeywords: `{'`, `'.join(data['kw'])}`\n"
     for name,data in keywords.items()
@@ -24,6 +37,7 @@ import json
 from datetime import datetime
 import glob
 import re
+from dotenv import dotenv_values
 cmdi = {}
 # config:dict = {}
 
@@ -39,6 +53,7 @@ def lprint(*values: object, sep: str | None = " ",end: str | None = "\n", ptnt: 
         print(values)
         
                     
+# load the command locale
 def phraser():
     for langpth in glob.glob("lang/*"):
         lang = langpth[5:]
@@ -62,16 +77,31 @@ def phraser():
     # EXCEPTIONS
     cmdi['en']["link.desc"] = cmdi['en']["link.desc"].format(linksstr)
 
+# get a locale entry
 def evl(target, lang="en") -> str | list:
     try:
         return cmdi[lang][target]
     except:
         return ""
+def handlehostid():
+    raw = ""
+    try:
+        raw = dotenv_values("cred/client.env")['HOSTID']
+    except Exception as e:
+        print(f"ReadingHostID Failed {e}")
+        raw = "CLIENT--0"
+    auid, setting = re.fullmatch(r"^CLIENT\-(\w*)\-(.*)", raw).groups()
+    if not auid: auid = "0"
+    returntup = ( int(auid, 16), list(map(lambda x:x=="1", list(setting))) )
+    return returntup
 
 def loadconfig():
     with open("config.json") as f:
         global config
         config = json.load(f)
+        hostid, settings = handlehostid()
+        config['ShowHost'] = settings[0]
+        config['HostDCID'] = hostid
     return config
 
 def cfg(target):
