@@ -16,12 +16,12 @@ plot.syntax = !plot <m> <c> <min> <max>
 
 # prime
 prime.aliases = [pfac]
-prime.desc = Find <n>'s Prime Factor.
+prime.desc = Find <n>'s prime factorization.
 prime.error = Cannot factor {n}.
-prime.syntax = !prime <n> 
+prime.syntax = !prime <n>
 
 # factor
 factor.aliases = [fac]
-factor.desc = Find <n>'s All Factor.
+factor.desc = Find all of <n>'s factors.
 factor.error = Cannot factor {n}.
-factor.syntax = !factor <n> 
+factor.syntax = !factor <n>
