@@ -33,6 +33,8 @@ linksstr="".join([
 
 
 import time
+import os
+
 import json
 from datetime import datetime
 import glob
@@ -40,6 +42,7 @@ import re
 from dotenv import dotenv_values
 cmdi = {}
 config = None
+devs = None
 
 # write_to_log, basically similar to print, with extra steps...
 # ptnt is print_to_normal_terminal, ats is add_timestamp
@@ -124,3 +127,17 @@ def replacemoji(tar):
     for key, item in emojidict.items():
         tar = tar.replace(f":{key}:", item)
     return tar
+
+def getdevs():
+    with open(cfg("json.devInfoPath")) as f:
+        global devs
+        devs = json.load(f)
+        
+def botinit():
+    from pyfunc.assetload import assetinit
+    os.makedirs(cfg('cache_folder'), exist_ok=True) # directory to put images and other output in
+    os.makedirs(cfg('log_folder'), exist_ok=True) # logs folder (may be in cache)
+    loadconfig()
+    phraser() # command locale
+    getdevs()
+    assetinit() # roody locale and blocks

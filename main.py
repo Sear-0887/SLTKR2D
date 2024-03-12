@@ -1,27 +1,23 @@
 import glob
-import os
 import nextcord
 import datetime
-from pyfunc.assetload import init,devs
+from pyfunc.lang import botinit, devs
 from nextcord.ext import commands
 from pyfunc.lang import cfg, cmdi, config, evl, keywords, loadconfig, phraser
 from pyfunc.gettoken import gettoken
 from pyfunc.commanddec import MainCommand
 
+
+botinit()
 intents = nextcord.Intents.default()
 intents.members = True
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 TimeOn = datetime.datetime.now()
 # initialize some things
-def botinit():
-    os.makedirs(cfg('cache_folder'), exist_ok=True) # directory to put images and other output in
-    os.makedirs(cfg('log_folder'), exist_ok=True) # logs folder (may be in cache)
-    loadconfig()
-    phraser() # command locale
-    init() # roody locale and blocks
 
-botinit()
+
+
 
 # reload the command locale
 @MainCommand(bot, "reloadlocal")

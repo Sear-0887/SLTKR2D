@@ -8,9 +8,9 @@ Founded by Sear.
 
 ## Contributors \
 ### [Sear](https://github.com/Sear-0887) 
-Main Founder of the bot, contributing the bot's development and serval projects.
+Founder of the bot, contributing the bot's development and serval projects.
 ### [RbCaVi](https://github.com/RbCaVi) 
-Optimizes / refactors major part of codes. 
+Optimizes / refactors major part of the code. 
 
 
 ## License
