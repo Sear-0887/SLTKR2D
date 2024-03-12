@@ -21,5 +21,9 @@
     "TOKENPATH": "cred/.env",
     "cache_folder": "cache/",
     "log_folder": "cache/log",
-    "config_path": "config.json"
+    "config_path": "config.json",
+    "json":{
+        "devInfoPath": "json/devs.json",
+        "emojiInfoPath": "json/emoji.json"
+    }
 }

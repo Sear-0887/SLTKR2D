@@ -7,14 +7,14 @@ Please use the command !help <cmd> to view what !<cmd> does. \
 SLTKR2D by <@697801071208300574>, All rights reserved. \
 Time Since Last Restart: {} \
 {} \
-This bot is open sourced on [Github](https://github.com/Sear-0887/SLTKR2D).
+This bot is open sourced on [Github](https://github.com/Sear-0887/SLTKR2D). :Success:
 
 help.blankdisplay.server = ***Note: Bot is currently hosting in <@{}>'s Server.*** \
 ***Keep in mind that commands might be unstable or subject to change.***
 help.desc = Displays what command <cmd> does. \
 If left blank, shows info about the bot.
 
-help.error = Please provide a valid command name.
+help.error = :Fail: Please provide a valid command name.
 help.syntax = !help <cmd>
 help.helplist.title = Command List
 help.helplist.desc = Here's a list of commands: \
@@ -26,19 +26,19 @@ link.desc = Allows you to mention various game-related links through <keyword>. 
 Currently supports these links: \
 {}
 
-link.error = Unable to find link for {}.
+link.error = :Fail: Unable to find link for {}.
 link.syntax = !link <keyword>
 
 # ping
 ping.aliases = []
 ping.desc = Pong! + Display the latency of bot in ms.
-ping.error = Oh no! An error happened!
+ping.error = :Fail: Oh no! An error happened!
 ping.syntax = !ping
 
 # scream
 scream.aliases = [AAAAA]
 scream.desc = *It symbolizes my sanity* ~ Sear-0887
-scream.error = Oh no! An error happened!
+scream.error = :Fail: Oh no! An error happened!
 scream.syntax = !scream
 
 # credit
@@ -47,12 +47,12 @@ credit.desc = Crediting the Contributors of this project.
 credit.display = # Contributors \
 {}
 
-credit.error = Failed :<
+credit.error = :Fail: Failed :<
 credit.syntax = !credit
 
 # reloadlocal
 reloadlocal.aliases = []
 reloadlocal.desc = Reloads Locale
 
-reloadlocal.error = Unable to Reload Locale???
+reloadlocal.error = :Fail: Unable to Reload Locale???
 reloadlocal.syntax = !reloadlocal

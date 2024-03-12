@@ -39,7 +39,7 @@ import glob
 import re
 from dotenv import dotenv_values
 cmdi = {}
-# config:dict = {}
+config = None
 
 # write_to_log, basically similar to print, with extra steps...
 # ptnt is print_to_normal_terminal, ats is add_timestamp
@@ -55,6 +55,7 @@ def lprint(*values: object, sep: str | None = " ",end: str | None = "\n", ptnt: 
                     
 # load the command locale
 def phraser():
+    loademoji()
     for langpth in glob.glob("lang/*"):
         lang = langpth[5:]
         try: cmdi[lang]
@@ -69,6 +70,7 @@ def phraser():
                         if re.match(r"^\[.*\]$", val):
                             val = val[1:-1].split(", ")
                             if val == ['']: val = []
+                        val = replacemoji(val)
                         cmdi[lang][expr] = val
                         lprint(f"{(expr, val) =}")
                     
@@ -105,7 +107,20 @@ def loadconfig():
     return config
 
 def cfg(target):
+    if config is None: loadconfig()
     base = config
     for tv in target.split("."):
         base = base[tv]
     return base
+
+def loademoji():
+    with open(cfg("json.emojiInfoPath")) as f:
+        global emojidict
+        emojidict = json.load(f)
+    return emojidict
+
+def replacemoji(tar):
+    if type(tar) != str: return tar
+    for key, item in emojidict.items():
+        tar = tar.replace(f":{key}:", item)
+    return tar

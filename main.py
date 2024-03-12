@@ -17,6 +17,7 @@ TimeOn = datetime.datetime.now()
 def botinit():
     os.makedirs(cfg('cache_folder'), exist_ok=True) # directory to put images and other output in
     os.makedirs(cfg('log_folder'), exist_ok=True) # logs folder (may be in cache)
+    loadconfig()
     phraser() # command locale
     init() # roody locale and blocks
 
