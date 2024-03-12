@@ -6,8 +6,11 @@ PREFIX: ! \
 Please use the command !help <cmd> to view what !<cmd> does. \
 SLTKR2D by <@697801071208300574>, All rights reserved. \
 Time Since Last Restart: {} \
-This bot is open-source on [Github](https://github.com/Sear-0887/SLTKR2D).
+{} \
+This bot is open sourced on [Github](https://github.com/Sear-0887/SLTKR2D).
 
+help.blankdisplay.server = ***Note: Bot is currently hosting in <@{}>'s Server.*** \
+***Keep in mind that commands might be unstable or subject to change.***
 help.desc = Displays what command <cmd> does. \
 If left blank, shows info about the bot.
 
@@ -19,7 +22,7 @@ help.helplist.desc = Here's a list of commands: \
 
 ## link
 link.aliases = [l, lnk, www]
-link.desc = Allow you to mention various game-related links through <keyword>. \
+link.desc = Allows you to mention various game-related links through <keyword>. \
 Currently supports these links: \
 {}
 
@@ -29,13 +32,13 @@ link.syntax = !link <keyword>
 # ping
 ping.aliases = []
 ping.desc = Pong! + Display the latency of bot in ms.
-ping.error = This is a error message
+ping.error = Oh no! An error happened!
 ping.syntax = !ping
 
 # scream
 scream.aliases = [AAAAA]
-scream.desc = *It symbolizes my sanity*
-scream.error = This is a error message
+scream.desc = *It symbolizes my sanity* ~ Sear-0887
+scream.error = Oh no! An error happened!
 scream.syntax = !scream
 
 # credit
@@ -49,7 +52,7 @@ credit.syntax = !credit
 
 # reloadlocal
 reloadlocal.aliases = []
-reloadlocal.desc = Reloads Locals
+reloadlocal.desc = Reloads Locale
 
-reloadlocal.error = Unable to Reload?
+reloadlocal.error = Unable to Reload Locale???
 reloadlocal.syntax = !reloadlocal

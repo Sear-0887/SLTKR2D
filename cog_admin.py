@@ -35,7 +35,7 @@ class Admin(commands.Cog):
     @CogCommand("unloadcog")
     async def unloadcog(self,ctx, tar):
         try:
-            if tar == "cog_admin":
+            if tar == "admin":
                 await ctx.send("You can't unload cog_admin!") # prevent softlock
                 return
             self.bot.unload_extension("cog_"+tar)
