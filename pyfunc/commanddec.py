@@ -72,3 +72,4 @@ def CogCommand(name):
             description = evl(f"{name}.desc"), 
             aliases     = evl(f"{name}.aliases")
         )( trycmd(cmd) )
+    return fixcmd
