@@ -2,34 +2,10 @@
 # key is link name
 # value['link'] is the url
 # value['kw'] is the keywords !link recognizes
-keywords = {
-    "Roody:2D Game Discord Server": {
-        "link": "https://discord.gg/gbEkBNt",
-        "kw": ["r2d", "roody2d", "roody:2d", "game", "gameser", "gamedc"]
-    },
-    "Redinator PitBottom": {
-        "link": "https://pitbottom.com/",
-        "kw": ["pitbottom", "ptbtm", "redinator", "r2dauthor"]
-    },
-    "Roody:2D Game Steam Page": {
-        "link": "https://steamcommunity.com/app/2345220",
-        "kw": ["steam", "steampage", "gamepage", "r2dsteam"]
-    },
-    "SLTK Wiki Server": {
-        "link": "https://discord.gg/cDAUYrtjzV",
-        "kw": ["sltk", "wikiser", "wikidc", "r2dwiki", "r2dwikiser"]
-    },
-    "SLTK Wiki Page": {
-        "link": "https://roody2d.wiki.gg",
-        "kw": ["wiki", "sltkwiki", "wikipage", "r2dwiki"]
-    }
-}
+
 
 # the links as one string (used to format into !link description)
-linksstr="".join([
-    f"{name} ({data['link']})\nKeywords: `{'`, `'.join(data['kw'])}`\n"
-    for name,data in keywords.items()
-])
+
 
 
 import time
@@ -43,6 +19,7 @@ from dotenv import dotenv_values
 cmdi = {}
 config = None
 devs = None
+keywords = {}
 
 # write_to_log, basically similar to print, with extra steps...
 # ptnt is print_to_normal_terminal, ats is add_timestamp
@@ -80,7 +57,10 @@ def phraser():
                         
     print(cmdi['en']["help.aliases"])
     # EXCEPTIONS
-    cmdi['en']["link.desc"] = cmdi['en']["link.desc"].format(linksstr)
+    cmdi['en']["link.desc"] = cmdi['en']["link.desc"].format("".join([
+    f"{name} ({data['link']})\nKeywords: `{'`, `'.join(data['kw'])}`\n"
+    for name,data in keywords.items()
+]))
 
 # get a locale entry
 def evl(target, lang="en") -> str | list:
@@ -88,6 +68,7 @@ def evl(target, lang="en") -> str | list:
         return cmdi[lang][target]
     except:
         return ""
+    
 def handlehostid():
     raw = ""
     try:
@@ -132,12 +113,19 @@ def getdevs():
     with open(cfg("infoPath.devInfoPath")) as f:
         global devs
         devs = json.load(f)
+
+def getkws(): 
+    with open(cfg("infoPath.kwInfoPath")) as f:
+        global keywords
+        keywords = json.load(f)
+    return keywords
         
 def botinit():
     from pyfunc.assetload import assetinit
     os.makedirs(cfg('cacheFolder'), exist_ok=True) # directory to put images and other output in
     os.makedirs(cfg('logFolder'), exist_ok=True) # logs folder (may be in cache)
     loadconfig()
+    getkws()
     phraser() # command locale
     getdevs()
     assetinit() # roody locale and blocks

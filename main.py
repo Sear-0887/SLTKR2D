@@ -106,7 +106,7 @@ async def on_ready():
     global TimeOn
     TimeOn = datetime.datetime.now() # updating the real TimeOnline
     presense = nextcord.Game("with Roody:2D")
-    await bot.change_presence(status=nextcord.Status.idle, activity=presense)
+    await bot.change_presence(status=nextcord.Status.online, activity=presense)
 
 
 # get the bot token
