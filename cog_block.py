@@ -4,7 +4,7 @@ import random
 import re
 from PIL import Image
 from nextcord.ext import commands
-from pyfunc.lang import evl
+from pyfunc.lang import cfg
 from pyfunc.commanddec import CogCommand
 from pyfunc.assetload import idtoblock
 from pyfunc.block import makeimage as blockmakeimage
@@ -21,8 +21,8 @@ class Block(commands.Cog):
                 block = idtoblock.get(int(block),'NIC')
             binfo=blockinfos[block]
             embed = nextcord.Embed()
-            
-            img = Image.open("assets/block_zoo.png")
+            pthblockzoo = cfg("localGame.textures.blockIconFile")
+            img = Image.open(pthblockzoo)
             icox, icoy = binfo["iconcoord"]
             img = img.crop((16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))).resize((128, 128), Image.NEAREST)
             img.save("cache/blockim.png")

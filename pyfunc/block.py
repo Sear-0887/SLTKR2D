@@ -2,19 +2,20 @@ import PIL
 import PIL.Image
 import pyfunc.smp as smp
 import os
+from pyfunc.lang import cfg
 
 #welded=top,left,bottom,right
 #rotate= 0    1    2      3
 
 blockpaths={}
-
-with open("assets/block_textures.smp") as f:
+pthblocktexture = cfg("localGame.texture.texturePathFile")
+with open(pthblocktexture) as f:
   data=smp.getsmpvalue(f.read())
 for name,texture in data.items():
   blockpaths[name] = texture
 
 def getblockim(block):
-	return PIL.Image.open(os.path.join('assets/textures/blocks',blockpaths[block]))
+	return PIL.Image.open(os.path.join(cfg("localGame.texture.texturePathFolder"),blockpaths[block]))
 
 # https://stackoverflow.com/a/13054570
 class Block:
@@ -343,10 +344,6 @@ if __name__=='__main__':
 		['cast_iron',{"type":'wire_spool',"rotate":2,"weld":[False,False,True,False]}],
 		['cast_iron','cast_iron'],
 	]
-	#im=makeimage(blocks)
-	#im.show()
-	#im.save('frecipe.png')
-
 	leftspool={"type":'wire_spool',"rotate":1,"weld":[False,False,False,True]}
 	rightspool={"type":'wire_spool',"rotate":1,"weld":[False,True,False,False]}
 
@@ -355,15 +352,3 @@ if __name__=='__main__':
 		[leftspool,'iron_bar',rightspool],
 		[leftspool,'iron_bar',rightspool],
 	]
-	#im=makeimage(blocks)
-	#im.show()
-	#im.save('inductor.png')
-
-	#im1=makeimage([['wire','glass']])
-	#im2=makeimage([['wire_board','glass']])
-
-	#im1.save('E.apng', duration=500, save_all=True, append_images=[im2],loop=0,disposal=0,blend=0)
-	#im1.save('E.gif', duration=500, save_all=True, append_images=[im2],loop=0,disposal=2)
-
-	#im=PIL.Image.open('E.apng')
-	#im.show()

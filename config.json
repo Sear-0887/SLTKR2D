@@ -1,28 +1,31 @@
 {
-    "bot_info": {
-        "id": 1195952074861584514
+    "botInfo": {
+        "ID": 1195952074861584514
     },
-    "local": {
-        "fblang": "en",
-        "localPath": "lang/"  
+    "locale": {
+        "defaultName": "en",
+        "localePath": "lang/"  
     },
-    "local_game": {
-        "language_path": {
-            "english": "assets/localization/english_*.txt"
+    "localGame": {
+        "language": {
+            "en": {
+                "fullName": "English",
+                "path": "assets/localization/english_*.txt"
+            }
         },
         "texture": {
-            "texturepathfolder": "assets/textures/",
-            "block_texture_path_file_path": "assets/block_textures.smp",
-            "block_zoo_path": "assets/block_zoo.png",
-            "block_id_path": "assets/block_id_.smp",
-            "block_icons_path": "assets/block_icons.smp"
+            "texturePathFolder": "assets/textures/blocks",
+            "texturePathFile": "assets/block_textures.smp",
+            "blockIconFile": "assets/block_zoo.png",
+            "blockIDFile": "assets/block_id_.smp",
+            "iconLocationFile": "assets/block_icons.smp"
         }
     },
     "TOKENPATH": "cred/.env",
-    "cache_folder": "cache/",
-    "log_folder": "cache/log",
-    "config_path": "config.json",
-    "json":{
+    "cacheFolder": "cache/",
+    "logFolder": "cache/log",
+    "configPath": "config.json",
+    "infoPath":{
         "devInfoPath": "json/devs.json",
         "emojiInfoPath": "json/emoji.json"
     }

@@ -95,16 +95,18 @@ async def link(ctx, typ="r2d"):
 # credits to the developers
 @MainCommand(bot,'credit')
 async def credit(ctx):
-    devstr = '\n'.join([f'### [{dev["name"]}]({dev["github_link"]})\n{dev["desc"]}' for dev in devs])
+    devstr = '\n'.join([f'### [{dev["name"]}]({dev["github_link"]}){dev["desc"]}' for dev in devs])
     await ctx.send(evl("credit.display").format(devstr))
 
 # the bot is ready now
 @bot.event
 async def on_ready():
-    print(f"ONLINE as {bot.user}, id {bot.user.id}.")
+    print(f"ONLINE as {bot.user} appearing {bot.user.display_name}, id {bot.user.id}.")
     print("Done.")
     global TimeOn
-    TimeOn = datetime.datetime.now() # why is this still here?
+    TimeOn = datetime.datetime.now() # updating the real TimeOnline
+    presense = nextcord.Game("with Roody:2D")
+    await bot.change_presence(status=nextcord.Status.idle, activity=presense)
 
 
 # get the bot token

@@ -117,7 +117,7 @@ def cfg(target):
     return base
 
 def loademoji():
-    with open(cfg("json.emojiInfoPath")) as f:
+    with open(cfg("infoPath.emojiInfoPath")) as f:
         global emojidict
         emojidict = json.load(f)
     return emojidict
@@ -129,14 +129,14 @@ def replacemoji(tar):
     return tar
 
 def getdevs():
-    with open(cfg("json.devInfoPath")) as f:
+    with open(cfg("infoPath.devInfoPath")) as f:
         global devs
         devs = json.load(f)
         
 def botinit():
     from pyfunc.assetload import assetinit
-    os.makedirs(cfg('cache_folder'), exist_ok=True) # directory to put images and other output in
-    os.makedirs(cfg('log_folder'), exist_ok=True) # logs folder (may be in cache)
+    os.makedirs(cfg('cacheFolder'), exist_ok=True) # directory to put images and other output in
+    os.makedirs(cfg('logFolder'), exist_ok=True) # logs folder (may be in cache)
     loadconfig()
     phraser() # command locale
     getdevs()
