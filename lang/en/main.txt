@@ -51,7 +51,7 @@ credit.error = :Fail: Failed :<
 credit.syntax = !credit
 
 # reloadlocale
-reloadlocale.aliases = []
+reloadlocale.aliases = [reloadlocal]
 reloadlocale.desc = Reloads Locale
 
 reloadlocale.error = :Fail: Unable to Reload Locale???
