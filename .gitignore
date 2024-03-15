@@ -1,5 +1,3 @@
 *cache*/
 .vscode/
-cred/
-
-.gitignore
+cred/.env
