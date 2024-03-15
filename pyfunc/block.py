@@ -329,25 +329,3 @@ def makeimage(blocks,bsize=128,autoweld=True):
 			bim=b.draw(block['weld'],block['rotate'],size=bsize)
 			im.alpha_composite(bim,(xi*bsize,yi*bsize)) # paste the block
 	return im
-
-if __name__=='__main__':
-	blocks=[
-		['iron_bar',{"type":'wire_spool',"rotate":2,"weld":[False,False,True,False]}],
-		['air','iron_bar'],
-	]
-	im=makeimage(blocks)
-	im.show()
-	im.save('recipe.png')
-
-	blocks=[
-		['cast_iron',{"type":'wire_spool',"rotate":2,"weld":[False,False,True,False]}],
-		['cast_iron','cast_iron'],
-	]
-	leftspool={"type":'wire_spool',"rotate":1,"weld":[False,False,False,True]}
-	rightspool={"type":'wire_spool',"rotate":1,"weld":[False,True,False,False]}
-
-	blocks=[
-		[leftspool,'iron_bar',rightspool],
-		[leftspool,'iron_bar',rightspool],
-		[leftspool,'iron_bar',rightspool],
-	]
