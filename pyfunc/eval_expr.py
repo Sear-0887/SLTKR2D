@@ -1,6 +1,5 @@
 # to add a binary operator:
-# add it to the ops list
-# add it to opdata
+# add it to ops
 # add a case in apply()
 
 # to add an unary operator:
@@ -10,11 +9,9 @@
 import re
 import math
 
-ops=['+','-','**','*','/','^']
-
 uops=['-']
 
-opdata={
+ops={
   '+':(1,LEFT),
   '-':(1,LEFT),
   '*':(2,LEFT),
@@ -161,13 +158,13 @@ def getToken(s,lastType):
 
 def precedence(token):
   # get the precedence of a binary operator
-  return opdata[token[1]][0]
+  return ops[token[1]][0]
 
 def rightassoc(op):
-  return opdata[token[1]][1]==RIGHT
+  return ops[token[1]][1]==RIGHT
 
 def leftassoc(op):
-  return opdata[token[1]][1]==LEFT
+  return ops[token[1]][1]==LEFT
 
 def evaluate(expr):
   values=[]
