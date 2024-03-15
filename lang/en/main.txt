@@ -6,15 +6,15 @@ PREFIX: ! \
 Please use the command !help <cmd> to view what !<cmd> does. \
 SLTKR2D by <@697801071208300574>, All rights reserved. \
 Time Since Last Restart: {} \
-{} \ 
-This bot is open-source on [Github](https://github.com/Sear-0887/SLTKR2D).
+{} \
+This bot is open sourced on [Github](https://github.com/Sear-0887/SLTKR2D). :Success:
 
 help.blankdisplay.server = ***Note: Bot is currently hosting in <@{}>'s Server.*** \
 ***Keep in mind that commands might be unstable or subject to change.***
 help.desc = Displays what command <cmd> does. \
 If left blank, shows info about the bot.
 
-help.error = Please provide a valid command name.
+help.error = :Fail: Please provide a valid command name.
 help.syntax = !help <cmd>
 help.helplist.title = Command List
 help.helplist.desc = Here's a list of commands: \
@@ -22,40 +22,37 @@ help.helplist.desc = Here's a list of commands: \
 
 ## link
 link.aliases = [l, lnk, www]
-link.desc = Allow you to mention various game-related links through <keyword>. \
+link.desc = Allows you to mention various game-related links through <keyword>. \
 Currently supports these links: \
 {}
 
-link.error = Unable to find link for {}.
+link.error = :Fail: Unable to find link for {}.
 link.syntax = !link <keyword>
 
 # ping
 ping.aliases = []
 ping.desc = Pong! + Display the latency of bot in ms.
-ping.error = This is a error message
+ping.error = :Fail: Oh no! An error happened!
 ping.syntax = !ping
 
 # scream
 scream.aliases = [AAAAA]
-scream.desc = *It symbolizes my sanity*
-scream.error = This is a error message
+scream.desc = *It symbolizes my sanity* ~ Sear-0887
+scream.error = :Fail: Oh no! An error happened!
 scream.syntax = !scream
 
 # credit
 credit.aliases = [credits]
 credit.desc = Crediting the Contributors of this project.
 credit.display = # Contributors \
-### [Sear]({}) \
-Main Founder of the bot, contributing the bot's development and serval projects. \
-### [RbCaVi]({}) \
-Optimizes / refactors major part of codes. 
+{}
 
-credit.error = Failed :<
+credit.error = :Fail: Failed :<
 credit.syntax = !credit
 
 # reloadlocale
 reloadlocale.aliases = []
 reloadlocale.desc = Reloads Locale
 
-reloadlocale.error = Unable to Reload?
+reloadlocale.error = :Fail: Unable to Reload Locale???
 reloadlocale.syntax = !reloadlocale
