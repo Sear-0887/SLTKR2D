@@ -6,11 +6,11 @@ Founded by Sear.
 [Roody:2d Official Server](https://discord.gg/gbEkBNt)
 [Roody:2d Steam Page](https://store.steampowered.com/app/2345220/Roody2d)
 
-## Contributors \
+## Contributors
 ### [Sear](https://github.com/Sear-0887) 
-Main Founder of the bot, contributing the bot's development and serval projects.
+Founder of the bot, contributing the bot's development and serval projects.
 ### [RbCaVi](https://github.com/RbCaVi) 
-Optimizes / refactors major part of codes. 
+Optimizes / refactors major part of the code. 
 
 
 ## License

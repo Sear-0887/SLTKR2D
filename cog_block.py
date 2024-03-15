@@ -4,8 +4,7 @@ import random
 import re
 from PIL import Image
 from nextcord.ext import commands
-from pyfunc.lang import evl
-import pyfunc.block_extra as be
+from pyfunc.lang import cfg
 from pyfunc.commanddec import CogCommand
 from pyfunc.assetload import idtoblock
 from pyfunc.block import makeimage as blockmakeimage
@@ -18,12 +17,12 @@ class Block(commands.Cog):
     @CogCommand("block")
     async def block(self,ctx, block=None):
         if block:
-            if block.isdigit():
-                block = idtoblock.get(int(block),'NIC') # numeric id to string
+            if block.isdigit(): # if the argument is a number, get the corresponding block name
+                block = idtoblock.get(int(block),'NIC')
             binfo=blockinfos[block]
             embed = nextcord.Embed()
-            
-            img = Image.open("assets/block_zoo.png")
+            pthblockzoo = cfg("localGame.textures.blockIconFile")
+            img = Image.open(pthblockzoo)
             icox, icoy = binfo["iconcoord"]
             img = img.crop((16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))).resize((128, 128), Image.NEAREST)
             img.save("cache/blockim.png")
@@ -50,6 +49,15 @@ class Block(commands.Cog):
                 b=''.join(b.split()) # remove all whitespace
                 turn=0
                 weld=[True,True,True,True]
+                # either 
+                #   block          normal
+                #   block#         normal
+                #   block#dir      set facing
+                #   block#weld     set welded sides
+                #   block#dirweld  set both
+                #   #block         no weld
+                # welded sides is 4x 0 or 1 in the order right bottom left top
+                # dir is eswn
                 match=re.fullmatch('(?:([^]#]+)(?:#([eswn])?([01]{4})?)?)|#([^]]+)',b)
                 if match is None:
                     raise Exception(f'Invalid block: {b}')
@@ -61,7 +69,7 @@ class Block(commands.Cog):
                     turn='nwse'.index(turnm)
                 if weldm is not None:
                     weld=[c=='1' for c in reversed(weldm)]
-                if b=='nic':
+                if b=='nic': # nic is treated as air
                     b='air'
                 if b.isdigit():
                     b = idtoblock[int(b)]
