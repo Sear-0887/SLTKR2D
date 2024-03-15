@@ -5,8 +5,6 @@ import nextcord
 import random
 import math
 import re
-import time
-from PIL import Image
 from pyfunc.math import primefactor
 from nextcord.ext import commands
 from pyfunc.lang import lprint
