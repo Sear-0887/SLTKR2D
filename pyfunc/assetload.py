@@ -1,17 +1,16 @@
 import re
+import json
 import collections
 import pyfunc.smp as smp
 import glob
-from pyfunc.lang import cfg, loadconfig
-
+from pyfunc.lang import cfg
 idtoblock = {}
 
 blockinfos = collections.defaultdict(dict)
 
 locale = {}
 
-loadconfig()
-lang = cfg("local_game.language_path")
+lang = cfg("localGame.language.en")
 
 def capitalize(s):
     s=s[0].upper()+s[1:]
@@ -36,20 +35,24 @@ modifiers={
 }
 
 def getblockids():
-    with open("assets/block_id_.smp") as f:
+    with open(cfg("localGame.texture.blockIDFile")) as f:
         data=smp.getsmpvalue(f.read())
     for name,i in data.items():
         blockinfos[name]["id"] = int(i)
         idtoblock[int(i)] = name
 
 def geticoncoords():
-    with open("assets/block_icons.smp") as f:
+    with open(cfg("localGame.texture.iconLocationFile")) as f:
         data=smp.getsmpvalue(f.read())
     for icon,xy in data.items():
         x,y=xy.split(',')
         blockinfos[icon]["iconcoord"] = (int(x), int(y))
 
 def substitutelocale(s):
+    # substitute locale entries into others
+    # used in descriptions
+    # a reference is {category name|mods}
+    # mods is optional and is a string containing one or more of ^, s, or d
     i=0 # the index to look for the next opening bracket at
     while '{' in s[i:]:
         i1=s.index('{',i)
@@ -73,6 +76,11 @@ def substitutelocale(s):
     return s
 
 def getlocale():
+    # get locale entries from config.local_game.language_path
+    # a locale entry is 
+    # category name = value
+    # value can be continued across lines with a backslash (\)
+    # comments beginning with # are ignored
     for langname, langpath in lang.items():
         for fname in glob.glob(langpath):
             with open(fname, "r") as f:
@@ -91,7 +99,7 @@ def getlocale():
     for key,s in locale.items():
         locale[key]=substitutelocale(s)
 
-def init():
+def assetinit():
     getblockids()
     geticoncoords()
     getlocale()

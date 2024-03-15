@@ -5,11 +5,12 @@ import nextcord
 import random
 import math
 import re
+import time
 from PIL import Image
+from collections import defaultdict
 from nextcord.ext import commands
 from pyfunc.lang import lprint
 from pyfunc.commanddec import CogCommand
-from collections import defaultdict
 
 # rbcavi implementation
 smallprimes=[2,3,5,7,11,13,17,19] # i hope i didn't miss any
