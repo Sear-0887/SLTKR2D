@@ -90,12 +90,11 @@ def loadconfig():
         config['HostDCID'] = hostid
     return config
 
-def cfg(target):
-    if config is None: loadconfig()
-    base = config
-    for tv in target.split("."):
-        base = base[tv]
-    return base
+def cfg(*args):
+    target = config
+    for key in args:
+        target = target[key]
+    return target
 
 def loademoji():
     with open(cfg("infoPath.emojiInfoPath")) as f:
