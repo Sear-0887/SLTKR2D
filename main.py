@@ -38,18 +38,18 @@ async def help(ctx, cmdname=None,):
                 preparedlist.append(f"### {key.name} ({'/'.join(key.aliases)})")
                 preparedlist.append(f"{key.description}")
         sembed = nextcord.Embed()
-        sembed.title = evl("help.helplist.title")
-        sembed.description = evl("help.helplist.desc").format("\n".join(preparedlist))
+        sembed.title = evl("help","helplist","title")
+        sembed.description = evl("help","helplist","desc").format("\n".join(preparedlist))
         await interaction.send(ephemeral=True, embed=sembed)
         
     if not cmdname:
         # send an info embed about the bot if no command given
         embed = nextcord.Embed()
         if cfg('ShowHost'):
-            showdisplay = evl("help.blankdisplay.server").format(cfg('HostDCID'))
+            showdisplay = evl("help","blankdisplay","server").format(cfg('HostDCID'))
         else:
             showdisplay = ""
-        embed.description = evl("help.blankdisplay").format(datetime.datetime.now()-TimeOn, showdisplay)
+        embed.description = evl("help","blankdisplay").format(datetime.datetime.now()-TimeOn, showdisplay)
         view = nextcord.ui.View()
         getlistbtn = nextcord.ui.Button(style=nextcord.ButtonStyle.blurple, label="Help List")
         getlistbtn.callback = gethelplist
@@ -61,14 +61,14 @@ async def help(ctx, cmdname=None,):
             if cmdname in cmd.aliases or cmdname == cmd.name:
                 embed = nextcord.Embed()
                 embed.title = cmd.name
-                embed.description = evl(f"{cmdname}.desc")
-                embed.add_field(name="Syntax", value=evl(f"{cmd.name}.syntax"))
+                embed.description = evl(f"{cmdname}",f"desc")
+                embed.add_field(name="Syntax", value=evl(f"{cmd",f"name}",f"syntax"))
                 embed.add_field(name="Aliases", value=",\n".join(cmd.aliases))
                 embed.add_field(name="Cog", value='Main' if cmd.cog_name == None else cmd.cog_name)
                 await ctx.send(embed=embed)
                 return
         else:
-            await ctx.send(evl(f"{cmdname}.error"))
+            await ctx.send(evl(f"{cmdname}",f"error"))
 
 # check if the bot is up
 @MainCommand(bot,"ping")
@@ -96,7 +96,7 @@ async def link(ctx, typ="r2d"):
 @MainCommand(bot,'credit')
 async def credit(ctx):
     devstr = '\n'.join([f'### [{dev["name"]}]({dev["github_link"]}){dev["desc"]}' for dev in devs])
-    await ctx.send(evl("credit.display").format(devstr))
+    await ctx.send(evl("credit","display").format(devstr))
 
 # the bot is ready now
 @bot.event
