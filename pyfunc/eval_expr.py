@@ -1,6 +1,6 @@
 # to add a binary operator:
 # add it to the ops list
-# add it to precedences
+# add it to opdata
 # add a case in apply()
 
 # to add an unary operator:
@@ -14,13 +14,13 @@ ops=['+','-','**','*','/','^']
 
 uops=['-']
 
-precedences={
-  '+':1,
-  '-':1,
-  '*':2,
-  '/':2,
-  '^':3,
-  '**':3,
+opdata={
+  '+':(1,LEFT),
+  '-':(1,LEFT),
+  '*':(2,LEFT),
+  '/':(2,LEFT),
+  '^':(3,RIGHT),
+  '**':(3,RIGHT),
 }
 
 symbols={
@@ -38,6 +38,10 @@ UOP='UOP'   # unary operator
 SYM='SYM'   # symbol (variable or function)
 EXPR='EXPR' # expression (output of evaluate)
 CALL='CALL' # left paren after function name
+
+# associativity
+LEFT='LEFT'
+RIGHT='RIGHT'
 
 def mypow(a,b):
   if b>100000: # or maybe timeout
@@ -157,9 +161,13 @@ def getToken(s,lastType):
 
 def precedence(token):
   # get the precedence of a binary operator
-  return precedences[token[1]]
+  return opdata[token[1]][0]
 
+def rightassoc(op):
+  return opdata[token[1]][1]==RIGHT
 
+def leftassoc(op):
+  return opdata[token[1]][1]==LEFT
 
 def evaluate(expr):
   values=[]
@@ -209,7 +217,7 @@ def evaluate(expr):
         ops=ops[:-1]
         values[-1]=applyuop(op,values[-1])
     if token[0]==OP:
-      while len(ops)>0 and ops[-1][0] not in [LPAR,CALL] and precedence(ops[-1])>=precedence(token):
+      while len(ops)>0 and ops[-1][0] not in [LPAR,CALL] and (precedence(ops[-1])>precedence(token) or (precedence(ops[-1])==precedence(token) and leftassoc(ops[-1]))):
         # apply all operators to the left with a lower precedence
         op=ops[-1]
         ops=ops[:-1]
@@ -248,10 +256,12 @@ def stringifyexpr(e):
     p1=precedence(e)
     pleft=precedence(left) if left[0] in [OP,EXPR] else math.inf
     pright=precedence(right) if right[0] in [OP,EXPR] else math.inf
-    sleft = stringifyexpr(left)
-    if pleft < p1:
-      sleft = f'({sleft})'
-    sright = stringifyexpr(right)
-    if pright <= p1:
-      sright = f'({sright})'
+    leftparen=pleft<p1 or (pleft==p1 and rightassoc(op))
+    rightparen=pright<p1 or (pright==p1 and leftassoc(op))
+    sleft=stringifyexpr(left)
+    if leftparen:
+      sleft=f'({sleft})'
+    sright=stringifyexpr(right)
+    if rightparen:
+      sright=f'({sright})'
     return f'{sleft}{op}{sright}'
