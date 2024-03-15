@@ -61,6 +61,33 @@ class Admin(commands.Cog):
         for cachef in glob.glob("cache/log/cache-??-??-????.txt"):
             os.remove(cachef)
         await ctx.send("Done.")
+    
+    @commands.has_permissions(administrator=True)
+    @CogCommand("deleteerr")
+    async def deleteerr(self, ctx):
+        for errf in glob.glob("cache/log/error-*-??-??-????.txt"):
+            os.remove(errf)
+        await ctx.send("Done.")
+    
+    @CogCommand("viewerr")
+    async def viewerr(self, ctx, user: nextcord.User=None):
+        if user is None:
+            username=ctx.author.global_name
+        else:
+            username=user.global_name
+        for errf in glob.glob(f"cache/log/error-{username}-??-??-????.txt"):
+            with open(errf) as f:
+                parts=f.read().split('\n####:####\n')[:-1]
+                for part in parts:
+                    part=part.replace('`','ˋ') # nobody will notice
+                    try:
+                        await ctx.send('```\n'+part+'\n```')
+                    except nextcord.errors.HTTPException: # the error was too long
+                        part='\n'.join([x for x in part.split('\n') if not x.startswith('exctb-')])
+                        try:
+                            await ctx.send('```\n'+part+'\n```')
+                        except nextcord.errors.HTTPException: # the error was still too long
+                                await ctx.send('Error was too long.')
 
             
     
