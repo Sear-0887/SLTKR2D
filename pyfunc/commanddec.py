@@ -1,10 +1,8 @@
 import datetime
 import decorator
-import sys
 from pyfunc.lang import cmdi, evl
 from colorama import Fore, init
 from nextcord.ext import commands
-import time
 import traceback
 
 init() # colorama's init(), not assetload's
