@@ -30,7 +30,7 @@ def lprint(*values: object, sep: str | None = " ",end: str | None = "\n", ptnt: 
             values = time.strftime("%H:%M:%S", time.localtime()) + " | " + values
         fil.write(values)
     if ptnt:
-        print(values)
+        print(values,end='')
         
                     
 # load the command locale
