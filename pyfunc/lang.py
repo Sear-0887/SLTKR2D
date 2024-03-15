@@ -134,7 +134,7 @@ def botinit():
     os.makedirs(cfg('logFolder'), exist_ok=True) # logs folder (may be in cache)
     loadconfig()
     getkws()
+    loademoji() # needed for phraser
     phraser() # command locale
     getdevs()
     assetinit() # roody locale and blocks
-    loademoji()
