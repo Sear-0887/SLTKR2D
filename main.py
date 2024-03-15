@@ -36,7 +36,7 @@ async def help(ctx, cmdname=None,):
         for key in bot.commands:
             if key.name in helplist or helplist == []:
                 preparedlist.append(f"### {key.name} ({'/'.join(key.aliases)})")
-                preparedlist.append(f"{key.description}")
+                preparedlist.append(key.description)
         sembed = nextcord.Embed()
         sembed.title = evl("help","helplist","title")
         sembed.description = evl("help","helplist","desc").format("\n".join(preparedlist))
@@ -61,14 +61,14 @@ async def help(ctx, cmdname=None,):
             if cmdname in cmd.aliases or cmdname == cmd.name:
                 embed = nextcord.Embed()
                 embed.title = cmd.name
-                embed.description = evl(f"{cmdname}","desc")
-                embed.add_field(name="Syntax", value=evl(f"{cmd",f"name}","syntax"))
+                embed.description = evl(cmdname,"desc")
+                embed.add_field(name="Syntax", value=evl(cmd.name,"syntax"))
                 embed.add_field(name="Aliases", value=",\n".join(cmd.aliases))
                 embed.add_field(name="Cog", value='Main' if cmd.cog_name == None else cmd.cog_name)
                 await ctx.send(embed=embed)
                 return
         else:
-            await ctx.send(evl(f"{cmdname}","error"))
+            await ctx.send(evl(cmdname,"error"))
 
 # check if the bot is up
 @MainCommand(bot,"ping")
