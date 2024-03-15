@@ -63,7 +63,8 @@ def phraser():
 ]))
 
 # get a locale entry
-def evl(target, lang="en") -> str | list:
+def evl(*args, lang="en") -> str | list:
+    target = ".".join(args)
     try:
         return cmdi[lang][target]
     except:
@@ -90,9 +91,10 @@ def loadconfig():
         config['HostDCID'] = hostid
     return config
 
-def cfg(target):
+def cfg(*target):
     if config is None: loadconfig()
     base = config
+    target = ".".join(target)
     for tv in target.split("."):
         base = base[tv]
     return base
