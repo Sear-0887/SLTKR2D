@@ -38,5 +38,17 @@ Admin-Only Command.
 deletelog.error = Unable to delete all logs.
 deletelog.syntax = !deletelog
 
+## deleteerr
+deleteerr.aliases = [deerr]
+deleteerr.desc = Clear Error files. \
+Admin-Only Command.
 
+deleteerr.error = Unable to delete All Error files.
+deleteerr.syntax = !deleteerr
 
+## viewerr
+viewerr.aliases = [verr]
+viewerr.desc = View all Error files.
+
+viewerr.error = Unable to view.
+viewerr.syntax = !viewerr

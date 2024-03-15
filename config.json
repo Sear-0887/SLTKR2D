@@ -27,6 +27,7 @@
     "configPath": "config.json",
     "infoPath":{
         "devInfoPath": "json/devs.json",
-        "emojiInfoPath": "json/emoji.json"
+        "emojiInfoPath": "json/emoji.json",
+        "kwInfoPath": "json/kwlink.json"
     }
 }
