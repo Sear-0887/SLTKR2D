@@ -176,10 +176,10 @@ def precedence(token):
   return ops[token[1]][0]
 
 def rightassoc(op):
-  return ops[token[1]][1]==RIGHT
+  return ops[op][1]==RIGHT
 
 def leftassoc(op):
-  return ops[token[1]][1]==LEFT
+  return ops[op][1]==LEFT
 
 def evaluate(expr):
   values=[]
@@ -231,7 +231,7 @@ def evaluate(expr):
         ops=ops[:-1]
         values[-1]=applyuop(op,values[-1])
     if token[0]==OP:
-      while len(ops)>0 and ops[-1][0] not in [LPAR,CALL] and (precedence(ops[-1])>precedence(token) or (precedence(ops[-1])==precedence(token) and leftassoc(ops[-1]))):
+      while len(ops)>0 and ops[-1][0] not in [LPAR,CALL] and (precedence(ops[-1])>precedence(token) or (precedence(ops[-1])==precedence(token) and leftassoc(ops[-1][1]))):
         # apply all operators to the left with a lower precedence
         op=ops[-1]
         ops=ops[:-1]
