@@ -63,7 +63,8 @@ def phraser():
 ]))
 
 # get a locale entry
-def evl(target, lang="en") -> str | list:
+def evl(*args, lang="en") -> str | list:
+    target = ".".join(args)
     try:
         return cmdi[lang][target]
     except:

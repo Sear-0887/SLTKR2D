@@ -1,5 +1,4 @@
 import re
-import json
 import collections
 import pyfunc.smp as smp
 import glob
