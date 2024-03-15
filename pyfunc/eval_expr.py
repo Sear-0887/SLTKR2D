@@ -80,7 +80,7 @@ def applypop(op,v):
   if v[0]!=NUM:
     return [EXPR,op[1],v]
   if op[1]=='!':
-    return [NUM,factorial(v[1])]
+    return [NUM,math.factorial(v[1])]
   raise Exception('unrecognized postfix operator '+op[1])
 
 def applyfunc(f,v):
