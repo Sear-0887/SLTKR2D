@@ -38,9 +38,9 @@ def recursiveddict():
 cmdi = recursiveddict()
 
 def phraser():
-    for lang in os.listdir(cfg('local.localPath')):
-        for fname in os.listdir(os.path.join(cfg('local.localPath'),lang)): # you could filter for only .txt files
-            with open(os.path.join(cfg('local.localPath'),lang,fname)) as f:
+    for lang in os.listdir(cfg('locale.localePath')):
+        for fname in os.listdir(os.path.join(cfg('locale.localePath'),lang)): # you could filter for only .txt files
+            with open(os.path.join(cfg('locale.localePath'),lang,fname)) as f:
                 linesiter=iter(f)
                 for line in linesiter:
                     while line.endswith('\\\n'):
