@@ -12,6 +12,31 @@ from nextcord.ext import commands
 from pyfunc.lang import lprint
 from pyfunc.commanddec import CogCommand
 
+# rbcavi implementation
+smallprimes=[2,3,5,7,11,13,17,19] # i hope i didn't miss any
+# you can add more primes
+# just don't skip any
+
+def primefactor(n):
+    if n==1:
+        return {1:1}
+    factors=defaultdict(int) # a dict of primes to powers, all 0
+    for prime in smallprimes:
+        while n%prime==0: # assumes 1 isn't in the list
+            n//=prime
+            factors[prime]+=1
+    p=max(smallprimes) # assumes the maximum prime is odd
+    while n>1:
+        while n%p==0:
+            n//=p
+            factors[p]+=1
+        p+=2 # 100% faster!
+        if p*p>n: # sqrt is a bit slower
+            # n is now prime
+            if n!=1:
+                factors[n]+=1
+            break
+    return factors
 
 class Math(commands.Cog):
     def __init__(self, bot):
@@ -51,7 +76,7 @@ class Math(commands.Cog):
                 break
             formu = dif(formu)
             
-        await ctx.send(f"{formulae} = {formu}")   
+        await ctx.send(f"{formulae} = {formu}")
     
     @CogCommand("plot")
     async def plot(self, ctx:commands.Context, slope:int=3, yinter:int=3, min_:int=-20, max_:int=20):
@@ -68,50 +93,32 @@ class Math(commands.Cog):
         await ctx.send(file=nextcord.File("cache/plot.png", filename=f"{showy}.png"))
         plt.close()
     
-    # Copied from my old code, should run N (2≤N≤10^9) within 1 sec
     @CogCommand("prime")
-    async def prime(self, ctx, n:int=12):
+    async def prime(self, ctx:commands.Context, n:int=12):
+        if n <= 0: raise Exception('Cannot Factor Nonpositive Value')
         def handleexpo(expo) -> str:
-            if expo == 1: return ""
-            cvexp = ''.join(['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹'][int(digit)] for digit in str(expo))
-            return cvexp
-        start = time.perf_counter()
-        r = n
-        c = defaultdict(int)
-        if n <= 1:
-            c[n] = 1
-        else:
-            while n % 2 == 0:
-                n //= 2
-                c[2] += 1
-            i = 1
-            while n > 1:
-                i += 2
-                if i * i > n:
-                    c[n] += 1
-                    break
-                while n % i == 0:
-                    n //= i
-                    c[i] += 1
-        end = time.perf_counter()
-        print("DONE CALCULATING, HANDLING")
-        await ctx.send(f"{r} = {' * '.join([f'{base}{handleexpo(expo)}' for base, expo in c.items()])}")
-        print(f"{1000*(end - start):.3f} ms") 
-    # Near Same tested as !prime 
+            if expo==1:
+                return ''
+            return ''.join(list("⁰¹²³⁴⁵⁶⁷⁸⁹")[int(digit)] for digit in str(expo))
+        await ctx.send(f"{n} = {' * '.join([f'{p}{handleexpo(e)}' for p, e in primefactor(n).items()])}")
+        
     @CogCommand("factor")
     async def factor(self, ctx:commands.Context, n:int=12):
-        r = n
-        m = int(math.sqrt(n))
-        factor = []
-        for i in range(1, m + 1):
-            if n % i == 0:
-                factor.append(str(i))
-        if m * m == n:
-            m -= 1
-        for i in range(m, 0, -1):
-            if n % i == 0:
-                factor.append(str(n // i))
-        await ctx.send(f"{r} has {len(factor)} factors: \n{', '.join(factor)}")
+        if n <= 0: raise Exception('Cannot Factor Nonpositive Value')
+        pfactors=primefactor(n)
+        if math.prod([x+1 for x in pfactors.values()])>1_000_000:
+            raise Exception('Too Many Factors')
+        factors=[1]
+        for p,e in pfactors.items():
+            if p==1: # don't duplicate entries when 1 is present
+                continue
+            newfactors=[]
+            for i in range(e+1): # inclusive
+                factor=p**i
+                newfactors+=[factor*f for f in factors]
+            factors=newfactors
+        factors.sort() # in place sort
+        await ctx.send(f"{n} has {len(factors)} factors: \n{', '.join(map(str,factors))}")
         
 def setup(bot):
 	bot.add_cog(Math(bot))
