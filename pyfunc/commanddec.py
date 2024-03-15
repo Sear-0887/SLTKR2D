@@ -16,13 +16,13 @@ async def ErrorHandler(name, ctx, e, args, kwargs):
     # handle the error e
     # from a function call f(ctx,*args,**kwargs)
     # print a message with cool colors to the console
-    expecterr = evl(f"{name}",f"error")
+    expecterr = evl(f"{name}","error")
     try:
         expecterr = expecterr.format(*args, **kwargs)
     except:
         pass
     print(
-f'''
+'''
 {'-'*20}
 {RED}Exception: " {BLUE}{e} {RED}" 
 {RED}on {name} ({type(e)}).
@@ -63,8 +63,8 @@ def MainCommand(bot,name):
     def fixcmd(cmd):
         return bot.command(
             name        =        name, 
-            description = evl(f"{name}",f"desc"), 
-            aliases     = evl(f"{name}",f"aliases")
+            description = evl(f"{name}","desc"), 
+            aliases     = evl(f"{name}","aliases")
         )( trycmd(cmd) )
     return fixcmd
 
@@ -81,7 +81,7 @@ def CogCommand(name):
     def fixcmd(cmd):
         return commands.command(
             name        =        name, 
-            description = evl(f"{name}",f"desc"), 
-            aliases     = evl(f"{name}",f"aliases")
+            description = evl(f"{name}","desc"), 
+            aliases     = evl(f"{name}","aliases")
         )( trycmd(cmd) )
     return fixcmd

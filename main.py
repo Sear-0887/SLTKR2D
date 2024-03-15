@@ -61,14 +61,14 @@ async def help(ctx, cmdname=None,):
             if cmdname in cmd.aliases or cmdname == cmd.name:
                 embed = nextcord.Embed()
                 embed.title = cmd.name
-                embed.description = evl(f"{cmdname}",f"desc")
-                embed.add_field(name="Syntax", value=evl(f"{cmd",f"name}",f"syntax"))
+                embed.description = evl(f"{cmdname}","desc")
+                embed.add_field(name="Syntax", value=evl(f"{cmd",f"name}","syntax"))
                 embed.add_field(name="Aliases", value=",\n".join(cmd.aliases))
                 embed.add_field(name="Cog", value='Main' if cmd.cog_name == None else cmd.cog_name)
                 await ctx.send(embed=embed)
                 return
         else:
-            await ctx.send(evl(f"{cmdname}",f"error"))
+            await ctx.send(evl(f"{cmdname}","error"))
 
 # check if the bot is up
 @MainCommand(bot,"ping")
