@@ -63,34 +63,6 @@ def phraser():
             for name,data in keywords.items()
         ])) # aaaaaaaaaaaaaaaaaaaaaaaaaa
 
-# load the command locale
-def phraser():
-    for langpth in glob.glob("lang/*"):
-        lang = langpth[5:]
-        try: cmdi[lang]
-        except: cmdi[lang] = {}
-        for i in glob.glob("lang/en/*.txt"):
-            with open(i , "r") as f:
-                fc = re.sub(r"\\\s*\n", r"\\", f.read())
-                for line in fc.split("\n"):
-                    if line.startswith("##"): continue
-                    for expr, val in re.findall(r"^([\w.]+)\s*=\s*(.+)", line):
-                        val = val.replace("\\", "\n")
-                        if re.match(r"^\[.*\]$", val):
-                            val = val[1:-1].split(", ")
-                            if val == ['']: val = []
-                        val = replacemoji(val)
-                        cmdi[lang][expr] = val
-                        lprint(f"{(expr, val) =}")
-                    
-                        
-    print(cmdi['en']["help.aliases"])
-    # EXCEPTIONS
-    cmdi['en']["link.desc"] = cmdi['en']["link.desc"].format("".join([
-    f"{name} ({data['link']})\nKeywords: `{'`, `'.join(data['kw'])}`\n"
-    for name,data in keywords.items()
-]))
-
 # get a locale entry
 def evl(*args, lang="en") -> str | list:
     target = ".".join(args)
