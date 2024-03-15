@@ -11,6 +11,8 @@ import math
 
 uops=['-']
 
+pops=['!']
+
 # associativity
 LEFT='LEFT'
 RIGHT='RIGHT'
@@ -132,7 +134,10 @@ def getToken(s,lastType):
   # types accepted depand on last token
   # for example, can't have op after lpar
   ss=s.lstrip()
-  if lastType in [NUM,SYM,RPAR]:
+  if lastType in [NUM,SYM,RPAR,POP]:
+    for pop in pops:
+      if ss.startswith(pop):
+        return [POP,pop],ss[len(pop):]
     for op in ops:
       if ss.startswith(op):
         return [OP,op],ss[len(op):]
