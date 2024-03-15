@@ -8,14 +8,14 @@ from pyfunc.lang import cfg
 #rotate= 0    1    2      3
 
 blockpaths={}
-pthblocktexture = cfg("localGame.texture.texturePathFile")
+pthblocktexture = cfg("localGame","texture","texturePathFile")
 with open(pthblocktexture) as f:
   data=smp.getsmpvalue(f.read())
 for name,texture in data.items():
   blockpaths[name] = texture
 
 def getblockim(block):
-	return PIL.Image.open(os.path.join(cfg("localGame.texture.texturePathFolder"),blockpaths[block]))
+	return PIL.Image.open(os.path.join(cfg("localGame","texture","texturePathFolder"),blockpaths[block]))
 
 # https://stackoverflow.com/a/13054570
 class Block:

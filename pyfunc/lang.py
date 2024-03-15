@@ -97,7 +97,7 @@ def cfg(*args):
     return target
 
 def loademoji():
-    with open(cfg("infoPath.emojiInfoPath")) as f:
+    with open(cfg("infoPath","emojiInfoPath")) as f:
         global emojidict
         emojidict = json.load(f)
     return emojidict
@@ -109,12 +109,12 @@ def replacemoji(tar):
     return tar
 
 def getdevs():
-    with open(cfg("infoPath.devInfoPath")) as f:
+    with open(cfg("infoPath","devInfoPath")) as f:
         global devs
         devs = json.load(f)
 
 def getkws(): 
-    with open(cfg("infoPath.kwInfoPath")) as f:
+    with open(cfg("infoPath","kwInfoPath")) as f:
         global keywords
         keywords = json.load(f)
     return keywords

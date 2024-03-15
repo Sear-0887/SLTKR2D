@@ -10,7 +10,7 @@ blockinfos = collections.defaultdict(dict)
 
 locale = {}
 
-lang = cfg("localGame.language.en")
+lang = cfg("localGame","language","en")
 
 def capitalize(s):
     s=s[0].upper()+s[1:]
@@ -35,14 +35,14 @@ modifiers={
 }
 
 def getblockids():
-    with open(cfg("localGame.texture.blockIDFile")) as f:
+    with open(cfg("localGame","texture","blockIDFile")) as f:
         data=smp.getsmpvalue(f.read())
     for name,i in data.items():
         blockinfos[name]["id"] = int(i)
         idtoblock[int(i)] = name
 
 def geticoncoords():
-    with open(cfg("localGame.texture.iconLocationFile")) as f:
+    with open(cfg("localGame","texture","iconLocationFile")) as f:
         data=smp.getsmpvalue(f.read())
     for icon,xy in data.items():
         x,y=xy.split(',')
