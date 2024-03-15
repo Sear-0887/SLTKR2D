@@ -16,7 +16,7 @@ from datetime import datetime
 import glob
 import re
 from dotenv import dotenv_values
-cmdi = {}
+import collections
 config = None
 devs = None
 keywords = {}
@@ -31,11 +31,40 @@ def lprint(*values: object, sep: str | None = " ",end: str | None = "\n", ptnt: 
         fil.write(values)
     if ptnt:
         print(values,end='')
-        
-                    
+
+def recursiveddict():
+    return collections.defaultdict(recursiveddict)
+
+cmdi = recursiveddict()
+
+def phraser():
+    for lang in os.listdir(cfg('local.localPath')):
+        for fname in os.listdir(os.path.join(cfg('local.localPath'),lang)): # you could filter for only .txt files
+            with open(os.path.join(cfg('local.localPath'),lang,fname)) as f:
+                linesiter=iter(f)
+                for line in linesiter:
+                    while line.endswith('\\\n'):
+                        line=line[:-2].strip()+'\n'+next(linesiter) # add the next line to this if this line ends with a backslash
+                    line=re.sub('#.*$','',line) # remove comments
+                    if '=' not in line:
+                        continue
+                    key,value=line.split('=',maxsplit=1)
+                    value=value.strip()
+                    if value.startswith('[') and value.endswith(']'):
+                        value=[v.strip() for v in value[1:-1].split(',') if len(v.strip())>0]
+                    key=key.strip()
+                    cmdi[lang][key]=value
+        print(lang,cmdi[lang]["help.aliases"])
+    # EXCEPTIONS
+    # nooo not the exceptions
+    for lang in cmdi:
+        cmdi[lang]["link.desc"] = cmdi[lang]["link.desc"].format("".join([
+            f"{name} ({data['link']})\nKeywords: `{'`, `'.join(data['kw'])}`\n"
+            for name,data in keywords.items()
+        ])) # aaaaaaaaaaaaaaaaaaaaaaaaaa
+
 # load the command locale
 def phraser():
-    loademoji()
     for langpth in glob.glob("lang/*"):
         lang = langpth[5:]
         try: cmdi[lang]
@@ -131,3 +160,4 @@ def botinit():
     phraser() # command locale
     getdevs()
     assetinit() # roody locale and blocks
+    loademoji()
