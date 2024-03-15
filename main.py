@@ -20,7 +20,7 @@ TimeOn = datetime.datetime.now()
 
 
 # reload the command locale
-@MainCommand(bot, "reloadlocal")
+@MainCommand(bot, "reloadlocale")
 async def reloadlocal(ctx):
     phraser()
     for i in bot.commands:

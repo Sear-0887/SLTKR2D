@@ -50,9 +50,9 @@ credit.display = # Contributors \
 credit.error = :Fail: Failed :<
 credit.syntax = !credit
 
-# reloadlocal
-reloadlocal.aliases = []
-reloadlocal.desc = Reloads Locale
+# reloadlocale
+reloadlocale.aliases = [reloadlocal]
+reloadlocale.desc = Reloads Locale
 
-reloadlocal.error = :Fail: Unable to Reload Locale???
-reloadlocal.syntax = !reloadlocal
+reloadlocale.error = :Fail: Unable to Reload Locale???
+reloadlocale.syntax = !reloadlocale
