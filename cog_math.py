@@ -11,6 +11,7 @@ from collections import defaultdict
 from nextcord.ext import commands
 from pyfunc.lang import lprint
 from pyfunc.commanddec import CogCommand
+from pyfunc.eval_expr import evaluate,stringifyexpr
 
 
 class Math(commands.Cog):
@@ -18,40 +19,9 @@ class Math(commands.Cog):
         self.bot = bot
         
     @CogCommand("eval")
-    async def evalu(self, ctx:commands.Context, *, formulae="3 * ( 1 + 2 )"):
-        global formu
-        formu = formulae.replace(" ", "")
-        def dif(x): return int(x) if int(float(x)) == float(x) else float(x)
-        def removexcessbracket(formu):
-            while True:
-                elimb = re.findall(rf"\((\-?[\d\.]+)\)", formu)
-                if elimb: 
-                    elimb = elimb[0]
-                    print(f"{(formu, elimb)=}")
-                    formu = formu.replace(f"({elimb})", elimb)
-                else:
-                    break
-            return formu
-        while True:
-            print(f">>> {formu=}")
-            result = None
-            for operator in "^*/+-":
-                formu = removexcessbracket(formu)
-                result = re.findall(rf"(\-?[\d\.]+)([\+\-\*\/\^])(\-?[\d\.]+)", formu)
-                for f, operator, s in result:
-                    print(f, operator, s)
-                    if   operator == "^": operated = dif(f) ** dif(s)
-                    elif operator == "*": operated = dif(f) *  dif(s)
-                    elif operator == "/": operated = dif(f) /  dif(s)
-                    elif operator == "+": operated = dif(f) +  dif(s)
-                    elif operator == "-": operated = dif(f) -  dif(s)
-                    formu = formu.replace(f"{f}{operator}{s}", f"{operated}", 1)
-            if not result:
-                print("PROPERE")
-                break
-            formu = dif(formu)
-            
-        await ctx.send(f"{formulae} = {formu}")   
+    async def eval(self, ctx:commands.Context, *, formulae="3 * ( 1 + 2 )"):
+        result=evaluate(formulae)
+        await ctx.send(f"`{formulae} = {stringifyexpr(result)}`")
     
     @CogCommand("plot")
     async def plot(self, ctx:commands.Context, slope:int=3, yinter:int=3, min_:int=-20, max_:int=20):

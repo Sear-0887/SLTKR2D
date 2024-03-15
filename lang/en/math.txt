@@ -1,7 +1,7 @@
 # eval
 eval.aliases = [ev]
 eval.desc = Evaluate simple arithmetic expressions.\
-Only supports +, -, *, /, ^.
+Supports basic operations (+, -, \*, /, ^/\*\*), functions (ln, log, sqrt/√), and symbols (e, pi/π, i)
 
 eval.error = Unable to evaluate {formulae}.
 eval.syntax = !eval <expressionformula>
