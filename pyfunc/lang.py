@@ -55,14 +55,14 @@ def phraser():
                     key=tuple(key.strip().split('.'))
                     target=cmdi[lang]
                     print(key)
-                    for k in key[:-1]:
+                    for k in key:
                         target=target[k]
-                    target[key[-1]]=value
-        print(lang,cmdi[lang]["help"]["aliases"])
+                    target['.']=value
+        print(lang,cmdi[lang]["help"]["aliases"]['.'])
     # EXCEPTIONS
     # nooo not the exceptions
     for lang in cmdi:
-        cmdi[lang]["link"]["desc"] = cmdi[lang]["link"]["desc"].format("".join([
+        cmdi[lang]["link"]["desc"]['.'] = cmdi[lang]["link"]["desc"]['.'].format("".join([
             f"{name} ({data['link']})\nKeywords: `{'`, `'.join(data['kw'])}`\n"
             for name,data in keywords.items()
         ])) # aaaaaaaaaaaaaaaaaaaaaaaaaa
@@ -72,6 +72,7 @@ def evl(*args, lang="en") -> str | list:
     out=cmdi[lang]
     for key in args:
         out=out[key]
+    out=out['.']
     if isinstance(out,collections.defaultdict):
         return ''
     return out
