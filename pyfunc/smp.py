@@ -75,4 +75,5 @@ def _getsmpvalue(sinit):
         return s2,w.strip()
 
 def getsmpvalue(s):
+    # read an smp into a python object
     return _getsmpvalue(s)[1]
