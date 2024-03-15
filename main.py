@@ -3,7 +3,7 @@ import nextcord
 import datetime
 from pyfunc.lang import botinit, devs
 from nextcord.ext import commands
-from pyfunc.lang import cfg, cmdi, config, evl, keywords, loadconfig, phraser
+from pyfunc.lang import cfg, evl, keywords,  phraser
 from pyfunc.gettoken import gettoken
 from pyfunc.commanddec import MainCommand
 
@@ -20,7 +20,7 @@ TimeOn = datetime.datetime.now()
 
 
 # reload the command locale
-@MainCommand(bot, "reloadlocal")
+@MainCommand(bot, "reloadlocale")
 async def reloadlocal(ctx):
     phraser()
     for i in bot.commands:

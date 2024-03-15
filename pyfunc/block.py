@@ -1,4 +1,3 @@
-import PIL
 import PIL.Image
 import pyfunc.smp as smp
 import os
@@ -251,7 +250,7 @@ def canweld(side,block):
 	elif block['type'] in ['arc_furnace','beam_core','collector','creator','destroyer','dismantler','magnet','manipulator','mantler','teleportore']: # no top
 		sides=[False,True,True,True]
 	else:
-		return True
+		sides=[True,True,True,True]
 	i={'top':0,'bottom':2,'left':1,'right':3}[side]+4-block['rotate']
 	i=i%4
 	return sides[i] and block['weld'][{'top':0,'bottom':2,'left':1,'right':3}[side]]
@@ -260,7 +259,7 @@ def canweld(side,block):
 # blocks is a grid of blocks
 # autoweld makes it weld all possible unspecified welds
 # autoweld=False makes welds not autocorrect (for rendering roody structures)
-def makeimage(blocks,bsize=128,autoweld=True,debug=False):
+def makeimage(blocks,bsize=128,autoweld=True):
 	xsize=max(map(len,blocks))
 	ysize=len(blocks)
 
@@ -283,15 +282,19 @@ def makeimage(blocks,bsize=128,autoweld=True,debug=False):
 				weldleft=canweld('left',block) and canweld('right',get(newblocks,xi-1,yi))
 				weldbottom=canweld('bottom',block) and canweld('top',get(newblocks,xi,yi+1))
 				weldtop=canweld('top',block) and canweld('bottom',get(newblocks,xi,yi-1))
-				# cursed code
 				block['weld']=[
-					[
-						b and w,
-						print(f'welded side {i} not allowed on {block}\n'*(not w and debug),end='') # why
-					][0]
-					for i,b,w in
-					zip(range(4),block['weld'],[weldtop,weldleft,weldbottom,weldright])
+					b and w for b,w in 
+					zip(
+						block['weld'],
+						[weldtop,weldleft,weldbottom,weldright]
+					)
 				]
+				for i,b,w in zip(
+					range(4),
+					block['weld'],
+					[weldtop,weldleft,weldbottom,weldright]
+				):
+					print(f'welded side {i} not allowed on {block}\n'*(not w and b),end='')
 			if block['type']=='wire':
 				b=WireBlock('frame')
 			elif block['type']=='wire_board':
@@ -317,38 +320,12 @@ def makeimage(blocks,bsize=128,autoweld=True,debug=False):
 				b=TelecrossBlock()
 			else:
 				b=NormalBlock(block['type'])
-			if block['type'] in wiredtypes:
+			if block['type'] in wiretypes+wafertypes:
 				# check if sides are wired
 				block['weld'][0]=block['weld'][0] and (2 if get(newblocks,xi,yi-1)['type'] in wiredtypes else True)
 				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type'] in wiredtypes else True)
 				block['weld'][2]=block['weld'][2] and (2 if get(newblocks,xi,yi+1)['type'] in wiredtypes else True)
 				block['weld'][3]=block['weld'][3] and (2 if get(newblocks,xi+1,yi)['type'] in wiredtypes else True)
-				#block['weld'][0]=block['weld'][0] and 2
-				#block['weld'][1]=block['weld'][1] and 2
-				#block['weld'][2]=block['weld'][2] and 2
-				#block['weld'][3]=block['weld'][3] and 2
 			bim=b.draw(block['weld'],block['rotate'],size=bsize)
 			im.alpha_composite(bim,(xi*bsize,yi*bsize)) # paste the block
 	return im
-
-if __name__=='__main__':
-	blocks=[
-		['iron_bar',{"type":'wire_spool',"rotate":2,"weld":[False,False,True,False]}],
-		['air','iron_bar'],
-	]
-	im=makeimage(blocks)
-	im.show()
-	im.save('recipe.png')
-
-	blocks=[
-		['cast_iron',{"type":'wire_spool',"rotate":2,"weld":[False,False,True,False]}],
-		['cast_iron','cast_iron'],
-	]
-	leftspool={"type":'wire_spool',"rotate":1,"weld":[False,False,False,True]}
-	rightspool={"type":'wire_spool',"rotate":1,"weld":[False,True,False,False]}
-
-	blocks=[
-		[leftspool,'iron_bar',rightspool],
-		[leftspool,'iron_bar',rightspool],
-		[leftspool,'iron_bar',rightspool],
-	]
