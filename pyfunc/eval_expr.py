@@ -6,6 +6,10 @@
 # add it to the uops list
 # add a case in applyuop()
 
+# to add a postfix operator:
+# add it to the pops list
+# add a case in applypop()
+
 import re
 import math
 
