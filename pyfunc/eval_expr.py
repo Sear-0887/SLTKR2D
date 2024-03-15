@@ -11,6 +11,10 @@ import math
 
 uops=['-']
 
+# associativity
+LEFT='LEFT'
+RIGHT='RIGHT'
+
 ops={
   '+':(1,LEFT),
   '-':(1,LEFT),
@@ -35,10 +39,6 @@ UOP='UOP'   # unary operator
 SYM='SYM'   # symbol (variable or function)
 EXPR='EXPR' # expression (output of evaluate)
 CALL='CALL' # left paren after function name
-
-# associativity
-LEFT='LEFT'
-RIGHT='RIGHT'
 
 def mypow(a,b):
   if b>100000: # or maybe timeout
