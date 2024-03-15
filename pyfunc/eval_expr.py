@@ -73,6 +73,15 @@ def applyuop(op,v):
     return [NUM,-v[1]]
   raise Exception('unrecognized unary operator '+op[1])
 
+def applypop(op,v):
+  # apply op to v
+  # remember, they are both [type,value] pairs
+  if v[0]!=NUM:
+    return [EXPR,op[1],v]
+  if op[1]=='!':
+    return [NUM,factorial(v[1])]
+  raise Exception('unrecognized postfix operator '+op[1])
+
 def applyfunc(f,v):
   if v[0]!=NUM:
     return [EXPR,'(',f,v]
@@ -201,6 +210,8 @@ def evaluate(expr):
           values[-1]=[NUM,symbols[values[-1][1]]]
     if token[0]==UOP: # unary operator
       ops.append(token)
+    if token[0]==POP: # postfix operator
+      values[-1]=applypop(token,values[-1])
     if token[0]==RPAR: # right paren
       while ops[-1][0] not in [LPAR,CALL]: # finish the parenthesized expression
         op=ops[-1]
