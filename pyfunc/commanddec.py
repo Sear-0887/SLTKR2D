@@ -40,7 +40,7 @@ f'''
     await ctx.send(expecterr)
     with open(f"cache/log/error-{ctx.author.global_name}-{datetime.date.today():%d-%m-%Y}.txt", "a+") as fil:
         trigger = '\n'.join([f'Trigger Command: {s}' for s in ctx.message.clean_content.split('\n')])
-        arg = '\n'.join([f'Arg {i.zfill(2)}:'+s for i,arg in enumerate(args) for s in repr(arg).split('\n')])
+        arg = '\n'.join([f'Arg {str(i).zfill(2)}:'+s for i,arg in enumerate(args) for s in repr(arg).split('\n')])
         kwarg = '\n'.join([f'Kwarg "{k}": {s}' for _,(k,v) in enumerate(kwargs.items()) for s in repr(v).split('\n')])
         errname = ', '.join([f'{s}' for s in str(e).split('\n')])
         errline = '\n'.join([f'| {s}' for s in '\n'.join(traceback.format_exception(e)).split('\n')])

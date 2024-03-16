@@ -3,9 +3,10 @@ import nextcord
 import datetime
 from pyfunc.lang import botinit, devs
 from nextcord.ext import commands
-from pyfunc.lang import cfg, evl, keywords,  phraser
+from pyfunc.lang import cfg, evl, keywords, phraser, getkws
 from pyfunc.gettoken import gettoken
 from pyfunc.commanddec import MainCommand
+from pyfunc.block import get
 
 
 botinit()
@@ -15,8 +16,8 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 TimeOn = datetime.datetime.now()
 # initialize some things
-
-
+keywords = getkws()
+print(keywords)
 
 
 # reload the command locale

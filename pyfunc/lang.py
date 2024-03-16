@@ -120,6 +120,7 @@ def getkws():
     with open(cfg("infoPath.kwInfoPath")) as f:
         global keywords
         keywords = json.load(f)
+    print(keywords)
     return keywords
         
 def botinit():
@@ -127,7 +128,8 @@ def botinit():
     os.makedirs(cfg('cacheFolder'), exist_ok=True) # directory to put images and other output in
     os.makedirs(cfg('logFolder'), exist_ok=True) # logs folder (may be in cache)
     loadconfig()
-    getkws()
+    global keywords
+    keywords = getkws()
     phraser() # command locale
     getdevs()
     assetinit() # roody locale and blocks
