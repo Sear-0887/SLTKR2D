@@ -238,7 +238,7 @@ def stringifyexpr(e):
   if e[0] in [SYM,NUM]:
     return str(e[1])
   if e[1]=='(':
-    return f'{e[2]}({','.join(map(stringifyexpr,e[3:]))})'
+    return f'{e[2]}({",".join(map(stringifyexpr,e[3:]))})'
   if len(e)==3:
     if len(e[2])==4:
       return f'{e[1]}({stringifyexpr(e[2])})' # -(a+b)
