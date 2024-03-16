@@ -109,7 +109,7 @@ def getNum(s):
     return float(s[:m.end()]),s[m.end():]
   m=re.match(Intnumber,s)
   if m:
-    return int(s[:m.end()]),s[m.end():]
+    return int(s[:m.end()], base=0),s[m.end():] # Open to python to inter. the base
   return None,s
 
 def getSym(s):
