@@ -17,7 +17,6 @@ bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 TimeOn = datetime.datetime.now()
 # initialize some things
 keywords = getkws()
-print(keywords)
 
 
 # reload the command locale

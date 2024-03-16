@@ -120,7 +120,6 @@ def getkws():
     with open(cfg("infoPath.kwInfoPath")) as f:
         global keywords
         keywords = json.load(f)
-    print(keywords)
     return keywords
         
 def botinit():
