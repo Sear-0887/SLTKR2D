@@ -31,8 +31,21 @@ def lprint(*values: object, sep: str | None = " ",end: str | None = "\n", ptnt: 
         fil.write(values)
     if ptnt:
         print(values,end='')
-        
-                    
+
+def phraserfile(fname,lang):
+    with open(i , "r") as f:
+        fc = re.sub(r"\\\s*\n", r"\\", f.read())
+        for line in fc.split("\n"):
+            if line.startswith("##"): continue
+            for expr, val in re.findall(r"^([\w.]+)\s*=\s*(.+)", line):
+                val = val.replace("\\", "\n")
+                if re.match(r"^\[.*\]$", val):
+                    val = val[1:-1].split(", ")
+                    if val == ['']: val = []
+                val = replacemoji(val)
+                cmdi[lang][expr] = val
+                lprint(f"{(expr, val) =}")
+
 # load the command locale
 def phraser():
     loademoji()
@@ -41,18 +54,7 @@ def phraser():
         try: cmdi[lang]
         except: cmdi[lang] = {}
         for i in glob.glob("lang/en/*.txt"):
-            with open(i , "r") as f:
-                fc = re.sub(r"\\\s*\n", r"\\", f.read())
-                for line in fc.split("\n"):
-                    if line.startswith("##"): continue
-                    for expr, val in re.findall(r"^([\w.]+)\s*=\s*(.+)", line):
-                        val = val.replace("\\", "\n")
-                        if re.match(r"^\[.*\]$", val):
-                            val = val[1:-1].split(", ")
-                            if val == ['']: val = []
-                        val = replacemoji(val)
-                        cmdi[lang][expr] = val
-                        lprint(f"{(expr, val) =}")
+            phraserfile(i,lang)
                     
                         
     print(cmdi['en']["help.aliases"])
