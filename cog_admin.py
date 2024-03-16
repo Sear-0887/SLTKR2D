@@ -30,7 +30,7 @@ class Admin(commands.Cog):
             await ctx.send("cog_"+tar+".py is already loaded.")
         except commands.errors.ExtensionNotFound:
             await ctx.send("cog_"+tar+".py not found.")
-            
+
     @commands.has_permissions(administrator=True)
     @CogCommand("unloadcog")
     async def unloadcog(self,ctx, tar):
@@ -44,7 +44,7 @@ class Admin(commands.Cog):
             await ctx.send("cog_"+tar+".py is already unloaded.")
         except commands.errors.ExtensionNotFound:
             await ctx.send("cog_"+tar+".py not found.")
-            
+
     @commands.has_permissions(administrator=True)
     @CogCommand("reloadcog")
     async def reloadcog(self,ctx, tar):
@@ -53,22 +53,22 @@ class Admin(commands.Cog):
             self.bot.load_extension("cog_"+tar)
             await ctx.send("RELOADED "+"cog_"+tar+".py")
         except commands.errors.ExtensionNotFound:
-            await ctx.send("cog_"+tar+".py not found.")    
-    
+            await ctx.send("cog_"+tar+".py not found.")
+
     @commands.has_permissions(administrator=True)
     @CogCommand("deletelog")
     async def delog(self, ctx):
         for cachef in glob.glob("cache/log/cache-??-??-????.txt"):
             os.remove(cachef)
         await ctx.send("Done.")
-    
+
     @commands.has_permissions(administrator=True)
     @CogCommand("deleteerr")
     async def deleteerr(self, ctx):
         for errf in glob.glob("cache/log/error-*-??-??-????.txt"):
             os.remove(errf)
         await ctx.send("Done.")
-    
+
     @CogCommand("viewerr")
     async def viewerr(self, ctx, user: nextcord.User=None):
         if user is None:
@@ -89,7 +89,7 @@ class Admin(commands.Cog):
                         except nextcord.errors.HTTPException: # the error was still too long
                                 await ctx.send('Error was too long.')
 
-            
-    
+
+
 def setup(bot):
 	bot.add_cog(Admin(bot))

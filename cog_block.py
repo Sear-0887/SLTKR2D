@@ -13,7 +13,7 @@ import pyfunc.smp as smp
 class Block(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        
+
     @CogCommand("block")
     async def block(self,ctx, block=None):
         if block:
@@ -31,13 +31,13 @@ class Block(commands.Cog):
             embed.add_field(name="Block ID", value=binfo['id'])
             embed.add_field(name="Block Tutorial", value=locale[("BLOCK_TUTORIAL",block)])
             embed.set_image(url="attachment://blockim.png")
-            
+
             await ctx.send(file=nextcord.File("cache/blockim.png", filename="blockim.png"), embed=embed)
         else:
             await self.block(ctx, str(random.choice([*idtoblock.keys()])))
 
-    
-        
+
+
     #eswn
     @CogCommand("image")
     async def image(self,ctx, *, x="[[16][20]][[16][16]]"):
@@ -49,7 +49,7 @@ class Block(commands.Cog):
                 b=''.join(b.split()) # remove all whitespace
                 turn=0
                 weld=[True,True,True,True]
-                # either 
+                # either
                 #   block          normal
                 #   block#         normal
                 #   block#dir      set facing
@@ -77,6 +77,6 @@ class Block(commands.Cog):
         im=blockmakeimage(blocks,32)
         im.save("cache/blocks.png")
         await ctx.send(file=nextcord.File("cache/blocks.png", filename="f.png"))
-        
+
 def setup(bot):
 	bot.add_cog(Block(bot))

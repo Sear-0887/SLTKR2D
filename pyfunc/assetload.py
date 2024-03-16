@@ -74,7 +74,7 @@ def substitutelocale(s):
 
 def getlocale():
     # get locale entries from config.local_game.language_path
-    # a locale entry is 
+    # a locale entry is
     # category name = value
     # value can be continued across lines with a backslash (\)
     # comments beginning with # are ignored

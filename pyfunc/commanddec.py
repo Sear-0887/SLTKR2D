@@ -24,13 +24,13 @@ async def ErrorHandler(name, ctx, e, args, kwargs):
     print(
 f'''
 {'-'*20}
-{RED}Exception: " {BLUE}{e} {RED}" 
+{RED}Exception: " {BLUE}{e} {RED}"
 {RED}on {name} ({type(e)}).
 
 {BLUE}Passed Parameters:
 {ctx = },
 {args = },
-{kwargs = } 
+{kwargs = }
 
 {GREEN}Expected Error: "{expecterr}"
 {RESET}{'-'*20}
@@ -62,8 +62,8 @@ def MainCommand(bot,name):
         return decorator.decorate(cmd,_trycmd) # decorator preserves the signature of cmd
     def fixcmd(cmd):
         return bot.command(
-            name        =        name, 
-            description = evl(f"{name}.desc"), 
+            name        =        name,
+            description = evl(f"{name}.desc"),
             aliases     = evl(f"{name}.aliases")
         )( trycmd(cmd) )
     return fixcmd
@@ -80,8 +80,8 @@ def CogCommand(name):
         return decorator.decorate(cmd,_trycmd)
     def fixcmd(cmd):
         return commands.command(
-            name        =        name, 
-            description = evl(f"{name}.desc"), 
+            name        =        name,
+            description = evl(f"{name}.desc"),
             aliases     = evl(f"{name}.aliases")
         )( trycmd(cmd) )
     return fixcmd

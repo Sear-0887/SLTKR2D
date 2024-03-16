@@ -31,8 +31,8 @@ def lprint(*values: object, sep: str | None = " ",end: str | None = "\n", ptnt: 
         fil.write(values)
     if ptnt:
         print(values,end='')
-        
-                    
+
+
 # load the command locale
 def phraser():
     loademoji()
@@ -53,8 +53,8 @@ def phraser():
                         val = replacemoji(val)
                         cmdi[lang][expr] = val
                         lprint(f"{(expr, val) =}")
-                    
-                        
+
+
     print(cmdi['en']["help.aliases"])
     # EXCEPTIONS
     cmdi['en']["link.desc"] = cmdi['en']["link.desc"].format("".join([
@@ -69,7 +69,7 @@ def evl(*args, lang="en") -> str | list:
         return cmdi[lang][target]
     except:
         return ""
-    
+
 def handlehostid():
     raw = ""
     try:
@@ -116,12 +116,12 @@ def getdevs():
         global devs
         devs = json.load(f)
 
-def getkws(): 
+def getkws():
     with open(cfg("infoPath.kwInfoPath")) as f:
         global keywords
         keywords = json.load(f)
     return keywords
-        
+
 def botinit():
     from pyfunc.assetload import assetinit
     os.makedirs(cfg('cacheFolder'), exist_ok=True) # directory to put images and other output in
