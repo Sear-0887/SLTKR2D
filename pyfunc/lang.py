@@ -33,7 +33,7 @@ def lprint(*values: object, sep: str | None = " ",end: str | None = "\n", ptnt: 
         print(values,end='')
 
 def phraserfile(fname,lang):
-    with open(i , "r") as f:
+    with open(fname , "r") as f:
         fc = re.sub(r"\\\s*\n", r"\\", f.read())
         for line in fc.split("\n"):
             if line.startswith("##"): continue
