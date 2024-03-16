@@ -91,22 +91,22 @@ def applyfunc(f,v):
     return [NUM,math.log(v[1])]
   if f=='sqrt' or f=='√':
     return [NUM,math.sqrt(v[1])]
+  if f=='asin' or f == 'arcsin' or f == 'sin⁻¹':
+    return [NUM,math.asin(v[1])]
+  if f=='acos' or f == 'arccos' or f == 'cos⁻¹':
+    return [NUM,math.acos(v[1])]
+  if f=='atan' or f == 'arctan' or f == 'tan⁻¹':
+    return [NUM, math.atan(v[1])]
+  if f=='degree' or f=='deg':
+    return [NUM, math.degrees(v[1])]
+  if f=='radian' or f=='rad':
+    return [NUM, math.radians(v[1])]
   if f=='sin':
     return [NUM,math.sin(v[1])]
   if f=='cos':
     return [NUM,math.cos(v[1])]
   if f=='tan':
     return [NUM,math.tan(v[1])]
-  if f=='asin' or f == 'arcsin' or f == 'sin-1':
-    return [NUM,math.asin(v[1])]
-  if f=='acos' or f == 'arccos' or f == 'cos-1':
-    return [NUM,math.acos(v[1])]
-  if f=='atan' or f == 'arctan' or f == 'tan-1':
-    return [NUM, math.atan(v[1])]
-  if f=='degree' or f=='deg':
-    return [NUM, math.degrees(v[1])]
-  if f=='radian' or f=='rad':
-    return [NUM, math.radians(v[1])]
   return [EXPR,'(',f,v]
 
 # here starts RbCaVi's code
