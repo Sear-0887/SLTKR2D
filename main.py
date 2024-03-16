@@ -28,7 +28,7 @@ async def reloadlocal(ctx,module=None):
         #    i.update()
         await ctx.send("Done.")
     else:
-        phrasermodule(module)
+        found=phrasermodule(module)
         if found:
             await ctx.send("Done.")
         else:
