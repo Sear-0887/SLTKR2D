@@ -75,13 +75,14 @@ def apply(op,v1,v2):
 def applyuop(op,v):
   # apply op to v
   # remember, they are both [type,value] pairs
-  if v[0]!=NUM:
-    return [EXPR,op[1],v]
-  if op[1]=='-':
-    return [NUM,-v[1]]
+  if v[0] != NUM:
+    return [EXPR, op[1], v]
+  if op[1] == '-':
+    return [NUM, -v[1]]
   raise Exception('unrecognized unary operator '+op[1])
 
 def applyfunc(f,v):
+  print(f, v)
   if v[0]!=NUM:
     return [EXPR,'(',f,v]
   if f=='log':
@@ -90,6 +91,22 @@ def applyfunc(f,v):
     return [NUM,math.log(v[1])]
   if f=='sqrt' or f=='√':
     return [NUM,math.sqrt(v[1])]
+  if f=='sin':
+    return [NUM,math.sin(v[1])]
+  if f=='cos':
+    return [NUM,math.cos(v[1])]
+  if f=='tan':
+    return [NUM,math.tan(v[1])]
+  if f=='asin' or f == 'arcsin' or f == 'sin-1':
+    return [NUM,math.asin(v[1])]
+  if f=='acos' or f == 'arccos' or f == 'cos-1':
+    return [NUM,math.acos(v[1])]
+  if f=='atan' or f == 'arctan' or f == 'tan-1':
+    return [NUM, math.atan(v[1])]
+  if f=='degree' or f=='deg':
+    return [NUM, math.degrees(v[1])]
+  if f=='radian' or f=='rad':
+    return [NUM, math.radians(v[1])]
   return [EXPR,'(',f,v]
 
 # here starts RbCaVi's code
