@@ -91,11 +91,11 @@ def applyfunc(f,v):
     return [NUM,math.log(v[1])]
   if f=='sqrt' or f=='√':
     return [NUM,math.sqrt(v[1])]
-  if f=='asin' or f == 'arcsin' or f == 'sin⁻¹':
+  if f=='asin' or f == 'arcsin':
     return [NUM,math.asin(v[1])]
-  if f=='acos' or f == 'arccos' or f == 'cos⁻¹':
+  if f=='acos' or f == 'arccos':
     return [NUM,math.acos(v[1])]
-  if f=='atan' or f == 'arctan' or f == 'tan⁻¹':
+  if f=='atan' or f == 'arctan':
     return [NUM, math.atan(v[1])]
   if f=='degree' or f=='deg':
     return [NUM, math.degrees(v[1])]

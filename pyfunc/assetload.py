@@ -9,8 +9,6 @@ blockinfos = collections.defaultdict(dict)
 
 locale = {}
 
-lang = cfg("localGame.language.en")
-
 def capitalize(s):
     s=s[0].upper()+s[1:]
     return s
@@ -80,7 +78,7 @@ def getlocale():
     # category name = value
     # value can be continued across lines with a backslash (\)
     # comments beginning with # are ignored
-    for langname, langpath in lang.items():
+    for langname, langpath in cfg("localGame.language.en").items():
         for fname in glob.glob(langpath):
             with open(fname, "r") as f:
                 linesiter=iter(f)
