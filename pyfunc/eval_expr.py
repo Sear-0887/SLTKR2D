@@ -10,34 +10,40 @@
 import re
 import math
 
-ops=['+','-','**','*','/','^']
+ops = ["//", "div", "%", "mod", '^', '**', '*', '/','+', '-']
 
-uops=['-']
+uops = ['-']
 
-precedences={
+precedences = {
   '+':1,
   '-':1,
   '*':2,
   '/':2,
   '^':3,
   '**':3,
+  'mod': 4,
+  '%': 4,
+  'div': 5,
+  '//': 5
 }
 
 symbols={
-  'pi':math.pi,
-  'π':math.pi,
-  'e':math.e,
-  'i':1j,
+  'φ'  : (1 + 5 ** 0.5) / 2,
+  'phi': (1 + 5 ** 0.5) / 2,
+  'pi' : math.pi,
+  'π'  : math.pi,
+  'e'  : math.e,
+  'i'  : 1j,
 }
 # token types
-NUM='NUM'   # number
-LPAR='LPAR' # left paren
-RPAR='RPAR' # right paren
-OP='OP'     # binary operator
-UOP='UOP'   # unary operator
-SYM='SYM'   # symbol (variable or function)
-EXPR='EXPR' # expression (output of evaluate)
-CALL='CALL' # left paren after function name
+NUM  = 'NUM'   # number
+LPAR = 'LPAR'  # left paren
+RPAR = 'RPAR'  # right paren
+OP   = 'OP'    # binary operator
+UOP  = 'UOP'   # unary operator
+SYM  = 'SYM'   # symbol (variable or function)
+EXPR = 'EXPR'  # expression (output of evaluate)
+CALL = 'CALL'  # left paren after function name
 
 def mypow(a,b):
   if b>100000: # or maybe timeout
@@ -45,20 +51,25 @@ def mypow(a,b):
   return a**b
 
 def apply(op,v1,v2):
+  print(op, v1, v2)
   # apply op to v1 and v2
   # remember, they are all [type,value] pairs
-  if v1[0]!=NUM or v2[0]!=NUM:
-    return [EXPR,op[1],v1,v2]
-  if op[1]=='+':
-    return [NUM,v1[1]+v2[1]]
-  if op[1]=='-':
-    return [NUM,v1[1]-v2[1]]
-  if op[1]=='*':
-    return [NUM,v1[1]*v2[1]]
-  if op[1]=='/':
-    return [NUM,v1[1]/v2[1]]
-  if op[1]=='^' or op[1]=='**':
-    return [NUM,mypow(v1[1],v2[1])]
+  if v1[0] != NUM or v2[0] != NUM:
+    return [EXPR, op[1], v1, v2]
+  if op[1] == '+':
+    return [NUM, v1[1]+v2[1]]
+  if op[1] == '-':
+    return [NUM, v1[1]-v2[1]]
+  if op[1] == '*':
+    return [NUM, v1[1]*v2[1]]
+  if op[1] == '/':
+    return [NUM, v1[1]/v2[1]]
+  if op[1] == '^' or op[1] == '**':
+    return [NUM, mypow(v1[1],v2[1])]
+  if op[1] == '%' or op[1] == 'mod':
+    return [NUM, v1[1]%v2[1]]
+  if op[1] == r'//' or op[1] == 'div':
+    return [NUM, v1[1]//v2[1]]
   raise Exception('unrecognized binary operator '+op[1])
 
 def applyuop(op,v):
