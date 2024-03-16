@@ -1,18 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy
 import nextcord
-import random
 import math
-import re
 from pyfunc.math import primefactor
 from nextcord.ext import commands
-from pyfunc.lang import lprint
 from pyfunc.commanddec import CogCommand
 from pyfunc.eval_expr import evaluate,stringifyexpr
-
-
-
-
 
 class Math(commands.Cog):
     def __init__(self, bot):

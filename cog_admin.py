@@ -2,7 +2,6 @@ import glob
 import os
 import nextcord
 from nextcord.ext import commands
-from pyfunc.lang import evl
 from pyfunc.commanddec import CogCommand
 
 class Admin(commands.Cog):

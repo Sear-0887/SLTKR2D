@@ -3,21 +3,16 @@ import nextcord
 import datetime
 from pyfunc.lang import botinit, devs
 from nextcord.ext import commands
-from pyfunc.lang import cfg, evl, keywords,  phraser
+from pyfunc.lang import cfg, evl, keywords, phraser
 from pyfunc.gettoken import gettoken
 from pyfunc.commanddec import MainCommand
-
 
 botinit()
 intents = nextcord.Intents.default()
 intents.members = True
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
-TimeOn = datetime.datetime.now()
-# initialize some things
-
-
-
+TimeOn = None
 
 # reload the command locale
 @MainCommand(bot, "reloadlocale")

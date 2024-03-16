@@ -1,4 +1,4 @@
-from pyfunc.assetload import blockinfos, idtoblock as quickidtable,locale
+from pyfunc.assetload import blockinfos, idtoblock, locale
 import nextcord
 import random
 import re
@@ -6,7 +6,6 @@ from PIL import Image
 from nextcord.ext import commands
 from pyfunc.lang import cfg
 from pyfunc.commanddec import CogCommand
-from pyfunc.assetload import idtoblock
 from pyfunc.block import makeimage as blockmakeimage
 import pyfunc.smp as smp
 
@@ -36,9 +35,6 @@ class Block(commands.Cog):
         else:
             await self.block(ctx, str(random.choice([*idtoblock.keys()])))
 
-    
-        
-    #eswn
     @CogCommand("image")
     async def image(self,ctx, *, x="[[16][20]][[16][16]]"):
         blocks=smp.getsmpvalue(x)
