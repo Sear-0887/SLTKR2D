@@ -5,6 +5,7 @@ from nextcord.ext import commands
 from pyfunc.lang import evl
 from pyfunc.commanddec import CogCommand
 from collections import defaultdict
+from itertools import takewhile,count
 
 class Admin(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -79,13 +80,15 @@ class Admin(commands.Cog):
         async def senderr(err):
             values=defaultdict(list)
             for line in err.split('\n'):
+                if ':' not in line:
+                    continue
                 key,val=line.split(':',maxsplit=1)
                 values[key].append(val)
             values={key:'\n'.join(val) for key,val in values.items()}
             user=values['user-']
             time=values['time-']
             cmd=values['cmd-'].replace('`','ˋ')
-            args=[values[f'arg-{i}'] for i in takewhile(f'arg-{i}' in values for i in count())]
+            args=[values[f'arg-{i}'] for i in takewhile(lambda i:f'arg-{i}' in values,count())]
             exctb=values['exctb-'].replace('`','ˋ')
             exc=values['exc-']
             kwargs={k:v for k,v in values.items() if '-' not in k} # assuming here that - isn't allowed in kwargs
