@@ -7,6 +7,7 @@
 # add it to the uops list
 # add a case in applyuop()
 
+import re
 import math
 
 ops=['+','-','**','*','/','^']
@@ -28,6 +29,15 @@ symbols={
   'e':math.e,
   'i':1j,
 }
+# token types
+NUM='NUM'   # number
+LPAR='LPAR' # left paren
+RPAR='RPAR' # right paren
+OP='OP'     # binary operator
+UOP='UOP'   # unary operator
+SYM='SYM'   # symbol (variable or function)
+EXPR='EXPR' # expression (output of evaluate)
+CALL='CALL' # left paren after function name
 
 def mypow(a,b):
   if b>100000: # or maybe timeout
@@ -47,10 +57,7 @@ def apply(op,v1,v2):
     return [NUM,v1[1]*v2[1]]
   if op[1]=='/':
     return [NUM,v1[1]/v2[1]]
-  if op[1]=='**':
-    return [NUM,mypow(v1[1],v2[1])]
-  if op[1]=='^':
-    return [NUM,v1[1]**v2[1]]
+  if op[1]=='^' or op[1]=='**':
     return [NUM,mypow(v1[1],v2[1])]
   raise Exception('unrecognized binary operator '+op[1])
 
@@ -70,25 +77,12 @@ def applyfunc(f,v):
     return [NUM,math.log(v[1],10)]
   if f=='ln':
     return [NUM,math.log(v[1])]
-  if f=='sqrt':
-    return [NUM,math.sqrt(v[1])]
-  if f=='√':
+  if f=='sqrt' or f=='√':
     return [NUM,math.sqrt(v[1])]
   return [EXPR,'(',f,v]
-  #raise Exception('unrecognized function '+f)
 
-# here starts my code
-# please know what you are doing
-
-# token types
-NUM='NUM'   # number
-LPAR='LPAR' # left paren
-RPAR='RPAR' # right paren
-OP='OP'     # binary operator
-UOP='UOP'   # unary operator
-SYM='SYM'   # symbol (variable or function)
-EXPR='EXPR' # expression (output of evaluate)
-CALL='CALL' # left paren after function name
+# here starts RbCaVi's code
+# please know what you are doing, sear.
 
 # from cpython Tokenize.py
 def group(*choices): return '(' + '|'.join(choices) + ')'
@@ -107,8 +101,6 @@ Floatnumber = group(Pointfloat, Expfloat)
 Number = group(Floatnumber, Intnumber)
 # end from cpython Tokenize.py
 
-import re
-
 def getNum(s):
   # an actual number
   # not a variable
@@ -117,7 +109,7 @@ def getNum(s):
     return float(s[:m.end()]),s[m.end():]
   m=re.match(Intnumber,s)
   if m:
-    return int(s[:m.end()]),s[m.end():]
+    return int(s[:m.end()], base=0),s[m.end():] # Open to python to inter. the base
   return None,s
 
 def getSym(s):
@@ -167,11 +159,7 @@ def precedence(token):
   # get the precedence of a binary operator
   return precedences[token[1]]
 
-def rightassoc(op):
-  return False
 
-def leftassoc(op):
-  return True
 
 def evaluate(expr):
   values=[]
@@ -250,7 +238,7 @@ def stringifyexpr(e):
   if e[0] in [SYM,NUM]:
     return str(e[1])
   if e[1]=='(':
-    return f'{e[2]}({','.join(map(stringifyexpr,e[3:]))})'
+    return f'{e[2]}({",".join(map(stringifyexpr,e[3:]))})'
   if len(e)==3:
     if len(e[2])==4:
       return f'{e[1]}({stringifyexpr(e[2])})' # -(a+b)
@@ -260,12 +248,10 @@ def stringifyexpr(e):
     p1=precedence(e)
     pleft=precedence(left) if left[0] in [OP,EXPR] else math.inf
     pright=precedence(right) if right[0] in [OP,EXPR] else math.inf
-    leftparen=pleft<p1 or (pleft==p1 and rightassoc(op))
-    rightparen=pright<p1 or (pright==p1 and leftassoc(op))
-    sleft=stringifyexpr(left)
-    if leftparen:
-      sleft=f'({sleft})'
-    sright=stringifyexpr(right)
-    if rightparen:
-      sright=f'({sright})'
+    sleft = stringifyexpr(left)
+    if pleft < p1:
+      sleft = f'({sleft})'
+    sright = stringifyexpr(right)
+    if pright <= p1:
+      sright = f'({sright})'
     return f'{sleft}{op}{sright}'

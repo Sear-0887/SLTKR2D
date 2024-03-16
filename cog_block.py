@@ -21,7 +21,7 @@ class Block(commands.Cog):
                 block = idtoblock.get(int(block),'NIC')
             binfo=blockinfos[block]
             embed = nextcord.Embed()
-            pthblockzoo = cfg("localGame","textures","blockIconFile")
+            pthblockzoo = cfg("localGame","texture","blockIconFile")
             img = Image.open(pthblockzoo)
             icox, icoy = binfo["iconcoord"]
             img = img.crop((16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))).resize((128, 128), Image.NEAREST)
