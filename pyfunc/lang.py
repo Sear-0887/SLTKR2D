@@ -64,6 +64,16 @@ def phraser():
     for name,data in keywords.items()
 ]))
 
+def phrasermodule(module): # reloads the locale from one file in each locale folder
+    for langpth in glob.glob("lang/*"):
+        lang = langpth[5:]
+        try: cmdi[lang]
+        except: cmdi[lang] = {}
+        try:
+            phraserfile(os.path.join('lang',lang,module+'.txt'),lang)
+        except FileNotFoundError:
+            lprint("WARNING: locale for {module} in {lang} wasn't found")
+
 # get a locale entry
 def evl(*args, lang="en") -> str | list:
     target = ".".join(args)
