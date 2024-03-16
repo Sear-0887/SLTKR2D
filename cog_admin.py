@@ -4,6 +4,7 @@ import nextcord
 from nextcord.ext import commands
 from pyfunc.lang import evl
 from pyfunc.commanddec import CogCommand
+from collections import defaultdict
 
 class Admin(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -75,19 +76,37 @@ class Admin(commands.Cog):
             username=ctx.author.global_name
         else:
             username=user.global_name
+        async def senderr(err):
+            values=defaultdict(list)
+            for line in err.split('\n'):
+                key,val=line.split(':',maxsplit=1)
+                values[key].append(val)
+            values={key:'\n'.join(val) for key,val in values.items()}
+            user=values['user-']
+            time=values['time-']
+            cmd=values['cmd-'].replace('`','ˋ')
+            args=[values[f'arg-{i}'] for i in takewhile(f'arg-{i}' in values for i in count())]
+            exctb=values['exctb-'].replace('`','ˋ')
+            exc=values['exc-']
+            kwargs={k:v for k,v in values.items() if '-' not in k} # assuming here that - isn't allowed in kwargs
+            embed = nextcord.Embed()
+            embed.title = f'Error at {time}'
+            embed.description = f'Caused by {user}\nCommand line: `{cmd}`\nTraceback: ```{exctb}```'
+            for i,arg in enumerate(args):
+                embed.add_field(name=f"Argument {i+1}", value=arg)
+            for k,v in kwargs.items():
+                embed.add_field(name=f"Kwarg {k}", value=v)
+            if len(embed)>6000:
+                embed.description = f'Caused by {user}\nCommand line: `{cmd}`\nError message: ```{exc}```'
+            await ctx.send(embed=embed)
         for errf in glob.glob(f"cache/log/error-{username}-??-??-????.txt"):
             with open(errf) as f:
                 parts=f.read().split('\n####:####\n')[:-1]
                 for part in parts:
-                    part=part.replace('`','ˋ') # nobody will notice
                     try:
-                        await ctx.send('```\n'+part+'\n```')
-                    except nextcord.errors.HTTPException: # the error was too long
-                        part='\n'.join([x for x in part.split('\n') if not x.startswith('exctb-')])
-                        try:
-                            await ctx.send('```\n'+part+'\n```')
-                        except nextcord.errors.HTTPException: # the error was still too long
-                                await ctx.send('Error was too long.')
+                        await senderr(part)
+                    except nextcord.errors.HTTPException: # the error was still too long
+                        await ctx.send('Error was too long.')
 
             
     
