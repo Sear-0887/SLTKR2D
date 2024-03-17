@@ -120,7 +120,7 @@ class Admin(commands.Cog):
         if len(errs)==0:
             await ctx.send(f'No Error messages were found for {user.display_name}.')
         errs.sort(key=lambda x:datetime.datetime.fromisoformat(x[1]['time']))
-        errs=reversed(reversed(errs)[:count])
+        errs=[*reversed([*reversed(errs)][:count])]
         count = len(errs)
         print(f"printing {count} errors")
         for fname,err in errs:
