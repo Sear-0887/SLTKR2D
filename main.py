@@ -1,8 +1,9 @@
 import glob
 import nextcord
 import datetime
+import random
 from pyfunc.lang import botinit, devs
-from nextcord.ext import commands
+from nextcord.ext import commands, tasks
 from pyfunc.lang import cfg, evl, keywords, phraser, phrasermodule, getkws
 from pyfunc.gettoken import gettoken
 from pyfunc.commanddec import MainCommand
@@ -108,6 +109,12 @@ async def credit(ctx):
     devstr = '\n'.join([f'### [{dev["name"]}]({dev["github_link"]}){dev["desc"]}' for dev in devs])
     await ctx.send(evl("credit.display").format(devstr))
 
+@tasks.loop(seconds=60)
+async def changepresense():
+    allmessages = cfg("botInfo.Messages")
+    presense = nextcord.Game(random.choice(allmessages))
+    await bot.change_presence(status=nextcord.Status.online, activity=presense)
+
 # the bot is ready now
 @bot.event
 async def on_ready():
@@ -115,8 +122,7 @@ async def on_ready():
     print("Done.")
     global TimeOn
     TimeOn = datetime.datetime.now() # updating the real TimeOnline
-    presense = nextcord.Game("with Roody:2D")
-    await bot.change_presence(status=nextcord.Status.online, activity=presense)
+    changepresense.start()
 
 
 # get the bot token
