@@ -116,7 +116,7 @@ class Admin(commands.Cog):
             with open(filname) as jsonfil:
                 fil = json.load(jsonfil)
         except:
-            await ctx.send(f'No Error message is found by {user.display_name}.')
+            await ctx.send(f'No Error messages were found for {user.display_name}.')
         finally:
             count = min(count, len(fil)) # Prevent list index out of range
             print(f"printing {count} packet")
@@ -124,7 +124,7 @@ class Admin(commands.Cog):
                 try:
                     await senderr(errpkt, filname)
                 except nextcord.errors.HTTPException: # Error is STILL too long
-                    await ctx.send(f'An Error is too long to be displayed.\n Please view `{filname}` for more info.')
+                    await ctx.send(f'The Error is too long to be displayed.\n Please view `{filname}` for more info.')
 
             
     
