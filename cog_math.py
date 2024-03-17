@@ -1,9 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy
 import nextcord
-import random
 import math
-import re
 from pyfunc.math import primefactor
 from nextcord.ext import commands
 from pyfunc.lang import lprint

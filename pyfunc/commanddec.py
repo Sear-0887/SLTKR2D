@@ -47,27 +47,31 @@ f'''
 '''
     )
     await ctx.send(expecterr)
-    errorpacket = {}
-    errorpacket['user'] = {
-        "displayname": ctx.author.display_name,
-        "globalname": ctx.author.global_name,
-        'id': ctx.author.id,
-        "servername": ctx.guild.name
+    errorpacket = {
+        "user": {
+            "displayname": ctx.author.display_name,
+            "globalname": ctx.author.global_name,
+            'id': ctx.author.id,
+            "servername": ctx.guild.name
+        },
+        'time': datetime.datetime.now().isoformat(),
+        'trigger': ctx.message.clean_content.split('\n'),
+        'arg': args,
+        'kwarg': kwargs,
+        'errname': str(e).split('\n'),
+        'errline': '\n'.join(traceback.format_exception(e)).split("\n")
     }
-    errorpacket['time'] = datetime.datetime.now().isoformat()
-    errorpacket['trigger'] = ctx.message.clean_content.split('\n')
-    errorpacket['arg'] = args
-    errorpacket['kwarg'] = kwargs
-    errorpacket['errname'] = str(e).split('\n')
-    errorpacket['errline'] = '\n'.join(traceback.format_exception(e)).split("\n")
-    excstr = ""
     while e.__context__ or e.__cause__:
         e = e.__context__ or e.__cause__
         excstr = '\n'.join([f'exc-:{s}' for s in str(e).split('\n')]) + excstr
     errorpacket['excstr'] = excstr
     
     errfilname = f"cache/log/error-{ctx.author.global_name}-{datetime.date.today():%d-%m-%Y}.json"
-    with open(errfilname, "r") as fil:
+    try:
+        open(errfilname, "r+")
+    except:
+        open(errfilname, "w+")
+    with open(errfilname, "r+") as fil:
         prev = []
         try:
             prev = json.load(fil)
