@@ -24,7 +24,7 @@ keywords = {}
 # write_to_log, basically similar to print, with extra steps...
 # ptnt is print_to_normal_terminal, ats is add_timestamp
 def lprint(*values: object, sep: str | None = " ",end: str | None = "\n", ptnt: bool = False, ats: bool = True) -> None:
-    with open(f"cache/log/cache-{datetime.now():%d-%m-%Y}.txt", "a+") as fil:
+    with open(f"cache/log/cache-{datetime.now():%d-%m-%Y}.txt", "a+", encoding="utf-8") as fil:
         values = sep.join(list(map(str, values))) + end
         if ats:
             values = time.strftime("%H:%M:%S", time.localtime()) + " | " + values
@@ -33,7 +33,7 @@ def lprint(*values: object, sep: str | None = " ",end: str | None = "\n", ptnt: 
         print(values,end='')
 
 def phraserfile(fname,lang):
-    with open(fname , "r") as f:
+    with open(fname , "r", encoding='utf-8') as f:
         fc = re.sub(r"\\\s*\n", r"\\", f.read())
         for line in fc.split("\n"):
             if line.startswith("##"): continue

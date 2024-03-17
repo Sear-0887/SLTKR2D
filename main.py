@@ -68,6 +68,7 @@ async def help(ctx, cmdname=None):
         # search through the commands and their aliases
         for cmd in bot.commands:
             if cmdname in cmd.aliases or cmdname == cmd.name:
+                cmdname = cmd.name
                 embed = nextcord.Embed()
                 embed.title = cmd.name
                 embed.description = evl(f"{cmdname}.desc")

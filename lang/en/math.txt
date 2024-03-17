@@ -1,10 +1,10 @@
 # eval
 eval.aliases = [ev]
 eval.desc = Evaluate simple arithmetic expressions.\
-Supports:
+Supports: \
 * Basic operations (`+`, `-`, `*`, `/`, `^`/`**`)\
 * Functions (`ln`, `log`, `sqrt`/`√`)\
-* Symbols (`e`, `pi`/`π`, `i`)\
+* Symbols (`e`, `pi`/`π`, `i`, `phi`/`φ`)\
 * Factorial (`!`)
 
 eval.error = Unable to evaluate {formulae}.
