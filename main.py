@@ -72,7 +72,7 @@ async def help(ctx, cmdname=None):
                 cmdname = cmd.name
                 embed = nextcord.Embed()
                 embed.title = cmd.name
-                embed.description = evl(f"{cmdname}.desc")
+                embed.description = evl(f"{cmd.name}.desc")
                 embed.add_field(name="Syntax", value=evl(f"{cmd.name}.syntax"))
                 embed.add_field(name="Aliases", value=",\n".join(cmd.aliases))
                 embed.add_field(name="Cog", value='Main' if cmd.cog_name == None else cmd.cog_name)
