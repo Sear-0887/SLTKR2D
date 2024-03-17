@@ -44,7 +44,12 @@ f'''
         kwarg = '\n'.join([f'Kwarg "{k}": {s}' for _,(k,v) in enumerate(kwargs.items()) for s in repr(v).split('\n')])
         errname = ', '.join([f'{s}' for s in str(e).split('\n')])
         errline = '\n'.join([f'| {s}' for s in '\n'.join(traceback.format_exception(e)).split('\n')])
+        excstr = '\n'.join([f'exc-:{s}' for s in str(e).split('\n')])
+        while e.__context__ or e.__cause__:
+            e = e.__context__ or e.__cause__
+            excstr = '\n'.join([f'exc-:{s}' for s in str(e).split('\n')]) + excstr
         wholestr = f'''
+        
 User: {ctx.author.display_name}/{ctx.author.global_name} (<@{ctx.author.id}> in Server {ctx.guild.name})
 At: {datetime.datetime.now().isoformat()}'
 {trigger}
@@ -53,6 +58,7 @@ At: {datetime.datetime.now().isoformat()}'
 ExceptionName: " {errname} "
 Detail:
 {errline}
+Exc- {excstr}
         '''
         fil.write(wholestr)
         fil.write('\n####:####\n') # record separator

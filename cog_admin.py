@@ -4,6 +4,7 @@ import nextcord
 from nextcord.ext import commands
 from pyfunc.lang import evl
 from pyfunc.commanddec import CogCommand
+import datetime
 
 class Admin(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -70,16 +71,31 @@ class Admin(commands.Cog):
         await ctx.send("Done.")
     
     @CogCommand("viewerr")
-    async def viewerr(self, ctx, user: nextcord.User=None):
+    async def viewerr(self, ctx, user: nextcord.User=None, count: int=5):
         if user is None:
             username=ctx.author.global_name
         else:
             username=user.global_name
         for errf in glob.glob(f"cache/log/error-{username}-??-??-????.txt"):
+            parts=[]
             with open(errf) as f:
-                parts=f.read().split('\n####:####\n')[:-1]
-                for part in parts:
-                    part=part.replace('`','ˋ') # nobody will notice
+                parts+=f.read().split('\n####:####\n')[:-1]
+            partdates=[
+                (
+                    datetime.datetime.fromisoformat([
+                        line[6:] for line in part.split('\n')
+                        if line.startswith('time-:')
+                    ][0]),
+                    part
+                )
+                for part in parts
+            ]
+            for date,part in sorted(partdates)[-count:]:
+                part=part.replace('`','ˋ') # nobody will notice
+                try:
+                    await ctx.send('```\n'+part+'\n```')
+                except nextcord.errors.HTTPException: # the error was too long
+                    part='\n'.join([x for x in part.split('\n') if not x.startswith('exctb-')])
                     try:
                         await ctx.send('```\n'+part+'\n```')
                     except nextcord.errors.HTTPException: # the error was too long
