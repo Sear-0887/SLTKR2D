@@ -48,7 +48,8 @@ deleteerr.syntax = !deleteerr
 
 ## viewerr
 viewerr.aliases = [verr, viewerror, viewerrors]
-viewerr.desc = View all Error files.
+viewerr.desc = View <n> Error files produced by <user>. \
+<n> defaults to 1, <user> defaults to yourself.
 
 viewerr.error = Unable to view.
-viewerr.syntax = !viewerr
+viewerr.syntax = !viewerr <n> <user>
