@@ -58,13 +58,13 @@ f'''
         'trigger': ctx.message.clean_content,
         'arg': args,
         'kwarg': kwargs,
-        'errname': str(e).split('\n'),
         'errline': '\n'.join(traceback.format_exception(e))
     }
+    excstrs = [str(e)]
     while e.__context__ or e.__cause__:
         e = e.__context__ or e.__cause__
-        excstr = '\n'.join([f'exc-:{s}' for s in str(e).split('\n')]) + excstr
-    errorpacket['excstr'] = excstr
+        excstrs = [str(e),*excstrs]
+    errorpacket['excstr'] = '\n'.join(excstrs)
     
     errfilname = f"cache/log/error-{ctx.author.global_name}-{datetime.date.today():%d-%m-%Y}.json"
     try:
