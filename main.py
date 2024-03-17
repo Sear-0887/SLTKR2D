@@ -3,7 +3,7 @@ import nextcord
 import datetime
 from pyfunc.lang import botinit, devs
 from nextcord.ext import commands
-from pyfunc.lang import cfg, evl, keywords, phraser, phrasermodule
+from pyfunc.lang import cfg, evl, keywords, phraser, phrasermodule, getkws
 from pyfunc.gettoken import gettoken
 from pyfunc.commanddec import MainCommand
 from pyfunc.block import get
