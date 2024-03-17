@@ -56,8 +56,8 @@ f'''
         },
         'time': datetime.datetime.now().isoformat(),
         'trigger': ctx.message.clean_content,
-        'arg': args,
-        'kwarg': kwargs,
+        'arg': [repr(a) for a in args],
+        'kwarg': {k:repr(v) for k,v in kwargs.items()},
         'errline': '\n'.join(traceback.format_exception(e)),
         'errname': str(type(e)),
     }
