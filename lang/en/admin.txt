@@ -31,7 +31,7 @@ unloadcog.error = Unable to reach all cogs.
 unloadcog.syntax = !unloadcog
 
 ## deletelog
-deletelog.aliases = [delog, lgd, lgdelete]
+deletelog.aliases = [delog, lgd, lgdelete, dellog]
 deletelog.desc = Clear Log files. \
 Admin-Only Command.
 
@@ -39,7 +39,7 @@ deletelog.error = Unable to delete all logs.
 deletelog.syntax = !deletelog
 
 ## deleteerr
-deleteerr.aliases = [deerr]
+deleteerr.aliases = [deerr, delerr, errd, errdelete]
 deleteerr.desc = Clear Error files. \
 Admin-Only Command.
 
@@ -47,7 +47,7 @@ deleteerr.error = Unable to delete All Error files.
 deleteerr.syntax = !deleteerr
 
 ## viewerr
-viewerr.aliases = [verr]
+viewerr.aliases = [verr, viewerror, viewerrors]
 viewerr.desc = View all Error files.
 
 viewerr.error = Unable to view.
