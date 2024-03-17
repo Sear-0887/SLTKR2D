@@ -16,30 +16,29 @@ import math
 uops = ['-']
 pops=['!']
 
-# token types
-NUM  = 'NUM'   # number
-LPAR = 'LPAR'  # left paren
-RPAR = 'RPAR'  # right paren
-OP   = 'OP'    # binary operator
-UOP  = 'UOP'   # unary operator
-SYM  = 'SYM'   # symbol (variable or function)
-EXPR = 'EXPR'  # expression (output of evaluate)
-CALL = 'CALL'  # left paren after function name
-POP  = 'POP'   # postfix operator
-LEFT='LEFT'    # associativity of left
-RIGHT='RIGHT'  # associativity of right
+NUM   = 'NUM'   # Token: number
+LPAR  = 'LPAR'  # Token: left paren
+RPAR  = 'RPAR'  # Token: right paren
+OP    = 'OP'    # Token: binary operator
+UOP   = 'UOP'   # Token: unary operator
+SYM   = 'SYM'   # Token: symbol (variable or function)
+EXPR  = 'EXPR'  # Token: expression (output of evaluate)
+CALL  = 'CALL'  # Token: left paren after function name
+POP   = 'POP'   # Token: postfix operator
+LEFT  = 'LEFT'  # associativity: left
+RIGHT = 'RIGHT' # associativity: right
 
 ops={
-  '+':(1,LEFT),
-  '-':(1,LEFT),
-  '*':(2,LEFT),
-  '/':(2,LEFT),
-  '^':(3,RIGHT),
-  '**':(3,RIGHT),
-  'mod': (4,LEFT),
-  '%': (4,LEFT),
-  'div': (5,LEFT),
-  '//': (5,LEFT)
+  '//' : (5, LEFT ),
+  'div': (5, LEFT ),
+  '%'  : (4, LEFT ),
+  'mod': (4, LEFT ),
+  '**' : (3, RIGHT),
+  '^'  : (3, RIGHT),
+  '/'  : (2, LEFT ),
+  '*'  : (2, LEFT ),
+  '+'  : (1, LEFT ),
+  '-'  : (1, LEFT )
 }
 
 symbols={
@@ -74,7 +73,7 @@ def applyop(op,v1,v2):
     return [NUM, mypow(v1[1],v2[1])]
   if op[1] == '%' or op[1] == 'mod':
     return [NUM, v1[1]%v2[1]]
-  if op[1] == r'//' or op[1] == 'div':
+  if op[1] == '//' or op[1] == 'div':
     return [NUM, v1[1]//v2[1]]
   raise Exception('unrecognized binary operator '+op[1])
 
@@ -291,17 +290,17 @@ def stringifyexpr(e):
     return str(e[1])
   if e[1]=='(':
     return f'{e[2]}({",".join(map(stringifyexpr,e[3:]))})'
-  if len(e)==3:
-    if len(e[2])==4:
+  if len(e) == 3:
+    if len(e[2]) == 4:
       return f'{e[1]}({stringifyexpr(e[2])})' # -(a+b)
     return f'{e[1]}{stringifyexpr(e[2])}' # a
-  if len(e)==4:
-    _,op,left,right=e
-    p1=precedence(e)
-    pleft=precedence(left) if left[0] in [OP,EXPR] else math.inf
-    pright=precedence(right) if right[0] in [OP,EXPR] else math.inf
-    leftparen=pleft<p1 or (pleft==p1 and rightassoc(op))
-    rightparen=pright<p1 or (pright==p1 and leftassoc(op))
+  if len(e) == 4:
+    _,op,left,right = e
+    p1 = precedence(e)
+    pleft = precedence(left) if left[0] in [OP,EXPR] else math.inf
+    pright = precedence(right) if right[0] in [OP,EXPR] else math.inf
+    leftparen = pleft<p1 or (pleft==p1 and rightassoc(op))
+    rightparen = pright<p1 or (pright==p1 and leftassoc(op))
     sleft=stringifyexpr(left)
     if leftparen:
       sleft=f'({sleft})'
