@@ -52,7 +52,7 @@ credit.syntax = !credit
 
 # reloadlocale
 reloadlocale.aliases = [reloadlocal]
-reloadlocale.desc = Reloads Locale
+reloadlocale.desc = Reloads Locale for a module, or if no module is given, all locale
 
 reloadlocale.error = :Fail: Unable to Reload Locale???
-reloadlocale.syntax = !reloadlocale
+reloadlocale.syntax = !reloadlocale <module>
