@@ -82,11 +82,11 @@ class Admin(commands.Cog):
             # Values
             user=values['user']
             time=values['time']
-            cmd='\n'.join(values['trigger']).replace('`','ˋ')
+            cmd=values['trigger'].replace('`','ˋ')
             args=values['arg']
             kwargs=values['kwarg']
-            exctb='\n'.join(values['errline']).replace('`','ˋ')
-            exc='\n'.join(values['errname'])
+            exctb=values['errline'].replace('`','ˋ')
+            exc=values['errname']
             excstr = values['excstr']
             # Embed
             embed = nextcord.Embed()
