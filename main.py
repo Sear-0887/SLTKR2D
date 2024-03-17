@@ -67,17 +67,16 @@ async def help(ctx, cmdname=None):
         await ctx.send(embed=embed, view=view)
     else:
         # search through the commands and their aliases
-        for cmd in bot.commands:
-            if cmdname in cmd.aliases or cmdname == cmd.name:
-                cmdname = cmd.name
-                embed = nextcord.Embed()
-                embed.title = cmd.name
-                embed.description = evl(f"{cmd.name}.desc")
-                embed.add_field(name="Syntax", value=evl(f"{cmd.name}.syntax"))
-                embed.add_field(name="Aliases", value=",\n".join(cmd.aliases))
-                embed.add_field(name="Cog", value='Main' if cmd.cog_name == None else cmd.cog_name)
-                await ctx.send(embed=embed)
-                return
+        cmdnames=dict(alias:cmd.name for cmd in bot.commands for alias in cmd.aliases+[cmd.name])
+        if cmdname in cmdnames:
+            cmdname=cmdnames[cmdname]
+            embed = nextcord.Embed()
+            embed.title = cmd.name
+            embed.description = evl(f"{cmd.name}.desc")
+            embed.add_field(name="Syntax", value=evl(f"{cmd.name}.syntax"))
+            embed.add_field(name="Aliases", value=",\n".join(cmd.aliases))
+            embed.add_field(name="Cog", value='Main' if cmd.cog_name == None else cmd.cog_name)
+            await ctx.send(embed=embed)
         else:
             raise Exception("Couldn't find the command") # the decorator will handle it
 
