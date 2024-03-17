@@ -1,6 +1,5 @@
 import datetime
 import decorator
-import nextcord
 from pyfunc.lang import cmdi, evl
 from colorama import Fore, init
 from nextcord.ext import commands
@@ -62,7 +61,6 @@ Exc- {excstr}
         '''
         fil.write(wholestr)
         fil.write('\n####:####\n') # record separator
-    # raise e
 
 def MainCommand(bot,name):
     # bot command
