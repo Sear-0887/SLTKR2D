@@ -10,34 +10,40 @@
 import re
 import math
 
-ops=['+','-','**','*','/','^']
+ops = ["//", "div", "%", "mod", '^', '**', '*', '/','+', '-']
 
-uops=['-']
+uops = ['-']
 
-precedences={
+precedences = {
   '+':1,
   '-':1,
   '*':2,
   '/':2,
   '^':3,
   '**':3,
+  'mod': 4,
+  '%': 4,
+  'div': 5,
+  '//': 5
 }
 
 symbols={
-  'pi':math.pi,
-  'π':math.pi,
-  'e':math.e,
-  'i':1j,
+  'φ'  : (1 + 5 ** 0.5) / 2,
+  'phi': (1 + 5 ** 0.5) / 2,
+  'pi' : math.pi,
+  'π'  : math.pi,
+  'e'  : math.e,
+  'i'  : 1j,
 }
 # token types
-NUM='NUM'   # number
-LPAR='LPAR' # left paren
-RPAR='RPAR' # right paren
-OP='OP'     # binary operator
-UOP='UOP'   # unary operator
-SYM='SYM'   # symbol (variable or function)
-EXPR='EXPR' # expression (output of evaluate)
-CALL='CALL' # left paren after function name
+NUM  = 'NUM'   # number
+LPAR = 'LPAR'  # left paren
+RPAR = 'RPAR'  # right paren
+OP   = 'OP'    # binary operator
+UOP  = 'UOP'   # unary operator
+SYM  = 'SYM'   # symbol (variable or function)
+EXPR = 'EXPR'  # expression (output of evaluate)
+CALL = 'CALL'  # left paren after function name
 
 def mypow(a,b):
   if b>100000: # or maybe timeout
@@ -45,32 +51,38 @@ def mypow(a,b):
   return a**b
 
 def apply(op,v1,v2):
+  print(op, v1, v2)
   # apply op to v1 and v2
   # remember, they are all [type,value] pairs
-  if v1[0]!=NUM or v2[0]!=NUM:
-    return [EXPR,op[1],v1,v2]
-  if op[1]=='+':
-    return [NUM,v1[1]+v2[1]]
-  if op[1]=='-':
-    return [NUM,v1[1]-v2[1]]
-  if op[1]=='*':
-    return [NUM,v1[1]*v2[1]]
-  if op[1]=='/':
-    return [NUM,v1[1]/v2[1]]
-  if op[1]=='^' or op[1]=='**':
-    return [NUM,mypow(v1[1],v2[1])]
+  if v1[0] != NUM or v2[0] != NUM:
+    return [EXPR, op[1], v1, v2]
+  if op[1] == '+':
+    return [NUM, v1[1]+v2[1]]
+  if op[1] == '-':
+    return [NUM, v1[1]-v2[1]]
+  if op[1] == '*':
+    return [NUM, v1[1]*v2[1]]
+  if op[1] == '/':
+    return [NUM, v1[1]/v2[1]]
+  if op[1] == '^' or op[1] == '**':
+    return [NUM, mypow(v1[1],v2[1])]
+  if op[1] == '%' or op[1] == 'mod':
+    return [NUM, v1[1]%v2[1]]
+  if op[1] == r'//' or op[1] == 'div':
+    return [NUM, v1[1]//v2[1]]
   raise Exception('unrecognized binary operator '+op[1])
 
 def applyuop(op,v):
   # apply op to v
   # remember, they are both [type,value] pairs
-  if v[0]!=NUM:
-    return [EXPR,op[1],v]
-  if op[1]=='-':
-    return [NUM,-v[1]]
+  if v[0] != NUM:
+    return [EXPR, op[1], v]
+  if op[1] == '-':
+    return [NUM, -v[1]]
   raise Exception('unrecognized unary operator '+op[1])
 
 def applyfunc(f,v):
+  print(f, v)
   if v[0]!=NUM:
     return [EXPR,'(',f,v]
   if f=='log':
@@ -79,6 +91,22 @@ def applyfunc(f,v):
     return [NUM,math.log(v[1])]
   if f=='sqrt' or f=='√':
     return [NUM,math.sqrt(v[1])]
+  if f=='asin' or f == 'arcsin':
+    return [NUM,math.asin(v[1])]
+  if f=='acos' or f == 'arccos':
+    return [NUM,math.acos(v[1])]
+  if f=='atan' or f == 'arctan':
+    return [NUM, math.atan(v[1])]
+  if f=='degree' or f=='deg':
+    return [NUM, math.degrees(v[1])]
+  if f=='radian' or f=='rad':
+    return [NUM, math.radians(v[1])]
+  if f=='sin':
+    return [NUM,math.sin(v[1])]
+  if f=='cos':
+    return [NUM,math.cos(v[1])]
+  if f=='tan':
+    return [NUM,math.tan(v[1])]
   return [EXPR,'(',f,v]
 
 # here starts RbCaVi's code
@@ -109,7 +137,7 @@ def getNum(s):
     return float(s[:m.end()]),s[m.end():]
   m=re.match(Intnumber,s)
   if m:
-    return int(s[:m.end()]),s[m.end():]
+    return int(s[:m.end()], base=0),s[m.end():] # Open to python to inter. the base
   return None,s
 
 def getSym(s):
@@ -238,7 +266,7 @@ def stringifyexpr(e):
   if e[0] in [SYM,NUM]:
     return str(e[1])
   if e[1]=='(':
-    return f'{e[2]}({','.join(map(stringifyexpr,e[3:]))})'
+    return f'{e[2]}({",".join(map(stringifyexpr,e[3:]))})'
   if len(e)==3:
     if len(e[2])==4:
       return f'{e[1]}({stringifyexpr(e[2])})' # -(a+b)

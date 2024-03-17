@@ -1,4 +1,3 @@
-from pyfunc.assetload import blockinfos, idtoblock as quickidtable,locale
 import matplotlib.pyplot as plt
 import numpy
 import nextcord

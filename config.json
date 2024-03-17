@@ -10,15 +10,15 @@
         "language": {
             "en": {
                 "fullName": "English",
-                "path": "assets/localization/english_*.txt"
+                "path": "gameAssets/localization/english_*.txt"
             }
         },
         "texture": {
-            "texturePathFolder": "assets/textures/blocks",
-            "texturePathFile": "assets/block_textures.smp",
-            "blockIconFile": "assets/block_zoo.png",
-            "blockIDFile": "assets/block_id_.smp",
-            "iconLocationFile": "assets/block_icons.smp"
+            "texturePathFolder": "gameAssets/textures/blocks",
+            "texturePathFile": "gameAssets/block_textures.smp",
+            "blockIconFile": "gameAssets/block_zoo.png",
+            "blockIDFile": "gameAssets/block_id_.smp",
+            "iconLocationFile": "gameAssets/block_icons.smp"
         }
     },
     "TOKENPATH": "cred/.env",
