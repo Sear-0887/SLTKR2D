@@ -3,7 +3,7 @@ import nextcord
 import datetime
 from pyfunc.lang import botinit, devs
 from nextcord.ext import commands
-from pyfunc.lang import cfg, evl, keywords, phraser, getkws
+from pyfunc.lang import cfg, evl, keywords, phraser, phrasermodule
 from pyfunc.gettoken import gettoken
 from pyfunc.commanddec import MainCommand
 from pyfunc.block import get
@@ -21,11 +21,18 @@ keywords = getkws()
 
 # reload the command locale
 @MainCommand(bot, "reloadlocale")
-async def reloadlocal(ctx):
-    phraser()
-    #for i in bot.commands:
-    #    i.update()
-    await ctx.send("Done.")
+async def reloadlocal(ctx,module=None):
+    if module is None:
+        phraser()
+        #for i in bot.commands:
+        #    i.update()
+        await ctx.send("Done.")
+    else:
+        found=phrasermodule(module)
+        if found:
+            await ctx.send("Done.")
+        else:
+            await ctx.send(f"Did not find any locale files for {module}")
 
 # get help for a command or display info about the bot
 @MainCommand(bot,"help")
