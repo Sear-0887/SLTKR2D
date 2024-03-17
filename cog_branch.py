@@ -1,15 +1,4 @@
-from pyfunc.assetload import blockinfos, idtoblock as quickidtable,locale
-import matplotlib.pyplot as plt
-import numpy
-import nextcord
-import random
-import math
-import re
-import time
-from PIL import Image
-from collections import defaultdict
 from nextcord.ext import commands
-from pyfunc.lang import lprint
 from pyfunc.commanddec import CogCommand
 from pathlib import Path
 
