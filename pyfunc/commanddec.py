@@ -67,7 +67,11 @@ f'''
     errorpacket['excstr'] = excstr
     
     errfilname = f"cache/log/error-{ctx.author.global_name}-{datetime.date.today():%d-%m-%Y}.json"
-    with open(errfilname, "r") as fil:
+    try:
+        open(errfilname, "r+")
+    except:
+        open(errfilname, "w+")
+    with open(errfilname, "r+") as fil:
         prev = []
         try:
             prev = json.load(fil)
