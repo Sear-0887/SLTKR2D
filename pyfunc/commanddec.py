@@ -68,16 +68,12 @@ f'''
     
     errfilname = f"cache/log/error-{ctx.author.global_name}-{datetime.date.today():%d-%m-%Y}.json"
     try:
-        open(errfilname, "r+")
-    except:
-        open(errfilname, "w+")
-    with open(errfilname, "r+") as fil:
-        prev = []
-        try:
+        with open(errfilname, "r") as fil:
             prev = json.load(fil)
-        except: pass
+    except:
+        prev = []
     prev.append(errorpacket)
-    with open(errfilname, "w+") as fil:
+    with open(errfilname, "w") as fil:
         json.dump(prev, fil, indent=4)
 
 def MainCommand(bot,name):
