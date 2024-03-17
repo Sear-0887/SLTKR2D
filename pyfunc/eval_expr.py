@@ -13,15 +13,21 @@
 import re
 import math
 
-ops = ["//", "div", "%", "mod", '^', '**', '*', '/','+', '-']
-
 uops = ['-']
-
 pops=['!']
 
-# associativity
-LEFT='LEFT'
-RIGHT='RIGHT'
+# token types
+NUM  = 'NUM'   # number
+LPAR = 'LPAR'  # left paren
+RPAR = 'RPAR'  # right paren
+OP   = 'OP'    # binary operator
+UOP  = 'UOP'   # unary operator
+SYM  = 'SYM'   # symbol (variable or function)
+EXPR = 'EXPR'  # expression (output of evaluate)
+CALL = 'CALL'  # left paren after function name
+POP  = 'POP'   # postfix operator
+LEFT='LEFT'    # associativity of left
+RIGHT='RIGHT'  # associativity of right
 
 ops={
   '+':(1,LEFT),
@@ -44,23 +50,13 @@ symbols={
   'e'  : math.e,
   'i'  : 1j,
 }
-# token types
-NUM  = 'NUM'   # number
-LPAR = 'LPAR'  # left paren
-RPAR = 'RPAR'  # right paren
-OP   = 'OP'    # binary operator
-UOP  = 'UOP'   # unary operator
-SYM  = 'SYM'   # symbol (variable or function)
-EXPR = 'EXPR'  # expression (output of evaluate)
-CALL = 'CALL'  # left paren after function name
-POP  = 'POP'   # postfix operator
 
 def mypow(a,b):
   if b>100000: # or maybe timeout
     raise Exception('power too large')
   return a**b
 
-def apply(op,v1,v2):
+def applyop(op,v1,v2):
   print(op, v1, v2)
   # apply op to v1 and v2
   # remember, they are all [type,value] pairs
@@ -253,7 +249,7 @@ def evaluate(expr):
         ops=ops[:-1]
         v1,v2=values[-2:]
         values=values[:-2]
-        values.append(apply(op,v1,v2))
+        values.append(applyop(op,v1,v2))
       if ops[-1][0]==CALL:
         v1,v2=values[-2:]
         values=values[:-2]
@@ -271,7 +267,7 @@ def evaluate(expr):
         ops=ops[:-1]
         v1,v2=values[-2:]
         values=values[:-2]
-        values.append(apply(op,v1,v2))
+        values.append(applyop(op,v1,v2))
       ops.append(token) # push this operator
     lastType=token[0] # type of last token
     #print('s',s)
@@ -282,7 +278,7 @@ def evaluate(expr):
     ops=ops[:-1]
     v1,v2=values[-2:]
     values=values[:-2]
-    values.append(apply(op,v1,v2))
+    values.append(applyop(op,v1,v2))
   if len(values)>1: # each operator reduces the number of values by 1
     raise Exception('not enough operators')
   if len(values)==0: # how
