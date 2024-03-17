@@ -67,7 +67,7 @@ async def help(ctx, cmdname=None):
         await ctx.send(embed=embed, view=view)
     else:
         # search through the commands and their aliases
-        cmdnames=dict(alias:cmd.name for cmd in bot.commands for alias in cmd.aliases+[cmd.name])
+        cmdnames={alias:cmd.name for cmd in bot.commands for alias in cmd.aliases+[cmd.name]}
         if cmdname in cmdnames:
             cmdname=cmdnames[cmdname]
             embed = nextcord.Embed()
