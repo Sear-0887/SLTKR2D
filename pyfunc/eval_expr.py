@@ -1,11 +1,14 @@
 # to add a binary operator:
-# add it to the ops list
-# add it to precedences
+# add it to ops
 # add a case in apply()
 
 # to add an unary operator:
 # add it to the uops list
 # add a case in applyuop()
+
+# to add a postfix operator:
+# add it to the pops list
+# add a case in applypop()
 
 import re
 import math
@@ -14,17 +17,23 @@ ops = ["//", "div", "%", "mod", '^', '**', '*', '/','+', '-']
 
 uops = ['-']
 
-precedences = {
-  '+':1,
-  '-':1,
-  '*':2,
-  '/':2,
-  '^':3,
-  '**':3,
-  'mod': 4,
-  '%': 4,
-  'div': 5,
-  '//': 5
+pops=['!']
+
+# associativity
+LEFT='LEFT'
+RIGHT='RIGHT'
+
+ops={
+  '+':(1,LEFT),
+  '-':(1,LEFT),
+  '*':(2,LEFT),
+  '/':(2,LEFT),
+  '^':(3,RIGHT),
+  '**':(3,RIGHT),
+  'mod': (4,LEFT),
+  '%': (4,LEFT),
+  'div': (5,LEFT),
+  '//': (5,LEFT)
 }
 
 symbols={
@@ -44,6 +53,7 @@ UOP  = 'UOP'   # unary operator
 SYM  = 'SYM'   # symbol (variable or function)
 EXPR = 'EXPR'  # expression (output of evaluate)
 CALL = 'CALL'  # left paren after function name
+POP  = 'POP'   # postfix operator
 
 def mypow(a,b):
   if b>100000: # or maybe timeout
@@ -81,6 +91,15 @@ def applyuop(op,v):
     return [NUM, -v[1]]
   raise Exception('unrecognized unary operator '+op[1])
 
+def applypop(op,v):
+  # apply op to v
+  # remember, they are both [type,value] pairs
+  if v[0]!=NUM:
+    return [EXPR,op[1],v]
+  if op[1]=='!':
+    return [NUM,math.factorial(v[1])]
+  raise Exception('unrecognized postfix operator '+op[1])
+
 def applyfunc(f,v):
   print(f, v)
   if v[0]!=NUM:
@@ -91,11 +110,11 @@ def applyfunc(f,v):
     return [NUM,math.log(v[1])]
   if f=='sqrt' or f=='√':
     return [NUM,math.sqrt(v[1])]
-  if f=='asin' or f == 'arcsin' or f == 'sin⁻¹':
+  if f=='asin' or f == 'arcsin':
     return [NUM,math.asin(v[1])]
-  if f=='acos' or f == 'arccos' or f == 'cos⁻¹':
+  if f=='acos' or f == 'arccos':
     return [NUM,math.acos(v[1])]
-  if f=='atan' or f == 'arctan' or f == 'tan⁻¹':
+  if f=='atan' or f == 'arctan':
     return [NUM, math.atan(v[1])]
   if f=='degree' or f=='deg':
     return [NUM, math.degrees(v[1])]
@@ -159,7 +178,10 @@ def getToken(s,lastType):
   # types accepted depand on last token
   # for example, can't have op after lpar
   ss=s.lstrip()
-  if lastType in [NUM,SYM,RPAR]:
+  if lastType in [NUM,SYM,RPAR,POP]:
+    for pop in pops:
+      if ss.startswith(pop):
+        return [POP,pop],ss[len(pop):]
     for op in ops:
       if ss.startswith(op):
         return [OP,op],ss[len(op):]
@@ -185,9 +207,13 @@ def getToken(s,lastType):
 
 def precedence(token):
   # get the precedence of a binary operator
-  return precedences[token[1]]
+  return ops[token[1]][0]
 
+def rightassoc(op):
+  return ops[op][1]==RIGHT
 
+def leftassoc(op):
+  return ops[op][1]==LEFT
 
 def evaluate(expr):
   values=[]
@@ -219,6 +245,8 @@ def evaluate(expr):
           values[-1]=[NUM,symbols[values[-1][1]]]
     if token[0]==UOP: # unary operator
       ops.append(token)
+    if token[0]==POP: # postfix operator
+      values[-1]=applypop(token,values[-1])
     if token[0]==RPAR: # right paren
       while ops[-1][0] not in [LPAR,CALL]: # finish the parenthesized expression
         op=ops[-1]
@@ -237,7 +265,7 @@ def evaluate(expr):
         ops=ops[:-1]
         values[-1]=applyuop(op,values[-1])
     if token[0]==OP:
-      while len(ops)>0 and ops[-1][0] not in [LPAR,CALL] and precedence(ops[-1])>=precedence(token):
+      while len(ops)>0 and ops[-1][0] not in [LPAR,CALL] and (precedence(ops[-1])>precedence(token) or (precedence(ops[-1])==precedence(token) and leftassoc(ops[-1][1]))):
         # apply all operators to the left with a lower precedence
         op=ops[-1]
         ops=ops[:-1]
@@ -276,10 +304,12 @@ def stringifyexpr(e):
     p1=precedence(e)
     pleft=precedence(left) if left[0] in [OP,EXPR] else math.inf
     pright=precedence(right) if right[0] in [OP,EXPR] else math.inf
-    sleft = stringifyexpr(left)
-    if pleft < p1:
-      sleft = f'({sleft})'
-    sright = stringifyexpr(right)
-    if pright <= p1:
-      sright = f'({sright})'
+    leftparen=pleft<p1 or (pleft==p1 and rightassoc(op))
+    rightparen=pright<p1 or (pright==p1 and leftassoc(op))
+    sleft=stringifyexpr(left)
+    if leftparen:
+      sleft=f'({sleft})'
+    sright=stringifyexpr(right)
+    if rightparen:
+      sright=f'({sright})'
     return f'{sleft}{op}{sright}'

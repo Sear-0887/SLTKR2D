@@ -1,5 +1,6 @@
 import datetime
 import decorator
+import nextcord
 from pyfunc.lang import cmdi, evl
 from colorama import Fore, init
 from nextcord.ext import commands
@@ -12,7 +13,7 @@ GREEN = Fore.GREEN
 RESET = Fore.RESET
 
 
-async def ErrorHandler(name, ctx, e, args, kwargs):
+async def ErrorHandler(name, ctx:commands.Context, e, args, kwargs):
     # handle the error e
     # from a function call f(ctx,*args,**kwargs)
     # print a message with cool colors to the console
@@ -38,19 +39,28 @@ f'''
     )
     await ctx.send(expecterr)
     with open(f"cache/log/error-{ctx.author.global_name}-{datetime.date.today():%d-%m-%Y}.txt", "a+") as fil:
-        userstr = f'user-:{ctx.author.display_name}\n'
-        userstr += f'user-:{ctx.author.global_name}\n'
-        userstr += f'user-:{ctx.author.id}'
-        timestr = f'time-:{datetime.datetime.now().isoformat()}'
-        cmdstr = '\n'.join([f'cmd-:{s}' for s in ctx.message.clean_content.split('\n')])
-        argsstr = '\n'.join([f'arg-{i}:'+s for i,arg in enumerate(args) for s in repr(arg).split('\n')])
-        kwargsstr = '\n'.join([k+':'+s for i,(k,v) in enumerate(kwargs.items()) for s in repr(v).split('\n')])
-        exctbstr = '\n'.join(['exctb-:'+s for s in '\n'.join(traceback.format_exception(e)).split('\n')])
+        trigger = '\n'.join([f'Trigger Command: {s}' for s in ctx.message.clean_content.split('\n')])
+        arg = '\n'.join([f'Arg {str(i).zfill(2)}:'+s for i,arg in enumerate(args) for s in repr(arg).split('\n')])
+        kwarg = '\n'.join([f'Kwarg "{k}": {s}' for _,(k,v) in enumerate(kwargs.items()) for s in repr(v).split('\n')])
+        errname = ', '.join([f'{s}' for s in str(e).split('\n')])
+        errline = '\n'.join([f'| {s}' for s in '\n'.join(traceback.format_exception(e)).split('\n')])
         excstr = '\n'.join([f'exc-:{s}' for s in str(e).split('\n')])
         while e.__context__ or e.__cause__:
             e = e.__context__ or e.__cause__
             excstr = '\n'.join([f'exc-:{s}' for s in str(e).split('\n')]) + excstr
-        fil.write('\n'.join([userstr,timestr,cmdstr,argsstr,kwargsstr,exctbstr,excstr]))
+        wholestr = f'''
+        
+User: {ctx.author.display_name}/{ctx.author.global_name} (<@{ctx.author.id}> in Server {ctx.guild.name})
+At: {datetime.datetime.now().isoformat()}'
+{trigger}
+{arg}
+{kwarg}
+ExceptionName: " {errname} "
+Detail:
+{errline}
+Exc- {excstr}
+        '''
+        fil.write(wholestr)
         fil.write('\n####:####\n') # record separator
     # raise e
 

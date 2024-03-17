@@ -3,9 +3,10 @@ import nextcord
 import datetime
 from pyfunc.lang import botinit, devs
 from nextcord.ext import commands
-from pyfunc.lang import cfg, evl, keywords,  phraser
+from pyfunc.lang import cfg, evl, keywords, phraser, phrasermodule
 from pyfunc.gettoken import gettoken
 from pyfunc.commanddec import MainCommand
+from pyfunc.block import get
 
 
 botinit()
@@ -15,28 +16,36 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 TimeOn = datetime.datetime.now()
 # initialize some things
-
-
+keywords = getkws()
 
 
 # reload the command locale
 @MainCommand(bot, "reloadlocale")
-async def reloadlocal(ctx):
-    phraser()
-    for i in bot.commands:
-        i.update()
-    await ctx.send("Done.")
+async def reloadlocal(ctx,module=None):
+    if module is None:
+        phraser()
+        #for i in bot.commands:
+        #    i.update()
+        await ctx.send("Done.")
+    else:
+        found=phrasermodule(module)
+        if found:
+            await ctx.send("Done.")
+        else:
+            await ctx.send(f"Did not find any locale files for {module}")
 
 # get help for a command or display info about the bot
 @MainCommand(bot,"help")
-async def help(ctx, cmdname=None,):
-    async def gethelplist(interaction:nextcord.Interaction, helplist:list|str=[]):
-        author = interaction.user
+async def help(ctx, cmdname=None):
+    async def gethelplist(interaction:nextcord.Interaction):
         preparedlist = []
-        for key in bot.commands:
-            if key.name in helplist or helplist == []:
-                preparedlist.append(f"### {key.name} ({'/'.join(key.aliases)})")
-                preparedlist.append(f"{key.description}")
+        for cmd in bot.commands:
+            s=f"### !{cmd.name}"
+            if len(cmd.aliases)>0: # don't have empty parens
+                s+=f" ({'/'.join(cmd.aliases)})"
+            s+=f"\n"
+            s+=f"{cmd.description}"
+            preparedlist.append(s)
         sembed = nextcord.Embed()
         sembed.title = evl("help.helplist.title")
         sembed.description = evl("help.helplist.desc").format("\n".join(preparedlist))
@@ -68,7 +77,7 @@ async def help(ctx, cmdname=None,):
                 await ctx.send(embed=embed)
                 return
         else:
-            await ctx.send(evl(f"{cmdname}.error"))
+            raise Exception("Couldn't find the command") # the decorator will handle it
 
 # check if the bot is up
 @MainCommand(bot,"ping")

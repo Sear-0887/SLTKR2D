@@ -31,8 +31,21 @@ def lprint(*values: object, sep: str | None = " ",end: str | None = "\n", ptnt: 
         fil.write(values)
     if ptnt:
         print(values,end='')
-        
-                    
+
+def phraserfile(fname,lang):
+    with open(fname , "r") as f:
+        fc = re.sub(r"\\\s*\n", r"\\", f.read())
+        for line in fc.split("\n"):
+            if line.startswith("##"): continue
+            for expr, val in re.findall(r"^([\w.]+)\s*=\s*(.+)", line):
+                val = val.replace("\\", "\n")
+                if re.match(r"^\[.*\]$", val):
+                    val = val[1:-1].split(", ")
+                    if val == ['']: val = []
+                val = replacemoji(val)
+                cmdi[lang][expr] = val
+                lprint(f"{(expr, val) =}")
+
 # load the command locale
 def phraser():
     loademoji()
@@ -41,18 +54,7 @@ def phraser():
         try: cmdi[lang]
         except: cmdi[lang] = {}
         for i in glob.glob("lang/en/*.txt"):
-            with open(i , "r") as f:
-                fc = re.sub(r"\\\s*\n", r"\\", f.read())
-                for line in fc.split("\n"):
-                    if line.startswith("##"): continue
-                    for expr, val in re.findall(r"^([\w.]+)\s*=\s*(.+)", line):
-                        val = val.replace("\\", "\n")
-                        if re.match(r"^\[.*\]$", val):
-                            val = val[1:-1].split(", ")
-                            if val == ['']: val = []
-                        val = replacemoji(val)
-                        cmdi[lang][expr] = val
-                        lprint(f"{(expr, val) =}")
+            phraserfile(i,lang)
                     
                         
     print(cmdi['en']["help.aliases"])
@@ -61,6 +63,19 @@ def phraser():
     f"{name} ({data['link']})\nKeywords: `{'`, `'.join(data['kw'])}`\n"
     for name,data in keywords.items()
 ]))
+
+def phrasermodule(module): # reloads the locale from one file in each locale folder
+    found=False # did it find any locale files?
+    for langpth in glob.glob("lang/*"):
+        lang = langpth[5:]
+        try: cmdi[lang]
+        except: cmdi[lang] = {}
+        try:
+            phraserfile(os.path.join('lang',lang,module+'.txt'),lang)
+            found=True
+        except FileNotFoundError:
+            lprint(f"WARNING: locale for {module} in {lang} wasn't found")
+    return found
 
 # get a locale entry
 def evl(*args, lang="en") -> str | list:
@@ -127,7 +142,8 @@ def botinit():
     os.makedirs(cfg('cacheFolder'), exist_ok=True) # directory to put images and other output in
     os.makedirs(cfg('logFolder'), exist_ok=True) # logs folder (may be in cache)
     loadconfig()
-    getkws()
+    global keywords
+    keywords = getkws()
     phraser() # command locale
     getdevs()
     assetinit() # roody locale and blocks
