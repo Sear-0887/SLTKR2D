@@ -55,11 +55,11 @@ f'''
             "servername": ctx.guild.name
         },
         'time': datetime.datetime.now().isoformat(),
-        'trigger': ctx.message.clean_content.split('\n'),
+        'trigger': ctx.message.clean_content,
         'arg': args,
         'kwarg': kwargs,
         'errname': str(e).split('\n'),
-        'errline': '\n'.join(traceback.format_exception(e)).split("\n")
+        'errline': '\n'.join(traceback.format_exception(e))
     }
     while e.__context__ or e.__cause__:
         e = e.__context__ or e.__cause__
