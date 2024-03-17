@@ -70,7 +70,7 @@ class Admin(commands.Cog):
     @commands.has_permissions(administrator=True)
     @CogCommand("deleteerr")
     async def deleteerr(self, ctx):
-        for errf in glob.glob("cache/log/error-*-??-??-????.txt"):
+        for errf in glob.glob("cache/log/error-*-??-??-????.json"):
             os.remove(errf)
         await ctx.send("Done.")
     
