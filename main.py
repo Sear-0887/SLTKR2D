@@ -23,8 +23,8 @@ keywords = getkws()
 @MainCommand(bot, "reloadlocale")
 async def reloadlocal(ctx):
     phraser()
-    for i in bot.commands:
-        i.update()
+    #for i in bot.commands:
+    #    i.update()
     await ctx.send("Done.")
 
 # get help for a command or display info about the bot
