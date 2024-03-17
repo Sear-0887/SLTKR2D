@@ -58,7 +58,8 @@ f'''
         'trigger': ctx.message.clean_content,
         'arg': args,
         'kwarg': kwargs,
-        'errline': '\n'.join(traceback.format_exception(e))
+        'errline': '\n'.join(traceback.format_exception(e)),
+        'errname': str(type(e)),
     }
     excstrs = [str(e)]
     while e.__context__ or e.__cause__:
