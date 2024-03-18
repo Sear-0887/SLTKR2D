@@ -61,10 +61,6 @@ f'''
         'errname': str(e).split('\n'),
         'errline': '\n'.join(traceback.format_exception(e)).split("\n")
     }
-    while e.__context__ or e.__cause__:
-        e = e.__context__ or e.__cause__
-        excstr = '\n'.join([f'exc-:{s}' for s in str(e).split('\n')]) + excstr
-    errorpacket['excstr'] = excstr
     
     errfilname = f"cache/log/error-{ctx.author.global_name}-{datetime.date.today():%d-%m-%Y}.json"
     try:

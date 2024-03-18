@@ -113,6 +113,7 @@ async def credit(ctx):
 async def changepresense():
     allmessages = cfg("botInfo.Messages")
     presense = nextcord.Game(random.choice(allmessages))
+    print(f"Changed Presence to {presense}")
     await bot.change_presence(status=nextcord.Status.online, activity=presense)
 
 # the bot is ready now
