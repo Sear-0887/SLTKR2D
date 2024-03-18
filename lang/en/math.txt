@@ -11,6 +11,7 @@ eval.error = Unable to evaluate {formulae}.
 eval.error.KeyError = An unrecognized {0} operator is present: {1}
 eval.error.TimeoutError = An power operator is too large: {0} ** {1}
 eval.error.ArithmeticError = No such types of operation(s): {e}
+eval.error.ValueError = An Operator doesn't have a 2nd operand.
 eval.syntax = !eval <expressionformula>
 
 # plot
