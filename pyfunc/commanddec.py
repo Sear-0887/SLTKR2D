@@ -1,5 +1,6 @@
 import datetime
 import decorator
+import json
 from pyfunc.lang import cmdi, evl
 from colorama import Fore, init
 from nextcord.ext import commands
@@ -11,15 +12,38 @@ BLUE = Fore.BLUE
 GREEN = Fore.GREEN
 RESET = Fore.RESET
 
-
-async def ErrorHandler(name, ctx, e, args, kwargs):
+# User: {errorpacket['user']['displayname']}/{errorpacket['user']['globalname']}
+# | (<@{errorpacket['user']['id']}> in Server {errorpacket['user']['servername']})
+# At: {errorpacket['time']}'
+# {errorpacket['trigger']}
+# {errorpacket['arg']}
+# {errorpacket['kwarg']}
+# ExceptionName: " {errorpacket['errname']} "
+# Detail:
+# {errorpacket['errline']}
+# Exc- {excstr}
+async def ErrorHandler(name, ctx:commands.Context, e, args, kwargs):
     # handle the error e
     # from a function call f(ctx,*args,**kwargs)
     # print a message with cool colors to the console
     expecterr = evl(f"{name}.error")
+    errortype = repr(type(e)).split("\'")[1] # <class '[KeyError]'>
+    replacingerror = evl(f"{name}.error.{errortype}")
+    if replacingerror:
+        print(f"Other Error Message found for {name}: {replacingerror}")
+        expecterr = replacingerror
     try:
-        expecterr = expecterr.format(*args, **kwargs)
-    except:
+        print(f"{e.args=}")
+        eargs = e.args[0]
+        print(eargs)
+        if isinstance(eargs, str):
+            expecterr = expecterr.format(*args, e=eargs, **kwargs)
+        elif isinstance(eargs, list):
+            expecterr = expecterr.format(*args, *eargs, **kwargs)
+        elif type(eargs) == dict:
+            expecterr = expecterr.format(*args, **eargs, **kwargs)
+    except Exception as EX:
+        print(EX)
         pass
     print(
 f'''
@@ -37,19 +61,34 @@ f'''
 '''
     )
     await ctx.send(expecterr)
-    with open(f"cache/log/error-{ctx.author.global_name}-{datetime.date.today():%d-%m-%Y}.txt", "a+") as fil:
-        userstr = f'user-:{ctx.author.display_name}\n'
-        userstr += f'user-:{ctx.author.global_name}\n'
-        userstr += f'user-:{ctx.author.id}'
-        timestr = f'time-:{datetime.datetime.now().isoformat()}'
-        cmdstr = '\n'.join([f'cmd-:{s}' for s in ctx.message.clean_content.split('\n')])
-        argsstr = '\n'.join([f'arg-{i}:'+s for i,arg in enumerate(args) for s in repr(arg).split('\n')])
-        kwargsstr = '\n'.join([k+':'+s for i,(k,v) in enumerate(kwargs.items()) for s in repr(v).split('\n')])
-        exctbstr = '\n'.join(['exctb-:'+s for s in '\n'.join(traceback.format_exception(e)).split('\n')])
-        excstr = '\n'.join([f'exc-:{s}' for s in str(e).split('\n')])
-        fil.write('\n'.join([userstr,timestr,cmdstr,argsstr,kwargsstr,exctbstr,excstr]))
-        fil.write('\n####:####\n') # record separator
-    # raise e
+    errorpacket = {
+        "user": {
+            "displayname": ctx.author.display_name,
+            "globalname": ctx.author.global_name,
+            'id': ctx.author.id,
+            "servername": ctx.guild.name
+        },
+        'time': datetime.datetime.now().isoformat(),
+        'trigger': ctx.message.clean_content.split('\n'),
+        'arg': args,
+        'kwarg': kwargs,
+        'errname': str(e).split('\n'),
+        'errline': '\n'.join(traceback.format_exception(e)).split("\n")
+    }
+    
+    errfilname = f"cache/log/error-{ctx.author.global_name}-{datetime.date.today():%d-%m-%Y}.json"
+    try:
+        open(errfilname, "r+")
+    except:
+        open(errfilname, "w+")
+    with open(errfilname, "r+") as fil:
+        prev = []
+        try:
+            prev = json.load(fil)
+        except: pass
+    prev.append(errorpacket)
+    with open(errfilname, "w+") as fil:
+        json.dump(prev, fil, indent=4)
 
 def MainCommand(bot,name):
     # bot command

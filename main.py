@@ -1,11 +1,14 @@
 import glob
 import nextcord
 import datetime
+import random
 from pyfunc.lang import botinit, devs
-from nextcord.ext import commands
-from pyfunc.lang import cfg, evl, keywords,  phraser
+from nextcord.ext import commands, tasks
+from pyfunc.lang import cfg, evl, keywords, phraser, phrasermodule, getkws
 from pyfunc.gettoken import gettoken
 from pyfunc.commanddec import MainCommand
+from pyfunc.block import get
+import nextcord
 
 
 botinit()
@@ -15,28 +18,36 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 TimeOn = datetime.datetime.now()
 # initialize some things
-
-
+keywords = getkws()
 
 
 # reload the command locale
 @MainCommand(bot, "reloadlocale")
-async def reloadlocal(ctx):
-    phraser()
-    for i in bot.commands:
-        i.update()
-    await ctx.send("Done.")
+async def reloadlocal(ctx,module=None):
+    if module is None:
+        phraser()
+        #for i in bot.commands:
+        #    i.update()
+        await ctx.send("Done.")
+    else:
+        found=phrasermodule(module)
+        if found:
+            await ctx.send("Done.")
+        else:
+            await ctx.send(f"Did not find any locale files for {module}")
 
 # get help for a command or display info about the bot
 @MainCommand(bot,"help")
-async def help(ctx, cmdname=None,):
-    async def gethelplist(interaction:nextcord.Interaction, helplist:list|str=[]):
-        author = interaction.user
+async def help(ctx, cmdname=None):
+    async def gethelplist(interaction:nextcord.Interaction):
         preparedlist = []
-        for key in bot.commands:
-            if key.name in helplist or helplist == []:
-                preparedlist.append(f"### {key.name} ({'/'.join(key.aliases)})")
-                preparedlist.append(f"{key.description}")
+        for cmd in bot.commands:
+            s=f"### !{cmd.name}"
+            if len(cmd.aliases)>0: # don't have empty parens
+                s+=f" ({'/'.join(cmd.aliases)})"
+            s+=f"\n"
+            s+=f"{cmd.description}"
+            preparedlist.append(s)
         sembed = nextcord.Embed()
         sembed.title = evl("help.helplist.title")
         sembed.description = evl("help.helplist.desc").format("\n".join(preparedlist))
@@ -59,6 +70,7 @@ async def help(ctx, cmdname=None,):
         # search through the commands and their aliases
         for cmd in bot.commands:
             if cmdname in cmd.aliases or cmdname == cmd.name:
+                cmdname = cmd.name
                 embed = nextcord.Embed()
                 embed.title = cmd.name
                 embed.description = evl(f"{cmdname}.desc")
@@ -68,7 +80,7 @@ async def help(ctx, cmdname=None,):
                 await ctx.send(embed=embed)
                 return
         else:
-            await ctx.send(evl(f"{cmdname}.error"))
+            raise KeyError("Couldn't find the command") # the decorator will handle it
 
 # check if the bot is up
 @MainCommand(bot,"ping")
@@ -90,13 +102,27 @@ async def link(ctx, typ="r2d"):
             await ctx.send(f"`{i}` - {keywords[i]['link']}")
             return
     else:
-        raise Exception('')
+        raise KeyError('')
 
 # credits to the developers
 @MainCommand(bot,'credit')
 async def credit(ctx):
     devstr = '\n'.join([f'### [{dev["name"]}]({dev["github_link"]}){dev["desc"]}' for dev in devs])
     await ctx.send(evl("credit.display").format(devstr))
+
+@tasks.loop(seconds=60)
+async def changepresense():
+    allmessages = cfg("botInfo.Messages")
+    rdmcatagory = random.choice(list(allmessages.keys()))
+    message = random.choice(allmessages[rdmcatagory])
+    typ={
+        'play':nextcord.ActivityType.playing,
+        'listen':nextcord.ActivityType.listening,
+        'watch':nextcord.ActivityType.watching,
+    }
+    presense=nextcord.Activity(type=typ[rdmcatagory], name=message)
+    print(f"Changed Presence to {presense}")
+    await bot.change_presence(status=nextcord.Status.online, activity=presense)
 
 # the bot is ready now
 @bot.event
@@ -105,8 +131,7 @@ async def on_ready():
     print("Done.")
     global TimeOn
     TimeOn = datetime.datetime.now() # updating the real TimeOnline
-    presense = nextcord.Game("with Roody:2D")
-    await bot.change_presence(status=nextcord.Status.online, activity=presense)
+    changepresense.start()
 
 
 # get the bot token

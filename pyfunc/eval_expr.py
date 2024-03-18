@@ -1,30 +1,44 @@
 # to add a binary operator:
-# add it to the ops list
-# add it to precedences
+# add it to ops
 # add a case in apply()
 
 # to add an unary operator:
 # add it to the uops list
 # add a case in applyuop()
 
+# to add a postfix operator:
+# add it to the pops list
+# add a case in applypop()
+
 import re
 import math
 
-ops = ["//", "div", "%", "mod", '^', '**', '*', '/','+', '-']
-
 uops = ['-']
+pops=['!']
 
-precedences = {
-  '+':1,
-  '-':1,
-  '*':2,
-  '/':2,
-  '^':3,
-  '**':3,
-  'mod': 4,
-  '%': 4,
-  'div': 5,
-  '//': 5
+NUM   = 'NUM'   # Token: number
+LPAR  = 'LPAR'  # Token: left paren
+RPAR  = 'RPAR'  # Token: right paren
+OP    = 'OP'    # Token: binary operator
+UOP   = 'UOP'   # Token: unary operator
+SYM   = 'SYM'   # Token: symbol (variable or function)
+EXPR  = 'EXPR'  # Token: expression (output of evaluate)
+CALL  = 'CALL'  # Token: left paren after function name
+POP   = 'POP'   # Token: postfix operator
+LEFT  = 'LEFT'  # associativity: left
+RIGHT = 'RIGHT' # associativity: right
+
+ops={
+  '//' : (5, LEFT ),
+  'div': (5, LEFT ),
+  '%'  : (4, LEFT ),
+  'mod': (4, LEFT ),
+  '**' : (3, RIGHT),
+  '^'  : (3, RIGHT),
+  '/'  : (2, LEFT ),
+  '*'  : (2, LEFT ),
+  '+'  : (1, LEFT ),
+  '-'  : (1, LEFT )
 }
 
 symbols={
@@ -35,22 +49,13 @@ symbols={
   'e'  : math.e,
   'i'  : 1j,
 }
-# token types
-NUM  = 'NUM'   # number
-LPAR = 'LPAR'  # left paren
-RPAR = 'RPAR'  # right paren
-OP   = 'OP'    # binary operator
-UOP  = 'UOP'   # unary operator
-SYM  = 'SYM'   # symbol (variable or function)
-EXPR = 'EXPR'  # expression (output of evaluate)
-CALL = 'CALL'  # left paren after function name
 
 def mypow(a,b):
   if b>100000: # or maybe timeout
-    raise Exception('power too large')
+    raise TimeoutError([a, b])
   return a**b
 
-def apply(op,v1,v2):
+def applyop(op,v1,v2):
   print(op, v1, v2)
   # apply op to v1 and v2
   # remember, they are all [type,value] pairs
@@ -68,9 +73,9 @@ def apply(op,v1,v2):
     return [NUM, mypow(v1[1],v2[1])]
   if op[1] == '%' or op[1] == 'mod':
     return [NUM, v1[1]%v2[1]]
-  if op[1] == r'//' or op[1] == 'div':
+  if op[1] == '//' or op[1] == 'div':
     return [NUM, v1[1]//v2[1]]
-  raise Exception('unrecognized binary operator '+op[1])
+  raise KeyError(["binary", op[1]])
 
 def applyuop(op,v):
   # apply op to v
@@ -79,7 +84,16 @@ def applyuop(op,v):
     return [EXPR, op[1], v]
   if op[1] == '-':
     return [NUM, -v[1]]
-  raise Exception('unrecognized unary operator '+op[1])
+  raise KeyError(["unary", op[1]])
+
+def applypop(op,v):
+  # apply op to v
+  # remember, they are both [type,value] pairs
+  if v[0]!=NUM:
+    return [EXPR,op[1],v]
+  if op[1]=='!':
+    return [NUM,math.factorial(v[1])]
+  raise KeyError(["postfix", op[1]])
 
 def applyfunc(f,v):
   print(f, v)
@@ -159,7 +173,10 @@ def getToken(s,lastType):
   # types accepted depand on last token
   # for example, can't have op after lpar
   ss=s.lstrip()
-  if lastType in [NUM,SYM,RPAR]:
+  if lastType in [NUM,SYM,RPAR,POP]:
+    for pop in pops:
+      if ss.startswith(pop):
+        return [POP,pop],ss[len(pop):]
     for op in ops:
       if ss.startswith(op):
         return [OP,op],ss[len(op):]
@@ -168,7 +185,7 @@ def getToken(s,lastType):
     if lastType==SYM:
       if ss.startswith('('):
         return [CALL],ss[1:]
-    raise Exception('no token: '+s)
+    raise ArithmeticError(s)
   if lastType in [LPAR,CALL,OP,UOP]:
     if ss.startswith('('):
       return [LPAR],ss[1:]
@@ -181,13 +198,17 @@ def getToken(s,lastType):
     sym,snew=getSym(ss)
     if sym is not None:
       return [SYM,sym],snew
-    raise Exception('no token: '+s)
+    raise ArithmeticError(s)
 
 def precedence(token):
   # get the precedence of a binary operator
-  return precedences[token[1]]
+  return ops[token[1]][0]
 
+def rightassoc(op):
+  return ops[op][1]==RIGHT
 
+def leftassoc(op):
+  return ops[op][1]==LEFT
 
 def evaluate(expr):
   values=[]
@@ -219,13 +240,15 @@ def evaluate(expr):
           values[-1]=[NUM,symbols[values[-1][1]]]
     if token[0]==UOP: # unary operator
       ops.append(token)
+    if token[0]==POP: # postfix operator
+      values[-1]=applypop(token,values[-1])
     if token[0]==RPAR: # right paren
       while ops[-1][0] not in [LPAR,CALL]: # finish the parenthesized expression
         op=ops[-1]
         ops=ops[:-1]
         v1,v2=values[-2:]
         values=values[:-2]
-        values.append(apply(op,v1,v2))
+        values.append(applyop(op,v1,v2))
       if ops[-1][0]==CALL:
         v1,v2=values[-2:]
         values=values[:-2]
@@ -237,13 +260,13 @@ def evaluate(expr):
         ops=ops[:-1]
         values[-1]=applyuop(op,values[-1])
     if token[0]==OP:
-      while len(ops)>0 and ops[-1][0] not in [LPAR,CALL] and precedence(ops[-1])>=precedence(token):
+      while len(ops)>0 and ops[-1][0] not in [LPAR,CALL] and (precedence(ops[-1])>precedence(token) or (precedence(ops[-1])==precedence(token) and leftassoc(ops[-1][1]))):
         # apply all operators to the left with a lower precedence
         op=ops[-1]
         ops=ops[:-1]
         v1,v2=values[-2:]
         values=values[:-2]
-        values.append(apply(op,v1,v2))
+        values.append(applyop(op,v1,v2))
       ops.append(token) # push this operator
     lastType=token[0] # type of last token
     #print('s',s)
@@ -254,11 +277,11 @@ def evaluate(expr):
     ops=ops[:-1]
     v1,v2=values[-2:]
     values=values[:-2]
-    values.append(apply(op,v1,v2))
+    values.append(applyop(op,v1,v2))
   if len(values)>1: # each operator reduces the number of values by 1
-    raise Exception('not enough operators')
+    raise ValueError('Not enough operators')
   if len(values)==0: # how
-    raise Exception('empty expression')
+    raise ValueError('Empty expression')
   return values[0]
 
 def stringifyexpr(e):
@@ -267,19 +290,21 @@ def stringifyexpr(e):
     return str(e[1])
   if e[1]=='(':
     return f'{e[2]}({",".join(map(stringifyexpr,e[3:]))})'
-  if len(e)==3:
-    if len(e[2])==4:
+  if len(e) == 3:
+    if len(e[2]) == 4:
       return f'{e[1]}({stringifyexpr(e[2])})' # -(a+b)
     return f'{e[1]}{stringifyexpr(e[2])}' # a
-  if len(e)==4:
-    _,op,left,right=e
-    p1=precedence(e)
-    pleft=precedence(left) if left[0] in [OP,EXPR] else math.inf
-    pright=precedence(right) if right[0] in [OP,EXPR] else math.inf
-    sleft = stringifyexpr(left)
-    if pleft < p1:
-      sleft = f'({sleft})'
-    sright = stringifyexpr(right)
-    if pright <= p1:
-      sright = f'({sright})'
+  if len(e) == 4:
+    _,op,left,right = e
+    p1 = precedence(e)
+    pleft = precedence(left) if left[0] in [OP,EXPR] else math.inf
+    pright = precedence(right) if right[0] in [OP,EXPR] else math.inf
+    leftparen = pleft<p1 or (pleft==p1 and rightassoc(op))
+    rightparen = pright<p1 or (pright==p1 and leftassoc(op))
+    sleft=stringifyexpr(left)
+    if leftparen:
+      sleft=f'({sleft})'
+    sright=stringifyexpr(right)
+    if rightparen:
+      sright=f'({sright})'
     return f'{sleft}{op}{sright}'

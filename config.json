@@ -1,6 +1,57 @@
 {
     "botInfo": {
-        "ID": 1195952074861584514
+        "ID": 1195952074861584514,
+        "Messages": {
+            "play": [
+                "with Roody:2D",
+                "Roody:2D",
+                "roody2d.wiki.gg",
+                "Minecraft",
+                "Something",
+                "Roody:3D ???",
+                "Roody:4D, :O",
+                "Roody:infinity, Maybe",
+                "with Sear's Brain",
+                "with RbCaVi's Brain",
+                "A Message or sth idk",
+                "with !help",
+                "with !link",
+                "with !image",
+                "HELP ME I AM GOING INSANE",
+                "Assets",
+                "with Sear's Sanity"
+            ],
+            "listen": [
+                "to Welding Sounds",
+                "to Some Music",
+                "Task 1: Situation",
+                "to Sound of Sorting",
+                "to *Win7 Error Sound*",
+                "to Music",
+                "to Podcast",
+                "001: Roody:2D",
+                "to Something",
+                "to Stupid Ideas™  by Sear"
+            ],
+            "watch": [
+                "Sear losing his mind",
+                "Roody:2D Speedrun",
+                "Roody:2D Trailer",
+                "Redinator's Video",
+                "Discord.py Tutorial",
+                "Console",
+                "Debug Console",
+                "Your Message",
+                "roody2d.wiki.gg pages",
+                "Youtube",
+                "Something",
+                "Sear breaks down",
+                "file system",
+                "Video",
+                "101 Block's Texture",
+                "The graph of y=sin(x)"
+            ]
+        }
     },
     "locale": {
         "defaultName": "en",
