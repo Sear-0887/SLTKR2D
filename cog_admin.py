@@ -94,7 +94,7 @@ class Admin(commands.Cog):
             desc = f"Caused by {user['displayname']} / {user['globalname']} \n"
             desc += f"<@{user['id']}> at {user['servername']} \n"
             desc += f"Command line: `{cmd}` \n"
-            desc += f"Error Name: {exc} \n"
+            desc += f"Error: {exc}: {excstr} \n"
             desc += f"```{exctb}```"
             embed.description = desc
             for i,arg in enumerate(args):
@@ -104,7 +104,7 @@ class Admin(commands.Cog):
             if len(embed)>6000: # Error is too long
                 desc = f"Caused by {user['displayname']} at {user['servername']} \n"
                 desc += f"Command line: `{cmd}` \n"
-                desc += f"Error Name: {exc} \n"
+                desc += f"Error: {exc}: {excstr} \n"
                 desc += f"For more info, please view {filname}."
                 embed.description = desc
             await ctx.send(embed=embed)
