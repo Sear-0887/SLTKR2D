@@ -14,7 +14,8 @@ help.blankdisplay.server = ***Note: Bot is currently hosting in <@{}>'s Server.*
 help.desc = Displays what command <cmd> does. \
 If left blank, shows info about the bot.
 
-help.error = :Fail: Please provide a valid command name.
+help.error = Unknown Error.
+help.error.KeyError = :Fail: Please provide a valid command name.
 help.syntax = !help <cmd>
 help.helplist.title = Command List
 help.helplist.desc = Here's a list of commands: \

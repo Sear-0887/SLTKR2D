@@ -52,7 +52,7 @@ symbols={
 
 def mypow(a,b):
   if b>100000: # or maybe timeout
-    raise Exception('power too large')
+    raise TimeoutError([a, b])
   return a**b
 
 def applyop(op,v1,v2):
@@ -75,7 +75,7 @@ def applyop(op,v1,v2):
     return [NUM, v1[1]%v2[1]]
   if op[1] == '//' or op[1] == 'div':
     return [NUM, v1[1]//v2[1]]
-  raise Exception('unrecognized binary operator '+op[1])
+  raise KeyError(["binary", op[1]])
 
 def applyuop(op,v):
   # apply op to v
@@ -84,7 +84,7 @@ def applyuop(op,v):
     return [EXPR, op[1], v]
   if op[1] == '-':
     return [NUM, -v[1]]
-  raise Exception('unrecognized unary operator '+op[1])
+  raise KeyError(["unary", op[1]])
 
 def applypop(op,v):
   # apply op to v
@@ -93,7 +93,7 @@ def applypop(op,v):
     return [EXPR,op[1],v]
   if op[1]=='!':
     return [NUM,math.factorial(v[1])]
-  raise Exception('unrecognized postfix operator '+op[1])
+  raise KeyError(["postfix", op[1]])
 
 def applyfunc(f,v):
   print(f, v)
@@ -185,7 +185,7 @@ def getToken(s,lastType):
     if lastType==SYM:
       if ss.startswith('('):
         return [CALL],ss[1:]
-    raise Exception('no token: '+s)
+    raise ArithmeticError(s)
   if lastType in [LPAR,CALL,OP,UOP]:
     if ss.startswith('('):
       return [LPAR],ss[1:]
@@ -198,7 +198,7 @@ def getToken(s,lastType):
     sym,snew=getSym(ss)
     if sym is not None:
       return [SYM,sym],snew
-    raise Exception('no token: '+s)
+    raise ArithmeticError(s)
 
 def precedence(token):
   # get the precedence of a binary operator
@@ -279,9 +279,9 @@ def evaluate(expr):
     values=values[:-2]
     values.append(applyop(op,v1,v2))
   if len(values)>1: # each operator reduces the number of values by 1
-    raise Exception('not enough operators')
+    raise ValueError('Not enough operators')
   if len(values)==0: # how
-    raise Exception('empty expression')
+    raise ValueError('Empty expression')
   return values[0]
 
 def stringifyexpr(e):

@@ -79,7 +79,7 @@ async def help(ctx, cmdname=None):
                 await ctx.send(embed=embed)
                 return
         else:
-            raise Exception("Couldn't find the command") # the decorator will handle it
+            raise KeyError("Couldn't find the command") # the decorator will handle it
 
 # check if the bot is up
 @MainCommand(bot,"ping")
@@ -101,7 +101,7 @@ async def link(ctx, typ="r2d"):
             await ctx.send(f"`{i}` - {keywords[i]['link']}")
             return
     else:
-        raise Exception('')
+        raise KeyError('')
 
 # credits to the developers
 @MainCommand(bot,'credit')
