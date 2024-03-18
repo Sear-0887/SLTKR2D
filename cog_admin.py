@@ -101,7 +101,6 @@ class Admin(commands.Cog):
                 embed.add_field(name=f"Argument {i+1}", value=arg)
             for k,v in kwargs.items():
                 embed.add_field(name=f"Kwarg {k}", value=v)
-            embed.add_field(name=f"EXCSTR", value=excstr)
             if len(embed)>6000: # Error is too long
                 desc = f"Caused by {user['displayname']} at {user['servername']} \n"
                 desc += f"Command line: `{cmd}` \n"

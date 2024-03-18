@@ -8,6 +8,7 @@ from pyfunc.lang import cfg, evl, keywords, phraser, phrasermodule, getkws
 from pyfunc.gettoken import gettoken
 from pyfunc.commanddec import MainCommand
 from pyfunc.block import get
+import nextcord
 
 
 botinit()
@@ -79,7 +80,7 @@ async def help(ctx, cmdname=None):
                 await ctx.send(embed=embed)
                 return
         else:
-            raise Exception("Couldn't find the command") # the decorator will handle it
+            raise KeyError("Couldn't find the command") # the decorator will handle it
 
 # check if the bot is up
 @MainCommand(bot,"ping")
@@ -101,7 +102,7 @@ async def link(ctx, typ="r2d"):
             await ctx.send(f"`{i}` - {keywords[i]['link']}")
             return
     else:
-        raise Exception('')
+        raise KeyError('')
 
 # credits to the developers
 @MainCommand(bot,'credit')
@@ -112,7 +113,15 @@ async def credit(ctx):
 @tasks.loop(seconds=60)
 async def changepresense():
     allmessages = cfg("botInfo.Messages")
-    presense = nextcord.Game(random.choice(allmessages))
+    rdmcatagory = random.choice(list(allmessages.keys()))
+    message = random.choice(allmessages[rdmcatagory])
+    typ={
+        'play':nextcord.ActivityType.playing,
+        'listen':nextcord.ActivityType.listening,
+        'watch':nextcord.ActivityType.watching,
+    }
+    presense=nextcord.Activity(type=typ[rdmcatagory], name=message)
+    print(f"Changed Presence to {presense}")
     await bot.change_presence(status=nextcord.Status.online, activity=presense)
 
 # the bot is ready now

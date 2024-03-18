@@ -22,14 +22,28 @@ RESET = Fore.RESET
 # Detail:
 # {errorpacket['errline']}
 # Exc- {excstr}
-async def ErrorHandler(name, ctx:commands.Context, e:Exception, args, kwargs):
+async def ErrorHandler(name, ctx:commands.Context, e, args, kwargs):
     # handle the error e
     # from a function call f(ctx,*args,**kwargs)
     # print a message with cool colors to the console
     expecterr = evl(f"{name}.error")
+    errortype = repr(type(e)).split("\'")[1] # <class '[KeyError]'>
+    replacingerror = evl(f"{name}.error.{errortype}")
+    if replacingerror:
+        print(f"Other Error Message found for {name}: {replacingerror}")
+        expecterr = replacingerror
     try:
-        expecterr = expecterr.format(*args, **kwargs)
-    except:
+        print(f"{e.args=}")
+        eargs = e.args[0]
+        print(eargs)
+        if isinstance(eargs, str):
+            expecterr = expecterr.format(*args, e=eargs, **kwargs)
+        elif isinstance(eargs, list):
+            expecterr = expecterr.format(*args, *eargs, **kwargs)
+        elif type(eargs) == dict:
+            expecterr = expecterr.format(*args, **eargs, **kwargs)
+    except Exception as EX:
+        print(EX)
         pass
     print(
 f'''
