@@ -11,6 +11,7 @@ Founded by Sear.
 Founder of the bot, contributing the bot's development and serval projects.
 ### [RbCaVi](https://github.com/RbCaVi) 
 Optimizes / refactors major part of the code. 
+Introduces useful commands as well.
 
 
 ## License

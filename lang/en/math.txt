@@ -1,9 +1,17 @@
 # eval
 eval.aliases = [ev]
 eval.desc = Evaluate simple arithmetic expressions.\
-Supports basic operations (+, -, \*, /, ^/\*\*), functions (ln, log, sqrt/√), and symbols (e, pi/π, i)
+Supports: \
+* Basic operations (`+`, `-`, `*`, `/`, `^`/`**`)\
+* Functions (`ln`, `log`, `sqrt`/`√`)\
+* Symbols (`e`, `pi`/`π`, `i`, `phi`/`φ`)\
+* Factorial (`!`)
 
 eval.error = Unable to evaluate {formulae}.
+eval.error.KeyError = An unrecognized {0} operator is present: {1}
+eval.error.TimeoutError = An power operator is too large: {0} ** {1}
+eval.error.ArithmeticError = No such types of operation(s): {e}
+eval.error.ValueError = An Operator doesn't have a 2nd operand.
 eval.syntax = !eval <expressionformula>
 
 # plot
