@@ -113,13 +113,14 @@ async def credit(ctx):
 @tasks.loop(seconds=60)
 async def changepresense():
     allmessages = cfg("botInfo.Messages")
-    message,typ=random.choice(allmessages)
+    rdmcatagory = random.choice(list(allmessages.keys()))
+    message = random.choice(allmessages[rdmcatagory])
     typ={
         'play':nextcord.ActivityType.playing,
         'listen':nextcord.ActivityType.listening,
         'watch':nextcord.ActivityType.watching,
-    }[typ]
-    presense=nextcord.Activity(type=typ, name=message)
+    }
+    presense=nextcord.Activity(type=typ[rdmcatagory], name=message)
     print(f"Changed Presence to {presense}")
     await bot.change_presence(status=nextcord.Status.online, activity=presense)
 
