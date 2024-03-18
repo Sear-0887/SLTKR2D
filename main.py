@@ -8,6 +8,7 @@ from pyfunc.lang import cfg, evl, keywords, phraser, phrasermodule, getkws
 from pyfunc.gettoken import gettoken
 from pyfunc.commanddec import MainCommand
 from pyfunc.block import get
+import nextcord
 
 
 botinit()
@@ -112,7 +113,13 @@ async def credit(ctx):
 @tasks.loop(seconds=60)
 async def changepresense():
     allmessages = cfg("botInfo.Messages")
-    presense = nextcord.Game(random.choice(allmessages))
+    message,typ=random.choice(allmessages)
+    typ={
+        'play':nextcord.ActivityType.playing,
+        'listen':nextcord.ActivityType.listening,
+        'watch':nextcord.ActivityType.watching,
+    }[typ]
+    presense=nextcord.Activity(type=typ, name=message)
     print(f"Changed Presence to {presense}")
     await bot.change_presence(status=nextcord.Status.online, activity=presense)
 
