@@ -111,7 +111,7 @@ class Admin(commands.Cog):
         filname = f"cache/log/error-{user.global_name}-{datetime.date.today():%d-%m-%Y}.json"
         try:
             fil = []
-            with open(filname) as jsonfil:
+            with open(filname, encoding="utf-8") as jsonfil:
                 fil = json.load(jsonfil)
         except:
             await ctx.send(f'No Error message is found by {user.display_name}.')
