@@ -57,10 +57,12 @@ class Block(commands.Cog):
                 #   #block         no weld
                 # welded sides is 4x 0 or 1 in the order right bottom left top
                 # dir is eswn
-                match=re.fullmatch('(?:([^]#]+)(?:#([eswn])?([01]{4})?)?)|#([^]]+)',b)
+                # all block can have :data after it
+                # data is block specific
+                match=re.fullmatch('(?:(?:([^]#]+)(?:#([eswn])?([01]{4})?)?)|#([^]]+))(?::([^]]+))?',b)
                 if match is None:
                     raise Exception(f'Invalid block: {b}')
-                b,turnm,weldm,unwelded=match.groups()
+                b,turnm,weldm,unwelded,bdata=match.groups()
                 if unwelded is not None:
                     weld=[False,False,False,False]
                     b=unwelded
@@ -72,7 +74,8 @@ class Block(commands.Cog):
                     b='air'
                 if b.isdigit():
                     b = idtoblock[int(b)]
-                blocks[y][x] = {"type":b,"rotate":turn,"weld":weld}
+                await ctx.send(bdata)
+                blocks[y][x] = {"type":b,"rotate":turn,"weld":weld,"data":bdata}
                 blocklist[b] += 1
         im=blockmakeimage(blocks,32)
         im.save("cache/blocks.png")
