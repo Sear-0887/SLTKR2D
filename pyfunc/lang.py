@@ -53,12 +53,12 @@ def phraser():
     for lang in os.listdir(cfg('locale.localePath')):
         for i in os.listdir(os.path.join(cfg('locale.localePath'),lang)):
             phraserfile(i,lang)
-    print(cmdi['en']["help.aliases"])
-    # EXCEPTIONS
-    cmdi['en']["link.desc"] = cmdi['en']["link.desc"].format("".join([
-        f"{name} ({data['link']})\nKeywords: `{'`, `'.join(data['kw'])}`\n"
-        for name,data in keywords.items()
-    ]))
+        print(cmdi[lang]["help.aliases"])
+        # EXCEPTIONS
+        cmdi[lang]["link.desc"] = cmdi[lang]["link.desc"].format("".join([
+            f"{name} ({data['link']})\nKeywords: `{'`, `'.join(data['kw'])}`\n"
+            for name,data in keywords.items()
+        ]))
 
 def phrasermodule(module): # reloads the locale from one file in each locale folder
     found=False # did it find any locale files?
