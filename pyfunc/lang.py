@@ -41,7 +41,7 @@ def phraserfile(fname,lang):
             if '=' not in line:
                 continue
             key,value=line.split('=',maxsplit=1)
-            value=value.strip()
+            value=replacemoji(value.strip())
             if value.startswith('[') and value.endswith(']'):
                 value=[v.strip() for v in value[1:-1].split(',') if len(v.strip())>0]
             key=key.strip()
