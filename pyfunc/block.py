@@ -85,7 +85,7 @@ norotatetypes=[
 ]+noweldtypes
 # blocks that only face two directions
 twowaytypes=[
-	"wire_spool",'wood',"mirror"
+	"wire_spool",'log_maple','log_pine',"mirror"
 ]
 
 def blockdesc():
