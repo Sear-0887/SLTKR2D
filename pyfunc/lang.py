@@ -35,7 +35,7 @@ def recursiveddict():
 cmdi = recursiveddict()
 
 def phraserfile(fname,lang):
-    with open(os.path.join(cfg('local.localPath'),lang,fname), "r", encoding='utf-8') as f:
+    with open(os.path.join(cfg('locale.localePath'),lang,fname), "r", encoding='utf-8') as f:
         linesiter=iter(f)
         for line in linesiter:
             while line.endswith('\\\n'):
