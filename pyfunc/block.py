@@ -195,47 +195,6 @@ def rotatewelded(welded,rotate):
 	if rotate==2:
 		return [welded[i] for i in [2,1,0,3]]
 
-# mirror and wood
-# 2 rotations instead of 4
-class TwoSideBlock(Block):
-	def __init__(self,block,offset=0):
-		self.image=getblockim(block).crop((offset,0,offset+32,32)).convert('RGBA')
-
-	def draw(self,welded,rotate=0):
-		if rotate==1:
-			rotate=3
-		if rotate==2:
-			rotate=0
-		top,left,bottom,right=rotatewelded(welded,rotate)
-		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
-		for x,xside in [(0,left),(8,right)]:
-			for y,yside in [(0,top),(8,bottom)]:
-				im.alpha_composite(self.image.crop((x+16*xside,y+16*yside,x+16*xside+8,y+16*yside+8)),(x,y))
-		im=rotateblock(im,rotate)
-		return im.resize((bsize,bsize),PIL.Image.NEAREST)
-
-# sand
-# unweldable
-class NoWeldBlock(Block):
-	def __init__(self,block):
-		self.image=getblockim(block).crop((0,0,16,16)).convert('RGBA')
-
-	def draw(self,_,__=0):
-		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
-		im.alpha_composite(self.image.crop((0,0,16,16)))
-		return im.resize((bsize,bsize),PIL.Image.NEAREST)
-
-# literally just telecross
-class TelecrossBlock(Block):
-	def __init__(self):
-		self.image=getblockim('telecross').crop((0,0,16,16)).convert('RGBA')
-
-	def draw(self,_,rotate=0):
-		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
-		im.alpha_composite(self.image.crop((0,0,16,16)))
-		im=rotateblock(im,rotate)
-		return im.resize((bsize,bsize),PIL.Image.NEAREST)
-
 # all wire components (transistor, latch, etc)
 class WaferBlock(Block):
 	def __init__(self,top,base='wafer',offset=0):
