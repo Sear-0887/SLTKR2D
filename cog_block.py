@@ -15,10 +15,11 @@ class Block(commands.Cog):
         self.bot = bot
         
     @CogCommand("block")
-    async def block(self,ctx, block=None):
+    async def block(self,ctx, *, block=None):
         if block:
             if block.isdigit(): # if the argument is a number, get the corresponding block name
                 block = idtoblock.get(int(block),'NIC')
+            block = block.replace(" ", "_")
             binfo=blockinfos[block]
             embed = nextcord.Embed()
             pthblockzoo = cfg("localGame.texture.blockIconFile")
