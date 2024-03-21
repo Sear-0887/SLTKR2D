@@ -1,7 +1,7 @@
 import datetime
 import decorator
 import json
-from pyfunc.lang import cmdi, evl
+from pyfunc.lang import evl
 from colorama import Fore, init
 from nextcord.ext import commands
 import traceback

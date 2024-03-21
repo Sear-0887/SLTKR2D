@@ -3,7 +3,6 @@ import os
 import nextcord
 import json
 from nextcord.ext import commands
-from pyfunc.lang import evl
 from pyfunc.commanddec import CogCommand
 from collections import defaultdict
 from itertools import takewhile,count

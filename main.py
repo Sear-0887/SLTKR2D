@@ -10,16 +10,14 @@ from pyfunc.commanddec import MainCommand
 from pyfunc.block import get
 import nextcord
 
-
 botinit()
 intents = nextcord.Intents.default()
 intents.members = True
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
-TimeOn = datetime.datetime.now()
+TimeOn = None
 # initialize some things
 keywords = getkws()
-
 
 # reload the command locale
 @MainCommand(bot, "reloadlocale")

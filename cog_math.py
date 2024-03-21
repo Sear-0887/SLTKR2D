@@ -4,13 +4,8 @@ import nextcord
 import math
 from pyfunc.math import primefactor
 from nextcord.ext import commands
-from pyfunc.lang import lprint
 from pyfunc.commanddec import CogCommand
 from pyfunc.eval_expr import evaluate,stringifyexpr
-
-
-
-
 
 class Math(commands.Cog):
     def __init__(self, bot):
