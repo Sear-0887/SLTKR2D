@@ -70,7 +70,7 @@ class Admin(commands.Cog):
     @commands.has_permissions(administrator=True)
     @CogCommand("deleteerr")
     async def deleteerr(self, ctx):
-        for errf in glob.glob("cache/log/error-*-??-??-????.txt"):
+        for errf in glob.glob("cache/log/error-*-??-??-????.json"):
             os.remove(errf)
         await ctx.send("Done.")
     
@@ -82,18 +82,19 @@ class Admin(commands.Cog):
             # Values
             user=values['user']
             time=values['time']
-            cmd='\n'.join(values['trigger']).replace('`','ˋ')
+            cmd=values['trigger'].replace('`','ˋ')
             args=values['arg']
             kwargs=values['kwarg']
-            exctb='\n'.join(values['errline']).replace('`','ˋ')
-            exc='\n'.join(values['errname'])
+            exctb=values['errline'].replace('`','ˋ')
+            exc=values['errname']
+            excstr = values['excstr']
             # Embed
             embed = nextcord.Embed()
             embed.title = f'Error at {time}'
             desc = f"Caused by {user['displayname']} / {user['globalname']} \n"
             desc += f"<@{user['id']}> at {user['servername']} \n"
             desc += f"Command line: `{cmd}` \n"
-            desc += f"Error Name: {exc} \n"
+            desc += f"Error: {exc}: {excstr} \n"
             desc += f"```{exctb}```"
             embed.description = desc
             for i,arg in enumerate(args):
@@ -103,26 +104,30 @@ class Admin(commands.Cog):
             if len(embed)>6000: # Error is too long
                 desc = f"Caused by {user['displayname']} at {user['servername']} \n"
                 desc += f"Command line: `{cmd}` \n"
-                desc += f"Error Name: {exc} \n"
+                desc += f"Error: {exc}: {excstr} \n"
                 desc += f"For more info, please view {filname}."
                 embed.description = desc
             await ctx.send(embed=embed)
         
-        filname = f"cache/log/error-{user.global_name}-{datetime.date.today():%d-%m-%Y}.json"
-        try:
-            fil = []
-            with open(filname, encoding="utf-8") as jsonfil:
-                fil = json.load(jsonfil)
-        except:
-            await ctx.send(f'No Error message is found by {user.display_name}.')
-        finally:
-            count = min(count, len(fil)) # Prevent list index out of range
-            print(f"printing {count} packet")
-            for errpkt in fil[::-1][:count]:
-                try:
-                    await senderr(errpkt, filname)
-                except nextcord.errors.HTTPException: # Error is STILL too long
-                    await ctx.send(f'An Error is too long to be displayed.\n Please view `{filname}` for more info.')
+        errs=[]
+        for fname in glob.glob(f"cache/log/error-{user.global_name}-??-??-????.json"):
+            try:
+                with open(fname) as f:
+                    errs.extend([(fname,err) for err in json.load(f)])
+            except: # not sure what kind of error to catch here
+                pass
+        if len(errs)==0:
+            await ctx.send(f'No Error messages were found for {user.display_name}.')
+        errs.sort(key=lambda x:datetime.datetime.fromisoformat(x[1]['time']))
+        errs=[*reversed([*reversed(errs)][:count])]
+        count = len(errs)
+        print(f"printing {count} errors")
+        for fname,err in errs:
+            try:
+                await senderr(err, fname)
+            except nextcord.errors.HTTPException: # Error is STILL too long
+                await ctx.send(f'The Error is too long to be displayed.\n Please view `{fname}` for more info.')
+
 
             
     
