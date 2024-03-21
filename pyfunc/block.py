@@ -92,7 +92,6 @@ twowaytypes=[
 def blockdesc():
 	return {
 		'wired':False, # does this block connect to wires beside it?
-		'platform':False, # does this block detect platforms beside it?
 		'datafilters':[], # change the block data (noweld/norotate)
 		'layers':[] # the layers of the block (actuator/any wire component)
 	}
@@ -363,28 +362,27 @@ def makeimage(blocks,autoweld=True):
 				b=NoRotateBlock(block['type'])
 			elif block['type'] in noweldtypes:
 				b=NoWeldBlock(block['type'])
-			elif block['type']=='platform': # special case
-				# check if sides are platform
-				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type']!='platform' else True)
-				block['weld'][3]=block['weld'][3] and (2 if get(newblocks,xi+1,yi)['type']!='platform' else True)
-				b=PlatformBlock()
-			elif block['type']=='actuator':
+			elelif block['type']=='actuator':
 				b=ActuatorBlock()
 			elif block['type']=='telecross':
 				b=TelecrossBlock()
 			else:
 				b=NormalBlock(block['type'])
+			if block['data'] is not None:
+				bim=b.draw(block['weld'],block['rotate'],data=getblockdata(block['data']))
+			else:
+				bim=b.draw(block['weld'],block['rotate'])
+				'''
+			if block['type']=='platform': # special case
+				# check if sides are platform
+				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type']!='platform' else True)
+				block['weld'][3]=block['weld'][3] and (2 if get(newblocks,xi+1,yi)['type']!='platform' else True)
 			if block['type'] in wiretypes+wafertypes:
 				# check if sides are wired
 				block['weld'][0]=block['weld'][0] and (2 if get(newblocks,xi,yi-1)['type'] in wiredtypes else True)
 				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type'] in wiredtypes else True)
 				block['weld'][2]=block['weld'][2] and (2 if get(newblocks,xi,yi+1)['type'] in wiredtypes else True)
 				block['weld'][3]=block['weld'][3] and (2 if get(newblocks,xi+1,yi)['type'] in wiredtypes else True)
-			if block['data'] is not None:
-				bim=b.draw(block['weld'],block['rotate'],data=getblockdata(block['data']))
-			else:
-				bim=b.draw(block['weld'],block['rotate'])
-				'''
 			blocktype=blocktypes[block['type']]
 			for datafilter in blocktype['datafilters']:
 				block=datafilter(block)
