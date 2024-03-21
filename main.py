@@ -120,7 +120,7 @@ async def changepresence():
         'watch':nextcord.ActivityType.watching,
     }
     presence=nextcord.Activity(type=types[category], name=status)
-    print(f"Changed Presence to {presence}")
+    print(f"Changed Presence to {category}: {status}")
     await bot.change_presence(status=nextcord.Status.online, activity=presence)
 
 # the bot is ready now
