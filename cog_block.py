@@ -91,10 +91,11 @@ class Block(commands.Cog):
             with open("cache/materialist.txt", "w") as f:
                 f.write(materialist.replace(", ", ", \n"))
             embed.add_field(name="Material List", value="*Please Refer to `material_list.txt` for the material list.*")
-            await ctx.send(embed=embed, 
+            await ctx.send(
+                embed=embed, 
                 files=[
-                nextcord.File("cache/blocks.png", filename="f.png"),
-                nextcord.File("cache/materialist.txt", filename="material_list.txt")
+                    nextcord.File("cache/blocks.png", filename="f.png"),
+                    nextcord.File("cache/materialist.txt", filename="material_list.txt")
                 ]
             )
             
