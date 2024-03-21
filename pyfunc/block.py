@@ -225,13 +225,13 @@ def get(vss,xi,yi):
 	return vs[xi]
 
 # wire components on a wafer
-wafertypes=["accelerometer","capacitor","diode","galvanometer","latch","matcher","potentiometer","sensor","transistor","wire_board"]
+wafertypes=["accelerometer","capacitor","diode","galvanometer","latch","matcher","potentiometer","sensor","transistor","wire_board","counter"]
 # wire components on a frame
 wiretypes=["detector","port","toggler","trigger","wire"]
 # all blocks that connect to wire
 wiredtypes=['actuator','motor','telewall','injector','pedestal','actuator_base','display',"lamp",'combiner','arc_furnace','extractor','beam_core','creator','destroyer','dismantler','magnet','manipulator','mantler']+wafertypes+wiretypes # that connect to wires
 # unweldable blocks
-noweldtypes=["copper_ore","iron_ore","pulp","sand","silicon","spawner","air"]
+noweldtypes=["copper_ore","iron_ore","pulp","sand","silicon","spawner","air","prism","sawdust"]
 # blocks that only face one direction
 norotatetypes=['pedestal','dirt','sediment','stone','rubber','leaf_maple','iron_vein','iron_bar','iron_plate','cast_iron','copper_vein','copper_bar','frame','toggler','capacitor','inductor','roller','dynamic_roller','chair','chair_pilot','display','core_ore','raw_core','mass_core','refined_core','catalyst_core','command_block','boundary','spawner','calcium_bar','water','foam','oxide','soul_core','adobe','peltmellow','glass','glass_cyan','glass_magenta','glass_yellow','grass','flower_magenta','flower_yellow','residue','ice','compressed_stone']
 # blocks that only face two directions
@@ -241,13 +241,13 @@ twowaytypes=["wire_spool",'wood',"mirror"]
 def canweld(side,block):
 	if block['type'] in noweldtypes:
 		return False
-	elif block['type'] in ['cap','flower_magenta','flower_yellow','grass','motor','pedestal','spikes']:
+	elif block['type'] in ['cap','flower_magenta','flower_yellow','grass','motor','pedestal','spikes']: # Only Bottom
 		sides=[False,False,True,False]
-	elif block['type'] in ['actuator_head','wire_spool','telewall']:# no sides
+	elif block['type'] in ['actuator_head','wire_spool','telewall']: # Only Top / Bottom
 		sides=[True,False,True,False]
-	elif block['type'] in ['combiner','extractor','injector','platform']: # no top/bottom
+	elif block['type'] in ['combiner','extractor','injector','platform']: # no Top / Bottom
 		sides=[False,True,False,True]
-	elif block['type'] in ['arc_furnace','beam_core','collector','creator','destroyer','dismantler','magnet','manipulator','mantler','teleportore']: # no top
+	elif block['type'] in ['arc_furnace','beam_core','collector','creator','destroyer','dismantler','magnet','manipulator','mantler','teleportore','summonore']: # no top
 		sides=[False,True,True,True]
 	else:
 		sides=[True,True,True,True]
