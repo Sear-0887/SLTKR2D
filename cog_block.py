@@ -77,20 +77,31 @@ class Block(commands.Cog):
                 if b.isdigit():
                     b = idtoblock[int(b)]
                 blocks[y][x] = {"type":b,"rotate":turn,"weld":weld}
-                blocklist[b] += 1
+                if b != "air":
+                    blocklist[b] += 1
         im=blockmakeimage(blocks,32)
         im.save("cache/blocks.png")
         embed = nextcord.Embed()
         width, height = im.size
         embed.title = f"{width//32}x{height//32} Image"
         embed.set_image(url="attachment://f.png")
-        
-        embed.add_field(name="Material List", 
-                        value=', '.join(
-                            [f"{count} {block}"for block, count in blocklist.items()])
-                        )
+        iterdic = dict(sorted(blocklist.items(), key=lambda item: item[1], reverse=True))
+        materialist = ', '.join([f"{count} {block}" for block, count in iterdic.items()])
+        if len(materialist) <= 1024:
+            embed.add_field(name="Material List", value=materialist)
+            await ctx.send(embed=embed, file=nextcord.File("cache/blocks.png", filename="f.png"))
+        else:
+            with open("cache/materialist.txt", "w") as f:
+                f.write(materialist.replace(", ", ", \n"))
+            embed.add_field(name="Material List", value="*Please Refer to `material_list.txt` for the material list.*")
+            await ctx.send(embed=embed, 
+                files=[
+                nextcord.File("cache/blocks.png", filename="f.png"),
+                nextcord.File("cache/materialist.txt", filename="material_list.txt")
+                ]
+            )
             
-        await ctx.send(embed=embed, file=nextcord.File("cache/blocks.png", filename="f.png"))
+        
         
 def setup(bot):
 	bot.add_cog(Block(bot))
