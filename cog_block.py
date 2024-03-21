@@ -1,5 +1,5 @@
 import collections
-from pyfunc.assetload import blockinfos, idtoblock as quickidtable,locale
+from pyfunc.assetload import blockinfos, idtoblock, locale
 import nextcord
 import random
 import re
@@ -7,14 +7,13 @@ from PIL import Image
 from nextcord.ext import commands
 from pyfunc.lang import cfg
 from pyfunc.commanddec import CogCommand
-from pyfunc.assetload import idtoblock
 from pyfunc.block import makeimage as blockmakeimage
 import pyfunc.smp as smp
 
 class Block(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        
+
     @CogCommand("block")
     async def block(self,ctx, *, block=None):
         if block:
@@ -33,14 +32,11 @@ class Block(commands.Cog):
             embed.add_field(name="Block ID", value=binfo['id'])
             embed.add_field(name="Block Tutorial", value=locale[("BLOCK_TUTORIAL",block)])
             embed.set_image(url="attachment://blockim.png")
-            
+
             await ctx.send(file=nextcord.File("cache/blockim.png", filename="blockim.png"), embed=embed)
         else:
             await self.block(ctx, str(random.choice([*idtoblock.keys()])))
 
-    
-        
-    #eswn
     @CogCommand("image")
     async def image(self,ctx, *, x="[[16][20]][[16][16]]"):
         blocklist = collections.defaultdict(int)
@@ -52,7 +48,7 @@ class Block(commands.Cog):
                 b=''.join(b.split()) # remove all whitespace
                 turn=0
                 weld=[True,True,True,True]
-                # either 
+                # either
                 #   block          normal
                 #   block#         normal
                 #   block#dir      set facing
@@ -81,6 +77,7 @@ class Block(commands.Cog):
                     blocklist[b] += 1
         im=blockmakeimage(blocks,32)
         im.save("cache/blocks.png")
+        
         embed = nextcord.Embed()
         width, height = im.size
         embed.title = f"{width//32}x{height//32} Image"

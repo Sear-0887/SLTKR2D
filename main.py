@@ -10,16 +10,14 @@ from pyfunc.commanddec import MainCommand
 from pyfunc.block import get
 import nextcord
 
-
 botinit()
 intents = nextcord.Intents.default()
 intents.members = True
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
-TimeOn = datetime.datetime.now()
+TimeOn = None
 # initialize some things
 keywords = getkws()
-
 
 # reload the command locale
 @MainCommand(bot, "reloadlocale")
@@ -52,7 +50,7 @@ async def help(ctx, cmdname=None):
         sembed.title = evl("help.helplist.title")
         sembed.description = evl("help.helplist.desc").format("\n".join(preparedlist))
         await interaction.send(ephemeral=True, embed=sembed)
-        
+
     if not cmdname:
         # send an info embed about the bot if no command given
         embed = nextcord.Embed()
@@ -110,18 +108,20 @@ async def credit(ctx):
     await ctx.send(evl("credit.display").format(devstr))
 
 @tasks.loop(seconds=60)
-async def changepresense():
-    allmessages = cfg("botInfo.Messages")
-    rdmcatagory = random.choice(list(allmessages.keys()))
-    message = random.choice(allmessages[rdmcatagory])
-    typ={
+async def changepresence():
+    statuses = cfg("botInfo.Messages")
+    categories = [*statuses.keys()]
+    weights = [len(statuses[c]) for c in categories]
+    category = random.choices(categories,weights)
+    status = random.choice(statuses[category])
+    types={
         'play':nextcord.ActivityType.playing,
         'listen':nextcord.ActivityType.listening,
         'watch':nextcord.ActivityType.watching,
     }
-    presense=nextcord.Activity(type=typ[rdmcatagory], name=message)
-    print(f"Changed Presence to {presense}")
-    await bot.change_presence(status=nextcord.Status.online, activity=presense)
+    presence=nextcord.Activity(type=types[category], name=status)
+    print(f"Changed Presence to {presence}")
+    await bot.change_presence(status=nextcord.Status.online, activity=presence)
 
 # the bot is ready now
 @bot.event
@@ -130,7 +130,7 @@ async def on_ready():
     print("Done.")
     global TimeOn
     TimeOn = datetime.datetime.now() # updating the real TimeOnline
-    changepresense.start()
+    changepresence.start()
 
 
 # get the bot token

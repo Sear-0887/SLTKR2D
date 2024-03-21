@@ -3,7 +3,6 @@ import os
 import nextcord
 import json
 from nextcord.ext import commands
-from pyfunc.lang import evl
 from pyfunc.commanddec import CogCommand
 from collections import defaultdict
 from itertools import takewhile,count
@@ -35,7 +34,7 @@ class Admin(commands.Cog):
             await ctx.send("cog_"+tar+".py is already loaded.")
         except commands.errors.ExtensionNotFound:
             await ctx.send("cog_"+tar+".py not found.")
-            
+
     @commands.has_permissions(administrator=True)
     @CogCommand("unloadcog")
     async def unloadcog(self,ctx, tar):
@@ -49,7 +48,7 @@ class Admin(commands.Cog):
             await ctx.send("cog_"+tar+".py is already unloaded.")
         except commands.errors.ExtensionNotFound:
             await ctx.send("cog_"+tar+".py not found.")
-            
+
     @commands.has_permissions(administrator=True)
     @CogCommand("reloadcog")
     async def reloadcog(self,ctx, tar):
@@ -58,22 +57,22 @@ class Admin(commands.Cog):
             self.bot.load_extension("cog_"+tar)
             await ctx.send("RELOADED "+"cog_"+tar+".py")
         except commands.errors.ExtensionNotFound:
-            await ctx.send("cog_"+tar+".py not found.")    
-    
+            await ctx.send("cog_"+tar+".py not found.")
+
     @commands.has_permissions(administrator=True)
     @CogCommand("deletelog")
     async def delog(self, ctx):
         for cachef in glob.glob("cache/log/cache-??-??-????.txt"):
             os.remove(cachef)
         await ctx.send("Done.")
-    
+
     @commands.has_permissions(administrator=True)
     @CogCommand("deleteerr")
     async def deleteerr(self, ctx):
         for errf in glob.glob("cache/log/error-*-??-??-????.json"):
             os.remove(errf)
         await ctx.send("Done.")
-    
+
     @CogCommand("viewerr")
     async def viewerr(self, ctx, count: int=1, user: nextcord.User=None, ):
         if count == "*": count = 999999 # All 
@@ -129,7 +128,7 @@ class Admin(commands.Cog):
                 await ctx.send(f'The Error is too long to be displayed.\n Please view `{fname}` for more info.')
 
 
-            
-    
+
+
 def setup(bot):
 	bot.add_cog(Admin(bot))
