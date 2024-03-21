@@ -13,7 +13,7 @@ from datetime import datetime
 import glob
 import re
 from dotenv import dotenv_values
-cmdi = {}
+import collections
 config = None
 devs = None
 keywords = {}
@@ -29,19 +29,26 @@ def lprint(*values: object, sep: str | None = " ",end: str | None = "\n", ptnt: 
     if ptnt:
         print(values,end='')
 
+def recursiveddict():
+    return collections.defaultdict(recursiveddict)
+
+cmdi = recursiveddict()
+
 def phraserfile(fname,lang):
-    with open(fname , "r", encoding='utf-8') as f:
-        fc = re.sub(r"\\\s*\n", r"\\", f.read())
-        for line in fc.split("\n"):
-            if line.startswith("##"): continue
-            for expr, val in re.findall(r"^([\w.]+)\s*=\s*(.+)", line):
-                val = val.replace("\\", "\n")
-                if re.match(r"^\[.*\]$", val):
-                    val = val[1:-1].split(", ")
-                    if val == ['']: val = []
-                val = replacemoji(val)
-                cmdi[lang][expr] = val
-                lprint(f"{(expr, val) =}")
+    with open(os.path.join(cfg('local.localPath'),lang,fname), "r", encoding='utf-8') as f:
+        linesiter=iter(f)
+        for line in linesiter:
+            while line.endswith('\\\n'):
+                line=line[:-2].strip()+'\n'+next(linesiter) # add the next line to this if this line ends with a backslash
+            line=re.sub('#.*$','',line) # remove comments
+            if '=' not in line:
+                continue
+            key,value=line.split('=',maxsplit=1)
+            value=value.strip()
+            if value.startswith('[') and value.endswith(']'):
+                value=[v.strip() for v in value[1:-1].split(',') if len(v.strip())>0]
+            key=key.strip()
+            cmdi[lang][key]=value
 
 # load the command locale
 def phraser():
