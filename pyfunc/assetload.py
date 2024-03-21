@@ -32,14 +32,14 @@ modifiers={
 }
 
 def getblockids():
-    with open(cfg("localGame.texture.blockIDFile")) as f:
+    with open(cfg("localGame.texture.blockIDFile"), encoding="utf-8") as f:
         data=smp.getsmpvalue(f.read())
     for name,i in data.items():
         blockinfos[name]["id"] = int(i)
         idtoblock[int(i)] = name
 
 def geticoncoords():
-    with open(cfg("localGame.texture.iconLocationFile")) as f:
+    with open(cfg("localGame.texture.iconLocationFile"), encoding="utf-8") as f:
         data=smp.getsmpvalue(f.read())
     for icon,xy in data.items():
         x,y=xy.split(',')
@@ -74,11 +74,12 @@ def substitutelocale(s):
 
 def getlocale():
     # get locale entries from config.local_game.language_path
-    # a locale entry is 
+    # a locale entry is
     # category name = value
     # value can be continued across lines with a backslash (\)
     # comments beginning with # are ignored
-    for langname, langpath in cfg("localGame.language.en").items():
+    for langname, langdata in cfg("localGame.language").items():
+        langpath=langdata['path']
         for fname in glob.glob(langpath):
             with open(fname, "r") as f:
                 linesiter=iter(f)
