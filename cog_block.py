@@ -1,3 +1,4 @@
+import collections
 from pyfunc.assetload import blockinfos, idtoblock as quickidtable,locale
 import nextcord
 import random
@@ -42,6 +43,7 @@ class Block(commands.Cog):
     #eswn
     @CogCommand("image")
     async def image(self,ctx, *, x="[[16][20]][[16][16]]"):
+        blocklist = collections.defaultdict(int)
         blocks=smp.getsmpvalue(x)
         for y,row in enumerate(blocks):
             for x,b in enumerate(row):
@@ -75,9 +77,20 @@ class Block(commands.Cog):
                 if b.isdigit():
                     b = idtoblock[int(b)]
                 blocks[y][x] = {"type":b,"rotate":turn,"weld":weld}
+                blocklist[b] += 1
         im=blockmakeimage(blocks,32)
         im.save("cache/blocks.png")
-        await ctx.send(file=nextcord.File("cache/blocks.png", filename="f.png"))
+        embed = nextcord.Embed()
+        width, height = im.size
+        embed.title = f"{width//32}x{height//32} Image"
+        embed.set_image(url="attachment://f.png")
+        
+        embed.add_field(name="Material List", 
+                        value=', '.join(
+                            [f"{count} {block}"for block, count in blocklist.items()])
+                        )
+            
+        await ctx.send(embed=embed, file=nextcord.File("cache/blocks.png", filename="f.png"))
         
 def setup(bot):
 	bot.add_cog(Block(bot))
