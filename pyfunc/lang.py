@@ -3,10 +3,7 @@
 # value['link'] is the url
 # value['kw'] is the keywords !link recognizes
 
-
 # the links as one string (used to format into !link description)
-
-
 
 import time
 import os
@@ -55,14 +52,12 @@ def phraser():
         except: cmdi[lang] = {}
         for i in glob.glob("lang/en/*.txt"):
             phraserfile(i,lang)
-                    
-                        
     print(cmdi['en']["help.aliases"])
     # EXCEPTIONS
     cmdi['en']["link.desc"] = cmdi['en']["link.desc"].format("".join([
-    f"{name} ({data['link']})\nKeywords: `{'`, `'.join(data['kw'])}`\n"
-    for name,data in keywords.items()
-]))
+        f"{name} ({data['link']})\nKeywords: `{'`, `'.join(data['kw'])}`\n"
+        for name,data in keywords.items()
+    ]))
 
 def phrasermodule(module): # reloads the locale from one file in each locale folder
     found=False # did it find any locale files?
@@ -84,7 +79,7 @@ def evl(*args, lang="en") -> str | list:
         return cmdi[lang][target]
     except:
         return ""
-    
+
 def handlehostid():
     raw = ""
     try:
@@ -136,7 +131,7 @@ def getkws():
         global keywords
         keywords = json.load(f)
     return keywords
-        
+
 def botinit():
     from pyfunc.assetload import assetinit
     os.makedirs(cfg('cacheFolder'), exist_ok=True) # directory to put images and other output in

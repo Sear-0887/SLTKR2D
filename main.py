@@ -52,7 +52,7 @@ async def help(ctx, cmdname=None):
         sembed.title = evl("help.helplist.title")
         sembed.description = evl("help.helplist.desc").format("\n".join(preparedlist))
         await interaction.send(ephemeral=True, embed=sembed)
-        
+
     if not cmdname:
         # send an info embed about the bot if no command given
         embed = nextcord.Embed()
