@@ -81,13 +81,21 @@ norotatetypes=[
 	'glass_cyan','glass_magenta','glass_yellow',
 	'grass','flower_magenta','flower_yellow','residue',
 	'ice','compressed_stone'
-]
+]+noweldtypes
 # blocks that only face two directions
 twowaytypes=[
 	"wire_spool",'wood',"mirror"
 ]
 
-blocktypes=collections.defaultdict(list)
+def blockdesc():
+	return {
+		'wired':False, # does this block connect to wires beside it?
+		'platform':False, # does this block detect platforms beside it?
+		'datafilters':[], # change the block data (noweld/norotate)
+		'layers':[] # the layers of the block (actuator/any wire component)
+	}
+
+blocktypes=collections.defaultdict(blockdesc)
 
 # just a normal block
 # no wire, 4 way rotation, etc
