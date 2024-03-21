@@ -59,7 +59,7 @@ class Block(commands.Cog):
                 # dir is eswn
                 # all block can have :data after it
                 # data is block specific
-                match=re.fullmatch('(?:(?:([^]#]+)(?:#([eswn])?([01]{4})?)?)|#([^]]+))(?::([^]]+))?',b)
+                match=re.fullmatch('(?:(?:([^]#:]+)(?:#([eswn])?([01]{4})?)?)|#([^]]+))(?::([^]]+))?',b)
                 if match is None:
                     raise Exception(f'Invalid block: {b}')
                 b,turnm,weldm,unwelded,bdata=match.groups()
