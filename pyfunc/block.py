@@ -3,6 +3,7 @@ import pyfunc.smp as smp
 import os
 from pyfunc.lang import cfg
 import functools
+import collections
 
 #welded=top,left,bottom,right
 #rotate= 0    1    2      3
@@ -95,7 +96,80 @@ def blockdesc():
 		'layers':[] # the layers of the block (actuator/any wire component)
 	}
 
+def noweldfilter(data):
+	data={**data}
+	data['weld']=[False,False,False,False]
+	return data
+
+def norotatefilter(data):
+	data={**data}
+	data['rotate']=0
+	return data
+
+def twowayfilter(data):
+	data={**data}
+	if data['rotate']==1:
+		data['rotate']=3
+	if data['rotate']==2:
+		data['rotate']=0
+	return data
+
+def getblocktexture(data):
+	block=data['type']
+	offsetx=data.get('offsetx',0)
+	offsety=data.get('offsety',0)
+	return getblockim(block).crop((offsetx,offsety,offsetx+32,offsety+32)).convert('RGBA')
+
+def defaultblock(data):
+	image=getblocktexture(data)
+	top,left,bottom,right=rotatewelded(welded,rotate)
+	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
+	for x,xside in [(0,left),(8,right)]:
+		for y,yside in [(0,top),(8,bottom)]:
+			im.alpha_composite(image.crop((x+16*xside,y+16*yside,x+16*xside+8,y+16*yside+8)),(x,y))
+	im=rotateblock(im,rotate)
+	return im.resize((bsize,bsize),PIL.Image.NEAREST)
+
+def wafer(data):
+	return defaultblock({'type':'wafer'})
+
+def wire(data):
+	return defaultblock({'type':'wire'})
+
+def wiretop(data):
+	pass
+
+def actuatorhead(data):
+	pass
+
+def actuatorbase(data):
+	pass
+
+
 blocktypes=collections.defaultdict(blockdesc)
+
+for t in noweldtypes:
+	blocktypes[t]['datafilters'].append(noweldfilter)
+
+for t in norotatetypes:
+	blocktypes[t]['datafilters'].append(norotatefilter)
+
+for t in twowaytypes:
+	blocktypes[t]['datafilters'].append(twowayfilter)
+
+for t in wiretypes:
+	blocktypes[t]['wired']=True
+
+for block in blockpaths:
+	blocktypes[block]['layers']=[defaultblock]
+
+blocktypes['actuator']['layers']=[actuatorhead,actuatorbase]
+
+for t in wafertypes:
+	blocktypes[t]['layers']=[wafer,wiretop]
+
+for t in wiretypes:
+	blocktypes[t]['layers']=[wire,wiretop]
 
 # just a normal block
 # no wire, 4 way rotation, etc
@@ -341,6 +415,7 @@ def makeimage(blocks,autoweld=True):
 					[weldtop,weldleft,weldbottom,weldright]
 				):
 					print(f'welded side {i} not allowed on {block}\n'*(not w and b),end='')
+					'''
 			if block['type']=='wire':
 				b=WireBlock('frame')
 			elif block['type']=='wire_board':
@@ -376,5 +451,10 @@ def makeimage(blocks,autoweld=True):
 				bim=b.draw(block['weld'],block['rotate'],data=getblockdata(block['data']))
 			else:
 				bim=b.draw(block['weld'],block['rotate'])
-			im.alpha_composite(bim,(xi*bsize,yi*bsize)) # paste the block
+				'''
+			blocktype=blocktypes[block['type']]
+			for datafilter in blocktype['datafilters']:
+				block=datafilter(block)
+			for layer in blocktype['layers']:
+				im.alpha_composite(layer(block),(xi*bsize,yi*bsize)) # paste the block
 	return im
