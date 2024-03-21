@@ -83,6 +83,7 @@ norotatetypes=[
 	'grass','flower_magenta','flower_yellow','residue',
 	'ice','compressed_stone'
 ]+noweldtypes
+noweldtypes.append('telecross') # literally the only rotatable but unweldable block
 # blocks that only face two directions
 twowaytypes=[
 	"wire_spool",'log_maple','log_pine',"mirror"
@@ -146,7 +147,6 @@ def actuatorhead(data):
 
 def actuatorbase(data):
 	pass
-
 
 blocktypes=collections.defaultdict(blockdesc)
 
