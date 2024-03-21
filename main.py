@@ -109,11 +109,11 @@ async def credit(ctx):
 
 @tasks.loop(seconds=60)
 async def changepresence():
-    statuses = cfg("botInfo.Messages")
-    categories = [*statuses.keys()]
-    weights = [len(statuses[c]) for c in categories]
-    category = random.choices(categories,weights)
-    status = random.choice(statuses[category])
+    statuses = cfg("botInfo.Messages") # General whole Statuses
+    categories = list(statuses.keys()) # Keys
+    weights = [len(statuses[c]) for c in categories] # Weights of keys
+    category = random.choices(categories,weights)[0] # Choosing a category
+    status = random.choice(statuses[category]) # Status Message
     types={
         'play':nextcord.ActivityType.playing,
         'listen':nextcord.ActivityType.listening,
