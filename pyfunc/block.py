@@ -45,6 +45,21 @@ class Block:
 		cls.cache.append([[str(cls),args,kwargs],block])
 		return block
 
+# wire components on a wafer
+wafertypes=["accelerometer","capacitor","diode","galvanometer","latch","matcher","potentiometer","sensor","transistor","wire_board"]
+# wire components on a frame
+wiretypes=["detector","port","toggler","trigger","wire"]
+# all blocks that connect to wire
+wiredtypes=['actuator','motor','telewall','injector','pedestal','actuator_base','display',"lamp",'combiner','arc_furnace','extractor','beam_core','creator','destroyer','dismantler','magnet','manipulator','mantler']+wafertypes+wiretypes # that connect to wires
+# unweldable blocks
+noweldtypes=["copper_ore","iron_ore","pulp","sand","silicon","spawner","air"]
+# blocks that only face one direction
+norotatetypes=['pedestal','dirt','sediment','stone','rubber','leaf_maple','iron_vein','iron_bar','iron_plate','cast_iron','copper_vein','copper_bar','frame','toggler','capacitor','inductor','roller','dynamic_roller','chair','chair_pilot','display','core_ore','raw_core','mass_core','refined_core','catalyst_core','command_block','boundary','spawner','calcium_bar','water','foam','oxide','soul_core','adobe','peltmellow','glass','glass_cyan','glass_magenta','glass_yellow','grass','flower_magenta','flower_yellow','residue','ice','compressed_stone']
+# blocks that only face two directions
+twowaytypes=["wire_spool",'wood',"mirror"]
+
+blocktypes=collections.defaultdict(list)
+
 # just a normal block
 # no wire, 4 way rotation, etc
 class NormalBlock(Block):
@@ -230,19 +245,6 @@ def get(vss,xi,yi):
 	if(xi>=len(vs)):
 		return normalize("air");
 	return vs[xi]
-
-# wire components on a wafer
-wafertypes=["accelerometer","capacitor","diode","galvanometer","latch","matcher","potentiometer","sensor","transistor","wire_board"]
-# wire components on a frame
-wiretypes=["detector","port","toggler","trigger","wire"]
-# all blocks that connect to wire
-wiredtypes=['actuator','motor','telewall','injector','pedestal','actuator_base','display',"lamp",'combiner','arc_furnace','extractor','beam_core','creator','destroyer','dismantler','magnet','manipulator','mantler']+wafertypes+wiretypes # that connect to wires
-# unweldable blocks
-noweldtypes=["copper_ore","iron_ore","pulp","sand","silicon","spawner","air"]
-# blocks that only face one direction
-norotatetypes=['pedestal','dirt','sediment','stone','rubber','leaf_maple','iron_vein','iron_bar','iron_plate','cast_iron','copper_vein','copper_bar','frame','toggler','capacitor','inductor','roller','dynamic_roller','chair','chair_pilot','display','core_ore','raw_core','mass_core','refined_core','catalyst_core','command_block','boundary','spawner','calcium_bar','water','foam','oxide','soul_core','adobe','peltmellow','glass','glass_cyan','glass_magenta','glass_yellow','grass','flower_magenta','flower_yellow','residue','ice','compressed_stone']
-# blocks that only face two directions
-twowaytypes=["wire_spool",'wood',"mirror"]
 
 # can this block weld on this side?
 def canweld(side,block):
