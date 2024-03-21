@@ -10,12 +10,12 @@ from pyfunc.eval_expr import evaluate,stringifyexpr
 class Math(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        
+
     @CogCommand("eval")
     async def eval(self, ctx:commands.Context, *, formulae="3 * ( 1 + 2 )"):
         result=evaluate(formulae)
         await ctx.send(f"`{formulae} = {stringifyexpr(result)}`")
-    
+
     @CogCommand("plot")
     async def plot(self, ctx:commands.Context, slope:int=3, yinter:int=3, min_:int=-20, max_:int=20):
         xaxis = numpy.arange(min_, max_, 0.1)
@@ -27,10 +27,10 @@ class Math(commands.Cog):
         if yinter != 0: showy += ["+",""][yinter<0] + str(yinter)
         plt.savefig("cache/plot.png")
         plt.grid()
-        
+
         await ctx.send(file=nextcord.File("cache/plot.png", filename=f"{showy}.png"))
         plt.close()
-    
+
     @CogCommand("prime")
     async def prime(self, ctx:commands.Context, n:int=12):
         if n <= 0: raise Exception('Cannot Factor Nonpositive Value')
@@ -39,7 +39,7 @@ class Math(commands.Cog):
                 return ''
             return ''.join(list("⁰¹²³⁴⁵⁶⁷⁸⁹")[int(digit)] for digit in str(expo))
         await ctx.send(f"{n} = {' * '.join([f'{p}{handleexpo(e)}' for p, e in primefactor(n).items()])}")
-        
+
     @CogCommand("factor")
     async def factor(self, ctx:commands.Context, n:int=12):
         if n <= 0: raise Exception('Cannot Factor Nonpositive Value')
@@ -57,6 +57,6 @@ class Math(commands.Cog):
             factors=newfactors
         factors.sort() # in place sort
         await ctx.send(f"{n} has {len(factors)} factors: \n{', '.join(map(str,factors))}")
-        
+
 def setup(bot):
 	bot.add_cog(Math(bot))

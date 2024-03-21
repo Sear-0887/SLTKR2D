@@ -15,7 +15,7 @@ class Branch(commands.Cog):
 def setup(bot):
     # https://stackoverflow.com/a/62724213
     head_dir = Path(".") / ".git" / "HEAD"
-    with head_dir.open("r") as f: content = f.read().splitlines()
+    with head_dir.open("r", encoding="utf-8") as f: content = f.read().splitlines()
 
     for line in content:
         if line[0:4] == "ref:":

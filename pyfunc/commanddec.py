@@ -48,13 +48,13 @@ async def ErrorHandler(name, ctx:commands.Context, e, args, kwargs):
     print(
 f'''
 {'-'*20}
-{RED}Exception: " {BLUE}{e} {RED}" 
+{RED}Exception: " {BLUE}{e} {RED}"
 {RED}on {name} ({type(e)}).
 
 {BLUE}Passed Parameters:
 {ctx = },
 {args = },
-{kwargs = } 
+{kwargs = }
 
 {GREEN}Expected Error: "{expecterr}"
 {RESET}{'-'*20}
@@ -69,25 +69,26 @@ f'''
             "servername": ctx.guild.name
         },
         'time': datetime.datetime.now().isoformat(),
-        'trigger': ctx.message.clean_content.split('\n'),
-        'arg': args,
-        'kwarg': kwargs,
-        'errname': str(e).split('\n'),
-        'errline': '\n'.join(traceback.format_exception(e)).split("\n")
+        'trigger': ctx.message.clean_content,
+        'arg': [repr(a) for a in args],
+        'kwarg': {k:repr(v) for k,v in kwargs.items()},
+        'errline': '\n'.join(traceback.format_exception(e)),
+        'errname': str(type(e)),
     }
+    excstrs = [str(e)]
+    while e.__context__ or e.__cause__:
+        e = e.__context__ or e.__cause__
+        excstrs = [str(e),*excstrs]
+    errorpacket['excstr'] = '\n'.join(excstrs)
     
     errfilname = f"cache/log/error-{ctx.author.global_name}-{datetime.date.today():%d-%m-%Y}.json"
     try:
-        open(errfilname, "r+")
-    except:
-        open(errfilname, "w+")
-    with open(errfilname, "r+") as fil:
-        prev = []
-        try:
+        with open(errfilname, "r") as fil:
             prev = json.load(fil)
-        except: pass
+    except:
+        prev = []
     prev.append(errorpacket)
-    with open(errfilname, "w+") as fil:
+    with open(errfilname, "w") as fil:
         json.dump(prev, fil, indent=4)
 
 def MainCommand(bot,name):
@@ -101,8 +102,8 @@ def MainCommand(bot,name):
         return decorator.decorate(cmd,_trycmd) # decorator preserves the signature of cmd
     def fixcmd(cmd):
         return bot.command(
-            name        =        name, 
-            description = evl(f"{name}.desc"), 
+            name        =        name,
+            description = evl(f"{name}.desc"),
             aliases     = evl(f"{name}.aliases")
         )( trycmd(cmd) )
     return fixcmd
@@ -119,8 +120,8 @@ def CogCommand(name):
         return decorator.decorate(cmd,_trycmd)
     def fixcmd(cmd):
         return commands.command(
-            name        =        name, 
-            description = evl(f"{name}.desc"), 
+            name        =        name,
+            description = evl(f"{name}.desc"),
             aliases     = evl(f"{name}.aliases")
         )( trycmd(cmd) )
     return fixcmd

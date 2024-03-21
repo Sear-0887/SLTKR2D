@@ -50,7 +50,7 @@ async def help(ctx, cmdname=None):
         sembed.title = evl("help.helplist.title")
         sembed.description = evl("help.helplist.desc").format("\n".join(preparedlist))
         await interaction.send(ephemeral=True, embed=sembed)
-        
+
     if not cmdname:
         # send an info embed about the bot if no command given
         embed = nextcord.Embed()
@@ -66,17 +66,16 @@ async def help(ctx, cmdname=None):
         await ctx.send(embed=embed, view=view)
     else:
         # search through the commands and their aliases
-        for cmd in bot.commands:
-            if cmdname in cmd.aliases or cmdname == cmd.name:
-                cmdname = cmd.name
-                embed = nextcord.Embed()
-                embed.title = cmd.name
-                embed.description = evl(f"{cmdname}.desc")
-                embed.add_field(name="Syntax", value=evl(f"{cmd.name}.syntax"))
-                embed.add_field(name="Aliases", value=",\n".join(cmd.aliases))
-                embed.add_field(name="Cog", value='Main' if cmd.cog_name == None else cmd.cog_name)
-                await ctx.send(embed=embed)
-                return
+        cmds={alias:cmd for cmd in bot.commands for alias in cmd.aliases+[cmd.name]}
+        if cmdname in cmds:
+            cmd=cmds[cmdname]
+            embed = nextcord.Embed()
+            embed.title = cmd.name
+            embed.description = evl(f"{cmd.name}.desc")
+            embed.add_field(name="Syntax", value=evl(f"{cmd.name}.syntax"))
+            embed.add_field(name="Aliases", value=",\n".join(cmd.aliases))
+            embed.add_field(name="Cog", value='Main' if cmd.cog_name == None else cmd.cog_name)
+            await ctx.send(embed=embed)
         else:
             raise KeyError("Couldn't find the command") # the decorator will handle it
 
@@ -109,18 +108,20 @@ async def credit(ctx):
     await ctx.send(evl("credit.display").format(devstr))
 
 @tasks.loop(seconds=60)
-async def changepresense():
-    allmessages = cfg("botInfo.Messages")
-    rdmcatagory = random.choice(list(allmessages.keys()))
-    message = random.choice(allmessages[rdmcatagory])
-    typ={
+async def changepresence():
+    statuses = cfg("botInfo.Messages")
+    categories = [*statuses.keys()]
+    weights = [len(statuses[c]) for c in categories]
+    category = random.choices(categories,weights)
+    status = random.choice(statuses[category])
+    types={
         'play':nextcord.ActivityType.playing,
         'listen':nextcord.ActivityType.listening,
         'watch':nextcord.ActivityType.watching,
     }
-    presense=nextcord.Activity(type=typ[rdmcatagory], name=message)
-    print(f"Changed Presence to {presense}")
-    await bot.change_presence(status=nextcord.Status.online, activity=presense)
+    presence=nextcord.Activity(type=types[category], name=status)
+    print(f"Changed Presence to {presence}")
+    await bot.change_presence(status=nextcord.Status.online, activity=presence)
 
 # the bot is ready now
 @bot.event
@@ -129,7 +130,7 @@ async def on_ready():
     print("Done.")
     global TimeOn
     TimeOn = datetime.datetime.now() # updating the real TimeOnline
-    changepresense.start()
+    changepresence.start()
 
 
 # get the bot token

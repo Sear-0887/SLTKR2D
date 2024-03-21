@@ -169,7 +169,7 @@ class WireBlock(Block):
 class PlatformBlock(Block):
 	def __init__(self):
 		self.image=getblockim('platform').convert('RGBA')
-		
+
 	def draw(self,welded,_,size=128,offset=(0,0)):
 		_,left,_,right=welded
 		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
@@ -283,7 +283,7 @@ def makeimage(blocks,bsize=128,autoweld=True):
 				weldbottom=canweld('bottom',block) and canweld('top',get(newblocks,xi,yi+1))
 				weldtop=canweld('top',block) and canweld('bottom',get(newblocks,xi,yi-1))
 				block['weld']=[
-					b and w for b,w in 
+					b and w for b,w in
 					zip(
 						block['weld'],
 						[weldtop,weldleft,weldbottom,weldright]
