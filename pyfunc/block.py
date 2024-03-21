@@ -121,6 +121,8 @@ def getblocktexture(data):
 	return getblockim(block).crop((offsetx,offsety,offsetx+32,offsety+32)).convert('RGBA')
 
 def defaultblock(data):
+	welded=data['weld']
+	rotate=data['rotate']
 	image=getblocktexture(data)
 	top,left,bottom,right=rotatewelded(welded,rotate)
 	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
