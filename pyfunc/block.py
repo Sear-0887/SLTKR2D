@@ -2,6 +2,7 @@ import PIL.Image
 import pyfunc.smp as smp
 import os
 from pyfunc.lang import cfg
+import functools
 
 #welded=top,left,bottom,right
 #rotate= 0    1    2      3
@@ -15,6 +16,7 @@ with open(pthblocktexture) as f:
 for name,texture in data.items():
   blockpaths[name] = texture
 
+@functools.cache
 def getblockim(block):
 	return PIL.Image.open(os.path.join(cfg("localGame.texture.texturePathFolder"),blockpaths[block]))
 
