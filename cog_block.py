@@ -7,7 +7,7 @@ from PIL import Image
 from nextcord.ext import commands
 from pyfunc.lang import cfg
 from pyfunc.commanddec import CogCommand
-from pyfunc.block import makeimage as blockmakeimage
+from pyfunc.block import makeimage as blockmakeimage, bsize
 import pyfunc.smp as smp
 
 class Block(commands.Cog):
@@ -76,12 +76,12 @@ class Block(commands.Cog):
                     b = idtoblock[int(b)]
                 blocks[y][x] = {"type":b,"rotate":turn,"weld":weld,"data":bdata}
                 blocklist[b] += 1
-        im=blockmakeimage(blocks,32)
+        im=blockmakeimage(blocks)
         im.save("cache/blocks.png")
         
         embed = nextcord.Embed()
         width, height = im.size
-        embed.title = f"{width//32}x{height//32} Image"
+        embed.title = f"{width//bsize}x{height//bsize} Image"
         embed.set_image(url="attachment://f.png")
         
         embed.add_field(name="Material List", 
