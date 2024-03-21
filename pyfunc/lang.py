@@ -29,10 +29,7 @@ def lprint(*values: object, sep: str | None = " ",end: str | None = "\n", ptnt: 
     if ptnt:
         print(values,end='')
 
-def recursiveddict():
-    return collections.defaultdict(recursiveddict)
-
-cmdi = recursiveddict()
+cmdi = collections.defaultdict(dict)
 
 def phraserfile(fname,lang):
     with open(os.path.join(cfg('locale.localePath'),lang,fname), "r", encoding='utf-8') as f:
@@ -54,9 +51,6 @@ def phraserfile(fname,lang):
 def phraser():
     loademoji()
     for lang in os.listdir(cfg('locale.localePath')):
-        lang = langpth[5:]
-        try: cmdi[lang]
-        except: cmdi[lang] = {}
         for i in os.listdir(os.path.join(cfg('locale.localePath'),lang)):
             phraserfile(i,lang)
     print(cmdi['en']["help.aliases"])
