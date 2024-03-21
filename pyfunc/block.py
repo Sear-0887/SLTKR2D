@@ -16,6 +16,9 @@ for name,texture in data.items():
 def getblockim(block):
 	return PIL.Image.open(os.path.join(cfg("localGame.texture.texturePathFolder"),blockpaths[block]))
 
+def getblockdata(data):
+	return {'data':data}
+
 # https://stackoverflow.com/a/13054570
 class Block:
 	# a class that i'm mot sure i need
@@ -326,6 +329,9 @@ def makeimage(blocks,bsize=128,autoweld=True):
 				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type'] in wiredtypes else True)
 				block['weld'][2]=block['weld'][2] and (2 if get(newblocks,xi,yi+1)['type'] in wiredtypes else True)
 				block['weld'][3]=block['weld'][3] and (2 if get(newblocks,xi+1,yi)['type'] in wiredtypes else True)
-			bim=b.draw(block['weld'],block['rotate'],size=bsize)
+			if block['data'] is not None:
+				bim=b.draw(block['weld'],block['rotate'],data=getblockdata(block['data']),size=bsize)
+			else:
+				bim=b.draw(block['weld'],block['rotate'],size=bsize)
 			im.alpha_composite(bim,(xi*bsize,yi*bsize)) # paste the block
 	return im
