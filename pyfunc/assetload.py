@@ -78,7 +78,8 @@ def getlocale():
     # category name = value
     # value can be continued across lines with a backslash (\)
     # comments beginning with # are ignored
-    for langname, langpath in cfg("localGame.language.en").items():
+    for langname, langdata in cfg("localGame.language").items():
+        langpath=langdata['path']
         for fname in glob.glob(langpath):
             with open(fname, "r") as f:
                 linesiter=iter(f)
