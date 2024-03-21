@@ -173,34 +173,6 @@ for t in wafertypes:
 for t in wiretypes:
 	blocktypes[t]['layers']=[wire,wiretop]
 
-# just a normal block
-# no wire, 4 way rotation, etc
-class NormalBlock(Block):
-	def __init__(self,block,offset=0):
-		self.image=getblockim(block).crop((offset,0,offset+32,32)).convert('RGBA')
-
-	def draw(self,welded,rotate=0):
-		top,left,bottom,right=rotatewelded(welded,rotate)
-		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
-		for x,xside in [(0,left),(8,right)]:
-			for y,yside in [(0,top),(8,bottom)]:
-				im.alpha_composite(self.image.crop((x+16*xside,y+16*yside,x+16*xside+8,y+16*yside+8)),(x,y))
-		im=rotateblock(im,rotate)
-		return im.resize((bsize,bsize),PIL.Image.NEAREST)
-
-# a block that welds but doesn't rotate (pedestal)
-class NoRotateBlock(Block):
-	def __init__(self,block,offset=0):
-		self.image=getblockim(block).crop((offset,0,offset+32,32)).convert('RGBA')
-
-	def draw(self,welded,_=0):
-		top,left,bottom,right=welded
-		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
-		for x,xside in [(0,left),(8,right)]:
-			for y,yside in [(0,top),(8,bottom)]:
-				im.alpha_composite(self.image.crop((x+16*xside,y+16*yside,x+16*xside+8,y+16*yside+8)),(x,y))
-		return im.resize((bsize,bsize),PIL.Image.NEAREST)
-
 # rotate an image of a block by rotate
 def rotateblock(im,rotate):
 	if rotate==0:
