@@ -6,6 +6,8 @@ from pyfunc.lang import cfg
 #welded=top,left,bottom,right
 #rotate= 0    1    2      3
 
+bsize=128
+
 blockpaths={}
 pthblocktexture = cfg("localGame.texture.texturePathFile")
 with open(pthblocktexture) as f:
@@ -23,7 +25,7 @@ def getblockdata(data):
 class Block:
 	# a class that i'm mot sure i need
 	# maybe replace with functions?
-	# has a draw(welds,direction,size) method
+	# has a draw(welds,direction) method
 	# with all the special cases, i'm not sure classes is easier
 	cache = []
 
@@ -47,27 +49,27 @@ class NormalBlock(Block):
 	def __init__(self,block,offset=0):
 		self.image=getblockim(block).crop((offset,0,offset+32,32)).convert('RGBA')
 
-	def draw(self,welded,rotate=0,size=128):
+	def draw(self,welded,rotate=0):
 		top,left,bottom,right=rotatewelded(welded,rotate)
 		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 		for x,xside in [(0,left),(8,right)]:
 			for y,yside in [(0,top),(8,bottom)]:
 				im.alpha_composite(self.image.crop((x+16*xside,y+16*yside,x+16*xside+8,y+16*yside+8)),(x,y))
 		im=rotateblock(im,rotate)
-		return im.resize((size,size),PIL.Image.NEAREST)
+		return im.resize((bsize,bsize),PIL.Image.NEAREST)
 
 # a block that welds but doesn't rotate (pedestal)
 class NoRotateBlock(Block):
 	def __init__(self,block,offset=0):
 		self.image=getblockim(block).crop((offset,0,offset+32,32)).convert('RGBA')
 
-	def draw(self,welded,_=0,size=128):
+	def draw(self,welded,_=0):
 		top,left,bottom,right=welded
 		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 		for x,xside in [(0,left),(8,right)]:
 			for y,yside in [(0,top),(8,bottom)]:
 				im.alpha_composite(self.image.crop((x+16*xside,y+16*yside,x+16*xside+8,y+16*yside+8)),(x,y))
-		return im.resize((size,size),PIL.Image.NEAREST)
+		return im.resize((bsize,bsize),PIL.Image.NEAREST)
 
 # rotate an image of a block by rotate
 def rotateblock(im,rotate):
@@ -97,7 +99,7 @@ class TwoSideBlock(Block):
 	def __init__(self,block,offset=0):
 		self.image=getblockim(block).crop((offset,0,offset+32,32)).convert('RGBA')
 
-	def draw(self,welded,rotate=0,size=128):
+	def draw(self,welded,rotate=0):
 		if rotate==1:
 			rotate=3
 		if rotate==2:
@@ -108,7 +110,7 @@ class TwoSideBlock(Block):
 			for y,yside in [(0,top),(8,bottom)]:
 				im.alpha_composite(self.image.crop((x+16*xside,y+16*yside,x+16*xside+8,y+16*yside+8)),(x,y))
 		im=rotateblock(im,rotate)
-		return im.resize((size,size),PIL.Image.NEAREST)
+		return im.resize((bsize,bsize),PIL.Image.NEAREST)
 
 # sand
 # unweldable
@@ -116,21 +118,21 @@ class NoWeldBlock(Block):
 	def __init__(self,block):
 		self.image=getblockim(block).crop((0,0,16,16)).convert('RGBA')
 
-	def draw(self,_,__=0,size=128):
+	def draw(self,_,__=0):
 		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 		im.alpha_composite(self.image.crop((0,0,16,16)))
-		return im.resize((size,size),PIL.Image.NEAREST)
+		return im.resize((bsize,bsize),PIL.Image.NEAREST)
 
 # literally just telecross
 class TelecrossBlock(Block):
 	def __init__(self):
 		self.image=getblockim('telecross').crop((0,0,16,16)).convert('RGBA')
 
-	def draw(self,_,rotate=0,size=128):
+	def draw(self,_,rotate=0):
 		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 		im.alpha_composite(self.image.crop((0,0,16,16)))
 		im=rotateblock(im,rotate)
-		return im.resize((size,size),PIL.Image.NEAREST)
+		return im.resize((bsize,bsize),PIL.Image.NEAREST)
 
 # all wire components (transistor, latch, etc)
 class WaferBlock(Block):
@@ -139,7 +141,7 @@ class WaferBlock(Block):
 		self.wire=getblockim('wire').crop((offset,0,offset+32,32)).convert('RGBA')
 		self.image=getblockim(top).crop((offset,0,offset+32,32)).convert('RGBA')
 
-	def draw(self,welded,rotate=0,size=128,offset=(0,0)):
+	def draw(self,welded,rotate=0,offset=(0,0)):
 		top,left,bottom,right=welded
 		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 		for x,xside in [(0,left),(8,right)]:
@@ -149,7 +151,7 @@ class WaferBlock(Block):
 			for y,yside in [(0,top),(8,bottom)]:
 				im.alpha_composite(self.wire.crop((x+16*(xside//2+offset[0]),y+16*(yside//2+offset[1]),x+16*(xside//2+offset[0])+8,y+16*(yside//2+offset[1])+8)),(x,y))
 		im.alpha_composite(self.image.crop((16*offset[0],16*offset[1],16*(offset[0]+1),16*(offset[1]+1))).rotate(90*rotate))
-		return im.resize((size,size),PIL.Image.NEAREST)
+		return im.resize((bsize,bsize),PIL.Image.NEAREST)
 
 # wire board and wire
 class WireBlock(Block):
@@ -157,7 +159,7 @@ class WireBlock(Block):
 		self.wafer=getblockim(base).crop((0,0,32,32)).convert('RGBA')
 		self.image=getblockim('wire').crop((offset,0,offset+32,32)).convert('RGBA')
 
-	def draw(self,welded,_=0,size=128,offset=(0,0)):
+	def draw(self,welded,_=0,offset=(0,0)):
 		top,left,bottom,right=welded
 		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 		for x,xside in [(0,left),(8,right)]:
@@ -166,14 +168,14 @@ class WireBlock(Block):
 		for x,xside in [(0,left),(8,right)]:
 			for y,yside in [(0,top),(8,bottom)]:
 				im.alpha_composite(self.image.crop((x+16*(xside//2+offset[0]),y+16*(yside//2+offset[1]),x+16*(xside//2+offset[0])+8,y+16*(yside//2+offset[1])+8)),(x,y))
-		return im.resize((size,size),PIL.Image.NEAREST)
+		return im.resize((bsize,bsize),PIL.Image.NEAREST)
 
 # platform
 class PlatformBlock(Block):
 	def __init__(self):
 		self.image=getblockim('platform').convert('RGBA')
 
-	def draw(self,welded,_,size=128,offset=(0,0)):
+	def draw(self,welded,_,offset=(0,0)):
 		_,left,_,right=welded
 		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 		y=0
@@ -181,7 +183,7 @@ class PlatformBlock(Block):
 			y=16
 		for x,xside in [(0,left),(8,right)]:
 			im.alpha_composite(self.image.crop((x+16*xside,y,x+16*xside+8,y+16)),(x,0))
-		return im.resize((size,size),PIL.Image.NEAREST)
+		return im.resize((bsize,bsize),PIL.Image.NEAREST)
 
 # actuator
 class ActuatorBlock(Block):
@@ -189,7 +191,7 @@ class ActuatorBlock(Block):
 		self.base=getblockim('actuator_base').crop((0,0,32,32)).convert('RGBA')
 		self.head=getblockim('actuator_head').crop((0,0,32,32)).convert('RGBA')
 
-	def draw(self,welded,rotate=0,size=128):
+	def draw(self,welded,rotate=0):
 		headtop,baseleft,basebottom,baseright=rotatewelded(welded,rotate)
 		basetop,headleft,headbottom,headright=[True,False,True,False]
 		im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
@@ -200,7 +202,7 @@ class ActuatorBlock(Block):
 			for y,yside in [(0,basetop),(8,basebottom)]:
 				im.alpha_composite(self.base.crop((x+16*xside,y+16*yside,x+16*xside+8,y+16*yside+8)),(x,y))
 		im=rotateblock(im,rotate)
-		return im.resize((size,size),PIL.Image.NEAREST)
+		return im.resize((bsize,bsize),PIL.Image.NEAREST)
 
 # convert blocks into a standardized format
 # for easy processing
@@ -262,7 +264,7 @@ def canweld(side,block):
 # blocks is a grid of blocks
 # autoweld makes it weld all possible unspecified welds
 # autoweld=False makes welds not autocorrect (for rendering roody structures)
-def makeimage(blocks,bsize=128,autoweld=True):
+def makeimage(blocks,autoweld=True):
 	xsize=max(map(len,blocks))
 	ysize=len(blocks)
 
@@ -330,8 +332,8 @@ def makeimage(blocks,bsize=128,autoweld=True):
 				block['weld'][2]=block['weld'][2] and (2 if get(newblocks,xi,yi+1)['type'] in wiredtypes else True)
 				block['weld'][3]=block['weld'][3] and (2 if get(newblocks,xi+1,yi)['type'] in wiredtypes else True)
 			if block['data'] is not None:
-				bim=b.draw(block['weld'],block['rotate'],data=getblockdata(block['data']),size=bsize)
+				bim=b.draw(block['weld'],block['rotate'],data=getblockdata(block['data']))
 			else:
-				bim=b.draw(block['weld'],block['rotate'],size=bsize)
+				bim=b.draw(block['weld'],block['rotate'])
 			im.alpha_composite(bim,(xi*bsize,yi*bsize)) # paste the block
 	return im
