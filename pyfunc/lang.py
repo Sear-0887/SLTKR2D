@@ -53,11 +53,11 @@ def phraserfile(fname,lang):
 # load the command locale
 def phraser():
     loademoji()
-    for langpth in glob.glob("lang/*"):
+    for lang in os.listdir(cfg('locale.localePath')):
         lang = langpth[5:]
         try: cmdi[lang]
         except: cmdi[lang] = {}
-        for i in glob.glob("lang/en/*.txt"):
+        for i in os.listdir(os.path.join(cfg('locale.localePath'),lang)):
             phraserfile(i,lang)
     print(cmdi['en']["help.aliases"])
     # EXCEPTIONS
