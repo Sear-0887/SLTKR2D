@@ -74,7 +74,6 @@ class Block(commands.Cog):
                     b='air'
                 if b.isdigit():
                     b = idtoblock[int(b)]
-                await ctx.send(bdata)
                 blocks[y][x] = {"type":b,"rotate":turn,"weld":weld,"data":bdata}
                 blocklist[b] += 1
         im=blockmakeimage(blocks,32)
