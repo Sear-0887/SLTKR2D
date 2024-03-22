@@ -149,8 +149,8 @@ def wire(data):
 def actuator(data):
 	welded=data['weld']
 	rotate=data['rotate']
-	im1=getblocktexture(data)
-	im2=getblocktexture(data)
+	im1=getblocktexture({'type':'actuator_base'})
+	im2=getblocktexture({'type':'actuator_head'})
 	top,left,bottom,right=rotatewelded(welded,rotate)
 	weld1=True,left,bottom,right
 	weld2=top,False,True,False
