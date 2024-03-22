@@ -1,6 +1,7 @@
 import datetime
 import decorator
 import json
+import asyncio
 from pyfunc.lang import evl
 from colorama import Fore, init
 from nextcord.ext import commands
@@ -95,6 +96,7 @@ def MainCommand(bot,name):
     # bot command
     async def _trycmd(cmd,ctx,*args,**kwargs):
         try:
+            await ctx.trigger_typing()
             await cmd(ctx,*args,**kwargs)
         except Exception as e:
             await ErrorHandler(name, ctx, e, args, kwargs)
@@ -113,6 +115,7 @@ def CogCommand(name):
     # command gets a self argument as well
     async def _trycmd(cmd, self, ctx:commands.Context ,*args,**kwargs):
         try:
+            await ctx.trigger_typing()
             await cmd(self, ctx,*args,**kwargs)
         except Exception as e:
             await ErrorHandler(name, ctx, e, args, kwargs)

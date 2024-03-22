@@ -14,8 +14,9 @@ botinit()
 intents = nextcord.Intents.default()
 intents.members = True
 intents.message_content = True
-bot = commands.Bot(command_prefix="?", intents=intents, help_command=None)
-TimeOn = None
+bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
+# TimeOn must be a datetime, or else error will be raised when !help
+TimeOn: datetime.datetime = datetime.datetime.now() 
 # initialize some things
 keywords = getkws()
 
@@ -109,18 +110,18 @@ async def credit(ctx):
 
 @tasks.loop(seconds=60)
 async def changepresence():
-    statuses = cfg("botInfo.Messages")
-    categories = [*statuses.keys()]
-    weights = [len(statuses[c]) for c in categories]
-    category = random.choices(categories,weights)
-    status = random.choice(statuses[category])
+    statuses: dict[list] = cfg("botInfo.Messages") # General whole Statuses
+    categories: list[str] = list(statuses.keys()) # Keys
+    weights: list[int] = [len(statuses[c]) for c in categories] # Weights of keys
+    category: str = random.choices(categories,weights)[0] # Choosing a category
+    status: str = random.choice(statuses[category]) # Status Message
     types={
         'play':nextcord.ActivityType.playing,
         'listen':nextcord.ActivityType.listening,
         'watch':nextcord.ActivityType.watching,
     }
     presence=nextcord.Activity(type=types[category], name=status)
-    print(f"Changed Presence to {presence}")
+    print(f"Changed Presence to {category}: {status}")
     await bot.change_presence(status=nextcord.Status.online, activity=presence)
 
 # the bot is ready now

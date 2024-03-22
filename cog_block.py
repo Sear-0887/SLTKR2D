@@ -84,13 +84,24 @@ class Block(commands.Cog):
         embed = nextcord.Embed()
         embed.title = f"{width//16}x{height//16} Image"
         embed.set_image(url="attachment://f.png")
-        
-        embed.add_field(name="Material List", 
-                        value=', '.join(
-                            [f"{count} {block}"for block, count in blocklist.items()])
-                        )
+        iterdic = dict(sorted(blocklist.items(), key=lambda item: item[1], reverse=True))
+        materialist = ', '.join([f"{count} {block}" for block, count in iterdic.items()])
+        if len(materialist) <= 1024:
+            embed.add_field(name="Material List", value=materialist)
+            await ctx.send(embed=embed, file=nextcord.File("cache/blocks.png", filename="f.png"))
+        else:
+            with open("cache/materialist.txt", "w") as f:
+                f.write(materialist.replace(", ", ", \n"))
+            embed.add_field(name="Material List", value="*Please Refer to `material_list.txt` for the material list.*")
+            await ctx.send(
+                embed=embed, 
+                files=[
+                    nextcord.File("cache/blocks.png", filename="f.png"),
+                    nextcord.File("cache/materialist.txt", filename="material_list.txt")
+                ]
+            )
             
-        await ctx.send(embed=embed, file=nextcord.File("cache/blocks.png", filename="f.png"))
-
+        
+        
 def setup(bot):
 	bot.add_cog(Block(bot))

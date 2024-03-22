@@ -262,13 +262,13 @@ def get(vss,xi,yi):
 def canweld(side,block):
 	if block['type'] in noweldtypes:
 		return False
-	elif block['type'] in ['cap','flower_magenta','flower_yellow','grass','motor','pedestal','spikes']:
+	elif block['type'] in ['cap','flower_magenta','flower_yellow','grass','motor','pedestal','spikes']: # Only Bottom
 		sides=[False,False,True,False]
-	elif block['type'] in ['actuator_head','wire_spool']:# no sides
+	elif block['type'] in ['actuator_head','wire_spool','telewall']: # Only Top / Bottom
 		sides=[True,False,True,False]
-	elif block['type'] in ['combiner','extractor','injector','platform','telewall']: # no top/bottom
+	elif block['type'] in ['combiner','extractor','injector','platform']: # no Top / Bottom
 		sides=[False,True,False,True]
-	elif block['type'] in ['arc_furnace','beam_core','collector','creator','destroyer','dismantler','magnet','manipulator','mantler','teleportore','port']: # no top
+	elif block['type'] in ['arc_furnace','beam_core','collector','creator','destroyer','dismantler','magnet','manipulator','mantler','teleportore','summonore']: 
 		sides=[False,True,True,True]
 	else:
 		sides=[True,True,True,True]
