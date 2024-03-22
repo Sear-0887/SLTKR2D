@@ -4,6 +4,7 @@ import os
 from pyfunc.lang import cfg
 import functools
 import collections
+import re
 
 #welded=top,left,bottom,right
 #rotate= 0    1    2      3
@@ -81,7 +82,7 @@ norotatetypes=[
 	'soul_core','adobe','peltmellow','glass',
 	'glass_cyan','glass_magenta','glass_yellow',
 	'grass','flower_magenta','flower_yellow','residue',
-	'ice','compressed_stone'
+	'ice','compressed_stone','wafer'
 ]+noweldtypes
 noweldtypes.append('telecross') # literally the only rotatable but unweldable block
 # blocks that only face two directions
@@ -156,7 +157,12 @@ def wiretop(data):
 
 def wire(data):
 	welded=data['weld']
-	image=getblocktexture({'type':'wire'})
+	if data['data'] is not None:
+		bdata=re.fullmatch('(?P<state>on|off)',data['data']).groupdict()
+		offset=32 if bdata['state']=='on' else 0
+	else:
+		offset=0
+	image=getblocktexture({'type':'wire','offsetx':offset})
 	top,left,bottom,right=welded
 	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 	for x,xside in [(0,left),(8,right)]:
@@ -286,7 +292,7 @@ def canweld(side,block):
 		sides=[True,False,True,False]
 	elif block['type'] in ['combiner','extractor','injector','platform','telewall']: # no top/bottom
 		sides=[False,True,False,True]
-	elif block['type'] in ['arc_furnace','beam_core','collector','creator','destroyer','dismantler','magnet','manipulator','mantler','teleportore']: # no top
+	elif block['type'] in ['arc_furnace','beam_core','collector','creator','destroyer','dismantler','magnet','manipulator','mantler','teleportore','port']: # no top
 		sides=[False,True,True,True]
 	else:
 		sides=[True,True,True,True]
