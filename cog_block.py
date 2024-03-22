@@ -78,7 +78,7 @@ class Block(commands.Cog):
                 blocklist[b] += 1
         im=blockmakeimage(blocks)
         width, height = im.size
-        im=im.resize((width*2,height*2)) # 16x16 to 32x32
+        im=im.resize((width*4,height*4),Image.NEAREST) # 16x16 to 128x128
         im.save("cache/blocks.png")
         
         embed = nextcord.Embed()
