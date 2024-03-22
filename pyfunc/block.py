@@ -118,7 +118,9 @@ def getblocktexture(data):
 	block=data['type']
 	offsetx=data.get('offsetx',0)
 	offsety=data.get('offsety',0)
-	return getblockim(block).crop((offsetx,offsety,offsetx+32,offsety+32)).convert('RGBA')
+	sizex=data.get('sizex',32)
+	sizey=data.get('sizey',32)
+	return getblockim(block).crop((offsetx,offsety,offsetx+sizex,offsety+sizey)).convert('RGBA')
 
 def drawblocktexture(image,weld,rotate):
 	top,left,bottom,right=weld
@@ -139,7 +141,7 @@ def defaultblock(data):
 
 def overlay(data):
 	rotate=data['rotate']
-	image=getblocktexture(data)
+	image=getblocktexture({**data,'sizex':16,'sizey':16})
 	im=rotateoverlay(image,rotate)
 	return im.resize((bsize,bsize),PIL.Image.NEAREST)
 
@@ -175,6 +177,18 @@ def actuator(data):
 	im=rotateblock(im,rotate)
 	return im.resize((bsize,bsize),PIL.Image.NEAREST)
 
+def platform(data):
+	_,left,_,right=data['weld']
+	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
+	image=getblocktexture({**data,'sizex':48})
+	y=0
+	if left==0 and right==1 or left==1 and right==0 or left==0 and right==0:
+		y=16
+	for x,xside in [(0,left),(8,right)]:
+		print('xside',(x+16*xside,y,x+16*xside+8,y+16))
+		im.alpha_composite(image.crop((x+16*xside,y,x+16*xside+8,y+16)),(x,0))
+	return im.resize((bsize,bsize),PIL.Image.NEAREST)
+
 blocktypes=collections.defaultdict(blockdesc)
 
 for t in noweldtypes:
@@ -193,6 +207,7 @@ for block in blockpaths:
 	blocktypes[block]['layers']=[defaultblock]
 
 blocktypes['actuator']['layers']=[actuator]
+blocktypes['platform']['layers']=[platform]
 
 for t in wafertypes:
 	blocktypes[t]['layers']=[wafer,wire,wiretop]
@@ -337,9 +352,9 @@ def canweld(side,block):
 		return False
 	elif block['type'] in ['cap','flower_magenta','flower_yellow','grass','motor','pedestal','spikes']:
 		sides=[False,False,True,False]
-	elif block['type'] in ['actuator_head','wire_spool','telewall']:# no sides
+	elif block['type'] in ['actuator_head','wire_spool']:# no sides
 		sides=[True,False,True,False]
-	elif block['type'] in ['combiner','extractor','injector','platform']: # no top/bottom
+	elif block['type'] in ['combiner','extractor','injector','platform','telewall']: # no top/bottom
 		sides=[False,True,False,True]
 	elif block['type'] in ['arc_furnace','beam_core','collector','creator','destroyer','dismantler','magnet','manipulator','mantler','teleportore']: # no top
 		sides=[False,True,True,True]
