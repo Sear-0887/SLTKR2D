@@ -23,28 +23,6 @@ def getblockim(block):
 def getblockdata(data):
 	return {'data':data}
 
-# https://stackoverflow.com/a/13054570
-class Block:
-	# a class that i'm mot sure i need
-	# maybe replace with functions?
-	# has a draw(welds,direction) method
-	# with all the special cases, i'm not sure classes is easier
-	cache = []
-
-	@classmethod
-	def __getCache(cls, key):
-		for k,v in cls.cache:
-			if k==key:
-				return v
-		return None
-	def __new__(cls, *args, **kwargs):
-		existing = cls.__getCache([args,kwargs])
-		if existing is not None:
-			return existing
-		block = super(Block, cls).__new__(cls)
-		cls.cache.append([[str(cls),args,kwargs],block])
-		return block
-
 # wire components on a wafer
 wafertypes=[
 	"accelerometer","capacitor","diode",
@@ -338,32 +316,6 @@ def makeimage(blocks,autoweld=True):
 					[weldtop,weldleft,weldbottom,weldright]
 				):
 					print(f'welded side {i} not allowed on {block}\n'*(not w and b),end='')
-					'''
-			if block['type']=='wire':
-				b=WireBlock('frame')
-			elif block['type']=='wire_board':
-				b=WireBlock('wafer')
-			elif block['type'] in wafertypes:
-				b=WaferBlock(block['type'])
-			elif block['type'] in wiretypes:
-				b=WaferBlock(block['type'],'frame')
-			elif block['type'] in twowaytypes:
-				b=TwoSideBlock(block['type'])
-			elif block['type'] in norotatetypes:
-				b=NoRotateBlock(block['type'])
-			elif block['type'] in noweldtypes:
-				b=NoWeldBlock(block['type'])
-			elelif block['type']=='actuator':
-				b=ActuatorBlock()
-			elif block['type']=='telecross':
-				b=TelecrossBlock()
-			else:
-				b=NormalBlock(block['type'])
-			if block['data'] is not None:
-				bim=b.draw(block['weld'],block['rotate'],data=getblockdata(block['data']))
-			else:
-				bim=b.draw(block['weld'],block['rotate'])
-				'''
 			if block['type']=='platform': # special case
 				# check if sides are platform
 				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type']!='platform' else True)
