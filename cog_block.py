@@ -57,10 +57,12 @@ class Block(commands.Cog):
                 #   #block         no weld
                 # welded sides is 4x 0 or 1 in the order right bottom left top
                 # dir is eswn
-                match=re.fullmatch('(?:([^]#]+)(?:#([eswn])?([01]{4})?)?)|#([^]]+)',b)
+                # all block can have :data after it
+                # data is block specific
+                match=re.fullmatch('(?:(?:([^]#:]+)(?:#([eswn])?([01]{4})?)?)|#([^]]+))(?::([^]]+))?',b)
                 if match is None:
                     raise Exception(f'Invalid block: {b}')
-                b,turnm,weldm,unwelded=match.groups()
+                b,turnm,weldm,unwelded,bdata=match.groups()
                 if unwelded is not None:
                     weld=[False,False,False,False]
                     b=unwelded
@@ -72,15 +74,15 @@ class Block(commands.Cog):
                     b='air'
                 if b.isdigit():
                     b = idtoblock[int(b)]
-                blocks[y][x] = {"type":b,"rotate":turn,"weld":weld}
-                if b != "air":
-                    blocklist[b] += 1
-        im=blockmakeimage(blocks,32)
+                blocks[y][x] = {"type":b,"rotate":turn,"weld":weld,"data":bdata}
+                blocklist[b] += 1
+        im=blockmakeimage(blocks)
+        width, height = im.size
+        im=im.resize((width*4,height*4),Image.NEAREST) # 16x16 to 128x128
         im.save("cache/blocks.png")
         
         embed = nextcord.Embed()
-        width, height = im.size
-        embed.title = f"{width//32}x{height//32} Image"
+        embed.title = f"{width//16}x{height//16} Image"
         embed.set_image(url="attachment://f.png")
         iterdic = dict(sorted(blocklist.items(), key=lambda item: item[1], reverse=True))
         materialist = ', '.join([f"{count} {block}" for block, count in iterdic.items()])
