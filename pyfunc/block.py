@@ -9,8 +9,6 @@ import re
 #welded=top,left,bottom,right
 #rotate= 0    1    2      3
 
-bsize=128
-
 blockpaths={}
 pthblocktexture = cfg("localGame.texture.texturePathFile")
 with open(pthblocktexture) as f:
@@ -138,13 +136,13 @@ def defaultblock(data):
 	welded=rotatewelded(welded,rotate)
 	im=drawblocktexture(image,welded,rotate)
 	im=rotateblock(im,rotate)
-	return im.resize((bsize,bsize),PIL.Image.NEAREST)
+	return im
 
 def overlay(data):
 	rotate=data['rotate']
 	image=getblocktexture({**data,'sizex':16,'sizey':16})
 	im=rotateoverlay(image,rotate)
-	return im.resize((bsize,bsize),PIL.Image.NEAREST)
+	return im
 
 def wafer(data):
 	return defaultblock({**data,'type':'wafer'})
@@ -168,7 +166,7 @@ def wire(data):
 	for x,xside in [(0,left),(8,right)]:
 		for y,yside in [(0,top),(8,bottom)]:
 			im.alpha_composite(image.crop((x+16*(xside==2),y+16*(yside==2),x+16*(xside==2)+8,y+16*(yside==2)+8)),(x,y))
-	return im.resize((bsize,bsize),PIL.Image.NEAREST)
+	return im
 
 def actuator(data):
 	welded=data['weld']
@@ -181,7 +179,7 @@ def actuator(data):
 	im=drawblocktexture(im1,weld1,rotate)
 	im.alpha_composite(drawblocktexture(im2,weld2,rotate),(0,0))
 	im=rotateblock(im,rotate)
-	return im.resize((bsize,bsize),PIL.Image.NEAREST)
+	return im
 
 def platform(data):
 	_,left,_,right=data['weld']
@@ -193,7 +191,7 @@ def platform(data):
 	for x,xside in [(0,left),(8,right)]:
 		print('xside',(x+16*xside,y,x+16*xside+8,y+16))
 		im.alpha_composite(image.crop((x+16*xside,y,x+16*xside+8,y+16)),(x,0))
-	return im.resize((bsize,bsize),PIL.Image.NEAREST)
+	return im
 
 blocktypes=collections.defaultdict(blockdesc)
 
@@ -314,7 +312,7 @@ def makeimage(blocks,autoweld=True):
 			block=normalize(block)
 			newblocks[yi][xi]=block
 
-	im=PIL.Image.new('RGBA',(bsize*xsize,bsize*ysize),(0,0,0,0))
+	im=PIL.Image.new('RGBA',(16*xsize,16*ysize),(0,0,0,0))
 	for xi in range(xsize):
 		for yi in range(ysize):
 			block=get(newblocks,xi,yi)
@@ -380,5 +378,5 @@ def makeimage(blocks,autoweld=True):
 			for datafilter in blocktype['datafilters']:
 				block=datafilter(block)
 			for layer in blocktype['layers']:
-				im.alpha_composite(layer(block),(xi*bsize,yi*bsize)) # paste the block
+				im.alpha_composite(layer(block),(xi*16,yi*16)) # paste the block
 	return im
