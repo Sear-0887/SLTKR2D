@@ -1,0 +1,55 @@
+wood-leaf weld
+block detector type
+accelerator on
+toggler of
+port on
+detector on
+capacitor
+diode
+potentiometer
+transistor
+what is with the cascade
+galvanometer
+latch
+roller direction
+dynamic roller direction
+magnet on
+motor anim 
+manipulator 
+combiner?
+destroyer anim 
+extractor anim 
+do i need animation tick?
+mantler?
+arc furnace
+pilot chair control
+display
+catalyst core
+force core
+mass core? what makes it light up?
+pedestal
+raw core (bit harder) 
+spawner?
+summonore for sure
+injector
+prism
+flowers?
+foam
+water?
+frame
+it's got 2 textures
+lamp on/off
+spikes weld
+command block?
+telecross
+teleportore
+telewall
+grass
+leaf burn?
+snow
+water anim?
+trigger
+matcher
+beam things?
+cascade
+counter
