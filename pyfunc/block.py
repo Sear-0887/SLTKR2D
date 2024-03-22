@@ -50,11 +50,11 @@ class Block:
 wafertypes=[
 	"accelerometer","capacitor","diode",
 	"galvanometer","latch","matcher",
-	"potentiometer","sensor","transistor","wire_board"
+	"potentiometer","sensor","transistor"
 ]
 # wire components on a frame
 wiretypes=[
-	"detector","port","toggler","trigger","wire"
+	"detector","port","toggler","trigger"
 ]
 # all blocks that connect to wire
 wiredtypes=[
@@ -62,7 +62,7 @@ wiredtypes=[
 	'actuator_base','display',"lamp",'combiner',
 	'arc_furnace','extractor','beam_core','creator',
 	'destroyer','dismantler','magnet','manipulator',
-	'mantler'
+	'mantler','wire','wire_board'
 ]+wafertypes+wiretypes
 # unweldable blocks
 noweldtypes=[
@@ -120,32 +120,60 @@ def getblocktexture(data):
 	offsety=data.get('offsety',0)
 	return getblockim(block).crop((offsetx,offsety,offsetx+32,offsety+32)).convert('RGBA')
 
+def drawblocktexture(image,weld,rotate):
+	top,left,bottom,right=weld
+	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
+	for x,xside in [(0,left),(8,right)]:
+		for y,yside in [(0,top),(8,bottom)]:
+			im.alpha_composite(image.crop((x+16*(xside>0),y+16*(yside>0),x+16*(xside>0)+8,y+16*(yside>0)+8)),(x,y))
+	return im
+
 def defaultblock(data):
 	welded=data['weld']
 	rotate=data['rotate']
 	image=getblocktexture(data)
-	top,left,bottom,right=rotatewelded(welded,rotate)
-	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
-	for x,xside in [(0,left),(8,right)]:
-		for y,yside in [(0,top),(8,bottom)]:
-			im.alpha_composite(image.crop((x+16*xside,y+16*yside,x+16*xside+8,y+16*yside+8)),(x,y))
+	welded=rotatewelded(welded,rotate)
+	im=drawblocktexture(image,welded,rotate)
 	im=rotateblock(im,rotate)
 	return im.resize((bsize,bsize),PIL.Image.NEAREST)
 
-def wafer(data):
-	return defaultblock({'type':'wafer'})
+def overlay(data):
+	rotate=data['rotate']
+	image=getblocktexture(data)
+	im=rotateoverlay(image,rotate)
+	return im.resize((bsize,bsize),PIL.Image.NEAREST)
 
-def wire(data):
-	return defaultblock({'type':'wire'})
+def wafer(data):
+	return defaultblock({**data,'type':'wafer'})
+
+def frame(data):
+	return defaultblock({**data,'type':'frame'})
 
 def wiretop(data):
-	pass
+	return overlay(data)
 
-def actuatorhead(data):
-	pass
+def wire(data):
+	welded=data['weld']
+	image=getblocktexture({'type':'wire'})
+	top,left,bottom,right=welded
+	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
+	for x,xside in [(0,left),(8,right)]:
+		for y,yside in [(0,top),(8,bottom)]:
+			im.alpha_composite(image.crop((x+16*(xside==2),y+16*(yside==2),x+16*(xside==2)+8,y+16*(yside==2)+8)),(x,y))
+	return im.resize((bsize,bsize),PIL.Image.NEAREST)
 
-def actuatorbase(data):
-	pass
+def actuator(data):
+	welded=data['weld']
+	rotate=data['rotate']
+	im1=getblocktexture(data)
+	im2=getblocktexture(data)
+	top,left,bottom,right=rotatewelded(welded,rotate)
+	weld1=True,left,bottom,right
+	weld2=top,False,True,False
+	im=drawblocktexture(im1,weld1,rotate)
+	im.alpha_composite(drawblocktexture(im2,weld2,rotate),(0,0))
+	im=rotateblock(im,rotate)
+	return im.resize((bsize,bsize),PIL.Image.NEAREST)
 
 blocktypes=collections.defaultdict(blockdesc)
 
@@ -158,19 +186,22 @@ for t in norotatetypes:
 for t in twowaytypes:
 	blocktypes[t]['datafilters'].append(twowayfilter)
 
-for t in wiretypes:
+for t in wiretypes+wafertypes+['wire','wire_board']:
 	blocktypes[t]['wired']=True
 
 for block in blockpaths:
 	blocktypes[block]['layers']=[defaultblock]
 
-blocktypes['actuator']['layers']=[actuatorhead,actuatorbase]
+blocktypes['actuator']['layers']=[actuator]
 
 for t in wafertypes:
-	blocktypes[t]['layers']=[wafer,wiretop]
+	blocktypes[t]['layers']=[wafer,wire,wiretop]
 
 for t in wiretypes:
-	blocktypes[t]['layers']=[wire,wiretop]
+	blocktypes[t]['layers']=[frame,wire,wiretop]
+
+blocktypes['wire_board']['layers']=[wafer,wire]
+blocktypes['wire']['layers']=[frame,wire]
 
 # rotate an image of a block by rotate
 def rotateblock(im,rotate):
@@ -182,6 +213,17 @@ def rotateblock(im,rotate):
 		return im.transpose(PIL.Image.TRANSPOSE)
 	if rotate==2:
 		return im.transpose(PIL.Image.FLIP_TOP_BOTTOM)
+
+# rotate an overlay (like galvanometer) by rotate
+def rotateoverlay(im,rotate):
+	if rotate==0:
+		return im
+	if rotate==3:
+		return im.transpose(PIL.Image.ROTATE_270)
+	if rotate==1:
+		return im.transpose(PIL.Image.ROTATE_90)
+	if rotate==2:
+		return im.transpose(PIL.Image.ROTATE_180)
 
 # rotate the welds so they are in the right place when rotated by rotateblock
 def rotatewelded(welded,rotate):
@@ -377,13 +419,13 @@ def makeimage(blocks,autoweld=True):
 				# check if sides are platform
 				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type']!='platform' else True)
 				block['weld'][3]=block['weld'][3] and (2 if get(newblocks,xi+1,yi)['type']!='platform' else True)
-			if block['type'] in wiretypes+wafertypes:
+			blocktype=blocktypes[block['type']]
+			if blocktype['wired']:
 				# check if sides are wired
 				block['weld'][0]=block['weld'][0] and (2 if get(newblocks,xi,yi-1)['type'] in wiredtypes else True)
 				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type'] in wiredtypes else True)
 				block['weld'][2]=block['weld'][2] and (2 if get(newblocks,xi,yi+1)['type'] in wiredtypes else True)
 				block['weld'][3]=block['weld'][3] and (2 if get(newblocks,xi+1,yi)['type'] in wiredtypes else True)
-			blocktype=blocktypes[block['type']]
 			for datafilter in blocktype['datafilters']:
 				block=datafilter(block)
 			for layer in blocktype['layers']:
