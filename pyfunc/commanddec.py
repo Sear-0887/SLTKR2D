@@ -105,8 +105,8 @@ def MainCommand(bot,name):
     def fixcmd(cmd):
         return bot.command(
             name        =        name,
-            description = evl(f"{name}.desc"),
-            aliases     = evl(f"{name}.aliases")
+            description = evl(f"{name}.desc") or "*No Description Found.*",
+            aliases     = evl(f"{name}.aliases") or []
         )( trycmd(cmd) )
     return fixcmd
 
@@ -124,7 +124,7 @@ def CogCommand(name):
     def fixcmd(cmd):
         return commands.command(
             name        =        name,
-            description = evl(f"{name}.desc"),
-            aliases     = evl(f"{name}.aliases")
+            description = evl(f"{name}.desc") or "*No Description Found.*",
+            aliases     = evl(f"{name}.aliases") or []
         )( trycmd(cmd) )
     return fixcmd
