@@ -65,6 +65,7 @@ noweldtypes.append('telecross') # literally the only rotatable but unweldable bl
 twowaytypes=[
 	"wire_spool",'log_maple','log_pine',"mirror"
 ]
+frametypes=wiretypes+['frame']
 
 def blockdesc():
 	return {
@@ -126,7 +127,13 @@ def wafer(data):
 	return defaultblock({**data,'type':'wafer'})
 
 def frame(data):
-	return defaultblock({**data,'type':'frame'})
+	welded=data['weld']
+	rotate=data['rotate']
+	image=getblocktexture({'type':'frame'})
+	welded=rotatewelded(welded,rotate)
+	im=drawblocktexture(image,welded)
+	im=rotateblock(im,rotate)
+	return im
 
 def wiretop(data):
 	return overlay(data)
@@ -199,6 +206,7 @@ for t in wiretypes:
 
 blocktypes['wire_board']['layers']=[wafer,wire]
 blocktypes['wire']['layers']=[frame,wire]
+blocktypes['frame']['layers']=[frame]
 
 # rotate an image of a block by rotate
 def rotateblock(im,rotate):
@@ -320,6 +328,12 @@ def makeimage(blocks,autoweld=True):
 				# check if sides are platform
 				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type']!='platform' else True)
 				block['weld'][3]=block['weld'][3] and (2 if get(newblocks,xi+1,yi)['type']!='platform' else True)
+			if block['type'] in frametypes: # special case
+				# check if sides are frame base
+				block['weld'][0]=block['weld'][0] and (2 if get(newblocks,xi,yi-1)['type'] in frametypes else True)
+				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type'] in frametypes else True)
+				block['weld'][2]=block['weld'][2] and (2 if get(newblocks,xi,yi+1)['type'] in frametypes else True)
+				block['weld'][3]=block['weld'][3] and (2 if get(newblocks,xi+1,yi)['type'] in frametypes else True)
 			blocktype=blocktypes[block['type']]
 			if blocktype['wired']:
 				# check if sides are wired
