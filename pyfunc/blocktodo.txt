@@ -36,8 +36,6 @@ prism
 flowers?
 foam
 water?
-frame
-it's got 2 textures
 lamp on/off
 spikes weld
 command block?

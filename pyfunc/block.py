@@ -129,9 +129,16 @@ def wafer(data):
 def frame(data):
 	welded=data['weld']
 	rotate=data['rotate']
-	image=getblocktexture({'type':'frame'})
-	welded=rotatewelded(welded,rotate)
-	im=drawblocktexture(image,welded)
+	image=getblocktexture({'type':'frame','sizex':64})
+	top,left,bottom,right=rotatewelded(welded,rotate)
+	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
+	for x,xside in [(0,left),(8,right)]:
+		for y,yside in [(0,top),(8,bottom)]:
+			if xside==2 or yside==2:
+				offset=32 # frames have different welding to each other
+			else:
+				offset=0
+			im.alpha_composite(image.crop((x+offset+16*(xside>0),y+16*(yside>0),x+offset+16*(xside>0)+8,y+16*(yside>0)+8)),(x,y))
 	im=rotateblock(im,rotate)
 	return im
 
