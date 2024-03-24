@@ -99,7 +99,7 @@ def getblocktexture(data):
 	sizey=data.get('sizey',32)
 	return getblockim(block).crop((offsetx,offsety,offsetx+sizex,offsety+sizey)).convert('RGBA')
 
-def drawblocktexture(image,weld,rotate):
+def drawblocktexture(image,weld):
 	top,left,bottom,right=weld
 	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 	for x,xside in [(0,left),(8,right)]:
@@ -112,7 +112,7 @@ def defaultblock(data):
 	rotate=data['rotate']
 	image=getblocktexture(data)
 	welded=rotatewelded(welded,rotate)
-	im=drawblocktexture(image,welded,rotate)
+	im=drawblocktexture(image,welded)
 	im=rotateblock(im,rotate)
 	return im
 
@@ -154,7 +154,7 @@ def actuator(data):
 	top,left,bottom,right=rotatewelded(welded,rotate)
 	weld1=True,left,bottom,right
 	weld2=top,False,True,False
-	im=drawblocktexture(im1,weld1,rotate)
+	im=drawblocktexture(im1,weld1)
 	im.alpha_composite(drawblocktexture(im2,weld2,rotate),(0,0))
 	im=rotateblock(im,rotate)
 	return im
