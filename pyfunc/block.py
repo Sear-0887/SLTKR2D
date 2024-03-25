@@ -44,7 +44,7 @@ wiredtypes=[
 ]+wafertypes+wiretypes
 # unweldable blocks
 noweldtypes=[
-	"copper_ore","iron_ore","pulp","sand","silicon","spawner","air"
+	"copper_ore","iron_ore","pulp","sand","silicon","spawner","air","sawdust"
 ]
 # blocks that only face one direction
 norotatetypes=[
