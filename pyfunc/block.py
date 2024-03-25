@@ -161,7 +161,13 @@ def defaultblock(data):
 
 def overlay(data):
 	rotate=data['rotate']
-	image=getblocktexture({**data,'sizex':16,'sizey':16})
+	image=getblocktexture({
+		**data,
+		'offsetx':data.get('overlayoffsetx',0),
+		'offsety':data.get('overlayoffsety',0),
+		'sizex':16,
+		'sizey':16
+	})
 	im=rotateoverlay(image,rotate)
 	return im
 
@@ -231,6 +237,30 @@ def platform(data):
 		im.alpha_composite(image.crop((x+16*platformx(xside),y,x+16*platformx(xside)+8,y+16)),(x,0))
 	return im
 
+def wirecomponent(data):
+	if data['data'] is not None:
+		typ=data['type']
+		if typ in ["capacitor","port","accelerometer","matcher","detector","toggler","trigger"]:
+			# top off bottom on texture
+			bdata=re.fullmatch('(?P<instate>on|off)?(?P<state>on|off)',data['data']).groupdict()
+			data['overlayoffsety']=16 if bdata['state']=='on' else 0
+			data['data']=bdata['instate']
+		elif typ in ["diode","galvanometer","latch","transistor"]:
+			# column 1 off
+			# column 2 on
+			bdata=re.fullmatch('(?P<instate>on|off)?(?P<outstate>on|off)',data['data']).groupdict()
+			data['overlayoffsetx']=16 if bdata['outstate']=='on' else 0
+			data['data']=bdata['instate']
+		elif typ=="potentiometer":
+			pass
+		elif typ=="sensor":
+			pass
+		elif typ=="cascade":
+			pass
+		elif typ=="counter":
+			pass
+	return data
+
 blocktypes=collections.defaultdict(blockdesc)
 
 for t in noweldtypes:
@@ -253,9 +283,11 @@ blocktypes['platform']['layers']=[platform]
 
 for t in wafertypes:
 	blocktypes[t]['layers']=[wafer,wire,wiretop]
+	blocktypes[t]['datafilters']=[wirecomponent]
 
 for t in wiretypes:
 	blocktypes[t]['layers']=[frame,wire,wiretop]
+	blocktypes[t]['datafilters']=[wirecomponent]
 
 blocktypes['wire_board']['layers']=[wafer,wire]
 blocktypes['wire']['layers']=[frame,wire]
