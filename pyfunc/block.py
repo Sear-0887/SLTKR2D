@@ -105,7 +105,7 @@ def drawblocktexture(image,weld):
 	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 	for x,xside in [(0,left),(8,right)]:
 		for y,yside in [(0,top),(8,bottom)]:
-			im.alpha_composite(image.crop((x+16*(xside>0),y+16*(yside>0),x+16*(xside>0)+8,y+16*(yside>0)+8)),(x,y))
+			im.alpha_composite(image.crop((x+16*iswelded(xside),y+16*iswelded(yside),x+16*iswelded(xside)+8,y+16*iswelded(yside)+8)),(x,y))
 	return im
 
 def defaultblock(data):
@@ -134,11 +134,11 @@ def frame(data):
 	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 	for x,xside in [(0,left),(8,right)]:
 		for y,yside in [(0,top),(8,bottom)]:
-			if xside==2 or yside==2:
+			if isframe(xside) or isframe(yside):
 				offset=32 # frames have different welding to each other
 			else:
 				offset=0
-			im.alpha_composite(image.crop((x+offset+16*(xside>0),y+16*(yside>0),x+offset+16*(xside>0)+8,y+16*(yside>0)+8)),(x,y))
+			im.alpha_composite(image.crop((x+offset+16*iswelded(xside),y+16*iswelded(yside),x+offset+16*iswelded(xside)+8,y+16*iswelded(yside)+8)),(x,y))
 	im=rotateblock(im,rotate)
 	return im
 
@@ -157,7 +157,7 @@ def wire(data):
 	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 	for x,xside in [(0,left),(8,right)]:
 		for y,yside in [(0,top),(8,bottom)]:
-			im.alpha_composite(image.crop((x+16*(xside==2),y+16*(yside==2),x+16*(xside==2)+8,y+16*(yside==2)+8)),(x,y))
+			im.alpha_composite(image.crop((x+16*iswired(xside),y+16*iswired(yside),x+16*iswired(xside)+8,y+16*iswired(yside)+8)),(x,y))
 	return im
 
 def actuator(data):
@@ -182,7 +182,7 @@ def platform(data):
 		y=16
 	for x,xside in [(0,left),(8,right)]:
 		print('xside',(x+16*xside,y,x+16*xside+8,y+16))
-		im.alpha_composite(image.crop((x+16*xside,y,x+16*xside+8,y+16)),(x,0))
+		im.alpha_composite(image.crop((x+16*platformx(xside),y,x+16*platformx(xside)+8,y+16)),(x,0))
 	return im
 
 blocktypes=collections.defaultdict(blockdesc)
@@ -331,23 +331,24 @@ def makeimage(blocks,autoweld=True):
 					[weldtop,weldleft,weldbottom,weldright]
 				):
 					print(f'welded side {i} not allowed on {block}\n'*(not w and b),end='')
+			block['weld']=[makeweldside(w) for w in block['weld']]
 			if block['type']=='platform': # special case
 				# check if sides are platform
-				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type']!='platform' else True)
-				block['weld'][3]=block['weld'][3] and (2 if get(newblocks,xi+1,yi)['type']!='platform' else True)
+				block['weld'][1]=setplatformside(block['weld'][1],get(newblocks,xi-1,yi)['type']!='platform')
+				block['weld'][3]=setplatformside(block['weld'][3],get(newblocks,xi+1,yi)['type']!='platform')
 			if block['type'] in frametypes: # special case
 				# check if sides are frame base
-				block['weld'][0]=block['weld'][0] and (2 if get(newblocks,xi,yi-1)['type'] in frametypes else True)
-				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type'] in frametypes else True)
-				block['weld'][2]=block['weld'][2] and (2 if get(newblocks,xi,yi+1)['type'] in frametypes else True)
-				block['weld'][3]=block['weld'][3] and (2 if get(newblocks,xi+1,yi)['type'] in frametypes else True)
+				block['weld'][0]=setframeside(block['weld'][0],get(newblocks,xi,yi-1)['type'] in frametypes)
+				block['weld'][1]=setframeside(block['weld'][1],get(newblocks,xi-1,yi)['type'] in frametypes)
+				block['weld'][2]=setframeside(block['weld'][2],get(newblocks,xi,yi+1)['type'] in frametypes)
+				block['weld'][3]=setframeside(block['weld'][3],get(newblocks,xi+1,yi)['type'] in frametypes)
 			blocktype=blocktypes[block['type']]
 			if blocktype['wired']:
 				# check if sides are wired
-				block['weld'][0]=block['weld'][0] and (2 if get(newblocks,xi,yi-1)['type'] in wiredtypes else True)
-				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type'] in wiredtypes else True)
-				block['weld'][2]=block['weld'][2] and (2 if get(newblocks,xi,yi+1)['type'] in wiredtypes else True)
-				block['weld'][3]=block['weld'][3] and (2 if get(newblocks,xi+1,yi)['type'] in wiredtypes else True)
+				block['weld'][0]=setwireside(block['weld'][0],get(newblocks,xi,yi-1)['type'] in wiredtypes)
+				block['weld'][1]=setwireside(block['weld'][1],get(newblocks,xi-1,yi)['type'] in wiredtypes)
+				block['weld'][2]=setwireside(block['weld'][2],get(newblocks,xi,yi+1)['type'] in wiredtypes)
+				block['weld'][3]=setwireside(block['weld'][3],get(newblocks,xi+1,yi)['type'] in wiredtypes)
 			for datafilter in blocktype['datafilters']:
 				block=datafilter(block)
 			for layer in blocktype['layers']:
