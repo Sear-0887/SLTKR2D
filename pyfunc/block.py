@@ -65,9 +65,11 @@ noweldtypes.append('telecross') # literally the only rotatable but unweldable bl
 twowaytypes=[
 	"wire_spool",'log_maple','log_pine',"mirror"
 ]
-frametypes=wiretypes+['frame']
+frametypes=wiretypes+['frame','wire']
 
 def iswelded(side):
+	if isinstance(side,bool):
+		return side
 	return side['weld']
 
 def iswired(side):
@@ -82,7 +84,7 @@ def platformx(side):
 	return int(side['weld'])
 
 def makeweldside(side):
-	return {'weld':side,'wire':False,'platform':False,'frame':False}
+	return {'weld':side,'wire':False,'platform':False,'frame':False,'id':id(side)}
 
 def setplatformside(side,other):
 	if side['weld'] and other:
@@ -321,7 +323,7 @@ def canweld(side,block):
 		sides=[True,True,True,True]
 	i={'top':0,'bottom':2,'left':1,'right':3}[side]+4-block['rotate']
 	i=i%4
-	return sides[i] and block['weld'][{'top':0,'bottom':2,'left':1,'right':3}[side]]
+	return sides[i] and iswelded(block['weld'][{'top':0,'bottom':2,'left':1,'right':3}[side]])
 
 # the main method
 # blocks is a grid of blocks
