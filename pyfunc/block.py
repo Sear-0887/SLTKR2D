@@ -67,6 +67,38 @@ twowaytypes=[
 ]
 frametypes=wiretypes+['frame']
 
+def iswelded(side):
+	return side['weld']
+
+def iswired(side):
+	return side['wire']
+
+def isframe(side):
+	return side['frame']
+
+def platformx(side):
+	if side['platform']:
+		return 2
+	return int(side['weld'])
+
+def makeweldside(side):
+	return {'weld':side,'wire':False,'platform':False,'frame':False}
+
+def setplatformside(side,other):
+	if side['weld'] and other:
+		side['platform']=True
+	return side
+
+def setframeside(side,other):
+	if side['weld'] and other:
+		side['frame']=True
+	return side
+
+def setwireside(side,other):
+	if side['weld'] and other:
+		side['wire']=True
+	return side
+
 def blockdesc():
 	return {
 		'wired':False, # does this block connect to wires beside it?
