@@ -27,7 +27,8 @@ def getblockdata(data):
 wafertypes=[
 	"accelerometer","capacitor","diode",
 	"galvanometer","latch","matcher",
-	"potentiometer","sensor","transistor"
+	"potentiometer","sensor","transistor",
+	"cascade","counter"
 ]
 # wire components on a frame
 wiretypes=[
