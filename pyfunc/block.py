@@ -30,6 +30,13 @@ wafertypes=[
 	"potentiometer","sensor","transistor",
 	"cascade","counter"
 ]
+# wafer components that have an output side
+outputtypes=[
+	"diode",
+	"galvanometer","latch",
+	"potentiometer","transistor",
+	"cascade","counter"
+]
 # wire components on a frame
 wiretypes=[
 	"detector","port","toggler","trigger"
@@ -178,6 +185,11 @@ def frame(data):
 	return im
 
 def wiretop(data):
+	if data['type'] in outputtypes:
+		welded=data['weld']
+		rotate=data['rotate']
+		top,_,_,_=rotatewelded(welded,rotate) # different texture by if the output is connected
+		data={**data,'offsety':data.get('offsety',0)+16*iswired(top)}
 	return overlay(data)
 
 def wire(data):
