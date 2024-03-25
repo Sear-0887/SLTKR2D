@@ -203,7 +203,7 @@ def actuator(data):
 	weld1=True,left,bottom,right
 	weld2=top,False,True,False
 	im=drawblocktexture(im1,weld1)
-	im.alpha_composite(drawblocktexture(im2,weld2,rotate),(0,0))
+	im.alpha_composite(drawblocktexture(im2,weld2),(0,0))
 	im=rotateblock(im,rotate)
 	return im
 
@@ -215,7 +215,6 @@ def platform(data):
 	if left==0 and right==1 or left==1 and right==0 or left==0 and right==0:
 		y=16
 	for x,xside in [(0,left),(8,right)]:
-		print('xside',(x+16*xside,y,x+16*xside+8,y+16))
 		im.alpha_composite(image.crop((x+16*platformx(xside),y,x+16*platformx(xside)+8,y+16)),(x,0))
 	return im
 
