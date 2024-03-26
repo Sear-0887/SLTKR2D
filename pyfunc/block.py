@@ -245,19 +245,19 @@ def wirecomponent(data):
 			# top off bottom on texture
 			bdata=re.fullmatch('(?P<state>on|off)',data['data']).groupdict()
 			data['overlayoffsety']=16 if bdata['state']=='on' else 0
-			data['data']=bdata['instate']
+			data['data']=bdata['state'] or 'off'
 		elif typ=="capacitor":
 			# non instantaneous
 			# top off bottom on texture
 			bdata=re.fullmatch('(?P<instate>on|off)?(?P<state>on|off)',data['data']).groupdict()
 			data['overlayoffsety']=16 if bdata['state']=='on' else 0
-			data['data']=bdata['instate']
+			data['data']=bdata['instate'] or 'off'
 		elif typ in ["diode","galvanometer","latch","transistor"]:
 			# column 1 off
 			# column 2 on
 			bdata=re.fullmatch('(?P<instate>on|off)?(?P<outstate>on|off)',data['data']).groupdict()
 			data['overlayoffsetx']=16 if bdata['outstate']=='on' else 0
-			data['data']=bdata['instate']
+			data['data']=bdata['instate'] or 'off'
 		elif typ=="potentiometer": # the rest have a setting
 			pass
 		elif typ=="sensor":
