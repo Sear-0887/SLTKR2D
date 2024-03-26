@@ -1,17 +1,33 @@
 import collections
 import glob
 import itertools
-from PIL import Image
+import re
+from PIL import Image, ImageSequence
 import os
+from pyfunc.gif_processing import gif, tuple_max
 import random
 from typing import Any
-from pyfunc.lang import botinit, cfg
+from pyfunc.lang import botinit, cfg, getarrowcoords
 from pyfunc.smp import getsmpvalue
 from pyfunc.block import makeimage
 from pyfunc.assetload import blockinfos
 
 
 botinit()
+
+def savegif(name, l):
+    l[0].save(name, format="gif", save_all=True, append_images=l[1:], loop=0, disposal=2, duration=1000)
+    return
+
+def overlayimglistonimg(gif, image, pos=(0,0), name=None):
+    frames = []
+    image = image.convert("RGBA")
+    for frame in gif:
+        output_frame = image.copy()
+        output_frame.alpha_composite(frame.convert("RGBA").copy(), pos)
+        frames.append(output_frame)
+    savegif(name or "cache/reci-ovl.gif", frames)
+
 def massstrip(l:list):
     for i, j in enumerate(l):
         l[i] = j.strip()
@@ -49,7 +65,7 @@ def addentries(i, entryname:str, typ:str, organdict:dict, includestr:str) -> lis
         organdict[typ][entryname] = []
     organdict[typ][entryname].append(entries)
     
-def every_recipe():
+def testing():
     with open("gameAssets/recipes.smp") as f:
         organdict = collections.defaultdict(dict)
         rawdata = getsmpvalue(f.read())
@@ -82,13 +98,13 @@ def every_recipe():
                 organdict, 
                 col)
     return organdict
-
+returned = testing()
 # Massive Comments Below to perform the Rubber duck debugging (https://en.wikipedia.org/wiki/Rubber_duck_debugging)
 def generates(generated, recipenum, prodname, replacedhistroy=""):
-    print(f"Generating | recipeframe-{prodname}-{replacedhistroy}.png") # Debug Purpose, Not removing in case
+    print(f"Generating | recipeframe-{prodname}-{recipenum}{replacedhistroy}.png") # Debug Purpose, Not removing in case
     for y, yaxis in enumerate(generated): # Open Grid
         for x, critem in enumerate(yaxis): # Scan through each block
-            if critem == "NIC": critem = "air"
+            if critem == "NIC": critem = "air" # Convert NIC to air
             if isinstance(critem, list): # If it's a list, it's a tag, which
                 place = critem # Store the original list for the next iter to process
                 for i in critem: # loops through tags element
@@ -99,12 +115,12 @@ def generates(generated, recipenum, prodname, replacedhistroy=""):
             elif isinstance(critem, str): # It's normal and needed to NORMALIZE
                 generated[y][x] = {"type":critem,"rotate":0,"weld":[True]*4,"data":None} # Actions
     else: 
-        gen = makeimage(generated)
-        gen = gen.resize((gen.size[0]*4, gen.size[1]*4), Image.NEAREST)
+        gen = makeimage(generated) # Make Image
+        width, height = gen.size # Get width, height
+        gen = gen.resize((width*4, height*4), Image.NEAREST).convert("RGBA") # Resize to dimension
         gen.save(f"cache/recipeframe-{prodname}-{recipenum}{replacedhistroy}.png") # Save the final image
 
 def generaterecipe(name):
-    returned = every_recipe()
     for typ in returned.keys():
         if name in returned[typ]:
             print(f"{typ}: {returned[typ][name]}")
@@ -113,17 +129,49 @@ def generaterecipe(name):
                 for num, entri in enumerate(gridpos):
                     generates(entri['grid'], num, name)
                     print()
-                    gifcontainer: list[Image.Image] = []
-                    for maderecipe in glob.glob(f"cache/recipeframe-{name}-*.png"):
-                        gifcontainer.append(Image.open(maderecipe).convert("RGBA"))
-                    gifcontainer[0].save(
-                        f"cache/recipe-{name}.webp", 
-                        format="webp",
-                        save_all=True, 
-                        append_images=gifcontainer[1:], 
-                        duration=1000, 
-                        loop=0, 
-                        disposal=2)
-                    for maderecipe in glob.glob(f"cache/recipeframe-{name}-*.png"):
-                        try: os.remove(maderecipe)
-                        except: pass
+                finimage = gif((50, 50, 50))
+                for recipenum in range(0, 99):
+                    pthf = tuple(glob.glob(f"cache/recipeframe-{name}-{recipenum}*.png"))
+                    if len(pthf) == 0: break
+                    print(f"{name} {recipenum} has {len(pthf)}")
+                    print(f"adding frames at (0, {recipenum*64})")
+                    frmct = []
+                    md = (0, 0)
+                    for pth in pthf:
+                        img = Image.open(pth)
+                        frmct.append(img)
+                        md = tuple_max(md, img.size)
+                    finimage.addgifframes([Image.open(pth) for pth in pthf], pos=(0, recipenum*(64+64+32)))
+                    combinerimg = makeimage([[
+                        {"type":"combiner","rotate":2,"weld":[True]*4,"data":None},
+                        {"type":"transistor","rotate":1,"weld":[True]*4,"data":None}
+                        ]])
+                    finimage.addimageframes(
+                        combinerimg.resize((combinerimg.width*4, combinerimg.height*4), Image.NEAREST), 
+                        (0, md[1]+recipenum*(64+64+32)))
+                    icox, icoy = getarrowcoords()["combiner"]
+                    finimage.addimageframes(
+                        Image.open(
+                            cfg("localGame.texture.guidebookArrowFile")).crop(
+                                (16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))
+                            ).resize((64, 64), Image.NEAREST
+                        ),
+                        (md[0]+64, recipenum*(64+64+32)+md[1]//2)
+                    )
+                finimage.export(f"cache/recipe-{name}.gif")
+                
+    for maderecipecache in glob.glob(f"cache/recipeframe-*.png"):
+        try: os.remove(maderecipecache)
+        except: pass
+
+# for maderecipe in glob.glob(f"cache/*"):
+#     try: os.remove(maderecipe)
+#     except: pass
+
+# generaterecipe(returned, "compressed_stone")
+# generaterecipe(returned, "galvanometer")
+# generaterecipe(returned, "extractor")
+# generaterecipe(returned, "galvanometer")
+# generaterecipe(returned, "prism")
+# generaterecipe(returned, "destroyer")
+# generaterecipe(returned, "potentiometer")

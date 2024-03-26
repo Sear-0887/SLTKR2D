@@ -112,9 +112,9 @@ class Block(commands.Cog):
         generaterecipe(block)
         embed = nextcord.Embed()
         embed.title = f"{block}'s Recipe"
-        embed.description = f"{block} has {len(glob.glob(f'cache/recipe-{block}.webp'))} Recipe."
-        embed.set_image(url="attachment://f.webp")
-        await ctx.send(embed=embed, file=nextcord.File(f"cache/recipe-{block}.webp", filename="f.webp"))  
+        embed.description = f"{block} has a Combiner Recipe."
+        embed.set_image(url="attachment://f.gif")
+        await ctx.send(embed=embed, file=nextcord.File(f"cache/recipe-{block}.gif", filename="f.gif"))  
         
         
 def setup(bot):

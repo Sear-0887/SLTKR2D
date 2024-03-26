@@ -7,7 +7,7 @@
 
 import time
 import os
-
+from pyfunc.smp import getsmpvalue
 import json
 from datetime import datetime
 import glob
@@ -131,6 +131,15 @@ def getkws():
         global keywords
         keywords = json.load(f)
     return keywords
+
+def getarrowcoords():
+    racord = {}
+    with open(cfg("localGame.texture.guidebookArrowCordFile"), encoding="utf-8") as f:
+        data=getsmpvalue(f.read())
+    for icon,xy in data.items():
+        x,y=xy.split(',')
+        racord[icon] = (int(x), int(y))
+    return racord
 
 def botinit():
     from pyfunc.assetload import assetinit
