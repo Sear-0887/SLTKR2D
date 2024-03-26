@@ -1,44 +1,56 @@
-wood-leaf weld
-block detector type
-potentiometer
 roller direction
 dynamic roller direction
-magnet on
-motor anim 
-manipulator 
-combiner?
-destroyer anim 
-extractor anim 
 do i need animation tick?
-mantler?
-arc furnace
-pilot chair control
-display
-catalyst core
-force core
-mass core? what makes it light up?
-pedestal
-raw core (bit harder) 
-spawner?
-summonore for sure
-injector
-prism
-flowers?
-foam
-water?
-lamp on/off
-spikes weld
-command block?
-telecross
+beam things?
+
+on/off
+magnet
 teleportore
 telewall
-grass
-leaf burn?
-snow
-water anim?
-trigger
-matcher
-beam things?
-cascade
-counter
+telecross
+combiner
+arc furnace
+manipulator
+mantler
+force core
+mass core
+spawner
+command block
 lamp
+beam core?
+
+animation
+roller
+dynamic roller
+destroyer
+extractor
+motor
+water
+
+different textures
+yellow flower
+magenta flower
+grass
+
+leaf-wood
+maple log
+pine log
+
+burn
+pine leaf
+maple leaf
+
+other states
+potentiometer
+counter
+catalyst core
+sensor
+injector "pill"
+prism
+pilot chair
+display
+foam
+pedestal
+raw core
+summonore
+snow
