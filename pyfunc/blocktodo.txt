@@ -1,16 +1,6 @@
 wood-leaf weld
 block detector type
-accelerator on
-toggler of
-port on
-detector on
-capacitor
-diode
 potentiometer
-transistor
-what is with the cascade
-galvanometer
-latch
 roller direction
 dynamic roller direction
 magnet on
