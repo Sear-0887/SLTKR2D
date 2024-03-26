@@ -274,6 +274,9 @@ def counterfilter(data):
 def counter(data):
 	pass
 
+def wiresetting(data):
+	pass
+
 blocktypes=collections.defaultdict(blockdesc)
 
 for t in noweldtypes:
