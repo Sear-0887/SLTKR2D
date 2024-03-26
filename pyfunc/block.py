@@ -240,7 +240,14 @@ def platform(data):
 def wirecomponent(data):
 	if data['data'] is not None:
 		typ=data['type']
-		if typ in ["capacitor","port","accelerometer","matcher","detector","toggler","trigger"]:
+		if typ in ["port","accelerometer","matcher","detector","toggler","trigger"]:
+			# instantaneous
+			# top off bottom on texture
+			bdata=re.fullmatch('(?P<state>on|off)',data['data']).groupdict()
+			data['overlayoffsety']=16 if bdata['state']=='on' else 0
+			data['data']=bdata['instate']
+		if typ=="capacitor":
+			# non instantaneous
 			# top off bottom on texture
 			bdata=re.fullmatch('(?P<instate>on|off)?(?P<state>on|off)',data['data']).groupdict()
 			data['overlayoffsety']=16 if bdata['state']=='on' else 0
