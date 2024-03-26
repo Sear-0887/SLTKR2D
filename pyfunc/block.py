@@ -302,6 +302,9 @@ for t in wiretypes:
 	blocktypes[t]['layers']=[frame,wire,wiretop]
 	blocktypes[t]['datafilters']=[wirecomponent]
 
+for t in ["potentiometer","sensor"]:
+	blocktypes[t]['layers']=[frame,wire,wiretop,wiresetting]
+
 blocktypes[t]['datafilters']=[counterfilter]
 blocktypes['counter']['layers']=[wafer,wire,counter]
 
