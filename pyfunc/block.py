@@ -263,7 +263,9 @@ def wirecomponent(data):
 		elif typ=="sensor":
 			pass
 		elif typ=="cascade":
-			pass
+			# delay, in, out
+			bdata=re.fullmatch('(?P<delay>[1-7])(?P<instate>on|off)?(?P<state>on|off)',data['data']).groupdict()
+			data['overlayoffsetx']=16*(2*(int(bdata['delay'])-1)+(bdata['state']=='on'))
 	return data
 
 def counterfilter(data):
