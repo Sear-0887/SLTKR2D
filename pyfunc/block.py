@@ -246,7 +246,7 @@ def wirecomponent(data):
 			bdata=re.fullmatch('(?P<state>on|off)',data['data']).groupdict()
 			data['overlayoffsety']=16 if bdata['state']=='on' else 0
 			data['data']=bdata['instate']
-		if typ=="capacitor":
+		elif typ=="capacitor":
 			# non instantaneous
 			# top off bottom on texture
 			bdata=re.fullmatch('(?P<instate>on|off)?(?P<state>on|off)',data['data']).groupdict()
@@ -258,15 +258,19 @@ def wirecomponent(data):
 			bdata=re.fullmatch('(?P<instate>on|off)?(?P<outstate>on|off)',data['data']).groupdict()
 			data['overlayoffsetx']=16 if bdata['outstate']=='on' else 0
 			data['data']=bdata['instate']
-		elif typ=="potentiometer":
+		elif typ=="potentiometer": # the rest have a setting
 			pass
 		elif typ=="sensor":
 			pass
 		elif typ=="cascade":
 			pass
-		elif typ=="counter":
-			pass
 	return data
+
+def counterfilter(data):
+	pass
+
+def counter(data):
+	pass
 
 blocktypes=collections.defaultdict(blockdesc)
 
@@ -295,6 +299,9 @@ for t in wafertypes:
 for t in wiretypes:
 	blocktypes[t]['layers']=[frame,wire,wiretop]
 	blocktypes[t]['datafilters']=[wirecomponent]
+
+blocktypes[t]['datafilters']=[counterfilter]
+blocktypes['counter']['layers']=[wafer,wire,counter]
 
 blocktypes['wire_board']['layers']=[wafer,wire]
 blocktypes['wire']['layers']=[frame,wire]
