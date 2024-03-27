@@ -27,7 +27,15 @@ def getblockdata(data):
 wafertypes=[
 	"accelerometer","capacitor","diode",
 	"galvanometer","latch","matcher",
-	"potentiometer","sensor","transistor"
+	"potentiometer","sensor","transistor",
+	"cascade","counter"
+]
+# wafer components that have an output side
+outputtypes=[
+	"diode",
+	"galvanometer","latch",
+	"potentiometer","transistor",
+	"cascade","counter"
 ]
 # wire components on a frame
 wiretypes=[
@@ -43,7 +51,7 @@ wiredtypes=[
 ]+wafertypes+wiretypes
 # unweldable blocks
 noweldtypes=[
-	"copper_ore","iron_ore","pulp","sand","silicon","spawner","air"
+	"copper_ore","iron_ore","pulp","sand","silicon","spawner","air","sawdust"
 ]
 # blocks that only face one direction
 norotatetypes=[
@@ -65,6 +73,41 @@ noweldtypes.append('telecross') # literally the only rotatable but unweldable bl
 twowaytypes=[
 	"wire_spool",'log_maple','log_pine',"mirror"
 ]
+frametypes=wiretypes+['frame','wire']
+
+def iswelded(side):
+	if isinstance(side,bool):
+		return side
+	return side['weld']
+
+def iswired(side):
+	return side['wire']
+
+def isframe(side):
+	return side['frame']
+
+def platformx(side):
+	if side['platform']:
+		return 2
+	return int(side['weld'])
+
+def makeweldside(side):
+	return {'weld':side,'wire':False,'platform':False,'frame':False,'id':id(side)}
+
+def setplatformside(side,other):
+	if side['weld'] and other:
+		side['platform']=True
+	return side
+
+def setframeside(side,other):
+	if side['weld'] and other:
+		side['frame']=True
+	return side
+
+def setwireside(side,other):
+	if side['weld'] and other:
+		side['wire']=True
+	return side
 
 def blockdesc():
 	return {
@@ -104,7 +147,7 @@ def drawblocktexture(image,weld):
 	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 	for x,xside in [(0,left),(8,right)]:
 		for y,yside in [(0,top),(8,bottom)]:
-			im.alpha_composite(image.crop((x+16*(xside>0),y+16*(yside>0),x+16*(xside>0)+8,y+16*(yside>0)+8)),(x,y))
+			im.alpha_composite(image.crop((x+16*iswelded(xside),y+16*iswelded(yside),x+16*iswelded(xside)+8,y+16*iswelded(yside)+8)),(x,y))
 	return im
 
 def defaultblock(data):
@@ -118,7 +161,13 @@ def defaultblock(data):
 
 def overlay(data):
 	rotate=data['rotate']
-	image=getblocktexture({**data,'sizex':16,'sizey':16})
+	image=getblocktexture({
+		**data,
+		'offsetx':data.get('overlayoffsetx',0),
+		'offsety':data.get('overlayoffsety',0),
+		'sizex':16,
+		'sizey':16
+	})
 	im=rotateoverlay(image,rotate)
 	return im
 
@@ -126,9 +175,27 @@ def wafer(data):
 	return defaultblock({**data,'type':'wafer'})
 
 def frame(data):
-	return defaultblock({**data,'type':'frame'})
+	welded=data['weld']
+	rotate=data['rotate']
+	image=getblocktexture({'type':'frame','sizex':64})
+	top,left,bottom,right=rotatewelded(welded,rotate)
+	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
+	for x,xside in [(0,left),(8,right)]:
+		for y,yside in [(0,top),(8,bottom)]:
+			if isframe(xside) or isframe(yside):
+				offset=32 # frames have different welding to each other
+			else:
+				offset=0
+			im.alpha_composite(image.crop((x+offset+16*iswelded(xside),y+16*iswelded(yside),x+offset+16*iswelded(xside)+8,y+16*iswelded(yside)+8)),(x,y))
+	im=rotateblock(im,rotate)
+	return im
 
 def wiretop(data):
+	if data['type'] in outputtypes:
+		welded=data['weld']
+		rotate=data['rotate']
+		top,_,_,_=rotatewelded(welded,rotate) # different texture by if the output is connected
+		data={**data,'offsety':data.get('offsety',0)+16*iswired(top)}
 	return overlay(data)
 
 def wire(data):
@@ -143,19 +210,19 @@ def wire(data):
 	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 	for x,xside in [(0,left),(8,right)]:
 		for y,yside in [(0,top),(8,bottom)]:
-			im.alpha_composite(image.crop((x+16*(xside==2),y+16*(yside==2),x+16*(xside==2)+8,y+16*(yside==2)+8)),(x,y))
+			im.alpha_composite(image.crop((x+16*iswired(xside),y+16*iswired(yside),x+16*iswired(xside)+8,y+16*iswired(yside)+8)),(x,y))
 	return im
 
 def actuator(data):
 	welded=data['weld']
 	rotate=data['rotate']
-	im1=getblocktexture(data)
-	im2=getblocktexture(data)
+	im1=getblocktexture({'type':'actuator_base'})
+	im2=getblocktexture({'type':'actuator_head'})
 	top,left,bottom,right=rotatewelded(welded,rotate)
 	weld1=True,left,bottom,right
 	weld2=top,False,True,False
 	im=drawblocktexture(im1,weld1)
-	im.alpha_composite(drawblocktexture(im2,weld2,rotate),(0,0))
+	im.alpha_composite(drawblocktexture(im2,weld2),(0,0))
 	im=rotateblock(im,rotate)
 	return im
 
@@ -167,9 +234,48 @@ def platform(data):
 	if left==0 and right==1 or left==1 and right==0 or left==0 and right==0:
 		y=16
 	for x,xside in [(0,left),(8,right)]:
-		print('xside',(x+16*xside,y,x+16*xside+8,y+16))
-		im.alpha_composite(image.crop((x+16*xside,y,x+16*xside+8,y+16)),(x,0))
+		im.alpha_composite(image.crop((x+16*platformx(xside),y,x+16*platformx(xside)+8,y+16)),(x,0))
 	return im
+
+def wirecomponent(data):
+	if data['data'] is not None:
+		typ=data['type']
+		if typ in ["port","accelerometer","matcher","detector","toggler","trigger"]:
+			# instantaneous
+			# top off bottom on texture
+			bdata=re.fullmatch('(?P<state>on|off)',data['data']).groupdict()
+			data['overlayoffsety']=16 if bdata['state']=='on' else 0
+			data['data']=bdata['state'] or 'off'
+		elif typ=="capacitor":
+			# non instantaneous
+			# top off bottom on texture
+			bdata=re.fullmatch('(?P<instate>on|off)?(?P<state>on|off)',data['data']).groupdict()
+			data['overlayoffsety']=16 if bdata['state']=='on' else 0
+			data['data']=bdata['instate'] or 'off'
+		elif typ in ["diode","galvanometer","latch","transistor"]:
+			# column 1 off
+			# column 2 on
+			bdata=re.fullmatch('(?P<instate>on|off)?(?P<outstate>on|off)',data['data']).groupdict()
+			data['overlayoffsetx']=16 if bdata['outstate']=='on' else 0
+			data['data']=bdata['instate'] or 'off'
+		elif typ=="potentiometer": # the rest have a setting
+			pass
+		elif typ=="sensor":
+			pass
+		elif typ=="cascade":
+			# delay, in, out
+			bdata=re.fullmatch('(?P<delay>[1-7])(?P<instate>on|off)?(?P<state>on|off)',data['data']).groupdict()
+			data['overlayoffsetx']=16*(2*(int(bdata['delay'])-1)+(bdata['state']=='on'))
+	return data
+
+def counterfilter(data):
+	pass
+
+def counter(data):
+	pass
+
+def wiresetting(data):
+	pass
 
 blocktypes=collections.defaultdict(blockdesc)
 
@@ -193,12 +299,21 @@ blocktypes['platform']['layers']=[platform]
 
 for t in wafertypes:
 	blocktypes[t]['layers']=[wafer,wire,wiretop]
+	blocktypes[t]['datafilters']=[wirecomponent]
 
 for t in wiretypes:
 	blocktypes[t]['layers']=[frame,wire,wiretop]
+	blocktypes[t]['datafilters']=[wirecomponent]
+
+for t in ["potentiometer","sensor"]:
+	blocktypes[t]['layers']=[frame,wire,wiretop,wiresetting]
+
+blocktypes[t]['datafilters']=[counterfilter]
+blocktypes['counter']['layers']=[wafer,wire,counter]
 
 blocktypes['wire_board']['layers']=[wafer,wire]
 blocktypes['wire']['layers']=[frame,wire]
+blocktypes['frame']['layers']=[frame]
 
 # rotate an image of a block by rotate
 def rotateblock(im,rotate):
@@ -274,7 +389,7 @@ def canweld(side,block):
 		sides=[True,True,True,True]
 	i={'top':0,'bottom':2,'left':1,'right':3}[side]+4-block['rotate']
 	i=i%4
-	return sides[i] and block['weld'][{'top':0,'bottom':2,'left':1,'right':3}[side]]
+	return sides[i] and iswelded(block['weld'][{'top':0,'bottom':2,'left':1,'right':3}[side]])
 
 # the main method
 # blocks is a grid of blocks
@@ -316,17 +431,24 @@ def makeimage(blocks,autoweld=True):
 					[weldtop,weldleft,weldbottom,weldright]
 				):
 					print(f'welded side {i} not allowed on {block}\n'*(not w and b),end='')
+			block['weld']=[makeweldside(w) for w in block['weld']]
 			if block['type']=='platform': # special case
 				# check if sides are platform
-				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type']!='platform' else True)
-				block['weld'][3]=block['weld'][3] and (2 if get(newblocks,xi+1,yi)['type']!='platform' else True)
+				block['weld'][1]=setplatformside(block['weld'][1],get(newblocks,xi-1,yi)['type']!='platform')
+				block['weld'][3]=setplatformside(block['weld'][3],get(newblocks,xi+1,yi)['type']!='platform')
+			if block['type'] in frametypes: # special case
+				# check if sides are frame base
+				block['weld'][0]=setframeside(block['weld'][0],get(newblocks,xi,yi-1)['type'] in frametypes)
+				block['weld'][1]=setframeside(block['weld'][1],get(newblocks,xi-1,yi)['type'] in frametypes)
+				block['weld'][2]=setframeside(block['weld'][2],get(newblocks,xi,yi+1)['type'] in frametypes)
+				block['weld'][3]=setframeside(block['weld'][3],get(newblocks,xi+1,yi)['type'] in frametypes)
 			blocktype=blocktypes[block['type']]
 			if blocktype['wired']:
 				# check if sides are wired
-				block['weld'][0]=block['weld'][0] and (2 if get(newblocks,xi,yi-1)['type'] in wiredtypes else True)
-				block['weld'][1]=block['weld'][1] and (2 if get(newblocks,xi-1,yi)['type'] in wiredtypes else True)
-				block['weld'][2]=block['weld'][2] and (2 if get(newblocks,xi,yi+1)['type'] in wiredtypes else True)
-				block['weld'][3]=block['weld'][3] and (2 if get(newblocks,xi+1,yi)['type'] in wiredtypes else True)
+				block['weld'][0]=setwireside(block['weld'][0],get(newblocks,xi,yi-1)['type'] in wiredtypes)
+				block['weld'][1]=setwireside(block['weld'][1],get(newblocks,xi-1,yi)['type'] in wiredtypes)
+				block['weld'][2]=setwireside(block['weld'][2],get(newblocks,xi,yi+1)['type'] in wiredtypes)
+				block['weld'][3]=setwireside(block['weld'][3],get(newblocks,xi+1,yi)['type'] in wiredtypes)
 			for datafilter in blocktype['datafilters']:
 				block=datafilter(block)
 			for layer in blocktype['layers']:
