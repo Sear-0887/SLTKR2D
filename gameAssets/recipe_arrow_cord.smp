@@ -1,0 +1,7 @@
+{blank}             :  { 0,0}
+{arc_furnace}       :  { 1,0}
+{injector}          :  { 0,1}
+{extractor}         :  { 1,1}
+{natural}           :  { 0,2}
+{combiner}          :  { 1,2}
+{mining}            :  { 0,3}

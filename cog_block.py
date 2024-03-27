@@ -1,4 +1,5 @@
 import collections
+import glob
 from pyfunc.assetload import blockinfos, idtoblock, locale
 import nextcord
 import random
@@ -9,6 +10,7 @@ from pyfunc.lang import cfg
 from pyfunc.commanddec import CogCommand
 from pyfunc.block import makeimage as blockmakeimage
 import pyfunc.smp as smp
+from pyfunc.recipe import generaterecipe
 
 class Block(commands.Cog):
     def __init__(self, bot):
@@ -101,6 +103,18 @@ class Block(commands.Cog):
                 ]
             )
             
+    @CogCommand("recipe")
+    async def block(self,ctx, *, block=None):
+        if block.isdigit(): # if the argument is a number, get the corresponding block name
+            block = idtoblock.get(int(block),'NIC')
+        block = block.replace(" ", "_").lower()
+        _ = blockinfos[block] # Lazy block detecting
+        generaterecipe(block)
+        embed = nextcord.Embed()
+        embed.title = f"{block}'s Recipe"
+        embed.description = f"{block} has a Combiner Recipe."
+        embed.set_image(url="attachment://f.gif")
+        await ctx.send(embed=embed, file=nextcord.File(f"cache/recipe-{block}.gif", filename="f.gif"))  
         
         
 def setup(bot):
