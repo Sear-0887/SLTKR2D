@@ -104,7 +104,7 @@ class Block(commands.Cog):
             )
             
     @CogCommand("recipe")
-    async def block(self,ctx, *, block=None):
+    async def recipe(self,ctx, *, block=None):
         if block.isdigit(): # if the argument is a number, get the corresponding block name
             block = idtoblock.get(int(block),'NIC')
         block = block.replace(" ", "_").lower()

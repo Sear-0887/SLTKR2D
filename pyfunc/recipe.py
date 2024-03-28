@@ -5,12 +5,12 @@ import itertools
 import re
 from PIL import Image, ImageSequence
 import os
-import pyfunc.gif_processing as gif
+import pyfunc.gif as gif
 import random
 from typing import Any
 from pyfunc.lang import botinit, cfg, getarrowcoords
 from pyfunc.smp import getsmpvalue
-from pyfunc.block import makeimage
+from pyfunc.block import canweld, get, makeimage, normalize, rotatewelded
 from pyfunc.assetload import blockinfos
 
 
@@ -37,7 +37,7 @@ def handlegridtags(s:list, organdict:dict) -> tuple[list, str]:
 
 def addentries(i, entryname:str, typ:str, organdict:dict, includestr:str) -> list:
     includes = massstrip(includestr.split(','))
-    entries = {}
+    entries = collections.defaultdict(None)
     for key, item in i.items():
         item = handletags(item, organdict)
         if isinstance(item, str) and item.isdigit(): # Handle Numbers Differently
@@ -88,6 +88,12 @@ def testing():
                 col)
     return organdict
 returned = testing()
+
+                        # canweld('bottom', normalize(get(generated, x, y-1))) or 
+                        # canweld('left', normalize(get(generated, x+1, y))) or 
+                        # canweld('top', normalize(get(generated, x, y+1))) or 
+                        # canweld('right', normalize(get(generated, x-1, y))) 
+
 # Massive Comments Below to perform the Rubber duck debugging (https://en.wikipedia.org/wiki/Rubber_duck_debugging)
 def generates(generated, recipenum=0, prodname="unknown", replacedhistroy="", pthname=None, ratio=4):
     pthname = pthname or f"cache/recipeframe-{prodname}-{recipenum}{replacedhistroy}.png"
@@ -105,6 +111,29 @@ def generates(generated, recipenum=0, prodname="unknown", replacedhistroy="", pt
             elif isinstance(critem, str): # It's normal and needed to NORMALIZE
                 generated[y][x] = {"type":critem,"rotate":0,"weld":[True]*4,"data":None} # Actions
     else: 
+        for y, yaxis in enumerate(generated): # Open Grid
+            for x, critem in enumerate(yaxis): # Scan through each block
+                print(get(generated, x, y))
+                copy = critem
+                for i in range(4):
+                    if (
+                        canweld('right',copy) and canweld('left',get(generated,x+1,y)) or
+                        canweld('left',copy) and canweld('right',get(generated,x-1,y)) or
+                        canweld('bottom',copy) and canweld('top',get(generated,x,y+1)) or
+                        canweld('top',copy) and canweld('bottom',get(generated,x,y-1))
+                        ):
+                        print(f"found")
+                        copy = critem
+                        generated[y][x] = copy
+                        break
+                    else:
+                        print("not found, rotates")
+                        copy['rotate'] += 1
+                        copy['rotate'] %= 4
+                        copy['weld'] = rotatewelded(copy['weld'], copy['rotate'])
+                        print(f"weld changed to {copy['weld']}")
+                
+        ... 
         gen = makeimage(generated) # Make Image
         width, height = gen.size # Get width, height
         gen = gen.resize((width*ratio, height*ratio), Image.NEAREST).convert("RGBA") # Resize to dimension*Ratio
@@ -120,7 +149,9 @@ def generaterecipe(name):
                 for num, entri in enumerate(gridpos):
                     generates(entri['grid'], num, name)
                     img = Image.new("RGBA", (128, 640))
-                    generates([[entri['block']]], pthname="cache/amount.png", ratio=4)
+                    generates([[
+                    {"type":entri['block'],"rotate":0,"weld":[True]*4,"data":None}
+                    ]], pthname="cache/amount.png", ratio=4)
                     for i in range(entri['amount']):
                         img.alpha_composite(
                             Image.open("cache/amount.png"),
@@ -138,7 +169,6 @@ def generaterecipe(name):
                     pthf = tuple(glob.glob(f"cache/recipeframe-{name}-{recipenum}*.png"))
                     if len(pthf) == 0: break
                     print(f"{name} {recipenum} has {len(pthf)}")
-                    print(f"adding frames at (0, {recipenum*64})")
                     frmct = []
                     md = (0, 0)
                     for pth in pthf:
@@ -166,16 +196,16 @@ def generaterecipe(name):
                         pos=(md[0]+64, posi+md[1]//2)
                     )
                 finimage.export(f"cache/recipe-{name}.gif")
-                
-    for maderecipecache in glob.glob(f"cache/recipeframe-*.png"):
-        try: os.remove(maderecipecache)
-        except: pass
+            
+    # for maderecipecache in glob.glob(f"cache/recipeframe-*.png"):
+    #     try: os.remove(maderecipecache)
+    #     except: pass
 
 
 if __name__ == "__main__":
-    generaterecipe("extractor")
-    generaterecipe("destroyer")
-    generaterecipe("inductor")
+    generaterecipe(returned, "extractor")
+    generaterecipe(returned, "destroyer")
+    generaterecipe(returned, "inductor")
     # generaterecipe(returned, "compressed_stone")
     # generaterecipe(returned, "galvanometer")
     # generaterecipe(returned, "potentiometer")
