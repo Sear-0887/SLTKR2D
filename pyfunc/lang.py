@@ -99,6 +99,7 @@ def loadconfig():
         hostid, settings = handlehostid()
         config['ShowHost'] = settings[0]
         config['HostDCID'] = hostid
+        config['PREFIX'] = dotenv_values("cred/client.env")['PREFIX']
     return config
 
 def cfg(*target):

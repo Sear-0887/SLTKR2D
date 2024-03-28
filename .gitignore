@@ -1,3 +1,5 @@
 *cache*/
 .vscode/
-cred/.env
+cred/client.env
+cred/client.env
+cred/client.env

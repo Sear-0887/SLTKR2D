@@ -14,7 +14,7 @@ botinit()
 intents = nextcord.Intents.default()
 intents.members = True
 intents.message_content = True
-bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
+bot = commands.Bot(command_prefix=cfg("PREFIX"), intents=intents, help_command=None)
 # TimeOn must be a datetime, or else error will be raised when !help
 TimeOn: datetime.datetime = datetime.datetime.now() 
 # initialize some things
