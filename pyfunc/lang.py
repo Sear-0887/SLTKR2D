@@ -29,7 +29,7 @@ def lprint(*values: object, sep: str = " ",end: str = "\n", ptnt: bool = False, 
     if ptnt:
         print(valuesstr,end='')
 
-def phraserfile(fname,lang):
+def phraserfile(fname:str,lang:str) -> None:
     with open(fname , "r", encoding='utf-8') as f:
         fc = re.sub(r"\\\s*\n", r"\\", f.read())
         for line in fc.split("\n"):
@@ -44,7 +44,7 @@ def phraserfile(fname,lang):
                 lprint(f"{(expr, val) =}")
 
 # load the command locale
-def phraser():
+def phraser() -> None:
     loademoji()
     for langpth in glob.glob("lang/*"):
         lang = langpth[5:]
@@ -59,7 +59,7 @@ def phraser():
         for name,data in keywords.items()
     ]))
 
-def phrasermodule(module): # reloads the locale from one file in each locale folder
+def phrasermodule(module:str): # reloads the locale from one file in each locale folder
     found=False # did it find any locale files?
     for langpth in glob.glob("lang/*"):
         lang = langpth[5:]
@@ -80,7 +80,7 @@ def evl(*args, lang="en") -> str | list:
     except:
         return ""
 
-def handlehostid():
+def handlehostid() -> tuple[int, list[bool]]:
     raw = ""
     try:
         raw = dotenv_values("cred/client.env")['HOSTID']

@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-def primefactor(n):
+def primefactor(n:int) -> dict[int, int]:
     # rbcavi implementation
     smallprimes=[2,3,5,7,11,13,17,19] # i hope i didn't miss any
     # you can add more primes

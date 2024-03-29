@@ -26,7 +26,7 @@ class Admin(commands.Cog):
 
     @commands.has_permissions(administrator=True)
     @CogCommand("loadcog")
-    async def loadcog(self,ctx, tar):
+    async def loadcog(self,ctx, tar:str):
         try:
             self.bot.load_extension("cog_"+tar)
             await ctx.send("LOADED "+"cog_"+tar+".py")
@@ -37,7 +37,7 @@ class Admin(commands.Cog):
 
     @commands.has_permissions(administrator=True)
     @CogCommand("unloadcog")
-    async def unloadcog(self,ctx, tar):
+    async def unloadcog(self,ctx, tar:str):
         try:
             if tar == "admin":
                 await ctx.send("You can't unload cog_admin!") # prevent softlock
@@ -51,7 +51,7 @@ class Admin(commands.Cog):
 
     @commands.has_permissions(administrator=True)
     @CogCommand("reloadcog")
-    async def reloadcog(self,ctx, tar):
+    async def reloadcog(self,ctx, tar:str):
         try:
             self.bot.unload_extension("cog_"+tar)
             self.bot.load_extension("cog_"+tar)
@@ -74,7 +74,7 @@ class Admin(commands.Cog):
         await ctx.send("Done.")
 
     @CogCommand("viewerr")
-    async def viewerr(self, ctx, count: int=1, user: nextcord.User | None=None, ):
+    async def viewerr(self, ctx, count: int=1, user: nextcord.User | None=None):
         if count == "*": count = 999999 # All 
         if user is None: user = ctx.author
         async def senderr(values, filname):

@@ -37,7 +37,7 @@ async def reloadlocal(ctx,module=None):
 
 # get help for a command or display info about the bot
 @MainCommand(bot,"help")
-async def help(ctx, cmdname=None):
+async def help(ctx, cmdname:str | None=None):
     async def gethelplist(interaction:nextcord.Interaction):
         preparedlist = []
         for cmd in bot.commands:
@@ -96,7 +96,7 @@ async def scream(ctx, n:int=32):
 
 # send a link
 @MainCommand(bot,"link")
-async def link(ctx, typ="r2d"):
+async def link(ctx, typ:str="r2d"):
     for i in keywords:
         if typ in keywords[i]["kw"]:
             await ctx.send(f"`{i}` - {keywords[i]['link']}")
@@ -111,8 +111,8 @@ async def credit(ctx):
     await ctx.send(evl("credit.display").format(devstr))
 
 @tasks.loop(seconds=60)
-async def changepresence():
-    statuses: dict[list] = cfg("botInfo.Messages") # General whole Statuses
+async def changepresence() -> None:
+    statuses: dict[str, list] = cfg("botInfo.Messages") # General whole Statuses
     categories: list[str] = list(statuses.keys()) # Keys
     weights: list[int] = [len(statuses[c]) for c in categories] # Weights of keys
     category: str = random.choices(categories,weights)[0] # Choosing a category
