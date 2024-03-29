@@ -10,7 +10,7 @@ import random
 from typing import Any
 from pyfunc.lang import botinit, cfg, getarrowcoords
 from pyfunc.smp import getsmpvalue
-from pyfunc.block import canweld, get, makeimage, normalize, rotatewelded
+from pyfunc.block import canweld, get, makeimage, normalize, rotatewelded, bottomtypes, topbottomtypes, sidestypes, notoptypes, norotatetypes, twowaytypes
 from pyfunc.assetload import blockinfos
 
 
@@ -111,18 +111,20 @@ def generates(generated, recipenum=0, prodname="unknown", replacedhistroy="", pt
             elif isinstance(critem, str): # It's normal and needed to NORMALIZE
                 generated[y][x] = {"type":critem,"rotate":0,"weld":[True]*4,"data":None} # Actions
     else:
+        print(bottomtypes+topbottomtypes+sidestypes+notoptypes)
         rotations=[]
         for y,row in enumerate(generated):
             for x,block in enumerate(row):
                 if block in norotatetypes:
                     continue
-                elif block not in bottomtypes+topbottomtypes+sidestypes+notoptypes:
+                elif block['type'] not in bottomtypes+topbottomtypes+sidestypes+notoptypes:
+                    print('block',block,'welds on all sides')
                     # the block welds on all sides
                     # no reason to check
                     # wired blocks might change this
                     # but would be complicated
                     continue
-                elif block in twowaytypes:
+                elif block['type'] in twowaytypes:
                     rotations.append([(x,y,r) for r in [0,1]]) # don't need to check all ways
                 else:
                     rotations.append([(x,y,r) for r in [0,2,1,3]])
