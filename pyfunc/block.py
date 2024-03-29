@@ -294,6 +294,9 @@ for t in wiretypes+wafertypes+['wire','wire_board']:
 for block in blockpaths:
 	blocktypes[block]['layers']=[defaultblock]
 
+if 'player_pilot_chair_controls' in blocktypes: # not a real block
+	del blocktypes['player_pilot_chair_controls']
+
 blocktypes['actuator']['layers']=[actuator]
 blocktypes['platform']['layers']=[platform]
 
