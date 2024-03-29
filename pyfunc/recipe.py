@@ -129,8 +129,8 @@ def generates(generated, recipenum=0, prodname="unknown", replacedhistroy="", pt
                 else:
                     rotations.append([(x,y,r) for r in [0,2,1,3]])
         def floodfill():
-            filled=set()
-            edgeblocks=[] # the blocks that are welded to a filled block
+            filled=set([(0,0)])
+            edgeblocks=[(0,0)] # the blocks that are welded to a filled block
             sideinfo=[ # do not change
                 ['right','left',+1, 0],
                 ['left','right',-1, 0],
@@ -148,11 +148,20 @@ def generates(generated, recipenum=0, prodname="unknown", replacedhistroy="", pt
                             filled.add((x+dx,y+dy))
                 edgeblocks=newedgeblocks
             return len(filled)==sum(map(len,generated)) # all blocks are connected
-        for rotations in itertools.product(*rotations):
-            for x,y,r in rotations:
+        indices=[0 for _ in rotations]
+        while True:
+            for x,y,r in tuple(r[i] for r,i in zip(rotations,indices)):
                 generated[y][x]['rotate']=r
             if floodfill():
                 break
+            for i in reversed(range(len(rotations))):
+                indices[i]+=1
+                if indices[i]>=len(rotations[i]):
+                    indices[i]=0 # roll over
+                if indices[i]!=0: # didn't roll over
+                    break
+            else:
+                raise Exception('disconnected recipe') # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
                 
         ... 
         gen = makeimage(generated) # Make Image
