@@ -103,58 +103,56 @@ def generates(generated, recipenum=0, prodname="unknown", replacedhistroy="", pt
                 return # Terminates the attempt because it cannot generate anything
             elif isinstance(critem, str): # It's normal and needed to NORMALIZE
                 generated[y][x] = {"type":critem,"rotate":0,"weld":[True]*4,"data":None} # Actions
-    else:
-        print(bottomtypes+topbottomtypes+sidestypes+notoptypes)
-        rotations=[]
-        for y,row in enumerate(generated):
-            for x,block in enumerate(row):
-                if block in norotatetypes:
-                    continue
-                elif block['type'] not in bottomtypes+topbottomtypes+sidestypes+notoptypes:
-                    print('block',block,'welds on all sides')
-                    # the block welds on all sides
-                    # no reason to check
-                    # wired blocks might change this
-                    # but would be complicated
-                    continue
-                elif block['type'] in twowaytypes:
-                    rotations.append([(x,y,r) for r in [0,1]]) # don't need to check all ways
-                else:
-                    rotations.append([(x,y,r) for r in [0,2,1,3]])
-        def floodfill():
-            filled=set([(0,0)])
-            edgeblocks=[(0,0)] # the blocks that are welded to a filled block
-            sideinfo=[ # do not change
-                ['right','left',+1, 0],
-                ['left','right',-1, 0],
-                ['bottom','top', 0,+1],
-                ['top','bottom', 0,-1],
-            ]
-            while len(edgeblocks)>0:
-                newedgeblocks=[]
-                for x,y in edgeblocks:
-                    b=get(generated,x,y)
-                    for thisside,otherside,dx,dy in sideinfo:
-                        if (x+dx,y+dy) not in filled and canweld(thisside,b) and canweld(otherside,get(generated,x+dx,y+dy)):
-                            # spread to that block
-                            newedgeblocks.append((x+dx,y+dy))
-                            filled.add((x+dx,y+dy))
-                edgeblocks=newedgeblocks
-            return len(filled)==sum(map(len,generated)) # all blocks are connected
-        indices=[0 for _ in rotations]
-        while True:
-            for x,y,r in tuple(r[i] for r,i in zip(rotations,indices)):
-                generated[y][x]['rotate']=r
-            if floodfill():
-                break
-            for i in reversed(range(len(rotations))):
-                indices[i]+=1
-                if indices[i]>=len(rotations[i]):
-                    indices[i]=0 # roll over
-                if indices[i]!=0: # didn't roll over
-                    break
+    rotations=[]
+    for y,row in enumerate(generated):
+        for x,block in enumerate(row):
+            if block in norotatetypes:
+                continue
+            elif block['type'] not in bottomtypes+topbottomtypes+sidestypes+notoptypes:
+                print('block',block,'welds on all sides')
+                # the block welds on all sides
+                # no reason to check
+                # wired blocks might change this
+                # but would be complicated
+                continue
+            elif block['type'] in twowaytypes:
+                rotations.append([(x,y,r) for r in [0,1]]) # don't need to check all ways
             else:
-                raise Exception('disconnected recipe') # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
+                rotations.append([(x,y,r) for r in [0,2,1,3]])
+    def floodfill():
+        filled=set([(0,0)])
+        edgeblocks=[(0,0)] # the blocks that are welded to a filled block
+        sideinfo=[ # do not change
+            ['right','left',+1, 0],
+            ['left','right',-1, 0],
+            ['bottom','top', 0,+1],
+            ['top','bottom', 0,-1],
+        ]
+        while len(edgeblocks)>0:
+            newedgeblocks=[]
+            for x,y in edgeblocks:
+                b=get(generated,x,y)
+                for thisside,otherside,dx,dy in sideinfo:
+                    if (x+dx,y+dy) not in filled and canweld(thisside,b) and canweld(otherside,get(generated,x+dx,y+dy)):
+                        # spread to that block
+                        newedgeblocks.append((x+dx,y+dy))
+                        filled.add((x+dx,y+dy))
+            edgeblocks=newedgeblocks
+        return len(filled)==sum(map(len,generated)) # all blocks are connected
+    indices=[0 for _ in rotations]
+    while True:
+        for x,y,r in tuple(r[i] for r,i in zip(rotations,indices)):
+            generated[y][x]['rotate']=r
+        if floodfill():
+            break
+        for i in reversed(range(len(rotations))):
+            indices[i]+=1
+            if indices[i]>=len(rotations[i]):
+                indices[i]=0 # roll over
+            if indices[i]!=0: # didn't roll over
+                break
+        else:
+            raise Exception('disconnected recipe') # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
                 
         ... 
         gen = makeimage(generated) # Make Image
