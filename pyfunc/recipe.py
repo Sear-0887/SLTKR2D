@@ -11,7 +11,7 @@ from pyfunc.block import canweld, get, makeimage, bottomtypes, topbottomtypes, s
 
 botinit()
 
-def massstrip(l:list[str]): -> list[str]
+def massstrip(l:list[str]) -> list[str]:
     return [s.strip() for s in l]
 
 def handletags(s:str, organdict:dict) -> str | list:
