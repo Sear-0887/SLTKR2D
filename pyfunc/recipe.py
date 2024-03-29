@@ -1,17 +1,12 @@
 import collections
 import glob
-import math
-import itertools
-import re
-from PIL import Image, ImageSequence
-import os
+from PIL import Image
+#import os
 import pyfunc.gif as gif
-import random
 from typing import Any
 from pyfunc.lang import botinit, cfg, getarrowcoords
 from pyfunc.smp import getsmpvalue
-from pyfunc.block import canweld, get, makeimage, normalize, rotatewelded, bottomtypes, topbottomtypes, sidestypes, notoptypes, norotatetypes, twowaytypes
-from pyfunc.assetload import blockinfos
+from pyfunc.block import canweld, get, makeimage, bottomtypes, topbottomtypes, sidestypes, notoptypes, norotatetypes, twowaytypes
 
 
 botinit()
@@ -88,11 +83,6 @@ def testing():
                 col)
     return organdict
 returned = testing()
-
-                        # canweld('bottom', normalize(get(generated, x, y-1))) or 
-                        # canweld('left', normalize(get(generated, x+1, y))) or 
-                        # canweld('top', normalize(get(generated, x, y+1))) or 
-                        # canweld('right', normalize(get(generated, x-1, y))) 
 
 # Massive Comments Below to perform the Rubber duck debugging (https://en.wikipedia.org/wiki/Rubber_duck_debugging)
 def generates(generated, recipenum=0, prodname="unknown", replacedhistroy="", pthname=None, ratio=4):
