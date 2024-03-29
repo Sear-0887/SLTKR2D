@@ -110,28 +110,47 @@ def generates(generated, recipenum=0, prodname="unknown", replacedhistroy="", pt
                 return # Terminates the attempt because it cannot generate anything
             elif isinstance(critem, str): # It's normal and needed to NORMALIZE
                 generated[y][x] = {"type":critem,"rotate":0,"weld":[True]*4,"data":None} # Actions
-    else: 
-        for y, yaxis in enumerate(generated): # Open Grid
-            for x, critem in enumerate(yaxis): # Scan through each block
-                print(get(generated, x, y))
-                copy = critem
-                for i in range(4):
-                    if (
-                        canweld('right',copy) and canweld('left',get(generated,x+1,y)) or
-                        canweld('left',copy) and canweld('right',get(generated,x-1,y)) or
-                        canweld('bottom',copy) and canweld('top',get(generated,x,y+1)) or
-                        canweld('top',copy) and canweld('bottom',get(generated,x,y-1))
-                        ):
-                        print(f"found")
-                        copy = critem
-                        generated[y][x] = copy
-                        break
-                    else:
-                        print("not found, rotates")
-                        copy['rotate'] += 1
-                        copy['rotate'] %= 4
-                        copy['weld'] = rotatewelded(copy['weld'], copy['rotate'])
-                        print(f"weld changed to {copy['weld']}")
+    else:
+        rotations=[]
+        for y,row in enumerate(generated):
+            for x,block in enumerate(row):
+                if block in norotatetypes:
+                    continue
+                elif block not in bottomtypes+topbottomtypes+sidestypes+notoptypes:
+                    # the block welds on all sides
+                    # no reason to check
+                    # wired blocks might change this
+                    # but would be complicated
+                    continue
+                elif block in twowaytypes:
+                    rotations.append([(x,y,r) for r in [0,1]]) # don't need to check all ways
+                else:
+                    rotations.append([(x,y,r) for r in [0,2,1,3]])
+        def floodfill():
+            filled=set()
+            edgeblocks=[] # the blocks that are welded to a filled block
+            sideinfo=[ # do not change
+                ['right','left',+1, 0],
+                ['left','right',-1, 0],
+                ['bottom','top', 0,+1],
+                ['top','bottom', 0,-1],
+            ]
+            while len(edgeblocks)>0:
+                newedgeblocks=[]
+                for x,y in edgeblocks:
+                    b=get(generated,x,y)
+                    for thisside,otherside,dx,dy in sideinfo:
+                        if (x+dx,y+dy) not in filled and canweld(thisside,b) and canweld(otherside,get(generated,x+dx,y+dy)):
+                            # spread to that block
+                            newedgeblocks.append((x+dx,y+dy))
+                            filled.add((x+dx,y+dy))
+                edgeblocks=newedgeblocks
+            return len(filled)==sum(map(len,generated)) # all blocks are connected
+        for rotations in itertools.product(*rotations):
+            for x,y,r in rotations:
+                generated[y][x]['rotate']=r
+            if floodfill():
+                break
                 
         ... 
         gen = makeimage(generated) # Make Image
