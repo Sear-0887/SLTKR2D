@@ -11,11 +11,10 @@ from pyfunc.block import canweld, get, makeimage, bottomtypes, topbottomtypes, s
 
 botinit()
 
-def massstrip(l:list):
-    for i, j in enumerate(l):
-        l[i] = j.strip()
-    return l
-def handletags(s:Any, organdict:dict) -> str | list:
+def massstrip(l:list[str]): -> list[str]
+    return [s.strip() for s in l]
+
+def handletags(s:str, organdict:dict) -> str | list:
     if not isinstance(s, str): return s 
     if s.startswith('$'):
         if s[1:] in organdict['tag'].keys():
@@ -23,18 +22,22 @@ def handletags(s:Any, organdict:dict) -> str | list:
         print('Just a Normal name starts with $ ???????')
     return s
 
-def handlegridtags(s:list, organdict:dict) -> tuple[list, str]:
-    for y, xaxis in enumerate(s):
-        for x, critem in enumerate(xaxis):
-            s[y][x] = handletags(critem, organdict)
-    return s
+def handlegridtags(s:list[list[str]], organdict:dict) -> list[list[str | list]]:
+    return [
+        [
+            handletags(critem, organdict)
+            for critem in row
+        ]
+        for row in s
+    ]
 
 
-def addentries(i, entryname:str, typ:str, organdict:dict, includestr:str) -> list:
-    includes = massstrip(includestr.split(','))
-    entries = collections.defaultdict(None)
+def addentries(i:dict[str, Any], entryname:str, typ:str, organdict:dict, includekeys:str) -> list:
+    includekeys = massstrip(includekeys.split(','))
+    entries = {}
     for key, item in i.items():
-        item = handletags(item, organdict)
+        if isinstance(item, str):
+            item = handletags(item, organdict)
         if isinstance(item, str) and item.isdigit(): # Handle Numbers Differently
             item = int(item)
         if typ == 'heat' and key == 'needs_entity': # True for needs_entity
@@ -42,7 +45,7 @@ def addentries(i, entryname:str, typ:str, organdict:dict, includestr:str) -> lis
         if typ == 'combine' and key == 'grid': # True for needs_entity
             item = handlegridtags(item, organdict)
         i[key] = item
-        if key in includes:
+        if key in includekeys:
             entries[key] = i[key]
     if entryname not in organdict[typ].keys():
         organdict[typ][entryname] = []
