@@ -33,6 +33,7 @@ async def ErrorHandler(name, ctx:commands.Context, e, args, kwargs):
     if replacingerror:
         print(f"Other Error Message found for {name}: {replacingerror}")
         expecterr = replacingerror
+    assert isinstance(expecterr,str)
     try:
         print(f"{e.args=}")
         eargs = e.args[0]
@@ -62,12 +63,17 @@ f'''
 '''
     )
     await ctx.send(expecterr)
+    guild=ctx.guild
+    if guild:
+        guildname=guild.name
+    else:
+        guildname='<DMs>'
     errorpacket = {
         "user": {
             "displayname": ctx.author.display_name,
             "globalname": ctx.author.global_name,
             'id': ctx.author.id,
-            "servername": ctx.guild.name
+            "servername": guildname
         },
         'time': datetime.datetime.now().isoformat(),
         'trigger': ctx.message.clean_content,

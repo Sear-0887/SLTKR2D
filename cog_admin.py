@@ -74,7 +74,7 @@ class Admin(commands.Cog):
         await ctx.send("Done.")
 
     @CogCommand("viewerr")
-    async def viewerr(self, ctx, count: int=1, user: nextcord.User=None, ):
+    async def viewerr(self, ctx, count: int=1, user: nextcord.User | None=None, ):
         if count == "*": count = 999999 # All 
         if user is None: user = ctx.author
         async def senderr(values, filname):

@@ -5,6 +5,7 @@ from pyfunc.lang import cfg
 import functools
 import collections
 import re
+from typing import Any
 
 #welded=top,left,bottom,right
 #rotate= 0    1    2      3
@@ -277,7 +278,7 @@ def counter(data):
 def wiresetting(data):
 	pass
 
-blocktypes=collections.defaultdict(blockdesc)
+blocktypes:dict[str, dict[str, Any]]=collections.defaultdict(blockdesc)
 
 for t in noweldtypes:
 	blocktypes[t]['datafilters'].append(noweldfilter)

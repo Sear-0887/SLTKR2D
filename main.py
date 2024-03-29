@@ -49,7 +49,9 @@ async def help(ctx, cmdname=None):
             preparedlist.append(s)
         sembed = nextcord.Embed()
         sembed.title = evl("help.helplist.title")
-        sembed.description = evl("help.helplist.desc").format("\n".join(preparedlist))
+        desc = evl("help.helplist.desc")
+        assert isinstance(desc,str)
+        sembed.description = desc.format("\n".join(preparedlist))
         await interaction.send(ephemeral=True, embed=sembed)
 
     if not cmdname:

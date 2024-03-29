@@ -3,11 +3,13 @@ import collections
 import pyfunc.smp as smp
 import glob
 from pyfunc.lang import cfg
-idtoblock = {}
+from typing import Any
 
-blockinfos = collections.defaultdict(dict)
+idtoblock:dict[str, int] = {}
 
-locale = {}
+blockinfos:dict[str, dict[str, Any]] = collections.defaultdict(dict)
+
+locale:dict[tuple[str, ...], str] = {}
 
 def capitalize(s):
     s=s[0].upper()+s[1:]

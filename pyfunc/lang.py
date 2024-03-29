@@ -13,21 +13,21 @@ from datetime import datetime
 import glob
 import re
 from dotenv import dotenv_values
-cmdi = {}
-config = None
-devs = None
-keywords = {}
+cmdi:dict[str, dict[str, str]] = {}
+config = {}
+devs = {}
+keywords:dict[str, dict[str, str]] = {}
 
 # write_to_log, basically similar to print, with extra steps...
 # ptnt is print_to_normal_terminal, ats is add_timestamp
-def lprint(*values: object, sep: str | None = " ",end: str | None = "\n", ptnt: bool = False, ats: bool = True) -> None:
+def lprint(*values: object, sep: str = " ",end: str = "\n", ptnt: bool = False, ats: bool = True) -> None:
+    valuesstr:str = sep.join(list(map(str, values))) + end
+    if ats:
+        valuesstr = time.strftime("%H:%M:%S", time.localtime()) + " | " + valuesstr
     with open(f"cache/log/cache-{datetime.now():%d-%m-%Y}.txt", "a+", encoding="utf-8") as fil:
-        values = sep.join(list(map(str, values))) + end
-        if ats:
-            values = time.strftime("%H:%M:%S", time.localtime()) + " | " + values
-        fil.write(values)
+        fil.write(valuesstr)
     if ptnt:
-        print(values,end='')
+        print(valuesstr,end='')
 
 def phraserfile(fname,lang):
     with open(fname , "r", encoding='utf-8') as f:
