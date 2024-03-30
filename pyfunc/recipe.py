@@ -104,6 +104,8 @@ def generates(generated, recipenum=0, prodname="unknown", replacedhistroy="", pt
             elif isinstance(critem, str): # It's normal and needed to NORMALIZE
                 generated[y][x] = {"type":critem,"rotate":0,"weld":[True]*4,"data":None} # Actions
     gen = genimage(generated)
+    width, height = gen.size # Get width, height
+    gen = gen.resize((width*ratio, height*ratio), Image.NEAREST).convert("RGBA") # Resize to dimension*Ratio
     gen.save(pthname) # Save the final image
 
 def generates2(grid):
@@ -186,8 +188,6 @@ def genimage(generated):
                 
     ... 
     gen = makeimage(generated) # Make Image
-    width, height = gen.size # Get width, height
-    gen = gen.resize((width*ratio, height*ratio), Image.NEAREST).convert("RGBA") # Resize to dimension*Ratio
     return gen
 
 def generaterecipe(name):
