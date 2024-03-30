@@ -106,6 +106,30 @@ def generates(generated, recipenum=0, prodname="unknown", replacedhistroy="", pt
     gen = genimage(generated)
     gen.save(pthname) # Save the final image
 
+def generates2(grid):
+    tags=[]
+    for y,row in enumerate(grid):
+        for x,block in enumerate(row):
+            if isinstance(block, list): # If it's a list, it's a tag, which
+                tags.append([(x,y,{"type":t,"rotate":0,"weld":[True]*4,"data":None}) for t in block])
+            elif # It's normal and needed to NORMALIZE
+                generated[y][x] = {"type":critem,"rotate":0,"weld":[True]*4,"data":None} # Actions
+    # now have a list of tags and coordinates
+    ims=[]
+    while True:
+        ims.append(genimage(grid))
+        for i in reversed(range(len(rotations))):
+            indices[i]+=1
+            if indices[i]>=len(rotations[i]):
+                indices[i]=0 # roll over
+            x,y,b=rotations[i][indices[i]]
+            generated[y][x]=b
+            if indices[i]!=0: # didn't roll over
+                break
+        else:
+            break # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
+    return ims
+
 def genimage(generated):
     rotations=[]
     for y,row in enumerate(generated):
