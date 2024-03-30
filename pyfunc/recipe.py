@@ -114,6 +114,7 @@ def generates(generated, recipenum=0, prodname="unknown", replacedhistroy="", pt
                 # no reason to check
                 # wired blocks might change this
                 # but would be complicated
+                # would have to save all valid states and a score of how many wired blocks output onto wires
                 continue
             elif block['type'] in twowaytypes:
                 rotations.append([(x,y,r) for r in [0,1]]) # don't need to check all ways
@@ -139,6 +140,7 @@ def generates(generated, recipenum=0, prodname="unknown", replacedhistroy="", pt
                         filled.add((x+dx,y+dy))
             edgeblocks=newedgeblocks
         return len(filled)==sum(map(len,generated)) # all blocks are connected
+    # a ?optimized? itertools.product that changes only the ones that change in each iteration
     indices=[0 for _ in rotations]
     while True:
         for x,y,r in tuple(r[i] for r,i in zip(rotations,indices)):
