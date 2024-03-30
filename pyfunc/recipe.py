@@ -103,6 +103,10 @@ def generates(generated, recipenum=0, prodname="unknown", replacedhistroy="", pt
                 return # Terminates the attempt because it cannot generate anything
             elif isinstance(critem, str): # It's normal and needed to NORMALIZE
                 generated[y][x] = {"type":critem,"rotate":0,"weld":[True]*4,"data":None} # Actions
+    gen = genimage(generated)
+    gen.save(pthname) # Save the final image
+
+def genimage(generated):
     rotations=[]
     for y,row in enumerate(generated):
         for x,block in enumerate(row):
@@ -156,11 +160,11 @@ def generates(generated, recipenum=0, prodname="unknown", replacedhistroy="", pt
         else:
             raise Exception('disconnected recipe') # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
                 
-        ... 
-        gen = makeimage(generated) # Make Image
-        width, height = gen.size # Get width, height
-        gen = gen.resize((width*ratio, height*ratio), Image.NEAREST).convert("RGBA") # Resize to dimension*Ratio
-        gen.save(pthname) # Save the final image
+    ... 
+    gen = makeimage(generated) # Make Image
+    width, height = gen.size # Get width, height
+    gen = gen.resize((width*ratio, height*ratio), Image.NEAREST).convert("RGBA") # Resize to dimension*Ratio
+    return gen
 
 def generaterecipe(name):
     for typ in returned.keys():
