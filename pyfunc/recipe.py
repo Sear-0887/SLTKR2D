@@ -255,66 +255,54 @@ def generaterecipe(name):
     #     try: os.remove(maderecipecache)
     #     except: pass
 
+def getarrow(typ):
+    icox, icoy = getarrowcoords()[typ]
+    return Image.open(
+        cfg("localGame.texture.guidebookArrowFile")
+    ).crop(
+        (16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))
+    ).resize(
+        (64, 64), Image.NEAREST
+    )
+
 def generaterecipe2(name):
     for typ in returned.keys():
         if name in returned[typ]:
             print(f"{typ}: {returned[typ][name]}")
             gridpos = returned[typ][name]
             if typ == "combine":
-                results = []
+                results:list[dict] = []
                 for i,recipe in enumerate(gridpos):
-                    imgs=generates2(entri['grid'])
+                    imgs=generates2(entri['grid'],ratio=4)
                     result=[{"type":entri['block'],"rotate":0,"weld":[False]*4,"data":None}]*entri['amount']
-                    img=generates2([*itertools.batched(result,2)]) # batched makes 2 columns automatically
-                    results.append(['recipeframes':imgs,'result':img])
-                amountimgtable = {}
-                for num, entri in enumerate(gridpos):
-                    generates(entri['grid'], num, name)
-                    img = Image.new("RGBA", (128, 640))
-                    generates([[
-                    {"type":entri['block'],"rotate":0,"weld":[True]*4,"data":None}
-                    ]], pthname="cache/amount.png", ratio=4)
-                    for i in range(entri['amount']):
-                        img.alpha_composite(
-                            Image.open("cache/amount.png"),
-                            (i%2*64, i//2*64)
-                        )
-                    amountimgtable[num] = img
-                    print()
+                    img=generates2([*itertools.batched(result,2)],ratio=4)[0] # batched makes 2 columns automatically
+                    results.append({'recipeframes':imgs,'result':img})
                 finimage = gif.gif((50, 50, 50))
-                generates([[
+                combiner=generates2([[
                     {"type":"combiner","rotate":2,"weld":[True]*4,"data":None}, 
                     {"type":"transistor","rotate":1,"weld":[True]*4,"data":None}
-                    ]], pthname='cache/combinerimg.png', ratio=4)
-                combinerimg = Image.open("cache/combinerimg.png")
-                for recipenum in range(0, 99):
-                    pthf = tuple(glob.glob(f"cache/recipeframe-{name}-{recipenum}*.png"))
-                    if len(pthf) == 0: break
-                    print(f"{name} {recipenum} has {len(pthf)}")
-                    frmct = []
-                    md = (0, 0)
-                    for pth in pthf:
-                        img = Image.open(pth)
-                        frmct.append(img)
-                        md = gif.tuple_max(md, img.size)
-                    productimg = amountimgtable[recipenum]
-                    posi = recipenum*(md[1]+64+32)
-                    finimage.addgifframes(frmct, pos=(0, posi))
+                ]],ratio=4)[0]
+                md = gif.tuple_max((0, 0),*[img.size for recipeimgs in results for img in recipeimgs['recipeframes']]) # fancy double iteration
+                for recipenum,recipeimgs in enumerate(results):
+                    posi = recipenum*( # y position of the recipe
+                        md[1]+ # the tallest recipe
+                        64+    # the combiner
+                        32     # mandatory 32 pixel gap
+                    )
+                    finimage.addgifframes(
+                        recipeimgs['recipeframes'],
+                        pos=(0, posi)
+                    )
                     finimage.addimageframes(
-                        combinerimg, 
+                        combiner,
                         pos=(0, posi+md[1])
                     )
                     finimage.addimageframes(
-                        productimg, 
+                        recipeimgs['result'],
                         pos=(md[0]+64+64+64, posi)
                     )
-                    icox, icoy = getarrowcoords()["combiner"]
                     finimage.addimageframes(
-                        Image.open(
-                            cfg("localGame.texture.guidebookArrowFile")).crop(
-                                (16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))
-                            ).resize((64, 64), Image.NEAREST
-                        ),
+                        getarrow("combiner"),
                         pos=(md[0]+64, posi+md[1]//2)
                     )
                 finimage.export(f"cache/recipe-{name}.gif")
