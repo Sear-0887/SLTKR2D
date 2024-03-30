@@ -147,14 +147,14 @@ def genimage(generated):
     # a ?optimized? itertools.product that changes only the ones that change in each iteration
     indices=[0 for _ in rotations]
     while True:
-        for x,y,r in tuple(r[i] for r,i in zip(rotations,indices)):
-            generated[y][x]['rotate']=r
         if floodfill():
             break
         for i in reversed(range(len(rotations))):
             indices[i]+=1
             if indices[i]>=len(rotations[i]):
                 indices[i]=0 # roll over
+            x,y,r=rotations[i][indices[i]]
+            generated[y][x]['rotate']=r
             if indices[i]!=0: # didn't roll over
                 break
         else:
