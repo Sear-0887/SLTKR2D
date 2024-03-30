@@ -87,28 +87,7 @@ def testing():
     return organdict
 returned = testing()
 
-# Massive Comments Below to perform the Rubber duck debugging (https://en.wikipedia.org/wiki/Rubber_duck_debugging)
-def generates(generated, recipenum=0, prodname="unknown", replacedhistroy="", pthname=None, ratio=4):
-    pthname = pthname or f"cache/recipeframe-{prodname}-{recipenum}{replacedhistroy}.png"
-    print(f"Generating | {pthname}") # Debug Purpose, Not removing in case
-    for y, yaxis in enumerate(generated): # Open Grid
-        for x, critem in enumerate(yaxis): # Scan through each block
-            if critem == "NIC": critem = "air" # Convert NIC to air
-            if isinstance(critem, list): # If it's a list, it's a tag, which
-                place = critem # Store the original list for the next iter to process
-                for i in critem: # loops through tags element
-                    generated[y][x] = {"type":i,"rotate":0,"weld":[True]*4,"data":None} # Modify the list element to be the block
-                    generates(generated, recipenum, prodname, f"{replacedhistroy}~{i}") # Recursive, Passes the copy and informations to the sub process
-                generated[y][x] = place # Places back the original list for the next iter to process
-                return # Terminates the attempt because it cannot generate anything
-            elif isinstance(critem, str): # It's normal and needed to NORMALIZE
-                generated[y][x] = {"type":critem,"rotate":0,"weld":[True]*4,"data":None} # Actions
-    gen = genimage(generated)
-    width, height = gen.size # Get width, height
-    gen = gen.resize((width*ratio, height*ratio), Image.NEAREST).convert("RGBA") # Resize to dimension*Ratio
-    gen.save(pthname) # Save the final image
-
-def generates2(grid,ratio,assertconnected=True):
+def generates2(grid,ratio,assertconnected=True) -> list[Image.Image]:
     tags=[]
     for y,row in enumerate(grid):
         for x,block in enumerate(row):
@@ -195,68 +174,6 @@ def genimage(generated,assertconnected=True):
     ... 
     gen = makeimage(generated) # Make Image
     return gen
-
-def generaterecipe(name):
-    for typ in returned.keys():
-        if name in returned[typ]:
-            print(f"{typ}: {returned[typ][name]}")
-            gridpos = returned[typ][name]
-            if typ == "combine":
-                amountimgtable = {}
-                for num, entri in enumerate(gridpos):
-                    generates(entri['grid'], num, name)
-                    img = Image.new("RGBA", (128, 640))
-                    generates([[
-                    {"type":entri['block'],"rotate":0,"weld":[True]*4,"data":None}
-                    ]], pthname="cache/amount.png", ratio=4)
-                    for i in range(entri['amount']):
-                        img.alpha_composite(
-                            Image.open("cache/amount.png"),
-                            (i%2*64, i//2*64)
-                        )
-                    amountimgtable[num] = img
-                    print()
-                finimage = gif.gif((50, 50, 50))
-                generates([[
-                    {"type":"combiner","rotate":2,"weld":[True]*4,"data":None}, 
-                    {"type":"transistor","rotate":1,"weld":[True]*4,"data":None}
-                    ]], pthname='cache/combinerimg.png', ratio=4)
-                combinerimg = Image.open("cache/combinerimg.png")
-                for recipenum in range(0, 99):
-                    pthf = tuple(glob.glob(f"cache/recipeframe-{name}-{recipenum}*.png"))
-                    if len(pthf) == 0: break
-                    print(f"{name} {recipenum} has {len(pthf)}")
-                    frmct = []
-                    md = (0, 0)
-                    for pth in pthf:
-                        img = Image.open(pth)
-                        frmct.append(img)
-                        md = gif.tuple_max(md, img.size)
-                    productimg = amountimgtable[recipenum]
-                    posi = recipenum*(md[1]+64+32)
-                    finimage.addgifframes(frmct, pos=(0, posi))
-                    finimage.addimageframes(
-                        combinerimg, 
-                        pos=(0, posi+md[1])
-                    )
-                    finimage.addimageframes(
-                        productimg, 
-                        pos=(md[0]+64+64+64, posi)
-                    )
-                    icox, icoy = getarrowcoords()["combiner"]
-                    finimage.addimageframes(
-                        Image.open(
-                            cfg("localGame.texture.guidebookArrowFile")).crop(
-                                (16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))
-                            ).resize((64, 64), Image.NEAREST
-                        ),
-                        pos=(md[0]+64, posi+md[1]//2)
-                    )
-                finimage.export(f"cache/recipe-{name}.gif")
-            
-    # for maderecipecache in glob.glob(f"cache/recipeframe-*.png"):
-    #     try: os.remove(maderecipecache)
-    #     except: pass
 
 def getarrow(typ:str) -> Image.Image:
     icox, icoy = getarrowcoords()[typ]
