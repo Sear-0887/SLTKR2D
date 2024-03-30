@@ -83,11 +83,18 @@ def evl(*args, lang="en") -> str | list:
 def handlehostid() -> tuple[int, list[bool]]:
     raw = ""
     try:
-        raw = dotenv_values("cred/client.env")['HOSTID']
+        raw2 = dotenv_values("cred/client.env")['HOSTID']
+        if raw2 is None:
+            raise Exception("No HOSTID.")
+        raw = raw2
     except Exception as e:
         print(f"ReadingHostID Failed {e}")
         raw = "CLIENT--0"
-    auid, setting = re.fullmatch(r"^CLIENT\-(\w*)\-(.*)", raw).groups()
+    match = re.fullmatch(r"^CLIENT\-(\w*)\-(.*)", raw)
+    if match is not None:
+        auid, setting = match.groups()
+    else:
+        auid, setting = '', '0'
     if not auid: auid = "0"
     returntup = ( int(auid, 16), list(map(lambda x:x=="1", list(setting))) )
     return returntup

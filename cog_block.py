@@ -18,7 +18,7 @@ class Block(commands.Cog):
 
     @CogCommand("block")
     async def block(self,ctx, *, block:str | None=None):
-        if block:
+        if block is not None:
             if block.isdigit(): # if the argument is a number, get the corresponding block name
                 block = idtoblock.get(int(block),'NIC')
             block = block.replace(" ", "_")
@@ -40,9 +40,9 @@ class Block(commands.Cog):
             await self.block(ctx, str(random.choice([*idtoblock.keys()])))
 
     @CogCommand("image")
-    async def image(self,ctx, *, x:str="[[16][20]][[16][16]]"):
-        blocklist = collections.defaultdict(int)
-        blocks=smp.getsmpvalue(x)
+    async def image(self,ctx, *, build:str="[[16][20]][[16][16]]"):
+        blocklist:dict[str, int] = collections.defaultdict(int)
+        blocks=smp.getsmpvalue(build)
         for y,row in enumerate(blocks):
             for x,b in enumerate(row):
                 print(b, x, y)
@@ -104,7 +104,7 @@ class Block(commands.Cog):
             )
             
     @CogCommand("recipe")
-    async def recipe(self,ctx, *, block:str | None=None):
+    async def recipe(self,ctx, *, block:str):
         if block.isdigit(): # if the argument is a number, get the corresponding block name
             block = idtoblock.get(int(block),'NIC')
         block = block.replace(" ", "_").lower()

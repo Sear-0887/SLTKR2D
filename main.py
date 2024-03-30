@@ -58,10 +58,14 @@ async def help(ctx, cmdname:str | None=None):
         # send an info embed about the bot if no command given
         embed = nextcord.Embed()
         if cfg('ShowHost'):
-            showdisplay = evl("help.blankdisplay.server").format(cfg('HostDCID'))
+            showdisplay = evl("help.blankdisplay.server")
+            assert isinstance(showdisplay,str)
+            showdisplay = showdisplay.format(cfg('HostDCID'))
         else:
             showdisplay = ""
-        embed.description = evl("help.blankdisplay").format(datetime.datetime.now()-TimeOn, showdisplay)
+        desc = evl("help.blankdisplay")
+        assert isinstance(desc,str)
+        embed.description = desc.format(datetime.datetime.now()-TimeOn, showdisplay)
         view = nextcord.ui.View()
         getlistbtn = nextcord.ui.Button(style=nextcord.ButtonStyle.blurple, label="Help List")
         getlistbtn.callback = gethelplist
@@ -69,7 +73,7 @@ async def help(ctx, cmdname:str | None=None):
         await ctx.send(embed=embed, view=view)
     else:
         # search through the commands and their aliases
-        cmds={alias:cmd for cmd in bot.commands for alias in cmd.aliases+[cmd.name]}
+        cmds={alias:cmd for cmd in bot.commands for alias in [*cmd.aliases,cmd.name]}
         if cmdname in cmds:
             cmd=cmds[cmdname]
             embed = nextcord.Embed()

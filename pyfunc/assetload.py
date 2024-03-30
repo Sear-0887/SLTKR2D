@@ -5,7 +5,7 @@ import glob
 from pyfunc.lang import cfg
 from typing import Any
 
-idtoblock:dict[str, int] = {}
+idtoblock:dict[int, str] = {}
 
 blockinfos:dict[str, dict[str, Any]] = collections.defaultdict(dict)
 

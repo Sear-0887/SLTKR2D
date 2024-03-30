@@ -6,7 +6,7 @@ def tuple_min(*tuples) -> tuple[int]:
     return tuple(map(min, zip(*tuples)))
 
 class gif_frame:
-    def __init__(self, image:Image=None) -> None:
+    def __init__(self, image:Image.Image | None=None) -> None:
         self.images: list[tuple[Image.Image, tuple[int, int]]] = []
         self.addimage(image or Image.new("RGBA", (0, 0)))
         
@@ -21,7 +21,7 @@ class gif_frame:
         return copy
 
 class gif:
-    def __init__(self, defaultbg):
+    def __init__(self, defaultbg: tuple[int, int, int]):
         self.framelist: list[gif_frame] = []
         self.defaultbg: tuple[int, int, int] = defaultbg
     
