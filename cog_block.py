@@ -10,7 +10,7 @@ from pyfunc.lang import cfg
 from pyfunc.commanddec import CogCommand
 from pyfunc.block import makeimage as blockmakeimage
 import pyfunc.smp as smp
-from pyfunc.recipe import generaterecipe2
+from pyfunc.recipe import generaterecipe
 
 class Block(commands.Cog):
     def __init__(self, bot):
@@ -109,7 +109,7 @@ class Block(commands.Cog):
             block = idtoblock.get(int(block),'NIC')
         block = block.replace(" ", "_").lower()
         _ = blockinfos[block] # Lazy block detecting
-        generaterecipe2(block)
+        generaterecipe(block)
         embed = nextcord.Embed()
         embed.title = f"{block}'s Recipe"
         embed.description = f"{block} has a Combiner Recipe."

@@ -87,7 +87,7 @@ def testing():
     return organdict
 returned = testing()
 
-def generates2(grid,ratio,assertconnected=True) -> list[Image.Image]:
+def generates(grid,ratio,assertconnected=True) -> list[Image.Image]:
     tags=[]
     for y,row in enumerate(grid):
         for x,block in enumerate(row):
@@ -185,7 +185,7 @@ def getarrow(typ:str) -> Image.Image:
         (64, 64), Image.NEAREST
     )
 
-def generaterecipe2(name) -> None:
+def generaterecipe(name) -> None:
     for typ in returned.keys():
         if name in returned[typ]:
             print(f"{typ}: {returned[typ][name]}")
@@ -193,12 +193,12 @@ def generaterecipe2(name) -> None:
             if typ == "combine":
                 results:list[dict] = []
                 for i,recipe in enumerate(gridpos):
-                    imgs=generates2(recipe['grid'],ratio=4)
+                    imgs=generates(recipe['grid'],ratio=4)
                     result=[{"type":recipe['block'],"rotate":0,"weld":[False]*4,"data":None}]*recipe['amount']
-                    img=generates2([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
+                    img=generates([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
                     results.append({'recipeframes':imgs,'result':img})
                 finimage = gif.gif((50, 50, 50))
-                combiner=generates2([[
+                combiner=generates([[
                     {"type":"combiner","rotate":2,"weld":[True]*4,"data":None}, 
                     {"type":"transistor","rotate":1,"weld":[True]*4,"data":None}
                 ]],ratio=4)[0]
