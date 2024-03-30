@@ -7,7 +7,7 @@ from typing import Any
 from pyfunc.lang import botinit, cfg, getarrowcoords
 from pyfunc.smp import getsmpvalue
 from pyfunc.block import canweld, get, makeimage, bottomtypes, topbottomtypes, sidestypes, notoptypes, norotatetypes, twowaytypes
-
+import itertools
 
 botinit()
 
@@ -108,34 +108,34 @@ def generates(generated, recipenum=0, prodname="unknown", replacedhistroy="", pt
     gen = gen.resize((width*ratio, height*ratio), Image.NEAREST).convert("RGBA") # Resize to dimension*Ratio
     gen.save(pthname) # Save the final image
 
-def generates2(grid,ratio):
+def generates2(grid,ratio,assertconnected=True):
     tags=[]
     for y,row in enumerate(grid):
         for x,block in enumerate(row):
             if isinstance(block, list): # If it's a list, it's a tag, which
                 tags.append([(x,y,{"type":t,"rotate":0,"weld":[True]*4,"data":None}) for t in block])
-            elif # It's normal and needed to NORMALIZE
-                generated[y][x] = {"type":critem,"rotate":0,"weld":[True]*4,"data":None} # Actions
+            elif isinstance(block, str): # It's normal and needed to NORMALIZE
+                grid[y][x] = {"type":block,"rotate":0,"weld":[True]*4,"data":None} # Actions
     # now have a list of tags and coordinates
     ims=[]
     while True:
-        gen=genimage(grid)
+        gen=genimage(grid,assertconnected)
         width, height = gen.size # Get width, height
         gen = gen.resize((width*ratio, height*ratio), Image.NEAREST).convert("RGBA") # Resize to dimension*Ratio
         ims.append(gen)
-        for i in reversed(range(len(rotations))):
+        for i in reversed(range(len(tags))):
             indices[i]+=1
-            if indices[i]>=len(rotations[i]):
+            if indices[i]>=len(tags[i]):
                 indices[i]=0 # roll over
-            x,y,b=rotations[i][indices[i]]
-            generated[y][x]=b
+            x,y,b=tags[i][indices[i]]
+            grid[y][x]=b
             if indices[i]!=0: # didn't roll over
                 break
         else:
             break # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
     return ims
 
-def genimage(generated):
+def genimage(generated,assertconnected=True):
     rotations=[]
     for y,row in enumerate(generated):
         for x,block in enumerate(row):
@@ -187,7 +187,10 @@ def genimage(generated):
             if indices[i]!=0: # didn't roll over
                 break
         else:
-            raise Exception('disconnected recipe') # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
+            if assertconnected:
+                raise Exception('disconnected recipe') # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
+            else:
+                break
                 
     ... 
     gen = makeimage(generated) # Make Image
@@ -273,16 +276,16 @@ def generaterecipe2(name) -> None:
             if typ == "combine":
                 results:list[dict] = []
                 for i,recipe in enumerate(gridpos):
-                    imgs=generates2(entri['grid'],ratio=4)
-                    result=[{"type":entri['block'],"rotate":0,"weld":[False]*4,"data":None}]*entri['amount']
-                    img=generates2([*itertools.batched(result,2)],ratio=4)[0] # batched makes 2 columns automatically
+                    imgs=generates2(recipe['grid'],ratio=4)
+                    result=[{"type":recipe['block'],"rotate":0,"weld":[False]*4,"data":None}]*recipe['amount']
+                    img=generates2([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
                     results.append({'recipeframes':imgs,'result':img})
                 finimage = gif.gif((50, 50, 50))
                 combiner=generates2([[
                     {"type":"combiner","rotate":2,"weld":[True]*4,"data":None}, 
                     {"type":"transistor","rotate":1,"weld":[True]*4,"data":None}
                 ]],ratio=4)[0]
-                maxdim = gif.tuple_max((2, 0),*[img.size for recipeimgs in results for img in recipeimgs['recipeframes']]) # fancy double iteration # the recipe is at least 2 blocks wide
+                maxdim = gif.tuple_max((64*2, 0),*[img.size for recipeimgs in results for img in recipeimgs['recipeframes']]) # fancy double iteration # the recipe is at least 2 blocks wide
                 for recipenum,recipeimgs in enumerate(results):
                     y = recipenum*(
                         maxdim[1]+ # the tallest recipe
@@ -306,10 +309,6 @@ def generaterecipe2(name) -> None:
                         pos=(maxdim[0]+64, y+maxdim[1]//2)
                     )
                 finimage.export(f"cache/recipe-{name}.gif")
-            
-    # for maderecipecache in glob.glob(f"cache/recipeframe-*.png"):
-    #     try: os.remove(maderecipecache)
-    #     except: pass
 
 if __name__ == "__main__":
     generaterecipe(returned, "extractor")
