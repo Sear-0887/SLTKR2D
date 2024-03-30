@@ -108,7 +108,7 @@ def generates(generated, recipenum=0, prodname="unknown", replacedhistroy="", pt
     gen = gen.resize((width*ratio, height*ratio), Image.NEAREST).convert("RGBA") # Resize to dimension*Ratio
     gen.save(pthname) # Save the final image
 
-def generates2(grid):
+def generates2(grid,ratio):
     tags=[]
     for y,row in enumerate(grid):
         for x,block in enumerate(row):
@@ -119,7 +119,10 @@ def generates2(grid):
     # now have a list of tags and coordinates
     ims=[]
     while True:
-        ims.append(genimage(grid))
+        gen=genimage(grid)
+        width, height = gen.size # Get width, height
+        gen = gen.resize((width*ratio, height*ratio), Image.NEAREST).convert("RGBA") # Resize to dimension*Ratio
+        ims.append(gen)
         for i in reversed(range(len(rotations))):
             indices[i]+=1
             if indices[i]>=len(rotations[i]):
