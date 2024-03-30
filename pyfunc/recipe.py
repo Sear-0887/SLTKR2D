@@ -255,7 +255,7 @@ def generaterecipe(name):
     #     try: os.remove(maderecipecache)
     #     except: pass
 
-def getarrow(typ):
+def getarrow(typ:str) -> Image.Image:
     icox, icoy = getarrowcoords()[typ]
     return Image.open(
         cfg("localGame.texture.guidebookArrowFile")
@@ -265,7 +265,7 @@ def getarrow(typ):
         (64, 64), Image.NEAREST
     )
 
-def generaterecipe2(name):
+def generaterecipe2(name) -> None:
     for typ in returned.keys():
         if name in returned[typ]:
             print(f"{typ}: {returned[typ][name]}")
@@ -282,28 +282,28 @@ def generaterecipe2(name):
                     {"type":"combiner","rotate":2,"weld":[True]*4,"data":None}, 
                     {"type":"transistor","rotate":1,"weld":[True]*4,"data":None}
                 ]],ratio=4)[0]
-                md = gif.tuple_max((0, 0),*[img.size for recipeimgs in results for img in recipeimgs['recipeframes']]) # fancy double iteration
+                maxdim = gif.tuple_max((2, 0),*[img.size for recipeimgs in results for img in recipeimgs['recipeframes']]) # fancy double iteration # the recipe is at least 2 blocks wide
                 for recipenum,recipeimgs in enumerate(results):
-                    posi = recipenum*( # y position of the recipe
-                        md[1]+ # the tallest recipe
-                        64+    # the combiner
-                        32     # mandatory 32 pixel gap
+                    y = recipenum*(
+                        maxdim[1]+ # the tallest recipe
+                        64+        # the combiner
+                        32         # mandatory 32 pixel gap
                     )
                     finimage.addgifframes(
                         recipeimgs['recipeframes'],
-                        pos=(0, posi)
+                        pos=(0, y)
                     )
                     finimage.addimageframes(
                         combiner,
-                        pos=(0, posi+md[1])
+                        pos=(0, y+maxdim[1])
                     )
                     finimage.addimageframes(
                         recipeimgs['result'],
-                        pos=(md[0]+64+64+64, posi)
+                        pos=(maxdim[0]+64+64+64, y)
                     )
                     finimage.addimageframes(
                         getarrow("combiner"),
-                        pos=(md[0]+64, posi+md[1]//2)
+                        pos=(maxdim[0]+64, y+maxdim[1]//2)
                     )
                 finimage.export(f"cache/recipe-{name}.gif")
             
