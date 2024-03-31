@@ -8,13 +8,18 @@ def tuple_min(*tuples) -> tuple[int]:
 class gif_frame:
     def __init__(self, image=None):
         self.images: list[tuple[Image.Image, tuple[int, int]]] = []
-        self.addimage(image or Image.new("RGBA", (0, 0)))
+        if image is not None:
+            self.addimage(image)
         
     def addimage(self, img=None, pos=(0,0)):
         self.images.append((img, pos))
+
+    def addgifframe(self, img:gif_frame, pos=(0,0)):
+        for frame,(x,y) in img.images:
+            self.addimage(frame, (x+pos[0],y+pos[1])):
     
     def exportframe(self):
-        copy = Image.new("RGBA", (4096, 4096))
+        copy = Image.new("RGBA", (4096, 4096)) # i don't like hard limits # like what if someone makes a 100 block tall recipe? # what then?
         for i, pos in self.images:
             copy.alpha_composite(i, pos)
         copy = copy.crop(copy.getbbox())
@@ -32,11 +37,22 @@ class gif:
         print(f"GIF adding img at pos {pos}")
         if len(self.framelist) < len(giflist):
             for _ in range( len(giflist) - len(self.framelist) ):
-                self.addframe()
+                self.addframe() # but consider: loops of different lengths multiply to their LCM
         for i in range(len(giflist)):
             gifframe, selfframe = giflist[i], self.framelist[i]
             if selfframe is None: return
             selfframe.addimage(gifframe, pos)
+        return self
+        
+    def addgif(self, newgif:gif, pos=(0, 0)): # ignore the background of newgif
+        print(f"GIF adding gif at pos {pos}")
+        if len(self.framelist) < len(newgif.framelist):
+            for _ in range( len(newgif.framelist) - len(self.framelist) ):
+                self.addframe()
+        for i in range(len(newgif.framelist)):
+            gifframe, selfframe = newgif.framelist[i], self.framelist[i]
+            if selfframe is None: return
+            selfframe.addgifframe(gifframe, pos)
         return self
             
     def addimageframes(self, image, pos=(0, 0)):
