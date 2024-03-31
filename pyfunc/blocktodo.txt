@@ -56,7 +56,6 @@ summonore
 snow
 
 # Sear
-Rotation Weld Fix (5/5)
 Extract, Heat Recipe (5/5)
 Extra Display/Inject (4/5)
 Optimize Code (3/5)
