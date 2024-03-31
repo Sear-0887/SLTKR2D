@@ -7,8 +7,6 @@ from nextcord.ext import commands, tasks
 from pyfunc.lang import cfg, evl, keywords, phraser, phrasermodule, getkws
 from pyfunc.gettoken import gettoken
 from pyfunc.commanddec import MainCommand
-from pyfunc.block import get
-import nextcord
 
 botinit()
 intents = nextcord.Intents.default()
