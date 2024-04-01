@@ -1,4 +1,5 @@
 from PIL import Image
+from typing import Self
 
 def tuple_max(*tuples) -> tuple[int]:
     return tuple(map(max, zip(*tuples)))
@@ -14,9 +15,9 @@ class gif_frame:
     def addimage(self, img=None, pos=(0,0)):
         self.images.append((img, pos))
 
-    def addgifframe(self, img:gif_frame, pos=(0,0)):
+    def addgifframe(self, img:Self, pos=(0,0)):
         for frame,(x,y) in img.images:
-            self.addimage(frame, (x+pos[0],y+pos[1])):
+            self.addimage(frame, (x+pos[0],y+pos[1]))
     
     def exportframe(self):
         copy = Image.new("RGBA", (4096, 4096)) # i don't like hard limits # like what if someone makes a 100 block tall recipe? # what then?
@@ -44,7 +45,7 @@ class gif:
             selfframe.addimage(gifframe, pos)
         return self
         
-    def addgif(self, newgif:gif, pos=(0, 0)): # ignore the background of newgif
+    def addgif(self, newgif:Self, pos=(0, 0)): # ignore the background of newgif
         print(f"GIF adding gif at pos {pos}")
         if len(self.framelist) < len(newgif.framelist):
             for _ in range( len(newgif.framelist) - len(self.framelist) ):
