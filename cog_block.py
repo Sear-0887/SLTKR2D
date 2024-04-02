@@ -104,15 +104,14 @@ class Block(commands.Cog):
             )
             
     @CogCommand("recipe")
-    async def recipe(self,ctx, *, block=None):
+    async def recipe(self,ctx, *, block='extractor'):
         if block.isdigit(): # if the argument is a number, get the corresponding block name
             block = idtoblock.get(int(block),'NIC')
         block = block.replace(" ", "_").lower()
-        _ = blockinfos[block] # Lazy block detecting
-        generaterecipe(block)
+        info = generaterecipe(block)
+        print(info)
         embed = nextcord.Embed()
         embed.title = f"{block}'s Recipe"
-        embed.description = f"{block} has a Combiner Recipe."
         embed.set_image(url="attachment://f.gif")
         await ctx.send(embed=embed, file=nextcord.File(f"cache/recipe-{block}.gif", filename="f.gif"))  
         
