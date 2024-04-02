@@ -1,5 +1,4 @@
 from PIL import Image
-from apng import APNG, PNG
 
 def tuple_max(*tuples) -> tuple[int]:
     return tuple(map(max, zip(*tuples)))
