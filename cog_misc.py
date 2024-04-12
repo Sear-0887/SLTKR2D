@@ -3,7 +3,7 @@ from pyfunc.commanddec import CogCommand
 from pathlib import Path
 
 
-class Branch(commands.Cog):
+class Misc(commands.Cog):
     def __init__(self, bot, branch):
         self.bot = bot
         self.branch = branch
@@ -26,4 +26,4 @@ def setup(bot):
     #process = subprocess.Popen(["git", "branch", "--show-current"], stdout=subprocess.PIPE)
     #branch_name, branch_error = process.communicate()
 
-    bot.add_cog(Branch(bot,branch))
+    bot.add_cog(Misc(bot,branch))
