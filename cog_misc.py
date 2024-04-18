@@ -15,6 +15,35 @@ class Misc(commands.Cog):
     async def branch(self, ctx:commands.Context):
         await ctx.send(f"Current branch is {self.branch}")
         
+    @InteractionCogCommand_Local("timestamp")
+    async def timestamp(self, 
+                     interaction: nextcord.Interaction, 
+                     offsetsecond: int = 0,
+                     formating: str|None=None):
+        formatinfo = {
+            "t": "Short Time",
+            "T": "Long Time",
+            "d": "Short Date",
+            "D": "Long Date",
+            "f": "Short Date/Time",
+            "F": "Long Date/Time",
+            "R": "Relative Time"
+        }
+        currenttime = int(time.time())-offsetsecond
+        if formating is None:
+            await interaction.response.send_message(f"Default | <t:{currenttime}> \n") 
+        else:
+            if formating in formatinfo.keys():
+                await interaction.response.send_message(f"<t:{currenttime}:{formating}>") 
+            elif formating.lower() in ["list", "listing", "l", "all"]:
+                dump = f"Default | <t:{currenttime}> \n"
+                for crfm in formatinfo.keys():
+                    dump += f"{formatinfo[crfm]} | <t:{currenttime}:{crfm}> \n"
+                await interaction.response.send_message(dump) 
+            else:
+                raise KeyError
+    
+
 def setup(bot):
     # https://stackoverflow.com/a/62724213
     head_dir = Path(".") / ".git" / "HEAD"

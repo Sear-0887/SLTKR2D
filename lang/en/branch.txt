@@ -1,6 +1,0 @@
-## branch
-branch.aliases = [br]
-branch.desc = Print the Git branch the bot is running from.
-
-branch.error = H o w   e r r o r
-branch.syntax = !branch
