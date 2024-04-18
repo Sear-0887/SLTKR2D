@@ -2,7 +2,8 @@ import datetime
 import decorator
 import json
 import asyncio
-from pyfunc.lang import evl
+import nextcord
+from pyfunc.lang import cfg, evl
 from colorama import Fore, init
 from nextcord.ext import commands
 import traceback
@@ -126,5 +127,25 @@ def CogCommand(name):
             name        =        name,
             description = evl(f"{name}.desc") or "*No Description Found.*",
             aliases     = evl(f"{name}.aliases") or []
+        )( trycmd(cmd) )
+    return fixcmd
+
+def InteractionCogCommand_Local(name):
+    # interaction cog command
+    # command gets a self argument as well
+    async def _trycmd(cmd, self, interaction: nextcord.Interaction ,*args,**kwargs):
+        try:
+            await cmd(self, interaction, *args,**kwargs)
+            
+        except Exception as e:
+            await ErrorHandler(name, interaction, e, args, kwargs)
+            return
+    def trycmd(cmd):
+        return decorator.decorate(cmd,_trycmd)
+    def fixcmd(cmd):
+        return nextcord.slash_command(
+            name        = name,
+            description = evl(f"{name}.desc") or "*No Description Found.*",
+            guild_ids   = cfg("localICCServer")
         )( trycmd(cmd) )
     return fixcmd

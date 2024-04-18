@@ -1,6 +1,9 @@
+import nextcord
 from nextcord.ext import commands
-from pyfunc.commanddec import CogCommand
+from pyfunc.commanddec import CogCommand, InteractionCogCommand_Local
 from pathlib import Path
+import os
+import time
 
 
 class Misc(commands.Cog):

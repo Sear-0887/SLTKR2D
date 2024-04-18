@@ -87,5 +87,11 @@
         "devInfoPath": "json/devs.json",
         "emojiInfoPath": "json/emoji.json",
         "kwInfoPath": "json/kwlink.json"
-    }
+    },
+    "localICCServer": [
+        629118014440079380,  // Roody:2d
+        1155016107963453462, // Roody:2d Wiki Server
+        967600751985709066,  // SearTestServer
+        1203529312016400435  // CReST Software
+    ]
 }
