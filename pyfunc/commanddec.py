@@ -70,9 +70,9 @@ f'''
 '''
     )
     await sendtoch(expecterr)
-    author = ctx.author if ctxorintr else interaction.user
-    guild = ctx.guild if ctxorintr else interaction.guild
-    trigger = ctx.message.clean_content if ctxorintr else "<INTERACTION>"
+    author = ctx.author if ctxorintr == ctx else interaction.user
+    guild = ctx.guild if ctxorintr == ctx else interaction.guild
+    trigger = ctx.message.clean_content if ctxorintr == ctx else "<INTERACTION>"
     errorpacket = {
         "user": {
             "displayname": author.display_name,
@@ -93,7 +93,7 @@ f'''
         excstrs = [str(e),*excstrs]
     errorpacket['excstr'] = '\n'.join(excstrs)
     
-    errfilname = f"cache/log/error-{ctx.author.global_name}-{datetime.date.today():%d-%m-%Y}.json"
+    errfilname = f"cache/log/error-{author.global_name}-{datetime.date.today():%d-%m-%Y}.json"
     try:
         with open(errfilname, "r") as fil:
             prev = json.load(fil)

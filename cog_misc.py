@@ -18,30 +18,37 @@ class Misc(commands.Cog):
     @InteractionCogCommand_Local("timestamp")
     async def timestamp(self, 
                      interaction: nextcord.Interaction, 
-                     offsetsecond: int = 0,
-                     formating: str|None=None):
-        formatinfo = {
-            "t": "Short Time",
-            "T": "Long Time",
-            "d": "Short Date",
-            "D": "Long Date",
-            "f": "Short Date/Time",
-            "F": "Long Date/Time",
-            "R": "Relative Time"
-        }
+                     offsetsecond: int = nextcord.SlashOption(required=False, default=0),
+                     formating = nextcord.SlashOption(name="formating", required=False, choices=[
+                        "Default",
+                        "List All",
+                        "Short Time",
+                        "Long Time",
+                        "Short Date",
+                        "Long Date",
+                        "Short Date/Time",
+                        "Long Date/Time",
+                        "Relative Time"
+                    ], default="Default")):
+        formatings = {
+                        "Default": "",
+                        "Short Time": ":t",
+                        "Long Time": ":T",
+                        "Short Date": ":d",
+                        "Long Date": ":D",
+                        "Short Date/Time": ":f",
+                        "Long Date/Time": ":F",
+                        "Relative Time": ":R"
+                    }
         currenttime = int(time.time())-offsetsecond
-        if formating is None:
-            await interaction.response.send_message(f"Default | <t:{currenttime}> \n") 
+        if formating == "List All":
+            await interaction.response.send_message(
+                "\n".join([
+                    f"{key} | <t:{currenttime}{item}>" for key, item in formatings.items()
+                ])) 
         else:
-            if formating in formatinfo.keys():
-                await interaction.response.send_message(f"<t:{currenttime}:{formating}>") 
-            elif formating.lower() in ["list", "listing", "l", "all"]:
-                dump = f"Default | <t:{currenttime}> \n"
-                for crfm in formatinfo.keys():
-                    dump += f"{formatinfo[crfm]} | <t:{currenttime}:{crfm}> \n"
-                await interaction.response.send_message(dump) 
-            else:
-                raise KeyError
+            await interaction.response.send_message(f"{formating} | <t:{currenttime}{formatings[formating]}>") 
+                
     
 
 def setup(bot):
