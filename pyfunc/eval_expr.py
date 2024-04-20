@@ -1,15 +1,3 @@
-# to add a binary operator:
-# add it to ops
-# add a case in apply()
-
-# to add an unary operator:
-# add it to the uops list
-# add a case in applyuop()
-
-# to add a postfix operator:
-# add it to the pops list
-# add a case in applypop()
-
 import random
 import re
 import math
@@ -20,7 +8,7 @@ postfixOperators=['!']
 NUM   = 'NUM'   # Token: number
 LPAR  = 'LPAR'  # Token: left paren
 RPAR  = 'RPAR'  # Token: right paren
-BOP    = 'OP'    # Token: binary operator
+BOP   = 'BOP'   # Token: binary operator
 UOP   = 'UOP'   # Token: unary operator
 SYM   = 'SYM'   # Token: symbol (variable or function)
 EXPR  = 'EXPR'  # Token: expression (output of evaluate)
@@ -70,8 +58,8 @@ def applyBinaryOperations(operation, operand1, operand2):
     case '-':          return [NUM, operand1Value - operand2Value]
     case '*':          return [NUM, operand1Value * operand2Value]
     case '/':          return [NUM, operand1Value / operand2Value]
-    case '^' | '**'  : return [NUM, customPowerOperation(operand1Value,operand2Value)]
-    case '%' | 'mod' : return [NUM, operand1Value % operand2Value]
+    case '^'  | '**' : return [NUM, customPowerOperation(operand1Value,operand2Value)]
+    case '%'  | 'mod': return [NUM, operand1Value % operand2Value]
     case '//' | 'div': return [NUM, operand1Value // operand2Value]
     case _:            raise  KeyError(["binary", operationSymbol])
 
@@ -112,7 +100,7 @@ def applyFunction(functionName,operand):
     case 'sin'            : return [NUM, math.sin(operandValue)]
     case 'cos'            : return [NUM, math.cos(operandValue)]
     case 'tan'            : return [NUM, math.tan(operandValue)]
-    case 'rdm'            : return [NUM, random.random()]
+    case 'rdm'            : return [NUM, random.random()*operandValue]
     case _                : return [EXPR,'(',functionName,operand]
 # here starts RbCaVi's code
 # please know what you are doing, sear.
@@ -137,10 +125,10 @@ Number = group(Floatnumber, Intnumber)
 def getANumber(expression):
   # Get an actual number, not a variable or symbol
   if matched := re.match(Floatnumber, expression):
-    return float(matched.groups()[0]), expression[matched.end():]
+    return float(expression[:matched.end()]), expression[matched.end():]
   if matched := re.match(Intnumber, expression):
     # Open to python to inter. the base
-    return int(matched.groups()[0], base=0), expression[matched.end():]
+    return int(expression[:matched.end()], base=0), expression[matched.end():]
   return None,expression
 
 def getASymbol(expression):
@@ -199,7 +187,11 @@ def leftassoc(op):
   return binaryOperators[op][1]==LEFT
 
 def listparti(lst, index):
-  return lst[:index], list[index:]
+  # print(f"Partied {lst} to {lst[:index], lst[index:]}")
+  if abs(index) == 1: # For single-isolated element
+    return (lst[:index], lst[index])
+  else:
+    return (lst[:index], lst[index:])
 
 def evaluate(originalExpression):
   valueStack = []
@@ -269,6 +261,7 @@ def evaluate(originalExpression):
   while len(operatorStack) > 0: # apply the rest of the operators
     operatorStack, lastoperator = listparti(operatorStack, -1)
     valueStack, operands = listparti(valueStack, -2)
+    print(f"{operands = }")
     operand1, operand2 = operands
     valueStack.append(applyBinaryOperations(lastoperator,operand1,operand2))
   if len(valueStack) > 1: # each operator reduces the number of values by 1
