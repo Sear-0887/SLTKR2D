@@ -91,6 +91,11 @@ async def ping(ctx):
 @MainCommand(bot,"scream")
 async def scream(ctx, n:int=32):
     await ctx.send("A"*n)
+    
+# represent sear's sanity... again?
+@MainCommand(bot,"wee")
+async def scream(ctx, e:int=32):
+    await ctx.send("W"+"e"*e)
 
 # send a link
 @MainCommand(bot,"link")
