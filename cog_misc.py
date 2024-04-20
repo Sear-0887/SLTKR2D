@@ -1,9 +1,11 @@
+import datetime
 import nextcord
 from nextcord.ext import commands
 from pyfunc.commanddec import CogCommand, InteractionCogCommand_Local
 from pathlib import Path
 import os
 import time
+from datetime import datetime, timezone
 
 
 class Misc(commands.Cog):
@@ -18,7 +20,12 @@ class Misc(commands.Cog):
     @InteractionCogCommand_Local("timestamp")
     async def timestamp(self, 
                      interaction: nextcord.Interaction, 
-                     offsetsecond: int = nextcord.SlashOption(required=False, default=0),
+                     year   : int = nextcord.SlashOption(required=False, default=None),
+                     month  : int = nextcord.SlashOption(required=False, default=None),
+                     day    : int = nextcord.SlashOption(required=False, default=None),
+                     hour   : int = nextcord.SlashOption(required=False, default=None),
+                     minute : int = nextcord.SlashOption(required=False, default=None),
+                     second : int = nextcord.SlashOption(required=False, default=None),
                      formating = nextcord.SlashOption(name="formating", required=False, choices=[
                         "Default",
                         "List All",
@@ -40,7 +47,15 @@ class Misc(commands.Cog):
                         "Long Date/Time": ":F",
                         "Relative Time": ":R"
                     }
-        currenttime = int(time.time())-offsetsecond
+        currenttime = int(
+        datetime(
+        year   = year   or datetime.now().year,
+        month  = month  or datetime.now().month,
+        day    = day    or datetime.now().day,
+        hour   = hour   or datetime.now().hour,
+        minute = minute or datetime.now().minute,
+        second = second or datetime.now().second
+        ).timestamp())
         if formating == "List All":
             await interaction.response.send_message(
                 "\n".join([

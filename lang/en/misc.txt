@@ -7,6 +7,6 @@ branch.syntax = !branch
 
 ## timestamp
 ## Interaction doesn't have aliases
-timestamp.desc = Create / List out a unix timestamp with formats specified.
+timestamp.desc = Create / List out a unix timestamp with formats and datetime specified.
 timestamp.error = Invalid Value
 timestamp.syntax = /timestamp <offsetseconds> <formating>
