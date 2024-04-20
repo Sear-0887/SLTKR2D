@@ -1,3 +1,15 @@
+# to add a binary operator:
+# add it to ops
+# add a case in apply()
+
+# to add an unary operator:
+# add it to the uops list
+# add a case in applyuop()
+
+# to add a postfix operator:
+# add it to the pops list
+# add a case in applypop()
+
 import random
 import re
 import math
