@@ -9,6 +9,52 @@ import re
 #welded=top,left,bottom,right
 #rotate= 0    1    2      3
 
+class ImageBit:
+	def __init__(self,im,x=0,y=0,w=16,h=16):
+		self.im = im
+		# the dimensions of the part of the image to use
+		self.x = x
+		self.y = y
+		self.w = w
+		self.h = h
+		# rotation
+		self.flip = False # first
+		self.rotate = 0 # second
+
+	def rotate(self,r,flip=False):
+		if flip:
+			self.rotate = -self.rotate % 4
+			self.flip = not self.flip
+		self.rotate += r
+
+class Image:
+	ims:list[tuple[tuple[float, float], ImageBit]] # centers
+
+	def __init__(self):
+		self.ims=[]
+
+	def addimagebit(self, im:ImageBit, x=0, y=0):
+		x += im.w / 2
+		y += im.h / 2
+		ims.append(((x, y), im))
+
+	def addimage(self, im:"Image", x=0, y=0):
+		for (ix, iy), im in im.ims:
+			ims.append(((ix + x, iy + y), im))
+
+	def rotate(self, r, flip=False):
+		for i, ((x, y), im) in enumerate(self.ims):
+			im.rotate(r, flip)
+			if r == 0:
+				x, y =  x,  y
+			if r == 1:
+				x, y = -y,  x
+			if r == 2:
+				x, y = -x, -y
+			if r == 3:
+				x, y =  y, -x
+			self.ims[i][0]=x, y
+
 blockpaths={}
 pthblocktexture = cfg("localGame.texture.texturePathFile")
 with open(pthblocktexture) as f:
