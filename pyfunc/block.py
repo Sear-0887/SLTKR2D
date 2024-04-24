@@ -28,8 +28,8 @@ class ImageBit:
 		self.rotate += r
 
 	def getim(self):
-		im = self.im.crop((x, y, x + w, y + h))
-		match self.r:
+		im = self.im.crop((self.x, self.y, self.x + self.w, self.y + self.h))
+		match self.rotate:
 			case 1:
 				im = im.transpose(PIL.Image.ROTATE_90)
 			case 2:
@@ -60,9 +60,9 @@ class Image:
 		self.ims=[]
 
 	def addimagebit(self, im:ImageBit, x=0, y=0):
-		x -= im.w / 2
-		y -= im.h / 2
-		ims.append(((x, y), im))
+		x += im.w / 2
+		y += im.h / 2
+		self.ims.append(((x, y), im))
 
 	def addimage(self, im:"Image", x=0, y=0):
 		for (ix, iy), im in im.ims:
@@ -80,9 +80,10 @@ class Image:
 		mx = 0
 		my = 0
 		for (x, y), im in self.ims:
-			mx = max(mx, x + im.w)
-			my = max(my, y + im.h)
-		return (x,y)
+			w, h = rotatexy(im.w, im.h, im.rotate, im.flip)
+			mx = max(mx, x + w / 2)
+			my = max(my, y + h / 2)
+		return (mx,my)
 
 	def genimage(self,w=None,h=None):
 		defaultw, defaulth = self.getdims()
@@ -90,9 +91,10 @@ class Image:
 			w = defaultw
 		if h is None:
 			h = defaulth
-		out=PIL.Image.new('RGBA',(w,h),(0,0,0,0))
+		out=PIL.Image.new('RGBA',(int(w),int(h)),(0,0,0,0))
 		for (x, y), im in self.ims:
-			out.alpha_composite(im.getim(),(x,y))
+			im = im.getim()
+			out.alpha_composite(im, (int(x - im.width / 2), int(y - im.height / 2)))
 		return out
 
 blockpaths={}
