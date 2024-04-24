@@ -81,7 +81,7 @@ class Image:
 			dx = ix - x
 			dy = iy - y
 			dx, dy = rotatexy(dx, dy, r, flip)
-			self.ims[i][0]=x + dx, y + dy
+			self.ims[i]=((x + dx, y + dy), self.ims[i][1])
 
 	def getdims(self):
 		mx = 0
