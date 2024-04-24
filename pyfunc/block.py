@@ -5,6 +5,7 @@ from pyfunc.lang import cfg
 import functools
 import collections
 import re
+import typing
 
 #welded=top,left,bottom,right
 #rotate= 0    1    2      3
@@ -69,9 +70,9 @@ class Image:
 		y += im.h / 2
 		self.ims.append(((x, y), im))
 
-	def addimage(self, im:"Image", x=0, y=0):
-		for (ix, iy), im in im.ims:
-			ims.append(((ix + x, iy + y), im))
+	def addimage(self, im:typing.Self, x=0, y=0):
+		for (ix, iy), oim in im.ims:
+			self.ims.append(((ix + x, iy + y), oim))
 
 	def rotate(self, r, flip=False):
 		for i, ((ix, iy), im) in enumerate(self.ims):
