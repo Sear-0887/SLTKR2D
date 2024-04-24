@@ -278,16 +278,16 @@ def frame(data):
 	rotate=data['rotate']
 	image=getblocktexture({'type':'frame','sizex':64})
 	top,left,bottom,right=rotatewelded(welded,rotate)
-	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
+	im = Image()
 	for x,xside in [(0,left),(8,right)]:
 		for y,yside in [(0,top),(8,bottom)]:
 			if isframe(xside) or isframe(yside):
 				offset=32 # frames have different welding to each other
 			else:
 				offset=0
-			im.alpha_composite(image.crop((x+offset+16*iswelded(xside),y+16*iswelded(yside),x+offset+16*iswelded(xside)+8,y+16*iswelded(yside)+8)),(x,y))
-	im=rotateblock(im,rotate)
-	return im
+			im.addimagebit(ImageBit(image,x+offset+16*iswelded(xside),y+16*iswelded(yside),8,8),x,y)
+	im=rotateblockib(im,rotate)
+	return im.genimage(16,16)
 
 def wiretop(data):
 	if data['type'] in outputtypes:
