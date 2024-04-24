@@ -273,7 +273,7 @@ def overlay(data) -> PIL.Image.Image:
 def wafer(data) -> PIL.Image.Image:
 	return defaultblock({**data,'type':'wafer'})
 
-def frame(data):
+def frame(data) -> PIL.Image.Image:
 	welded=data['weld']
 	rotate=data['rotate']
 	image=getblocktexture({'type':'frame','sizex':64})
@@ -289,7 +289,7 @@ def frame(data):
 	im=rotateblockib(im,rotate)
 	return im.genimage(16,16)
 
-def wiretop(data):
+def wiretop(data) -> PIL.Image.Image:
 	if data['type'] in outputtypes:
 		welded=data['weld']
 		rotate=data['rotate']
@@ -297,7 +297,7 @@ def wiretop(data):
 		data={**data,'offsety':data.get('offsety',0)+16*iswired(top)}
 	return overlay(data)
 
-def wire(data):
+def wire(data) -> PIL.Image.Image:
 	welded=data['weld']
 	if data['data'] is not None:
 		bdata=re.fullmatch('(?P<state>on|off)',data['data']).groupdict()
@@ -312,7 +312,7 @@ def wire(data):
 			im.alpha_composite(image.crop((x+16*iswired(xside),y+16*iswired(yside),x+16*iswired(xside)+8,y+16*iswired(yside)+8)),(x,y))
 	return im
 
-def actuator(data):
+def actuator(data) -> PIL.Image.Image:
 	welded=data['weld']
 	rotate=data['rotate']
 	im1=getblocktexture({'type':'actuator_base'})
@@ -325,7 +325,7 @@ def actuator(data):
 	im=rotateblock(im,rotate)
 	return im
 
-def platform(data):
+def platform(data) -> PIL.Image.Image:
 	_,left,_,right=data['weld']
 	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 	image=getblocktexture({**data,'sizex':48})
