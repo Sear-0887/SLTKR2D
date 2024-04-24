@@ -254,9 +254,9 @@ def defaultblock(data):
 	rotate=data['rotate']
 	image=getblocktexture(data)
 	welded=rotatewelded(welded,rotate)
-	im=drawblocktexture(image,welded).genimage(16,16)
-	im=rotateblock(im,rotate)
-	return im
+	im=drawblocktexture(image,welded)
+	im=rotateblockib(im,rotate)
+	return im.genimage(16,16)
 
 def overlay(data):
 	rotate=data['rotate']
