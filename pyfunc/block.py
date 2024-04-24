@@ -39,11 +39,11 @@ class ImageBit:
 			im = im.transpose(PIL.Image.FLIP_LEFT_RIGHT)
 		match self.rotation:
 			case 1:
-				im = im.transpose(PIL.Image.ROTATE_90)
+				im = im.transpose(PIL.Image.ROTATE_270)
 			case 2:
 				im = im.transpose(PIL.Image.ROTATE_180)
 			case 3:
-				im = im.transpose(PIL.Image.ROTATE_270)
+				im = im.transpose(PIL.Image.ROTATE_90)
 		return im
 
 def rotatexy(x, y, r, flip):
