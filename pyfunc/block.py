@@ -40,6 +40,19 @@ class ImageBit:
 			im = im.transpose(PIL.Image.FLIP_LEFT_RIGHT)
 		return im
 
+def rotatexy(x, y, r, flip):
+	if flip:
+		x = -x
+	if r == 0:
+		x, y =  x,  y
+	if r == 1:
+		x, y = -y,  x
+	if r == 2:
+		x, y = -x, -y
+	if r == 3:
+		x, y =  y, -x
+	return x, y
+
 class Image:
 	ims:list[tuple[tuple[float, float], ImageBit]] # centers
 
@@ -60,16 +73,7 @@ class Image:
 			im.rotate(r, flip)
 			dx = ix - x
 			dy = iy - y
-			if self.flip:
-				dx = -dx
-			if r == 0:
-				dx, dy =  dx,  dy
-			if r == 1:
-				dx, dy = -dy,  dx
-			if r == 2:
-				dx, dy = -dx, -dy
-			if r == 3:
-				dx, dy =  dy, -dx
+			dx, dy = rotatexy(dx, dy, r, flip)
 			self.ims[i][0]=x + dx, y + dy
 
 	def getdims(self):
