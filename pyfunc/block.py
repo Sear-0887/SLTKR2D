@@ -64,7 +64,7 @@ for name,texture in data.items():
 
 @functools.cache
 def getblockim(block):
-	return PIL.Image.open(os.path.join(cfg("localGame.texture.texturePathFolder"),blockpaths[block]))
+	return PIL.Image.open(os.path.join(cfg("localGame.texture.texturePathFolder"),blockpaths[block])).convert('RGBA')
 
 def getblockdata(data):
 	return {'data':data}
@@ -180,13 +180,17 @@ def twowayfilter(data):
 		data['rotate']=0
 	return data
 
+@functools.cache
+def _getblocktexture(block,offsetx,offsety,sizex,sizey):
+	return getblockim(block).crop((offsetx,offsety,offsetx+sizex,offsety+sizey)).convert('RGBA')
+
 def getblocktexture(data):
 	block=data['type']
 	offsetx=data.get('offsetx',0)
 	offsety=data.get('offsety',0)
 	sizex=data.get('sizex',32)
 	sizey=data.get('sizey',32)
-	return getblockim(block).crop((offsetx,offsety,offsetx+sizex,offsety+sizey)).convert('RGBA')
+	return _getblocktexture(block,offsetx,offsety,sizex,sizey)
 
 def drawblocktexture(image,weld):
 	top,left,bottom,right=weld
