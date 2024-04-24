@@ -17,6 +17,11 @@ class ImageBit:
 		self.y = y
 		self.w = w
 		self.h = h
+		while isinstance(self.im,ImageBit):
+			# gonna just assume x,y,w,h stays inside the image
+			self.x += self.im.x
+			self.y += self.im.y
+			self.im = self.im.im
 		# rotation
 		self.flip = False # first
 		self.rotate = 0 # second
