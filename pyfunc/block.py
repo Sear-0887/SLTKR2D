@@ -34,6 +34,8 @@ class ImageBit:
 
 	def getim(self):
 		im = self.im.crop((self.x, self.y, self.x + self.w, self.y + self.h))
+		if self.flip:
+			im = im.transpose(PIL.Image.FLIP_LEFT_RIGHT)
 		match self.rotate:
 			case 1:
 				im = im.transpose(PIL.Image.ROTATE_90)
@@ -41,8 +43,6 @@ class ImageBit:
 				im = im.transpose(PIL.Image.ROTATE_180)
 			case 3:
 				im = im.transpose(PIL.Image.ROTATE_270)
-		if self.flip:
-			im = im.transpose(PIL.Image.FLIP_LEFT_RIGHT)
 		return im
 
 def rotatexy(x, y, r, flip):
