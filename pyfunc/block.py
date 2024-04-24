@@ -529,6 +529,8 @@ def makeimage(blocks,autoweld=True):
 	for yi,line in enumerate(blocks):
 		for xi,block in enumerate(line):
 			block=normalize(block)
+			if block['weld']=='all':
+				block['weld']=[True,True,True,True]
 			newblocks[yi][xi]=block
 
 	im=PIL.Image.new('RGBA',(16*xsize,16*ysize),(0,0,0,0))
@@ -537,8 +539,6 @@ def makeimage(blocks,autoweld=True):
 			block=get(newblocks,xi,yi)
 			if block['type']=='air':
 				continue
-			if block['weld']=='all':
-				block['weld']=[True,True,True,True]
 			if autoweld:
 				weldright=canweld('right',block) and canweld('left',get(newblocks,xi+1,yi))
 				weldleft=canweld('left',block) and canweld('right',get(newblocks,xi-1,yi))
