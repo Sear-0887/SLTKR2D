@@ -12,3 +12,12 @@ im = makeimage([[
 ]])
 
 im.show()
+
+im = makeimage([[
+	{'type':'frame','rotate':0},
+	{'type':'frame','rotate':1},
+	{'type':'frame','rotate':2},
+	{'type':'actuator_head','rotate':3},
+]])
+
+im.show()
