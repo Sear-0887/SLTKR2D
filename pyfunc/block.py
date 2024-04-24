@@ -55,6 +55,25 @@ class Image:
 				x, y =  y, -x
 			self.ims[i][0]=x, y
 
+	def getdims(self):
+		mx = 0
+		my = 0
+		for (x, y), im in self.ims:
+			mx = max(mx, x + im.w)
+			my = max(my, y + im.h)
+		return (x,y)
+
+	def genimage(self,w=None,h=None):
+		defaultw, defaulth = self.getdims()
+		if w is None:
+			w = defaultw
+		if h is None:
+			h = defaulth
+		out=PIL.Image.new('RGBA',(w,h),(0,0,0,0))
+		for (x, y), im in self.ims:
+			out.alpha_composite(im,(x,y))
+		return out
+
 blockpaths={}
 pthblocktexture = cfg("localGame.texture.texturePathFile")
 with open(pthblocktexture) as f:
