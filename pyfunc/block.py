@@ -204,6 +204,21 @@ def setwireside(side,other):
 		side['wire']=True
 	return side
 
+class BlockData(typing.TypedDict):
+	type:str
+	rotate:int
+	weld:tuple[bool, bool, bool, bool]
+	data:str | None
+	offsetx:int | None
+	offsety:int | None
+	overlayoffsetx:int | None
+	overlayoffsety:int | None
+
+class BlockDesc(typing.TypedDict):
+	wired:bool
+	datafilters:list[typing.Callable[[BlockData], BlockData]]
+	layers:list[typing.Callable[[BlockData], Image | PIL.Image.Image]]
+
 def blockdesc():
 	return {
 		'wired':False, # does this block connect to wires beside it?
@@ -300,7 +315,9 @@ def wiretop(data) -> PIL.Image.Image:
 def wire(data) -> PIL.Image.Image:
 	welded=data['weld']
 	if data['data'] is not None:
-		bdata=re.fullmatch('(?P<state>on|off)',data['data']).groupdict()
+		bdata=re.fullmatch('(?P<state>on|off)',data['data'])
+		if bdata is None:
+			raise ValueError('bad value format')
 		offset=32 if bdata['state']=='on' else 0
 	else:
 		offset=0
@@ -336,25 +353,31 @@ def platform(data) -> PIL.Image.Image:
 		im.alpha_composite(image.crop((x+16*platformx(xside),y,x+16*platformx(xside)+8,y+16)),(x,0))
 	return im
 
-def wirecomponent(data):
+def wirecomponent(data:BlockData):
 	if data['data'] is not None:
 		typ=data['type']
 		if typ in ["port","accelerometer","matcher","detector","toggler","trigger"]:
 			# instantaneous
 			# top off bottom on texture
-			bdata=re.fullmatch('(?P<state>on|off)',data['data']).groupdict()
+			bdata=re.fullmatch('(?P<state>on|off)',data['data'])
+			if bdata is None:
+				raise ValueError('bad value format')
 			data['overlayoffsety']=16 if bdata['state']=='on' else 0
 			data['data']=bdata['state'] or 'off'
 		elif typ=="capacitor":
 			# non instantaneous
 			# top off bottom on texture
-			bdata=re.fullmatch('(?P<instate>on|off)?(?P<state>on|off)',data['data']).groupdict()
+			bdata=re.fullmatch('(?P<instate>on|off)?(?P<state>on|off)',data['data'])
+			if bdata is None:
+				raise ValueError('bad value format')
 			data['overlayoffsety']=16 if bdata['state']=='on' else 0
 			data['data']=bdata['instate'] or 'off'
 		elif typ in ["diode","galvanometer","latch","transistor"]:
 			# column 1 off
 			# column 2 on
-			bdata=re.fullmatch('(?P<instate>on|off)?(?P<outstate>on|off)',data['data']).groupdict()
+			bdata=re.fullmatch('(?P<instate>on|off)?(?P<outstate>on|off)',data['data'])
+			if bdata is None:
+				raise ValueError('bad value format')
 			data['overlayoffsetx']=16 if bdata['outstate']=='on' else 0
 			data['data']=bdata['instate'] or 'off'
 		elif typ=="potentiometer": # the rest have a setting
@@ -363,7 +386,9 @@ def wirecomponent(data):
 			pass
 		elif typ=="cascade":
 			# delay, in, out
-			bdata=re.fullmatch('(?P<delay>[1-7])(?P<instate>on|off)?(?P<state>on|off)',data['data']).groupdict()
+			bdata=re.fullmatch('(?P<delay>[1-7])(?P<instate>on|off)?(?P<state>on|off)',data['data'])
+			if bdata is None:
+				raise ValueError('bad value format')
 			data['overlayoffsetx']=16*(2*(int(bdata['delay'])-1)+(bdata['state']=='on'))
 	return data
 
@@ -418,7 +443,7 @@ blocktypes['wire']['layers']=[frame,wire]
 blocktypes['frame']['layers']=[frame]
 
 # rotate an image of a block by rotate
-def rotateblock(im,rotate):
+def rotateblock(im:PIL.Image.Image,rotate:int):
 	if rotate==0:
 		return im
 	if rotate==3:
@@ -429,7 +454,7 @@ def rotateblock(im,rotate):
 		return im.transpose(PIL.Image.FLIP_TOP_BOTTOM)
 
 # rotate an overlay (like galvanometer) by rotate
-def rotateoverlay(im,rotate):
+def rotateoverlay(im:PIL.Image.Image,rotate:int):
 	if rotate==0:
 		return im
 	if rotate==3:
@@ -440,7 +465,7 @@ def rotateoverlay(im,rotate):
 		return im.transpose(PIL.Image.ROTATE_180)
 
 # rotate an image of a block by rotate
-def rotateblockib(im:Image,rotate) -> Image:
+def rotateblockib(im:Image,rotate:int) -> Image:
 	if rotate==0:
 		pass
 	if rotate==3:
@@ -452,7 +477,7 @@ def rotateblockib(im:Image,rotate) -> Image:
 	return im
 
 # rotate an overlay (like galvanometer) by rotate
-def rotateoverlayib(im:Image,rotate) -> Image:
+def rotateoverlayib(im:Image,rotate:int) -> Image:
 	if rotate==0:
 		pass
 	if rotate==3:
@@ -464,7 +489,7 @@ def rotateoverlayib(im:Image,rotate) -> Image:
 	return im
 
 # rotate the welds so they are in the right place when rotated by rotateblock
-def rotatewelded(welded,rotate):
+def rotatewelded(welded:tuple[bool,bool,bool,bool],rotate:int):
 	if rotate==0:
 		return welded
 	if rotate==3:
@@ -476,22 +501,22 @@ def rotatewelded(welded,rotate):
 
 # convert blocks into a standardized format
 # for easy processing
-def normalize(block):
+def normalize(block:BlockData | str):
 	if block is None:
-		return {"type":'air',"rotate":0,"weld":'all'}
-	if type(block)==str:
-		return {"type":block,"rotate":0,"weld":"all"}
-	if type(block) in [tuple,list]:
-		out={"type":'air',"rotate":0,"weld":'all'}
+		return {"type":'air',"rotate":0,"weld":(True,True,True,True)}
+	if isinstance(block,str):
+		return {"type":block,"rotate":0,"weld":(True,True,True,True)}
+	if isinstance(block,(tuple,list)):
+		out={"type":'air',"rotate":0,"weld":(True,True,True,True)}
 		out.update(dict(zip(["type","rotate","weld"],block)))
 		return out
-	out={"type":'air',"rotate":0,"weld":'all'}
+	out={"type":'air',"rotate":0,"weld":(True,True,True,True)}
 	out.update(block)
 	return out
 
 # get a block from a grid
 # if the coordinates are outside the grid, return air
-def get(vss,xi,yi):
+def get(vss:list[list[BlockData]],xi:int,yi:int):
 	if xi<0 or yi<0 or yi>=len(vss):
 		return normalize("air");
 	vs=vss[yi]
@@ -500,7 +525,7 @@ def get(vss,xi,yi):
 	return vs[xi]
 
 # can this block weld on this side?
-def canweld(side,block):
+def canweld(side:str,block:BlockData):
 	if block['type'] in noweldtypes:
 		return False
 	elif block['type'] in ['cap','flower_magenta','flower_yellow','grass','motor','pedestal','spikes']: # Only Bottom
@@ -529,8 +554,6 @@ def makeimage(blocks,autoweld=True):
 	for yi,line in enumerate(blocks):
 		for xi,block in enumerate(line):
 			block=normalize(block)
-			if block['weld']=='all':
-				block['weld']=[True,True,True,True]
 			newblocks[yi][xi]=block
 
 	im=PIL.Image.new('RGBA',(16*xsize,16*ysize),(0,0,0,0))
