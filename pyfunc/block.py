@@ -578,5 +578,8 @@ def makeimage(blocks,autoweld=True):
 			for datafilter in blocktype['datafilters']:
 				block=datafilter(block)
 			for layer in blocktype['layers']:
-				im.alpha_composite(layer(block),(xi*16,yi*16)) # paste the block
+				bim = layer(block)
+				if isinstance(bim,Image):
+					bim = bim.genimage(16,16)
+				im.alpha_composite(bim,(xi*16,yi*16)) # paste the block
 	return im
