@@ -24,19 +24,19 @@ class ImageBit:
 			self.im = self.im.im
 		# rotation
 		self.flip = False # first
-		self.rotate = 0 # second
+		self.rotation = 0 # second
 
 	def rotate(self,r,flip=False):
 		if flip:
-			self.rotate = -self.rotate % 4
+			self.rotation = -self.rotation % 4
 			self.flip = not self.flip
-		self.rotate += r
+		self.rotation += r
 
 	def getim(self):
 		im = self.im.crop((self.x, self.y, self.x + self.w, self.y + self.h))
 		if self.flip:
 			im = im.transpose(PIL.Image.FLIP_LEFT_RIGHT)
-		match self.rotate:
+		match self.rotation:
 			case 1:
 				im = im.transpose(PIL.Image.ROTATE_90)
 			case 2:
@@ -85,7 +85,7 @@ class Image:
 		mx = 0
 		my = 0
 		for (x, y), im in self.ims:
-			w, h = rotatexy(im.w, im.h, im.rotate, im.flip)
+			w, h = rotatexy(im.w, im.h, im.rotation, im.flip)
 			mx = max(mx, x + w / 2)
 			my = max(my, y + h / 2)
 		return (mx,my)
@@ -436,6 +436,30 @@ def rotateoverlay(im,rotate):
 		return im.transpose(PIL.Image.ROTATE_90)
 	if rotate==2:
 		return im.transpose(PIL.Image.ROTATE_180)
+
+# rotate an image of a block by rotate
+def rotateblockib(im,rotate):
+	if rotate==0:
+		pass
+	if rotate==3:
+		im.rotate(3)
+	if rotate==1:
+		im.rotate(3,True)
+	if rotate==2:
+		im.rotate(2,True)
+	return im
+
+# rotate an overlay (like galvanometer) by rotate
+def rotateoverlayib(im,rotate):
+	if rotate==0:
+		pass
+	if rotate==3:
+		im.rotate(3)
+	if rotate==1:
+		im.rotate(1)
+	if rotate==2:
+		im.rotate(2)
+	return im
 
 # rotate the welds so they are in the right place when rotated by rotateblock
 def rotatewelded(welded,rotate):
