@@ -27,6 +27,19 @@ class ImageBit:
 			self.flip = not self.flip
 		self.rotate += r
 
+	def getim(self):
+		im = self.im.crop((x, y, x + w, y + h))
+		match self.r:
+			case 1:
+				im = im.transpose(PIL.Image.ROTATE_90)
+			case 2:
+				im = im.transpose(PIL.Image.ROTATE_180)
+			case 3:
+				im = im.transpose(PIL.Image.ROTATE_270)
+		if self.flip:
+			im = im.transpose(PIL.Image.FLIP_LEFT_RIGHT)
+		return im
+
 class Image:
 	ims:list[tuple[tuple[float, float], ImageBit]] # centers
 
@@ -34,8 +47,8 @@ class Image:
 		self.ims=[]
 
 	def addimagebit(self, im:ImageBit, x=0, y=0):
-		x += im.w / 2
-		y += im.h / 2
+		x -= im.w / 2
+		y -= im.h / 2
 		ims.append(((x, y), im))
 
 	def addimage(self, im:"Image", x=0, y=0):
@@ -43,17 +56,21 @@ class Image:
 			ims.append(((ix + x, iy + y), im))
 
 	def rotate(self, r, flip=False):
-		for i, ((x, y), im) in enumerate(self.ims):
+		for i, ((ix, iy), im) in enumerate(self.ims):
 			im.rotate(r, flip)
+			dx = ix - x
+			dy = iy - y
+			if self.flip:
+				dx = -dx
 			if r == 0:
-				x, y =  x,  y
+				dx, dy =  dx,  dy
 			if r == 1:
-				x, y = -y,  x
+				dx, dy = -dy,  dx
 			if r == 2:
-				x, y = -x, -y
+				dx, dy = -dx, -dy
 			if r == 3:
-				x, y =  y, -x
-			self.ims[i][0]=x, y
+				dx, dy =  dy, -dx
+			self.ims[i][0]=x + dx, y + dy
 
 	def getdims(self):
 		mx = 0
@@ -71,7 +88,7 @@ class Image:
 			h = defaulth
 		out=PIL.Image.new('RGBA',(w,h),(0,0,0,0))
 		for (x, y), im in self.ims:
-			out.alpha_composite(im,(x,y))
+			out.alpha_composite(im.getim(),(x,y))
 		return out
 
 blockpaths={}
