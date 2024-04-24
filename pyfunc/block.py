@@ -230,11 +230,11 @@ def getblocktexture(data):
 
 def drawblocktexture(image,weld):
 	top,left,bottom,right=weld
-	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
+	im = Image()
 	for x,xside in [(0,left),(8,right)]:
 		for y,yside in [(0,top),(8,bottom)]:
-			im.alpha_composite(image.crop((x+16*iswelded(xside),y+16*iswelded(yside),x+16*iswelded(xside)+8,y+16*iswelded(yside)+8)),(x,y))
-	return im
+			im.addimagebit(ImageBit(image,x+16*iswelded(xside),y+16*iswelded(yside),8,8),x,y)
+	return im.genimage()
 
 def defaultblock(data):
 	welded=data['weld']
