@@ -249,14 +249,14 @@ def drawblocktexture(image,weld) -> Image:
 			im.addimagebit(ImageBit(image,x+16*iswelded(xside),y+16*iswelded(yside),8,8),x,y)
 	return im
 
-def defaultblock(data) -> PIL.Image.Image:
+def defaultblock(data) -> Image:
 	welded=data['weld']
 	rotate=data['rotate']
 	image=getblocktexture(data)
 	welded=rotatewelded(welded,rotate)
 	im=drawblocktexture(image,welded)
 	im=rotateblockib(im,rotate)
-	return im.genimage(16,16)
+	return im
 
 def overlay(data) -> PIL.Image.Image:
 	rotate=data['rotate']
@@ -270,7 +270,7 @@ def overlay(data) -> PIL.Image.Image:
 	im=rotateoverlay(image,rotate)
 	return im
 
-def wafer(data) -> PIL.Image.Image:
+def wafer(data) -> Image:
 	return defaultblock({**data,'type':'wafer'})
 
 def frame(data) -> PIL.Image.Image:
