@@ -74,7 +74,8 @@ class Image:
 		for (ix, iy), oim in im.ims:
 			self.ims.append(((ix + x, iy + y), oim))
 
-	def rotate(self, r, flip=False):
+	def rotate(self, r, flip=False, center=(8, 8)):
+		x, y = center
 		for i, ((ix, iy), im) in enumerate(self.ims):
 			im.rotate(r, flip)
 			dx = ix - x
