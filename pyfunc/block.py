@@ -233,7 +233,7 @@ def twowayfilter(data):
 def _getblocktexture(block,offsetx,offsety,sizex,sizey):
 	return getblockim(block).crop((offsetx,offsety,offsetx+sizex,offsety+sizey)).convert('RGBA')
 
-def getblocktexture(data):
+def getblocktexture(data) -> PIL.Image.Image:
 	block=data['type']
 	offsetx=data.get('offsetx',0)
 	offsety=data.get('offsety',0)
@@ -273,7 +273,7 @@ def overlay(data) -> PIL.Image.Image:
 def wafer(data) -> Image:
 	return defaultblock({**data,'type':'wafer'})
 
-def frame(data) -> PIL.Image.Image:
+def frame(data) -> Image:
 	welded=data['weld']
 	rotate=data['rotate']
 	image=getblocktexture({'type':'frame','sizex':64})
@@ -287,7 +287,7 @@ def frame(data) -> PIL.Image.Image:
 				offset=0
 			im.addimagebit(ImageBit(image,x+offset+16*iswelded(xside),y+16*iswelded(yside),8,8),x,y)
 	im=rotateblockib(im,rotate)
-	return im.genimage(16,16)
+	return im
 
 def wiretop(data) -> PIL.Image.Image:
 	if data['type'] in outputtypes:
@@ -440,7 +440,7 @@ def rotateoverlay(im,rotate):
 		return im.transpose(PIL.Image.ROTATE_180)
 
 # rotate an image of a block by rotate
-def rotateblockib(im,rotate):
+def rotateblockib(im:Image,rotate) -> Image:
 	if rotate==0:
 		pass
 	if rotate==3:
@@ -452,7 +452,7 @@ def rotateblockib(im,rotate):
 	return im
 
 # rotate an overlay (like galvanometer) by rotate
-def rotateoverlayib(im,rotate):
+def rotateoverlayib(im:Image,rotate) -> Image:
 	if rotate==0:
 		pass
 	if rotate==3:
