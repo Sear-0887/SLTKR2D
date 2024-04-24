@@ -245,14 +245,14 @@ def drawblocktexture(image,weld):
 	for x,xside in [(0,left),(8,right)]:
 		for y,yside in [(0,top),(8,bottom)]:
 			im.addimagebit(ImageBit(image,x+16*iswelded(xside),y+16*iswelded(yside),8,8),x,y)
-	return im.genimage()
+	return im
 
 def defaultblock(data):
 	welded=data['weld']
 	rotate=data['rotate']
 	image=getblocktexture(data)
 	welded=rotatewelded(welded,rotate)
-	im=drawblocktexture(image,welded)
+	im=drawblocktexture(image,welded).genimage(16,16)
 	im=rotateblock(im,rotate)
 	return im
 
@@ -318,8 +318,8 @@ def actuator(data):
 	top,left,bottom,right=rotatewelded(welded,rotate)
 	weld1=True,left,bottom,right
 	weld2=top,False,True,False
-	im=drawblocktexture(im1,weld1)
-	im.alpha_composite(drawblocktexture(im2,weld2),(0,0))
+	im=drawblocktexture(im1,weld1).genimage(16,16)
+	im.alpha_composite(drawblocktexture(im2,weld2).genimage(16,16),(0,0))
 	im=rotateblock(im,rotate)
 	return im
 
