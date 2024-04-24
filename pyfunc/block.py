@@ -92,7 +92,7 @@ class Image:
 			my = max(my, y + h / 2)
 		return (mx,my)
 
-	def genimage(self,w=None,h=None):
+	def genimage(self,w=None,h=None) -> PIL.Image.Image:
 		defaultw, defaulth = self.getdims()
 		if w is None:
 			w = defaultw
@@ -100,8 +100,8 @@ class Image:
 			h = defaulth
 		out=PIL.Image.new('RGBA',(int(w),int(h)),(0,0,0,0))
 		for (x, y), im in self.ims:
-			im = im.getim()
-			out.alpha_composite(im, (int(x - im.width / 2), int(y - im.height / 2)))
+			pim = im.getim()
+			out.alpha_composite(pim, (int(x - pim.width / 2), int(y - pim.height / 2)))
 		return out
 
 blockpaths={}
@@ -241,7 +241,7 @@ def getblocktexture(data):
 	sizey=data.get('sizey',32)
 	return _getblocktexture(block,offsetx,offsety,sizex,sizey)
 
-def drawblocktexture(image,weld):
+def drawblocktexture(image,weld) -> Image:
 	top,left,bottom,right=weld
 	im = Image()
 	for x,xside in [(0,left),(8,right)]:
@@ -249,7 +249,7 @@ def drawblocktexture(image,weld):
 			im.addimagebit(ImageBit(image,x+16*iswelded(xside),y+16*iswelded(yside),8,8),x,y)
 	return im
 
-def defaultblock(data):
+def defaultblock(data) -> PIL.Image.Image:
 	welded=data['weld']
 	rotate=data['rotate']
 	image=getblocktexture(data)
@@ -258,7 +258,7 @@ def defaultblock(data):
 	im=rotateblockib(im,rotate)
 	return im.genimage(16,16)
 
-def overlay(data):
+def overlay(data) -> PIL.Image.Image:
 	rotate=data['rotate']
 	image=getblocktexture({
 		**data,
@@ -270,7 +270,7 @@ def overlay(data):
 	im=rotateoverlay(image,rotate)
 	return im
 
-def wafer(data):
+def wafer(data) -> PIL.Image.Image:
 	return defaultblock({**data,'type':'wafer'})
 
 def frame(data):
@@ -376,7 +376,7 @@ def counter(data):
 def wiresetting(data):
 	pass
 
-blocktypes=collections.defaultdict(blockdesc)
+blocktypes:collections.defaultdict[str,dict]=collections.defaultdict(blockdesc)
 
 for t in noweldtypes:
 	blocktypes[t]['datafilters'].append(noweldfilter)
