@@ -365,13 +365,14 @@ def wire(data:BlockData) -> Image:
 def actuator(data:BlockData) -> Image:
 	welded=data['weld']
 	rotate=data['rotate']
-	im1=getblocktexture({'type':'actuator_base'})
-	im2=getblocktexture({'type':'actuator_head'})
 	top,left,bottom,right=rotatewelded(welded,rotate)
 	weld1=weldedside,left,bottom,right
 	weld2=top,unweldedside,weldedside,unweldedside
-	im=drawblocktexture(im1,weld1)
-	im.addimage(drawblocktexture(im2,weld2),0,0)
+	im1 = defaultblock({**data,'type':'actuator_base','weld':weld1,'rotate':0})
+	im2 = defaultblock({**data,'type':'actuator_head','weld':weld2,'rotate':0})
+	im = Image()
+	im.addimage(im1,0,0)
+	im.addimage(im2,0,0)
 	im=rotateblockib(im,rotate)
 	return im
 
