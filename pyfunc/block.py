@@ -23,6 +23,7 @@ WeldSidesIn: typing.TypeAlias = tuple[WeldSideIn,WeldSideIn,WeldSideIn,WeldSideI
 
 class ImageBit:
 	im:PIL.Image.Image
+	normal:PIL.Image.Image
 	x:int
 	y:int
 	w:int
@@ -30,18 +31,18 @@ class ImageBit:
 	flip:bool
 	rotation:int
 
-	def __init__(self,im:PIL.Image.Image | typing.Self,x:int=0,y:int=0,w:int=16,h:int=16) -> None:
+	def __init__(self,im:tuple[PIL.Image.Image,PIL.Image.Image] | typing.Self,x:int=0,y:int=0,w:int=16,h:int=16) -> None:
 		# the dimensions of the part of the image to use
 		self.x = x
 		self.y = y
 		self.w = w
 		self.h = h
-		while isinstance(im,ImageBit):
+		if isinstance(im,ImageBit):
 			# gonna just assume x,y,w,h stays inside the image
 			self.x += im.x
 			self.y += im.y
-			im = im.im
-		self.im = im
+			im = im.im, im.normal
+		self.im, self.normal = im
 		# rotation
 		self.flip = False # first
 		self.rotation = 0 # second
@@ -54,6 +55,9 @@ class ImageBit:
 
 	def getim(self) -> PIL.Image.Image:
 		im = self.im.crop((self.x, self.y, self.x + self.w, self.y + self.h))
+		# i have to calculate the diffuse and "rimlight"
+		# self.flip = flip_uv_x
+		# self.rotate = either rotation or (3 - rotation)
 		if self.flip:
 			im = im.transpose(PIL.Image.FLIP_LEFT_RIGHT)
 		match self.rotation:
@@ -124,14 +128,6 @@ class BlockData(typing.TypedDict):
 
 BlockDataIn: typing.TypeAlias = BlockData | str | tuple | list
 
-defaultblockdata = {
-	"data":None,
-	"offsetx":None,
-	"offsety":None,
-	"overlayoffsetx":None,
-	"overlayoffsety":None,
-}
-
 class BlockDesc(typing.TypedDict):
 	wired:bool
 	datafilters:list[typing.Callable[[BlockData], BlockData]]
@@ -158,8 +154,11 @@ for name,texture in data.items():
   blockpaths[name] = texture
 
 @functools.cache
-def getblockim(block:str) -> PIL.Image.Image:
-	return PIL.Image.open(os.path.join(cfg("localGame.texture.texturePathFolder"),blockpaths[block])).convert('RGBA')
+def getblockims(block:str) -> tuple[PIL.Image.Image,PIL.Image.Image]:
+	return (
+		PIL.Image.open(os.path.join(cfg("localGame.texture.texturePathFolder"),blockpaths[block]['albedo'])).convert('RGBA'),
+		PIL.Image.open(os.path.join(cfg("localGame.texture.texturePathFolder"),blockpaths[block]['normal'])).convert('RGBA'),
+	)
 
 # wire components on a wafer
 wafertypes=[
@@ -276,10 +275,14 @@ def twowayfilter(data:BlockData) -> BlockData:
 	return data
 
 @functools.cache
-def _getblocktexture(block:str,offsetx:int,offsety:int,sizex:int,sizey:int) -> PIL.Image.Image:
-	return getblockim(block).crop((offsetx,offsety,offsetx+sizex,offsety+sizey)).convert('RGBA')
+def _getblocktexture(block:str,offsetx:int,offsety:int,sizex:int,sizey:int) -> tuple[PIL.Image.Image,PIL.Image.Image]:
+	im1, im2 = getblockims(block)
+	return (
+		im1.crop((offsetx,offsety,offsetx+sizex,offsety+sizey)),
+		im2.crop((offsetx,offsety,offsetx+sizex,offsety+sizey)),
+	)
 
-def getblocktexture(data:BlockData) -> PIL.Image.Image:
+def getblocktexture(data:BlockData) -> tuple[PIL.Image.Image,PIL.Image.Image]:
 	block=data['type']
 	offsetx=data.get('offsetx',0) or 0
 	offsety=data.get('offsety',0) or 0
@@ -287,7 +290,7 @@ def getblocktexture(data:BlockData) -> PIL.Image.Image:
 	sizey=data.get('sizey',32) or 32
 	return _getblocktexture(block,offsetx,offsety,sizex,sizey)
 
-def drawblocktexture(image:PIL.Image.Image,weld:WeldSides) -> Image:
+def drawblocktexture(image:tuple[PIL.Image.Image,PIL.Image.Image],weld:WeldSides) -> Image:
 	top,left,bottom,right=weld
 	im = Image()
 	for x,xside in [(0,left),(8,right)]:
