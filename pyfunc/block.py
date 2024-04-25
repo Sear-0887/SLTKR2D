@@ -10,30 +10,49 @@ import typing
 #welded=top,left,bottom,right
 #rotate= 0    1    2      3
 
+class WeldSide(typing.TypedDict):
+	weld:bool
+	wire:bool
+	platform:bool
+	frame:bool
+	id:int
+
+WeldSides: typing.TypeAlias = tuple[WeldSide,WeldSide,WeldSide,WeldSide]
+WeldSideIn: typing.TypeAlias = WeldSide | bool
+WeldSidesIn: typing.TypeAlias = tuple[WeldSideIn,WeldSideIn,WeldSideIn,WeldSideIn]
+
 class ImageBit:
-	def __init__(self,im,x=0,y=0,w=16,h=16):
-		self.im = im
+	im:PIL.Image.Image
+	x:int
+	y:int
+	w:int
+	h:int
+	flip:bool
+	rotation:int
+
+	def __init__(self,im:PIL.Image.Image | typing.Self,x:int=0,y:int=0,w:int=16,h:int=16) -> None:
 		# the dimensions of the part of the image to use
 		self.x = x
 		self.y = y
 		self.w = w
 		self.h = h
-		while isinstance(self.im,ImageBit):
+		while isinstance(im,ImageBit):
 			# gonna just assume x,y,w,h stays inside the image
-			self.x += self.im.x
-			self.y += self.im.y
-			self.im = self.im.im
+			self.x += im.x
+			self.y += im.y
+			im = im.im
+		self.im = im
 		# rotation
 		self.flip = False # first
 		self.rotation = 0 # second
 
-	def rotate(self,r,flip=False):
+	def rotate(self,r:int,flip:bool=False) -> None:
 		if flip:
 			self.rotation = -self.rotation % 4
 			self.flip = not self.flip
 		self.rotation += r
 
-	def getim(self):
+	def getim(self) -> PIL.Image.Image:
 		im = self.im.crop((self.x, self.y, self.x + self.w, self.y + self.h))
 		if self.flip:
 			im = im.transpose(PIL.Image.FLIP_LEFT_RIGHT)
@@ -46,7 +65,79 @@ class ImageBit:
 				im = im.transpose(PIL.Image.ROTATE_90)
 		return im
 
-def rotatexy(x, y, r, flip):
+class Image:
+	ims:list[tuple[tuple[float, float], ImageBit]] # centers
+
+	def __init__(self) -> None:
+		self.ims=[]
+
+	def addimagebit(self, im:ImageBit, x:float=0, y:float=0) -> None:
+		x += im.w / 2
+		y += im.h / 2
+		self.ims.append(((x, y), im))
+
+	def addimage(self, im:typing.Self, x:float=0, y:float=0) -> None:
+		for (ix, iy), oim in im.ims:
+			self.ims.append(((ix + x, iy + y), oim))
+
+	def rotate(self, r:int, flip:bool=False, center:tuple[int, int]=(8, 8)) -> None:
+		x, y = center
+		for i, ((ix, iy), im) in enumerate(self.ims):
+			im.rotate(r, flip)
+			dx = ix - x
+			dy = iy - y
+			dx, dy = rotatexy(dx, dy, r, flip)
+			self.ims[i]=((x + dx, y + dy), self.ims[i][1])
+
+	def getdims(self) -> tuple[int,int]:
+		mx:float = 0
+		my:float = 0
+		for (x, y), im in self.ims:
+			w, h = rotatexy(im.w, im.h, im.rotation, im.flip)
+			mx = max(mx, x + w / 2)
+			my = max(my, y + h / 2)
+		return (int(mx),int(my))
+
+	def genimage(self,w:int | None=None,h:int | None=None) -> PIL.Image.Image:
+		defaultw, defaulth = self.getdims()
+		if w is None:
+			w = defaultw
+		if h is None:
+			h = defaulth
+		out=PIL.Image.new('RGBA',(w,h),(0,0,0,0))
+		for (x, y), im in self.ims:
+			pim = im.getim()
+			out.alpha_composite(pim, (int(x - pim.width / 2), int(y - pim.height / 2)))
+		return out
+
+class BlockData(typing.TypedDict):
+	type:str
+	rotate:typing.NotRequired[int]
+	weld:typing.NotRequired[WeldSides]
+	data:typing.NotRequired[str]
+	offsetx:typing.NotRequired[int]
+	offsety:typing.NotRequired[int]
+	overlayoffsetx:typing.NotRequired[int]
+	overlayoffsety:typing.NotRequired[int]
+	sizex:typing.NotRequired[int]
+	sizey:typing.NotRequired[int]
+
+BlockDataIn: typing.TypeAlias = BlockData | str | tuple | list
+
+defaultblockdata = {
+	"data":None,
+	"offsetx":None,
+	"offsety":None,
+	"overlayoffsetx":None,
+	"overlayoffsety":None,
+}
+
+class BlockDesc(typing.TypedDict):
+	wired:bool
+	datafilters:list[typing.Callable[[BlockData], BlockData]]
+	layers:list[typing.Callable[[BlockData], Image | PIL.Image.Image]]
+
+def rotatexy(x:float, y:float, r:int, flip:bool) -> tuple[float,float]:
 	if flip:
 		x = -x
 	if r == 0:
@@ -59,51 +150,6 @@ def rotatexy(x, y, r, flip):
 		x, y =  y, -x
 	return x, y
 
-class Image:
-	ims:list[tuple[tuple[float, float], ImageBit]] # centers
-
-	def __init__(self):
-		self.ims=[]
-
-	def addimagebit(self, im:ImageBit, x=0, y=0):
-		x += im.w / 2
-		y += im.h / 2
-		self.ims.append(((x, y), im))
-
-	def addimage(self, im:typing.Self, x=0, y=0):
-		for (ix, iy), oim in im.ims:
-			self.ims.append(((ix + x, iy + y), oim))
-
-	def rotate(self, r, flip=False, center=(8, 8)):
-		x, y = center
-		for i, ((ix, iy), im) in enumerate(self.ims):
-			im.rotate(r, flip)
-			dx = ix - x
-			dy = iy - y
-			dx, dy = rotatexy(dx, dy, r, flip)
-			self.ims[i]=((x + dx, y + dy), self.ims[i][1])
-
-	def getdims(self):
-		mx = 0
-		my = 0
-		for (x, y), im in self.ims:
-			w, h = rotatexy(im.w, im.h, im.rotation, im.flip)
-			mx = max(mx, x + w / 2)
-			my = max(my, y + h / 2)
-		return (mx,my)
-
-	def genimage(self,w=None,h=None) -> PIL.Image.Image:
-		defaultw, defaulth = self.getdims()
-		if w is None:
-			w = defaultw
-		if h is None:
-			h = defaulth
-		out=PIL.Image.new('RGBA',(int(w),int(h)),(0,0,0,0))
-		for (x, y), im in self.ims:
-			pim = im.getim()
-			out.alpha_composite(pim, (int(x - pim.width / 2), int(y - pim.height / 2)))
-		return out
-
 blockpaths={}
 pthblocktexture = cfg("localGame.texture.texturePathFile")
 with open(pthblocktexture) as f:
@@ -112,11 +158,8 @@ for name,texture in data.items():
   blockpaths[name] = texture
 
 @functools.cache
-def getblockim(block):
+def getblockim(block:str) -> PIL.Image.Image:
 	return PIL.Image.open(os.path.join(cfg("localGame.texture.texturePathFolder"),blockpaths[block])).convert('RGBA')
-
-def getblockdata(data):
-	return {'data':data}
 
 # wire components on a wafer
 wafertypes=[
@@ -170,73 +213,61 @@ twowaytypes=[
 ]
 frametypes=wiretypes+['frame','wire']
 
-def iswelded(side):
-	if isinstance(side,bool):
-		return side
+def iswelded(side:WeldSide) -> bool:
 	return side['weld']
 
-def iswired(side):
+def iswired(side:WeldSide) -> bool:
 	return side['wire']
 
-def isframe(side):
+def isframe(side:WeldSide) -> bool:
 	return side['frame']
 
-def platformx(side):
+def platformx(side:WeldSide) -> int:
 	if side['platform']:
 		return 2
 	return int(side['weld'])
 
-def makeweldside(side):
+def makeweldside(side:WeldSideIn) -> WeldSide:
+	if isinstance(side,dict):
+		return side
 	return {'weld':side,'wire':False,'platform':False,'frame':False,'id':id(side)}
 
-def setplatformside(side,other):
+weldedside = makeweldside(True)
+unweldedside = makeweldside(False)
+
+def setplatformside(side:WeldSide,other:bool) -> WeldSide:
 	if side['weld'] and other:
 		side['platform']=True
 	return side
 
-def setframeside(side,other):
+def setframeside(side:WeldSide,other:bool) -> WeldSide:
 	if side['weld'] and other:
 		side['frame']=True
 	return side
 
-def setwireside(side,other):
+def setwireside(side:WeldSide,other:bool) -> WeldSide:
 	if side['weld'] and other:
 		side['wire']=True
 	return side
 
-class BlockData(typing.TypedDict):
-	type:str
-	rotate:int
-	weld:tuple[bool, bool, bool, bool]
-	data:str | None
-	offsetx:int | None
-	offsety:int | None
-	overlayoffsetx:int | None
-	overlayoffsety:int | None
-
-class BlockDesc(typing.TypedDict):
-	wired:bool
-	datafilters:list[typing.Callable[[BlockData], BlockData]]
-	layers:list[typing.Callable[[BlockData], Image | PIL.Image.Image]]
-
-def blockdesc():
+def blockdesc() -> BlockDesc:
 	return {
 		'wired':False, # does this block connect to wires beside it?
 		'datafilters':[], # change the block data (noweld/norotate)
 		'layers':[] # the layers of the block (actuator/any wire component)
 	}
 
-def noweldfilter(data):
+def noweldfilter(data:BlockData) -> BlockData:
 	data={**data}
-	data['weld']=[False,False,False,False]
+	data['weld']=(makeweldside(False),makeweldside(False),makeweldside(False),makeweldside(False))
 	return data
 
-def norotatefilter(data):
+def norotatefilter(data:BlockData) -> BlockData:
 	data={**data}
 	data['rotate']=0
 	return data
 
-def twowayfilter(data):
+def twowayfilter(data:BlockData) -> BlockData:
 	data={**data}
 	if data['rotate']==1:
 		data['rotate']=3
@@ -245,18 +276,18 @@ def twowayfilter(data):
 	return data
 
 @functools.cache
-def _getblocktexture(block,offsetx,offsety,sizex,sizey):
+def _getblocktexture(block:str,offsetx:int,offsety:int,sizex:int,sizey:int) -> PIL.Image.Image:
 	return getblockim(block).crop((offsetx,offsety,offsetx+sizex,offsety+sizey)).convert('RGBA')
 
-def getblocktexture(data) -> PIL.Image.Image:
+def getblocktexture(data:BlockData) -> PIL.Image.Image:
 	block=data['type']
-	offsetx=data.get('offsetx',0)
-	offsety=data.get('offsety',0)
-	sizex=data.get('sizex',32)
-	sizey=data.get('sizey',32)
+	offsetx=data.get('offsetx',0) or 0
+	offsety=data.get('offsety',0) or 0
+	sizex=data.get('sizex',32) or 32
+	sizey=data.get('sizey',32) or 32
 	return _getblocktexture(block,offsetx,offsety,sizex,sizey)
 
-def drawblocktexture(image,weld) -> Image:
+def drawblocktexture(image:PIL.Image.Image,weld:WeldSides) -> Image:
 	top,left,bottom,right=weld
 	im = Image()
 	for x,xside in [(0,left),(8,right)]:
@@ -264,7 +295,7 @@ def drawblocktexture(image,weld) -> Image:
 			im.addimagebit(ImageBit(image,x+16*iswelded(xside),y+16*iswelded(yside),8,8),x,y)
 	return im
 
-def defaultblock(data) -> Image:
+def defaultblock(data:BlockData) -> Image:
 	welded=data['weld']
 	rotate=data['rotate']
 	image=getblocktexture(data)
@@ -273,22 +304,22 @@ def defaultblock(data) -> Image:
 	im=rotateblockib(im,rotate)
 	return im
 
-def overlay(data) -> PIL.Image.Image:
+def overlay(data:BlockData) -> PIL.Image.Image:
 	rotate=data['rotate']
-	image=getblocktexture({
+	im=getblocktexture({
 		**data,
 		'offsetx':data.get('overlayoffsetx',0),
 		'offsety':data.get('overlayoffsety',0),
 		'sizex':16,
-		'sizey':16
+		'sizey':16,
 	})
-	im=rotateoverlay(image,rotate)
+	im=rotateoverlay(im,rotate)
 	return im
 
-def wafer(data) -> Image:
+def wafer(data:BlockData) -> Image:
 	return defaultblock({**data,'type':'wafer'})
 
-def frame(data) -> Image:
+def frame(data:BlockData) -> Image:
 	welded=data['weld']
 	rotate=data['rotate']
 	image=getblocktexture({'type':'frame','sizex':64})
@@ -304,7 +335,7 @@ def frame(data) -> Image:
 	im=rotateblockib(im,rotate)
 	return im
 
-def wiretop(data) -> PIL.Image.Image:
+def wiretop(data:BlockData) -> PIL.Image.Image:
 	if data['type'] in outputtypes:
 		welded=data['weld']
 		rotate=data['rotate']
@@ -312,7 +343,7 @@ def wiretop(data) -> PIL.Image.Image:
 		data={**data,'offsety':data.get('offsety',0)+16*iswired(top)}
 	return overlay(data)
 
-def wire(data) -> PIL.Image.Image:
+def wire(data:BlockData) -> PIL.Image.Image:
 	welded=data['weld']
 	if data['data'] is not None:
 		bdata=re.fullmatch('(?P<state>on|off)',data['data'])
@@ -329,20 +360,20 @@ def wire(data) -> PIL.Image.Image:
 			im.alpha_composite(image.crop((x+16*iswired(xside),y+16*iswired(yside),x+16*iswired(xside)+8,y+16*iswired(yside)+8)),(x,y))
 	return im
 
-def actuator(data) -> PIL.Image.Image:
+def actuator(data:BlockData) -> PIL.Image.Image:
 	welded=data['weld']
 	rotate=data['rotate']
 	im1=getblocktexture({'type':'actuator_base'})
 	im2=getblocktexture({'type':'actuator_head'})
 	top,left,bottom,right=rotatewelded(welded,rotate)
-	weld1=True,left,bottom,right
-	weld2=top,False,True,False
+	weld1=weldedside,left,bottom,right
+	weld2=top,unweldedside,weldedside,unweldedside
 	im=drawblocktexture(im1,weld1).genimage(16,16)
 	im.alpha_composite(drawblocktexture(im2,weld2).genimage(16,16),(0,0))
 	im=rotateblock(im,rotate)
 	return im
 
-def platform(data) -> PIL.Image.Image:
+def platform(data:BlockData) -> PIL.Image.Image:
 	_,left,_,right=data['weld']
 	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 	image=getblocktexture({**data,'sizex':48})
@@ -353,7 +384,7 @@ def platform(data) -> PIL.Image.Image:
 		im.alpha_composite(image.crop((x+16*platformx(xside),y,x+16*platformx(xside)+8,y+16)),(x,0))
 	return im
 
-def wirecomponent(data:BlockData):
+def wirecomponent(data:BlockData) -> BlockData:
 	if data['data'] is not None:
 		typ=data['type']
 		if typ in ["port","accelerometer","matcher","detector","toggler","trigger"]:
@@ -392,16 +423,16 @@ def wirecomponent(data:BlockData):
 			data['overlayoffsetx']=16*(2*(int(bdata['delay'])-1)+(bdata['state']=='on'))
 	return data
 
-def counterfilter(data):
-	pass
+def counterfilter(data:BlockData) -> BlockData:
+	raise NotImplemented
 
-def counter(data):
-	pass
+def counter(data:BlockData) -> PIL.Image.Image:
+	raise NotImplemented
 
-def wiresetting(data):
-	pass
+def wiresetting(data:BlockData) -> PIL.Image.Image:
+	raise NotImplemented
 
-blocktypes:collections.defaultdict[str,dict]=collections.defaultdict(blockdesc)
+blocktypes:collections.defaultdict[str,BlockDesc]=collections.defaultdict(blockdesc)
 
 for t in noweldtypes:
 	blocktypes[t]['datafilters'].append(noweldfilter)
@@ -443,7 +474,7 @@ blocktypes['wire']['layers']=[frame,wire]
 blocktypes['frame']['layers']=[frame]
 
 # rotate an image of a block by rotate
-def rotateblock(im:PIL.Image.Image,rotate:int):
+def rotateblock(im:PIL.Image.Image,rotate:int) -> PIL.Image.Image:
 	if rotate==0:
 		return im
 	if rotate==3:
@@ -452,9 +483,10 @@ def rotateblock(im:PIL.Image.Image,rotate:int):
 		return im.transpose(PIL.Image.TRANSPOSE)
 	if rotate==2:
 		return im.transpose(PIL.Image.FLIP_TOP_BOTTOM)
+	raise ValueError(f'bad rotate {rotate}')
 
 # rotate an overlay (like galvanometer) by rotate
-def rotateoverlay(im:PIL.Image.Image,rotate:int):
+def rotateoverlay(im:PIL.Image.Image,rotate:int) -> PIL.Image.Image:
 	if rotate==0:
 		return im
 	if rotate==3:
@@ -463,6 +495,7 @@ def rotateoverlay(im:PIL.Image.Image,rotate:int):
 		return im.transpose(PIL.Image.ROTATE_90)
 	if rotate==2:
 		return im.transpose(PIL.Image.ROTATE_180)
+	raise ValueError(f'bad rotate {rotate}')
 
 # rotate an image of a block by rotate
 def rotateblockib(im:Image,rotate:int) -> Image:
@@ -489,34 +522,57 @@ def rotateoverlayib(im:Image,rotate:int) -> Image:
 	return im
 
 # rotate the welds so they are in the right place when rotated by rotateblock
-def rotatewelded(welded:tuple[bool,bool,bool,bool],rotate:int):
+def rotatewelded(welded:WeldSides,rotate:int) -> WeldSides:
 	if rotate==0:
 		return welded
+	idxs:tuple[int,int,int,int]
 	if rotate==3:
-		return [welded[i] for i in [3,0,1,2]]
-	if rotate==1:
-		return [welded[i] for i in [1,0,3,2]]
-	if rotate==2:
-		return [welded[i] for i in [2,1,0,3]]
+		idxs = (3, 0, 1, 2)
+	elif rotate==1:
+		idxs = (1, 0, 3, 2)
+	elif rotate==2:
+		idxs = (2, 1, 0, 3)
+	else:
+		raise ValueError(f'bad rotate {rotate}')
+	return ( # mypy dumb
+		welded[idxs[0]],
+		welded[idxs[1]],
+		welded[idxs[2]],
+		welded[idxs[3]],
+	)
 
 # convert blocks into a standardized format
 # for easy processing
-def normalize(block:BlockData | str):
+def normalize(block:BlockDataIn) -> BlockData:
+	weld:WeldSidesIn
 	if block is None:
-		return {"type":'air',"rotate":0,"weld":(True,True,True,True)}
-	if isinstance(block,str):
-		return {"type":block,"rotate":0,"weld":(True,True,True,True)}
-	if isinstance(block,(tuple,list)):
-		out={"type":'air',"rotate":0,"weld":(True,True,True,True)}
-		out.update(dict(zip(["type","rotate","weld"],block)))
-		return out
-	out={"type":'air',"rotate":0,"weld":(True,True,True,True)}
-	out.update(block)
-	return out
+		typ = 'air'
+		rotate = 0
+		weld = (True,True,True,True)
+	elif isinstance(block,str):
+		typ = block
+		rotate = 0
+		weld = (True,True,True,True)
+	elif isinstance(block,(tuple,list)):
+		b = dict(zip(["type","rotate","weld"],block))
+		typ = b.get('type') or 'air'
+		rotate = b.get('rotate') or 0
+		weld = b.get('weld') or (True,True,True,True)
+	else:
+		typ = block.get('type') or 'air'
+		rotate = block.get('rotate') or 0
+		weld = block.get('weld') or (True,True,True,True)
+	weld2=tuple(makeweldside(w) for w in weld)
+	assert len(weld2)==4
+	return {
+		"type":typ,
+		"rotate":rotate,
+		"weld":weld2,
+	}
 
 # get a block from a grid
 # if the coordinates are outside the grid, return air
-def get(vss:list[list[BlockData]],xi:int,yi:int):
+def get(vss:list[list[BlockData]],xi:int,yi:int) -> BlockData:
 	if xi<0 or yi<0 or yi>=len(vss):
 		return normalize("air");
 	vs=vss[yi]
@@ -525,7 +581,7 @@ def get(vss:list[list[BlockData]],xi:int,yi:int):
 	return vs[xi]
 
 # can this block weld on this side?
-def canweld(side:str,block:BlockData):
+def canweld(side:str,block:BlockData) -> bool:
 	if block['type'] in noweldtypes:
 		return False
 	elif block['type'] in ['cap','flower_magenta','flower_yellow','grass','motor','pedestal','spikes']: # Only Bottom
@@ -546,7 +602,7 @@ def canweld(side:str,block:BlockData):
 # blocks is a grid of blocks
 # autoweld makes it weld all possible unspecified welds
 # autoweld=False makes welds not autocorrect (for rendering roody structures)
-def makeimage(blocks,autoweld=True):
+def makeimage(blocks:list[list[BlockDataIn]],autoweld:bool=True) -> PIL.Image.Image:
 	xsize=max(map(len,blocks))
 	ysize=len(blocks)
 
@@ -567,37 +623,37 @@ def makeimage(blocks,autoweld=True):
 				weldleft=canweld('left',block) and canweld('right',get(newblocks,xi-1,yi))
 				weldbottom=canweld('bottom',block) and canweld('top',get(newblocks,xi,yi+1))
 				weldtop=canweld('top',block) and canweld('bottom',get(newblocks,xi,yi-1))
-				block['weld']=[
-					b and w for b,w in
-					zip(
-						block['weld'],
-						[weldtop,weldleft,weldbottom,weldright]
-					)
-				]
-				for i,b,w in zip(
-					range(4),
-					block['weld'],
-					[weldtop,weldleft,weldbottom,weldright]
-				):
-					print(f'welded side {i} not allowed on {block}\n'*(not w and b),end='')
-			block['weld']=[makeweldside(w) for w in block['weld']]
+				block['weld']=(
+					makeweldside(block['weld'][0] and weldtop),
+					makeweldside(block['weld'][1] and weldleft),
+					makeweldside(block['weld'][2] and weldbottom),
+					makeweldside(block['weld'][3] and weldright),
+				)
 			if block['type']=='platform': # special case
 				# check if sides are platform
-				block['weld'][1]=setplatformside(block['weld'][1],get(newblocks,xi-1,yi)['type']!='platform')
-				block['weld'][3]=setplatformside(block['weld'][3],get(newblocks,xi+1,yi)['type']!='platform')
+				block['weld']=(
+					block['weld'][0],
+					setplatformside(block['weld'][1],get(newblocks,xi-1,yi)['type']!='platform'),
+					block['weld'][2],
+					setplatformside(block['weld'][3],get(newblocks,xi+1,yi)['type']!='platform'),
+				)
 			if block['type'] in frametypes: # special case
 				# check if sides are frame base
-				block['weld'][0]=setframeside(block['weld'][0],get(newblocks,xi,yi-1)['type'] in frametypes)
-				block['weld'][1]=setframeside(block['weld'][1],get(newblocks,xi-1,yi)['type'] in frametypes)
-				block['weld'][2]=setframeside(block['weld'][2],get(newblocks,xi,yi+1)['type'] in frametypes)
-				block['weld'][3]=setframeside(block['weld'][3],get(newblocks,xi+1,yi)['type'] in frametypes)
+				block['weld']=(
+					setframeside(block['weld'][0],get(newblocks,xi,yi-1)['type'] in frametypes),
+					setframeside(block['weld'][1],get(newblocks,xi-1,yi)['type'] in frametypes),
+					setframeside(block['weld'][2],get(newblocks,xi,yi+1)['type'] in frametypes),
+					setframeside(block['weld'][3],get(newblocks,xi+1,yi)['type'] in frametypes),
+				)
 			blocktype=blocktypes[block['type']]
 			if blocktype['wired']:
 				# check if sides are wired
-				block['weld'][0]=setwireside(block['weld'][0],get(newblocks,xi,yi-1)['type'] in wiredtypes)
-				block['weld'][1]=setwireside(block['weld'][1],get(newblocks,xi-1,yi)['type'] in wiredtypes)
-				block['weld'][2]=setwireside(block['weld'][2],get(newblocks,xi,yi+1)['type'] in wiredtypes)
-				block['weld'][3]=setwireside(block['weld'][3],get(newblocks,xi+1,yi)['type'] in wiredtypes)
+				block['weld']=(
+					setwireside(block['weld'][0],get(newblocks,xi,yi-1)['type'] in wiredtypes),
+					setwireside(block['weld'][1],get(newblocks,xi-1,yi)['type'] in wiredtypes),
+					setwireside(block['weld'][2],get(newblocks,xi,yi+1)['type'] in wiredtypes),
+					setwireside(block['weld'][3],get(newblocks,xi+1,yi)['type'] in wiredtypes),
+				)
 			for datafilter in blocktype['datafilters']:
 				block=datafilter(block)
 			for layer in blocktype['layers']:
