@@ -15,7 +15,14 @@ im = makeimage([
 		{'type':'frame','rotate':1},
 		{'type':'frame','rotate':2},
 		{'type':'actuator_head','rotate':3},
-	]
+	],
+	[],
+	[
+		{'type':'actuator','rotate':0},
+		{'type':'actuator','rotate':1},
+		{'type':'actuator','rotate':2},
+		{'type':'actuator','rotate':3},
+	],
 ])
 
 im.show()

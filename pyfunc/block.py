@@ -360,7 +360,7 @@ def wire(data:BlockData) -> PIL.Image.Image:
 			im.alpha_composite(image.crop((x+16*iswired(xside),y+16*iswired(yside),x+16*iswired(xside)+8,y+16*iswired(yside)+8)),(x,y))
 	return im
 
-def actuator(data:BlockData) -> PIL.Image.Image:
+def actuator(data:BlockData) -> Image:
 	welded=data['weld']
 	rotate=data['rotate']
 	im1=getblocktexture({'type':'actuator_base'})
@@ -368,9 +368,9 @@ def actuator(data:BlockData) -> PIL.Image.Image:
 	top,left,bottom,right=rotatewelded(welded,rotate)
 	weld1=weldedside,left,bottom,right
 	weld2=top,unweldedside,weldedside,unweldedside
-	im=drawblocktexture(im1,weld1).genimage(16,16)
-	im.alpha_composite(drawblocktexture(im2,weld2).genimage(16,16),(0,0))
-	im=rotateblock(im,rotate)
+	im=drawblocktexture(im1,weld1)
+	im.addimage(drawblocktexture(im2,weld2),0,0)
+	im=rotateblockib(im,rotate)
 	return im
 
 def platform(data:BlockData) -> PIL.Image.Image:
