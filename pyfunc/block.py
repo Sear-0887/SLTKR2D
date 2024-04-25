@@ -337,7 +337,7 @@ def frame(data:BlockData) -> Image:
 	im=rotateblockib(im,rotate)
 	return im
 
-def wiretop(data:BlockData) -> PIL.Image.Image:
+def wiretop(data:BlockData) -> Image:
 	if data['type'] in outputtypes:
 		welded=data['weld']
 		rotate=data['rotate']
@@ -428,10 +428,10 @@ def wirecomponent(data:BlockData) -> BlockData:
 def counterfilter(data:BlockData) -> BlockData:
 	raise NotImplemented
 
-def counter(data:BlockData) -> PIL.Image.Image:
+def counter(data:BlockData) -> Image:
 	raise NotImplemented
 
-def wiresetting(data:BlockData) -> PIL.Image.Image:
+def wiresetting(data:BlockData) -> Image:
 	raise NotImplemented
 
 blocktypes:collections.defaultdict[str,BlockDesc]=collections.defaultdict(blockdesc)
