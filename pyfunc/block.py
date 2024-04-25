@@ -135,7 +135,7 @@ defaultblockdata = {
 class BlockDesc(typing.TypedDict):
 	wired:bool
 	datafilters:list[typing.Callable[[BlockData], BlockData]]
-	layers:list[typing.Callable[[BlockData], Image | PIL.Image.Image]]
+	layers:list[typing.Callable[[BlockData], Image]]
 
 def rotatexy(x:float, y:float, r:int, flip:bool) -> tuple[float,float]:
 	if flip:
@@ -304,7 +304,7 @@ def defaultblock(data:BlockData) -> Image:
 	im=rotateblockib(im,rotate)
 	return im
 
-def overlay(data:BlockData) -> PIL.Image.Image:
+def overlay(data:BlockData) -> Image:
 	rotate=data['rotate']
 	im=getblocktexture({
 		**data,
@@ -313,8 +313,10 @@ def overlay(data:BlockData) -> PIL.Image.Image:
 		'sizex':16,
 		'sizey':16,
 	})
-	im=rotateoverlay(im,rotate)
-	return im
+	im2 = Image()
+	im2.addimagebit(ImageBit(im,0,0,16,16),0,0)
+	im2=rotateoverlayib(im2,rotate)
+	return im2
 
 def wafer(data:BlockData) -> Image:
 	return defaultblock({**data,'type':'wafer'})
@@ -343,9 +345,9 @@ def wiretop(data:BlockData) -> PIL.Image.Image:
 		data={**data,'offsety':data.get('offsety',0)+16*iswired(top)}
 	return overlay(data)
 
-def wire(data:BlockData) -> PIL.Image.Image:
+def wire(data:BlockData) -> Image:
 	welded=data['weld']
-	if data['data'] is not None:
+	if 'data' in data:
 		bdata=re.fullmatch('(?P<state>on|off)',data['data'])
 		if bdata is None:
 			raise ValueError('bad value format')
@@ -354,10 +356,10 @@ def wire(data:BlockData) -> PIL.Image.Image:
 		offset=0
 	image=getblocktexture({'type':'wire','offsetx':offset})
 	top,left,bottom,right=welded
-	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
+	im = Image()
 	for x,xside in [(0,left),(8,right)]:
 		for y,yside in [(0,top),(8,bottom)]:
-			im.alpha_composite(image.crop((x+16*iswired(xside),y+16*iswired(yside),x+16*iswired(xside)+8,y+16*iswired(yside)+8)),(x,y))
+			im.addimagebit(ImageBit(image,x+16*iswired(xside),y+16*iswired(yside),8,8),x,y)
 	return im
 
 def actuator(data:BlockData) -> Image:
@@ -385,7 +387,7 @@ def platform(data:BlockData) -> PIL.Image.Image:
 	return im
 
 def wirecomponent(data:BlockData) -> BlockData:
-	if data['data'] is not None:
+	if 'data' in data:
 		typ=data['type']
 		if typ in ["port","accelerometer","matcher","detector","toggler","trigger"]:
 			# instantaneous
@@ -657,7 +659,7 @@ def makeimage(blocks:list[list[BlockDataIn]],autoweld:bool=True) -> PIL.Image.Im
 			for datafilter in blocktype['datafilters']:
 				block=datafilter(block)
 			for layer in blocktype['layers']:
-				bim = layer(block)
+				bim:Image | PIL.Image.Image = layer(block)
 				if isinstance(bim,Image):
 					bim = bim.genimage(16,16)
 				im.alpha_composite(bim,(xi*16,yi*16)) # paste the block

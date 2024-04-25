@@ -23,6 +23,20 @@ im = makeimage([
 		{'type':'actuator','rotate':2},
 		{'type':'actuator','rotate':3},
 	],
+	[],
+	[
+		{'type':'actuator','rotate':0},
+		{'type':'wire','rotate':1},
+		{'type':'wire_board','rotate':2},
+		{'type':'actuator','rotate':3},
+	],
+	[],
+	[
+		{'type':'transistor','rotate':0},
+		{'type':'transistor','rotate':1},
+		{'type':'transistor','rotate':2},
+		{'type':'transistor','rotate':3},
+	],
 ])
 
 im.show()
