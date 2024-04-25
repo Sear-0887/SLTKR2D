@@ -23,7 +23,7 @@ WeldSidesIn: typing.TypeAlias = tuple[WeldSideIn,WeldSideIn,WeldSideIn,WeldSideI
 
 class ImageBit:
 	im:PIL.Image.Image
-	normal:PIL.Image.Image
+	normal:PIL.Image.Image | None
 	x:int
 	y:int
 	w:int
@@ -31,7 +31,7 @@ class ImageBit:
 	flip:bool
 	rotation:int
 
-	def __init__(self,im:tuple[PIL.Image.Image,PIL.Image.Image] | typing.Self,x:int=0,y:int=0,w:int=16,h:int=16) -> None:
+	def __init__(self,im:tuple[PIL.Image.Image,PIL.Image.Image | None] | typing.Self,x:int=0,y:int=0,w:int=16,h:int=16) -> None:
 		# the dimensions of the part of the image to use
 		self.x = x
 		self.y = y
@@ -154,10 +154,14 @@ for name,texture in data.items():
   blockpaths[name] = texture
 
 @functools.cache
-def getblockims(block:str) -> tuple[PIL.Image.Image,PIL.Image.Image]:
+def getblockims(block:str) -> tuple[PIL.Image.Image,PIL.Image.Image | None]:
+	try:
+		normal = PIL.Image.open(os.path.join(cfg("localGame.texture.texturePathFolder"),blockpaths[block]['normal'])).convert('RGBA')
+	except FileNotFoundError:
+		normal = None
 	return (
 		PIL.Image.open(os.path.join(cfg("localGame.texture.texturePathFolder"),blockpaths[block]['albedo'])).convert('RGBA'),
-		PIL.Image.open(os.path.join(cfg("localGame.texture.texturePathFolder"),blockpaths[block]['normal'])).convert('RGBA'),
+		normal,
 	)
 
 # wire components on a wafer
@@ -275,14 +279,11 @@ def twowayfilter(data:BlockData) -> BlockData:
 	return data
 
 @functools.cache
-def _getblocktexture(block:str,offsetx:int,offsety:int,sizex:int,sizey:int) -> tuple[PIL.Image.Image,PIL.Image.Image]:
+def _getblocktexture(block:str,offsetx:int,offsety:int,sizex:int,sizey:int) -> ImageBit:
 	im1, im2 = getblockims(block)
-	return (
-		im1.crop((offsetx,offsety,offsetx+sizex,offsety+sizey)),
-		im2.crop((offsetx,offsety,offsetx+sizex,offsety+sizey)),
-	)
+	return ImageBit((im1,im2),offsetx,offsety,offsetx+sizex,offsety+sizey)
 
-def getblocktexture(data:BlockData) -> tuple[PIL.Image.Image,PIL.Image.Image]:
+def getblocktexture(data:BlockData) -> ImageBit:
 	block=data['type']
 	offsetx=data.get('offsetx',0) or 0
 	offsety=data.get('offsety',0) or 0
@@ -290,7 +291,7 @@ def getblocktexture(data:BlockData) -> tuple[PIL.Image.Image,PIL.Image.Image]:
 	sizey=data.get('sizey',32) or 32
 	return _getblocktexture(block,offsetx,offsety,sizex,sizey)
 
-def drawblocktexture(image:tuple[PIL.Image.Image,PIL.Image.Image],weld:WeldSides) -> Image:
+def drawblocktexture(image:ImageBit,weld:WeldSides) -> Image:
 	top,left,bottom,right=weld
 	im = Image()
 	for x,xside in [(0,left),(8,right)]:
