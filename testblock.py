@@ -37,6 +37,13 @@ im = makeimage([
 		{'type':'transistor','rotate':2},
 		{'type':'transistor','rotate':3},
 	],
+	[],
+	[
+		{'type':'platform'},
+		{'type':'platform'},
+		{'type':'transistor'},
+		{'type':'platform'},
+	],
 ])
 
 im.show()

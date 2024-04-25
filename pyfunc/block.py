@@ -476,30 +476,6 @@ blocktypes['wire']['layers']=[frame,wire]
 blocktypes['frame']['layers']=[frame]
 
 # rotate an image of a block by rotate
-def rotateblock(im:PIL.Image.Image,rotate:int) -> PIL.Image.Image:
-	if rotate==0:
-		return im
-	if rotate==3:
-		return im.transpose(PIL.Image.ROTATE_270)
-	if rotate==1:
-		return im.transpose(PIL.Image.TRANSPOSE)
-	if rotate==2:
-		return im.transpose(PIL.Image.FLIP_TOP_BOTTOM)
-	raise ValueError(f'bad rotate {rotate}')
-
-# rotate an overlay (like galvanometer) by rotate
-def rotateoverlay(im:PIL.Image.Image,rotate:int) -> PIL.Image.Image:
-	if rotate==0:
-		return im
-	if rotate==3:
-		return im.transpose(PIL.Image.ROTATE_270)
-	if rotate==1:
-		return im.transpose(PIL.Image.ROTATE_90)
-	if rotate==2:
-		return im.transpose(PIL.Image.ROTATE_180)
-	raise ValueError(f'bad rotate {rotate}')
-
-# rotate an image of a block by rotate
 def rotateblockib(im:Image,rotate:int) -> Image:
 	if rotate==0:
 		pass
@@ -659,8 +635,6 @@ def makeimage(blocks:list[list[BlockDataIn]],autoweld:bool=True) -> PIL.Image.Im
 			for datafilter in blocktype['datafilters']:
 				block=datafilter(block)
 			for layer in blocktype['layers']:
-				bim:Image | PIL.Image.Image = layer(block)
-				if isinstance(bim,Image):
-					bim = bim.genimage(16,16)
+				bim = layer(block).genimage(16,16)
 				im.alpha_composite(bim,(xi*16,yi*16)) # paste the block
 	return im
