@@ -590,7 +590,7 @@ def makeimage(blocks:list[list[BlockDataIn]],autoweld:bool=True) -> PIL.Image.Im
 			block=normalize(block)
 			newblocks[yi][xi]=block
 
-	im=PIL.Image.new('RGBA',(16*xsize,16*ysize),(0,0,0,0))
+	im=Image()
 	for xi in range(xsize):
 		for yi in range(ysize):
 			block=get(newblocks,xi,yi)
@@ -635,6 +635,6 @@ def makeimage(blocks:list[list[BlockDataIn]],autoweld:bool=True) -> PIL.Image.Im
 			for datafilter in blocktype['datafilters']:
 				block=datafilter(block)
 			for layer in blocktype['layers']:
-				bim = layer(block).genimage(16,16)
-				im.alpha_composite(bim,(xi*16,yi*16)) # paste the block
-	return im
+				bim = layer(block)
+				im.addimage(bim,xi*16,yi*16) # paste the block
+	return im.genimage(xsize * 16,ysize * 16)
