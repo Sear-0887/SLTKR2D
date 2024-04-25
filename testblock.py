@@ -44,6 +44,13 @@ im = makeimage([
 		{'type':'transistor'},
 		{'type':'platform'},
 	],
+	[],
+	[
+		{'type':'iron_plate'},
+		{'type':'wafer'},
+		{'type':'iron_plate'},
+		{'type':'iron_plate'},
+	],
 ])
 
 im.show()
