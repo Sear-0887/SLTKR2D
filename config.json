@@ -70,11 +70,11 @@
             }
         },
         "texture": {
-            "texturePathFolder": "gameAssets/textures/blocks",
-            "texturePathFile": "gameAssets/block_textures.smp",
+            "texturePathFolder": "content/textures/blocks",
+            "texturePathFile": "content/block_textures.smp",
             "blockIconFile": "gameAssets/block_zoo.png",
             "blockIDFile": "gameAssets/block_id_.smp",
-            "iconLocationFile": "gameAssets/block_icons.smp",
+            "iconLocationFile": "content/block_icons.smp",
             "guidebookArrowFile": "gameAssets/recipe_arrow_test.png",
             "guidebookArrowCordFile": "gameAssets/recipe_arrow_cord.smp"
         }
