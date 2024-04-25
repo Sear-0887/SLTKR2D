@@ -375,15 +375,15 @@ def actuator(data:BlockData) -> Image:
 	im=rotateblockib(im,rotate)
 	return im
 
-def platform(data:BlockData) -> PIL.Image.Image:
+def platform(data:BlockData) -> Image:
 	_,left,_,right=data['weld']
-	im=PIL.Image.new('RGBA',(16,16),(0,0,0,0))
 	image=getblocktexture({**data,'sizex':48})
 	y=0
 	if left==0 and right==1 or left==1 and right==0 or left==0 and right==0:
 		y=16
+	im = Image()
 	for x,xside in [(0,left),(8,right)]:
-		im.alpha_composite(image.crop((x+16*platformx(xside),y,x+16*platformx(xside)+8,y+16)),(x,0))
+		im.addimagebit(ImageBit(image,x+16*platformx(xside),y,8,16),x,y)
 	return im
 
 def wirecomponent(data:BlockData) -> BlockData:
