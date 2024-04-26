@@ -182,3 +182,88 @@ extra_display = extra_displayschema.validate(extra_display)
 
 summonore_pillschema=schema.Schema({str})
 summonore_pill = summonore_pillschema.validate(summonore_pill)
+
+def strtobool(s):
+    assert s in ['0','1']
+    return s == '1'
+
+def assertblock(s):
+    assert s[0] != '$'
+
+def assertresearch(s):
+    assert True
+
+block = schema.Use(assertblock)
+research = schema.Use(assertresearch)
+blocktag = schema.Use(handletags)
+num = schema.Use(int)
+flag = schema.Use(strtobool)
+
+dataschema = schema.Schema({
+    'tag':[{
+        'name':str,
+        'blocks':[block]
+    }],
+    'heat':[{
+        'product':block,
+        'ingredient':blocktag,
+        'time':num,
+        schema.Optional('needs_entity',default = False):flag,
+        schema.Optional('surrounding'):{
+            'block':block,
+            'minimum':num,
+        },
+    }],
+    'extract':[{
+        'product':block,
+        'amount':num,
+        'ingredient':blocktag,
+        'time':num,
+        schema.Optional('post_action'):schema.Or('destroy','reduce_container_count5')
+    }],
+    'inject':[{
+        'product':schema.Or(
+            {
+                'transform_receiver':block
+            },
+            {
+                'fertilizer':num
+            }
+        ),
+        'pill':block,
+        'receiver':block,
+        schema.Optional('needs_passive'):research
+    }],
+    'combine':[{
+        'grid':[[schema.Use(handletags)]],
+        'product':{
+            'block':block,
+            'amount':num,
+        },
+        schema.Optional('needs_passive'):research
+    }],
+    'extra_display':[{
+        'grid':schema.Or(schema.Use(fixemptygrid),[[schema.Use(handletags)]]),
+        'product':{
+            'filter':blocktag,
+            schema.Optional('amount',default = 1):num,
+        },
+        schema.Optional('arrow_sprite'):schema.Use(int),
+        schema.Optional('guidebook_page_blacklist'):[block],
+        schema.Optional('guidebook_page_whitelist'):[block],
+        schema.Optional('weldall'):schema.Use(int),
+        schema.Optional('needs_passive'):research,
+        schema.Optional('research_requirement_override'):research,
+        schema.Optional('entity'):{
+            'type':str,
+            'position':schema.Use(handlepos)
+        },
+        schema.Optional('guidebook_use_only'):schema.Use(int),
+        schema.Optional('match_filter_modulo'):schema.Use(int),
+    }],
+    'summonore_pill':[{'filter':blocktag}],
+    'sensor_natural':[{'filter':blocktag}],
+    'sensor_rare_resource':[{'filter':blocktag}],
+})
+
+data2=dataschema.validate(data)
