@@ -39,8 +39,14 @@ ping.syntax = !ping
 # scream
 scream.aliases = [AAAAA]
 scream.desc = *It symbolizes my sanity* ~ Sear-0887
-scream.error = :Fail: Oh no! An error happened!
-scream.syntax = !scream
+scream.error = :Fail: Oh no! An error happened! Sure it's not debugging time right? *...right?*
+scream.syntax = !scream <n>
+
+# wee
+wee.aliases = [weee]
+wee.desc = *It symbolizes my sanity too* ~ Sear-0887
+wee.error = :Fail: Oh no! An error happened! Sure it's not debugging time right? *...right?*
+wee.syntax = !wee <e>
 
 # credit
 credit.aliases = [credits]

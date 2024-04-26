@@ -1,26 +1,20 @@
+import PIL.Image
 import collections
 import glob
-import math
-import itertools
-import re
-from PIL import Image, ImageSequence
-import os
+from PIL import Image
 import pyfunc.gif as gif
-import random
 from typing import Any
 from pyfunc.lang import botinit, cfg, getarrowcoords
 from pyfunc.smp import getsmpvalue
-from pyfunc.block import canweld, get, makeimage, normalize, rotatewelded
-from pyfunc.assetload import blockinfos
-
+from pyfunc.block import canweld, get, makeimage, bottomtypes, topbottomtypes, sidestypes, notoptypes, norotatetypes, twowaytypes
+import itertools
 
 botinit()
 
-def massstrip(l:list):
-    for i, j in enumerate(l):
-        l[i] = j.strip()
-    return l
-def handletags(s:Any, organdict:dict) -> str | list:
+def massstrip(l:list[str]) -> list[str]:
+    return [s.strip() for s in l]
+
+def handletags(s:str, organdict:dict) -> str | list:
     if not isinstance(s, str): return s 
     if s.startswith('$'):
         if s[1:] in organdict['tag'].keys():
@@ -28,26 +22,37 @@ def handletags(s:Any, organdict:dict) -> str | list:
         print('Just a Normal name starts with $ ???????')
     return s
 
-def handlegridtags(s:list, organdict:dict) -> tuple[list, str]:
-    for y, xaxis in enumerate(s):
-        for x, critem in enumerate(xaxis):
-            s[y][x] = handletags(critem, organdict)
-    return s
+def handlegridtags(s:list[list[str]], organdict:dict) -> list[list[str | list]]:
+    return [
+        [
+            handletags(critem, organdict)
+            for critem in row
+        ]
+        for row in s
+    ]
 
+def getarrowimg(name):
+    icox, icoy = getarrowcoords()[name]
+    return Image.open(
+        cfg("localGame.texture.guidebookArrowFile")).crop(
+            (16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))
+        ).resize((64, 64), Image.NEAREST
+    )
 
-def addentries(i, entryname:str, typ:str, organdict:dict, includestr:str) -> list:
-    includes = massstrip(includestr.split(','))
-    entries = collections.defaultdict(None)
+def addentries(i:dict[str, Any], entryname:str, typ:str, organdict:dict, includekeys:str) -> list:
+    includekeys = massstrip(includekeys.split(','))
+    entries = {}
     for key, item in i.items():
-        item = handletags(item, organdict)
+        if isinstance(item, str):
+            item = handletags(item, organdict)
         if isinstance(item, str) and item.isdigit(): # Handle Numbers Differently
             item = int(item)
         if typ == 'heat' and key == 'needs_entity': # True for needs_entity
             item = bool(item)
-        if typ == 'combine' and key == 'grid': # True for needs_entity
+        if typ == 'combine' and key == 'grid': # Handles combine grid properties
             item = handlegridtags(item, organdict)
         i[key] = item
-        if key in includes:
+        if key in includekeys:
             entries[key] = i[key]
     if entryname not in organdict[typ].keys():
         organdict[typ][entryname] = []
@@ -64,7 +69,7 @@ def testing():
                 organdict['tag'][i['name']] = i['blocks']
                 continue
             elif i['type'] == 'heat': # Heating Recipe
-                producename = i['product'], 
+                producename = i['product']
                 col = 'ingredient, time, surrounding, needs_entity'
             elif i['type'] == 'extract': # Extracting Recipe
                 producename = i['product']
@@ -83,131 +88,166 @@ def testing():
             addentries(
                 i, 
                 producename, 
-                "combine", 
+                i['type'], 
                 organdict, 
                 col)
+            ...
     return organdict
 returned = testing()
 
-                        # canweld('bottom', normalize(get(generated, x, y-1))) or 
-                        # canweld('left', normalize(get(generated, x+1, y))) or 
-                        # canweld('top', normalize(get(generated, x, y+1))) or 
-                        # canweld('right', normalize(get(generated, x-1, y))) 
+def generates(grid,ratio,assertconnected=True) -> list[Image.Image]:
+    tags=[]
+    for y,row in enumerate(grid):
+        for x,block in enumerate(row):
+            if isinstance(block, list): # If it's a list, it's a tag, which
+                tags.append([(x,y,{"type":t,"rotate":0,"weld":[True]*4,"data":None}) for t in block])
+            elif isinstance(block, str): # It's normal and needed to NORMALIZE
+                grid[y][x] = {"type":block,"rotate":0,"weld":[True]*4,"data":None} # Actions
+    # now have a list of tags and coordinates
+    ims=[]
+    while True:
+        gen=genimage(grid,assertconnected)
 
-# Massive Comments Below to perform the Rubber duck debugging (https://en.wikipedia.org/wiki/Rubber_duck_debugging)
-def generates(generated, recipenum=0, prodname="unknown", replacedhistroy="", pthname=None, ratio=4):
-    pthname = pthname or f"cache/recipeframe-{prodname}-{recipenum}{replacedhistroy}.png"
-    print(f"Generating | {pthname}") # Debug Purpose, Not removing in case
-    for y, yaxis in enumerate(generated): # Open Grid
-        for x, critem in enumerate(yaxis): # Scan through each block
-            if critem == "NIC": critem = "air" # Convert NIC to air
-            if isinstance(critem, list): # If it's a list, it's a tag, which
-                place = critem # Store the original list for the next iter to process
-                for i in critem: # loops through tags element
-                    generated[y][x] = {"type":i,"rotate":0,"weld":[True]*4,"data":None} # Modify the list element to be the block
-                    generates(generated, recipenum, prodname, f"{replacedhistroy}~{i}") # Recursive, Passes the copy and informations to the sub process
-                generated[y][x] = place # Places back the original list for the next iter to process
-                return # Terminates the attempt because it cannot generate anything
-            elif isinstance(critem, str): # It's normal and needed to NORMALIZE
-                generated[y][x] = {"type":critem,"rotate":0,"weld":[True]*4,"data":None} # Actions
-    else: 
-        for y, yaxis in enumerate(generated): # Open Grid
-            for x, critem in enumerate(yaxis): # Scan through each block
-                print(get(generated, x, y))
-                copy = critem
-                for i in range(4):
-                    if (
-                        canweld('right',copy) and canweld('left',get(generated,x+1,y)) or
-                        canweld('left',copy) and canweld('right',get(generated,x-1,y)) or
-                        canweld('bottom',copy) and canweld('top',get(generated,x,y+1)) or
-                        canweld('top',copy) and canweld('bottom',get(generated,x,y-1))
-                        ):
-                        print(f"found")
-                        copy = critem
-                        generated[y][x] = copy
-                        break
-                    else:
-                        print("not found, rotates")
-                        copy['rotate'] += 1
-                        copy['rotate'] %= 4
-                        copy['weld'] = rotatewelded(copy['weld'], copy['rotate'])
-                        print(f"weld changed to {copy['weld']}")
-                
-        ... 
-        gen = makeimage(generated) # Make Image
         width, height = gen.size # Get width, height
         gen = gen.resize((width*ratio, height*ratio), Image.NEAREST).convert("RGBA") # Resize to dimension*Ratio
-        gen.save(pthname) # Save the final image
+        ims.append(gen)
+        for i in reversed(range(len(tags))):
+            indices[i]+=1
+            if indices[i]>=len(tags[i]):
+                indices[i]=0 # roll over
+            x,y,b=tags[i][indices[i]]
+            grid[y][x]=b
+            if indices[i]!=0: # didn't roll over
+                break
+        else:
+            break # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
+    return ims
 
-def generaterecipe(name):
+def genimage(generated,assertconnected=True):
+    rotations=[]
+    for y,row in enumerate(generated):
+        for x,block in enumerate(row):
+            if block in norotatetypes:
+                continue
+            elif block['type'] not in bottomtypes+topbottomtypes+sidestypes+notoptypes:
+                print('block',block,'welds on all sides')
+                # the block welds on all sides
+                # no reason to check
+                # wired blocks might change this
+                # but would be complicated
+                # would have to save all valid states and a score of how many wired blocks output onto wires
+                continue
+            elif block['type'] in twowaytypes:
+                rotations.append([(x,y,r) for r in [0,1]]) # don't need to check all ways
+            else:
+                rotations.append([(x,y,r) for r in [0,2,1,3]])
+    def floodfill():
+        filled=set([(0,0)])
+        edgeblocks=[(0,0)] # the blocks that are welded to a filled block
+        sideinfo=[ # do not change
+            ['right','left',+1, 0],
+            ['left','right',-1, 0],
+            ['bottom','top', 0,+1],
+            ['top','bottom', 0,-1],
+        ]
+        while len(edgeblocks)>0:
+            newedgeblocks=[]
+            for x,y in edgeblocks:
+                b=get(generated,x,y)
+                for thisside,otherside,dx,dy in sideinfo:
+                    if (x+dx,y+dy) not in filled and canweld(thisside,b) and canweld(otherside,get(generated,x+dx,y+dy)):
+                        # spread to that block
+                        newedgeblocks.append((x+dx,y+dy))
+                        filled.add((x+dx,y+dy))
+            edgeblocks=newedgeblocks
+        return len(filled)==sum(map(len,generated)) # all blocks are connected
+    # a ?optimized? itertools.product that changes only the ones that change in each iteration
+    indices=[0 for _ in rotations]
+    while True:
+        if floodfill():
+            break
+        for i in reversed(range(len(rotations))):
+            indices[i]+=1
+            if indices[i]>=len(rotations[i]):
+                indices[i]=0 # roll over
+            x,y,r=rotations[i][indices[i]]
+            generated[y][x]['rotate']=r
+            if indices[i]!=0: # didn't roll over
+                break
+        else:
+            if assertconnected:
+                raise Exception('disconnected recipe') # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
+            else:
+                break
+                
+    ... 
+    gen = makeimage(generated) # Make Image
+    return gen
+
+def getarrow(typ:str) -> Image.Image:
+    icox, icoy = getarrowcoords()[typ]
+    return Image.open(
+        cfg("localGame.texture.guidebookArrowFile")
+    ).crop(
+        (16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))
+    ).resize(
+        (64, 64), Image.NEAREST
+    )
+
+def generaterecipe(name) -> None:
     for typ in returned.keys():
         if name in returned[typ]:
             print(f"{typ}: {returned[typ][name]}")
             gridpos = returned[typ][name]
             if typ == "combine":
-                amountimgtable = {}
-                for num, entri in enumerate(gridpos):
-                    generates(entri['grid'], num, name)
-                    img = Image.new("RGBA", (128, 640))
-                    generates([[
-                    {"type":entri['block'],"rotate":0,"weld":[True]*4,"data":None}
-                    ]], pthname="cache/amount.png", ratio=4)
-                    for i in range(entri['amount']):
-                        img.alpha_composite(
-                            Image.open("cache/amount.png"),
-                            (i%2*64, i//2*64)
-                        )
-                    amountimgtable[num] = img
-                    print()
+                results:list[dict] = []
+                for i,recipe in enumerate(gridpos):
+                    imgs=generates(recipe['grid'],ratio=4)
+                    result=[{"type":recipe['block'],"rotate":0,"weld":[False]*4,"data":None}]*recipe['amount']
+                    img=generates([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
+                    results.append({'recipeframes':imgs,'result':img})
                 finimage = gif.gif((50, 50, 50))
-                generates([[
+                combiner=generates([[
                     {"type":"combiner","rotate":2,"weld":[True]*4,"data":None}, 
                     {"type":"transistor","rotate":1,"weld":[True]*4,"data":None}
-                    ]], pthname='cache/combinerimg.png', ratio=4)
-                combinerimg = Image.open("cache/combinerimg.png")
-                for recipenum in range(0, 99):
-                    pthf = tuple(glob.glob(f"cache/recipeframe-{name}-{recipenum}*.png"))
-                    if len(pthf) == 0: break
-                    print(f"{name} {recipenum} has {len(pthf)}")
-                    frmct = []
-                    md = (0, 0)
-                    for pth in pthf:
-                        img = Image.open(pth)
-                        frmct.append(img)
-                        md = gif.tuple_max(md, img.size)
-                    productimg = amountimgtable[recipenum]
-                    posi = recipenum*(md[1]+64+32)
-                    finimage.addgifframes(frmct, pos=(0, posi))
-                    finimage.addimageframes(
-                        combinerimg, 
-                        pos=(0, posi+md[1])
+                ]],ratio=4)[0]
+                maxdim = gif.tuple_max((64*2, 0),*[img.size for recipeimgs in results for img in recipeimgs['recipeframes']]) # fancy double iteration # the recipe is at least 2 blocks wide
+                for recipenum,recipeimgs in enumerate(results):
+                    y = recipenum*(
+                        maxdim[1]+ # the tallest recipe
+                        64+        # the combiner
+                        32         # mandatory 32 pixel gap
+                    )
+                    finimage.addgifframes(
+                        recipeimgs['recipeframes'],
+                        pos=(0, y)
                     )
                     finimage.addimageframes(
-                        productimg, 
-                        pos=(md[0]+64+64+64, posi)
+                        combiner,
+                        pos=(0, y+maxdim[1])
                     )
-                    icox, icoy = getarrowcoords()["combiner"]
                     finimage.addimageframes(
-                        Image.open(
-                            cfg("localGame.texture.guidebookArrowFile")).crop(
-                                (16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))
-                            ).resize((64, 64), Image.NEAREST
-                        ),
-                        pos=(md[0]+64, posi+md[1]//2)
+                        recipeimgs['result'],
+                        pos=(maxdim[0]+64+64+64, y)
+                    )
+                    finimage.addimageframes(
+                        getarrow("combiner"),
+                        pos=(maxdim[0]+64, y+maxdim[1]//2)
                     )
                 finimage.export(f"cache/recipe-{name}.gif")
-            
-    # for maderecipecache in glob.glob(f"cache/recipeframe-*.png"):
-    #     try: os.remove(maderecipecache)
-    #     except: pass
 
 
 if __name__ == "__main__":
-    generaterecipe(returned, "extractor")
-    generaterecipe(returned, "destroyer")
-    generaterecipe(returned, "inductor")
-    # generaterecipe(returned, "compressed_stone")
+    generaterecipe("galvanometer", apng=True)
+    generaterecipe("pulp")
+    # generaterecipe("air")
+    # generaterecipe("destroyer")
+    generaterecipe("compressed_stone")
+    generaterecipe("inductor")
     # generaterecipe(returned, "galvanometer")
     # generaterecipe(returned, "potentiometer")
     # generaterecipe(returned, "galvanometer")
     # generaterecipe(returned, "prism")
+    for maderecipecache in glob.glob(f"cache/recipeframe-*.png"):
+        try: os.remove(maderecipecache)
+        except: pass

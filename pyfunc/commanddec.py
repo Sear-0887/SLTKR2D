@@ -2,7 +2,8 @@ import datetime
 import decorator
 import json
 import asyncio
-from pyfunc.lang import evl
+import nextcord
+from pyfunc.lang import cfg, evl
 from colorama import Fore, init
 from nextcord.ext import commands
 import traceback
@@ -23,7 +24,13 @@ RESET = Fore.RESET
 # Detail:
 # {errorpacket['errline']}
 # Exc- {excstr}
-async def ErrorHandler(name, ctx:commands.Context, e, args, kwargs):
+async def ErrorHandler(name, e, args, kwargs, interaction=None, ctx=None):
+    ctxorintr = ctx or interaction
+    async def sendtoch(msg):
+        if isinstance(ctxorintr, commands.Context):
+            await ctx.send(msg)
+        elif isinstance(ctxorintr, nextcord.Interaction):
+            await interaction.response.send_message(msg)
     # handle the error e
     # from a function call f(ctx,*args,**kwargs)
     # print a message with cool colors to the console
@@ -45,7 +52,7 @@ async def ErrorHandler(name, ctx:commands.Context, e, args, kwargs):
         elif type(eargs) == dict:
             expecterr = expecterr.format(*args, **eargs, **kwargs)
     except Exception as EX:
-        print(EX)
+        print(f"Unknown Error Happened when tring to replace keyword: {EX}")
         pass
     print(
 f'''
@@ -55,6 +62,7 @@ f'''
 
 {BLUE}Passed Parameters:
 {ctx = },
+{interaction = }
 {args = },
 {kwargs = }
 
@@ -62,21 +70,19 @@ f'''
 {RESET}{'-'*20}
 '''
     )
-    await ctx.send(expecterr)
-    guild=ctx.guild
-    if guild:
-        guildname=guild.name
-    else:
-        guildname='<DMs>'
+    await sendtoch(expecterr)
+    guild = ctx.guild if ctxorintr == ctx else interaction.guild
+    author = ctx.author if ctxorintr == ctx else interaction.user
+    trigger = ctx.message.clean_content if ctxorintr == ctx else "<INTERACTION>"
     errorpacket = {
         "user": {
-            "displayname": ctx.author.display_name,
-            "globalname": ctx.author.global_name,
-            'id': ctx.author.id,
-            "servername": guildname
+            "displayname": author.display_name,
+            "globalname": author.global_name,
+            'id': author.id,
+            "servername": guild.name
         },
         'time': datetime.datetime.now().isoformat(),
-        'trigger': ctx.message.clean_content,
+        'trigger': trigger,
         'arg': [repr(a) for a in args],
         'kwarg': {k:repr(v) for k,v in kwargs.items()},
         'errline': '\n'.join(traceback.format_exception(e)),
@@ -88,7 +94,7 @@ f'''
         excstrs = [str(e),*excstrs]
     errorpacket['excstr'] = '\n'.join(excstrs)
     
-    errfilname = f"cache/log/error-{ctx.author.global_name}-{datetime.date.today():%d-%m-%Y}.json"
+    errfilname = f"cache/log/error-{author.global_name}-{datetime.date.today():%d-%m-%Y}.json"
     try:
         with open(errfilname, "r") as fil:
             prev = json.load(fil)
@@ -105,7 +111,7 @@ def MainCommand(bot,name):
             await ctx.trigger_typing()
             await cmd(ctx,*args,**kwargs)
         except Exception as e:
-            await ErrorHandler(name, ctx, e, args, kwargs)
+            await ErrorHandler(name, e, args, kwargs, ctx=ctx)
     def trycmd(cmd):
         return decorator.decorate(cmd,_trycmd) # decorator preserves the signature of cmd
     def fixcmd(cmd):
@@ -124,7 +130,7 @@ def CogCommand(name):
             await ctx.trigger_typing()
             await cmd(self, ctx,*args,**kwargs)
         except Exception as e:
-            await ErrorHandler(name, ctx, e, args, kwargs)
+            await ErrorHandler(name, e, args, kwargs, ctx=ctx)
     def trycmd(cmd):
         return decorator.decorate(cmd,_trycmd)
     def fixcmd(cmd):
@@ -132,5 +138,25 @@ def CogCommand(name):
             name        =        name,
             description = evl(f"{name}.desc") or "*No Description Found.*",
             aliases     = evl(f"{name}.aliases") or []
+        )( trycmd(cmd) )
+    return fixcmd
+
+def InteractionCogCommand_Local(name):
+    # interaction cog command
+    # command gets a self argument as well
+    async def _trycmd(cmd, self, interaction: nextcord.Interaction ,*args,**kwargs):
+        try:
+            await cmd(self, interaction, *args,**kwargs)
+            
+        except Exception as e:
+            await ErrorHandler(name, e, args, kwargs, interaction=interaction)
+            return
+    def trycmd(cmd):
+        return decorator.decorate(cmd,_trycmd)
+    def fixcmd(cmd):
+        return nextcord.slash_command(
+            name        = name,
+            description = evl(f"{name}.desc") or "*No Description Found.*",
+            guild_ids   = cfg("localICCServer")
         )( trycmd(cmd) )
     return fixcmd

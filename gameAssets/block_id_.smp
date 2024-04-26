@@ -100,3 +100,11 @@
 {sawdust}: {99}
 {snow}: {100}
 {prism}: {101}
+{slime}: {102}
+{slime_ice}: {103}
+{chert}: {104}
+{compressed_chert}: {105}
+{spark_catcher}: {106}
+{spark_emitter}: {107}
+{bomb_emitter}: {108}
+{divider}: {109}

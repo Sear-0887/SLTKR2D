@@ -56,10 +56,7 @@ summonore
 snow
 
 # Sear
-Rotation Weld Fix (5/5)
 Extract, Heat Recipe (5/5)
 Extra Display/Inject (4/5)
 Optimize Code (3/5)
 Organize Code (3/5)
-Export APNG (2/5)
-Protocol 01 (?/5)

@@ -1,0 +1,565 @@
+{air}:{
+    {albedo}:{air_small.png}
+    {resolution}:{16}
+}
+{command_block}:{
+    {albedo}:{command_block_albedo.png}
+    {normal}:{command_block_normal.png}
+    {resolution}:{16}
+}
+{boundary}:{
+    {albedo}:{boundary_albedo.png}
+    {normal}:{boundary_normal.png}
+    {resolution}:{16}
+}
+{creator}:{
+    {albedo}:{machine/creator_albedo.png}
+    {normal}:{machine/creator_normal.png}
+    {resolution}:{16}
+}
+{spawner}:{
+    {albedo}:{core/spawner_albedo.png}
+    {normal}:{core/spawner_normal.png}
+    {resolution}:{16}
+}
+
+
+{dirt}:{
+    {albedo}:{natural/dirt_albedo.png}
+    {normal}:{natural/dirt_normal.png}
+    {resolution}:{16}
+}
+{grass}:{
+    {albedo}:{natural/grass_albedo.png}
+    {normal}:{natural/grass_normal.png}
+    {resolution}:{16}
+}
+{sediment}:{
+    {albedo}:{natural/sediment_albedo.png}
+    {normal}:{natural/sediment_normal.png}
+    {resolution}:{16}
+}
+{stone}:{
+    {albedo}:{natural/stone_albedo.png}
+    {normal}:{natural/stone_normal.png}
+    {resolution}:{16}
+}
+{chert}:{
+    {albedo}:{natural/chert_albedo.png}
+    {normal}:{natural/chert_normal.png}
+    {resolution}:{16}
+}
+{iron_vein}:{
+    {albedo}:{natural/iron_vein_albedo.png}
+    {normal}:{natural/vein_normal.png}
+    {resolution}:{16}
+}
+{iron_ore}:{
+    {albedo}:{natural/iron_ore_albedo.png}
+    {normal}:{natural/iron_ore_normal.png}
+    {resolution}:{16}
+}
+{copper_vein}:{
+    {albedo}:{natural/copper_vein_albedo.png}
+    {normal}:{natural/vein_normal.png}
+    {resolution}:{16}
+}
+{copper_ore}:{
+    {albedo}:{natural/copper_ore_albedo.png}
+    {normal}:{natural/copper_ore_normal.png}
+    {resolution}:{16}
+}
+{sand}:{
+    {albedo}:{natural/sand_albedo.png}
+    {normal}:{natural/sand_normal.png}
+    {resolution}:{16}
+}
+{leaf_maple}:{
+    {albedo}:{natural/leaf_maple.png}
+    {resolution}:{16}
+}
+{log_maple}:{
+    {albedo}:{natural/log_maple_albedo.png}
+    {normal}:{natural/log_maple_normal.png}
+    {resolution}:{16}
+}
+{leaf_pine}:{
+    {albedo}:{natural/leaf_pine.png}
+    {resolution}:{16}
+}
+{log_pine}:{
+    {albedo}:{natural/log_pine_albedo.png}
+    {normal}:{natural/log_pine_normal.png}
+    {resolution}:{16}
+}
+{snow}:{
+    {albedo}:{natural/snow_albedo.png}
+    {normal}:{natural/snow_normal.png}
+    {resolution}:{16}
+    {rimlight}:{natural/snow_rimlight.png}
+}
+{water}:{
+    {albedo}:{natural/water_albedo.png}
+    {normal}:{natural/water_normal.png}
+    {resolution}:{16}
+    {rimlight}:{natural/water_rimlight.png}
+}
+
+{iron_bar}:{
+    {albedo}:{material/iron_bar_albedo.png}
+    {normal}:{material/bar_normal.png}
+    {resolution}:{16}
+}
+{iron_plate}:{
+    {albedo}:{building/iron_plate_albedo.png}
+    {normal}:{building/iron_plate_normal.png}
+    {resolution}:{16}
+}
+{cast_iron}:{
+    {albedo}:{material/cast_iron_albedo.png}
+    {normal}:{material/cast_iron_normal.png}
+    {resolution}:{16}
+}
+{oxide}:{
+    {albedo}:{material/oxide_albedo.png}
+    {normal}:{material/oxide_normal.png}
+    {resolution}:{16}
+}
+{copper_bar}:{
+    {albedo}:{material/copper_bar_albedo.png}
+    {normal}:{material/bar_normal.png}
+    {resolution}:{16}
+}
+{wire_spool}:{
+    {albedo}:{material/wire_spool_albedo.png}
+    {normal}:{material/wire_spool_normal.png}
+    {resolution}:{16}
+}
+{silicon}:{
+    {albedo}:{material/silicon_albedo.png}
+    {normal}:{material/silicon_normal.png}
+    {rimlight}:{material/silicon_rimlight.png}
+    {resolution}:{16}
+}
+{wafer}:{
+    {albedo}:{material/wafer_albedo.png}
+    {normal}:{material/wafer_normal.png}
+    {resolution}:{16}
+}
+{pulp}:{
+    {albedo}:{material/pulp_albedo.png}
+    {normal}:{material/pulp_normal.png}
+    {rimlight}:{material/pulp_rimlight.png}
+    {resolution}:{16}
+}
+{rubber}:{
+    {albedo}:{material/rubber_albedo.png}
+    {normal}:{material/rubber_normal.png}
+    {resolution}:{16}
+    {rimlight}:{material/rubber_rimlight.png}
+}
+{sawdust}:{
+    {albedo}:{material/sawdust_albedo.png}
+    {normal}:{material/sawdust_normal.png}
+    {resolution}:{16}
+}
+{calcium_bar}:{
+    {albedo}:{material/calcium_bar_albedo.png}
+    {normal}:{material/bar_normal.png}
+    {resolution}:{16}
+}
+{peltmellow}:{
+    {albedo}:{material/peltmellow_albedo.png}
+    {normal}:{material/peltmellow_normal.png}
+    {resolution}:{16}
+}
+{compressed_stone}:{
+    {albedo}:{material/compressed_stone_albedo.png}
+    {normal}:{material/compressed_stone_normal.png}
+    {resolution}:{16}
+}
+{compressed_chert}:{
+    {albedo}:{material/compressed_chert_albedo.png}
+    {normal}:{material/compressed_stone_normal.png}
+    {resolution}:{16}
+}
+
+{frame}:{
+    {albedo}:{building/frame_albedo.png}
+    {normal}:{building/frame_normal.png}
+    {resolution}:{16}
+}
+{platform}:{
+    {albedo}:{building/platform_albedo.png}
+    {normal}:{building/platform_normal.png}
+    {resolution}:{16}
+}
+{lamp}:{
+    {albedo}:{building/lamp_albedo.png}
+    {normal}:{building/lamp_normal.png}
+    {resolution}:{16}
+}
+{display}:{
+    {albedo}:{building/display_albedo.png}
+    {normal}:{building/display_normal.png}
+    {resolution}:{16}
+}
+{cap}:{
+    {albedo}:{building/cap_albedo.png}
+    {normal}:{building/cap_normal.png}
+    {resolution}:{16}
+    {rimlight}:{material/rubber_rimlight.png}
+}
+{chair}:{
+    {albedo}:{building/chair_albedo.png}
+    {normal}:{building/chair_normal.png}
+    {resolution}:{16}
+}
+{chair_pilot}:{
+    {albedo}:{building/chair_pilot_albedo.png}
+    {normal}:{building/chair_pilot_normal.png}
+    {resolution}:{16}
+}
+{spikes}:{
+    {albedo}:{building/spikes_albedo.png}
+    {normal}:{building/spikes_normal.png}
+    {resolution}:{16}
+}
+{foam}:{
+    {albedo}:{building/foam_albedo.png}
+    {normal}:{building/foam_normal.png}
+    {resolution}:{16}
+}
+{adobe}:{
+    {albedo}:{building/adobe_albedo.png}
+    {normal}:{building/adobe_normal.png}
+    {resolution}:{16}
+}
+
+
+{wire}:{
+    {albedo}:{wire/wire_albedo.png}
+    {normal}:{wire/wire_normal.png}
+    {resolution}:{16}
+}
+{port}:{
+    {albedo}:{wire/port_albedo.png}
+    {normal}:{wire/port_normal.png}
+    {resolution}:{16}
+}
+{inductor}:{
+    {albedo}:{wire/inductor_albedo.png}
+    {normal}:{wire/inductor_normal.png}
+    {rimlight}:{wire/inductor_rimlight.png}
+    {resolution}:{16}
+}
+{diode}:{
+    {albedo}:{wire/diode_albedo.png}
+    {normal}:{wire/diode_normal.png}
+    {resolution}:{16}
+}
+{cascade}:{
+    {albedo}:{wire/cascade_albedo.png}
+    {normal}:{wire/cascade_normal.png}
+    {resolution}:{16}
+}
+{potentiometer}:{
+    {albedo}:{wire/potentiometer_albedo.png}
+    {normal}:{wire/potentiometer_normal.png}
+    {resolution}:{16}
+}
+{transistor}:{
+    {albedo}:{wire/transistor_albedo.png}
+    {normal}:{wire/transistor_normal.png}
+    {resolution}:{16}
+}
+{latch}:{
+    {albedo}:{wire/latch_albedo.png}
+    {normal}:{wire/latch_normal.png}
+    {resolution}:{16}
+}
+{galvanometer}:{
+    {albedo}:{wire/galvanometer_albedo.png}
+    {normal}:{wire/galvanometer_normal.png}
+    {resolution}:{16}
+}
+{divider}:{
+    {albedo}:{wire/divider_albedo.png}
+    {normal}:{wire/divider_normal.png}
+    {resolution}:{16}
+}
+{counter}:{
+    {albedo}:{wire/counter_albedo.png}
+    {normal}:{wire/counter_normal.png}
+    {resolution}:{16}
+}
+{capacitor}:{
+    {albedo}:{wire/capacitor_albedo.png}
+    {normal}:{wire/capacitor_normal.png}
+    {resolution}:{16}
+}
+
+{toggler}:{
+    {albedo}:{sensor/toggler_albedo.png}
+    {normal}:{sensor/toggler_normal.png}
+    {resolution}:{16}
+}
+{trigger}:{
+    {albedo}:{sensor/trigger_albedo.png}
+    {normal}:{sensor/trigger_normal.png}
+    {resolution}:{16}
+}
+{sensor}:{
+    {albedo}:{sensor/sensor_albedo.png}
+    {normal}:{sensor/sensor_normal.png}
+    {resolution}:{16}
+}
+{detector}:{
+    {albedo}:{sensor/detector_albedo.png}
+    {normal}:{sensor/detector_normal.png}
+    {resolution}:{16}
+}
+{matcher}:{
+    {albedo}:{sensor/matcher_albedo.png}
+    {normal}:{sensor/matcher_normal.png}
+    {resolution}:{16}
+}
+{accelerometer}:{
+    {albedo}:{sensor/accelerometer_albedo.png}
+    {normal}:{sensor/accelerometer_normal.png}
+    {resolution}:{16}
+}
+{spark_catcher}:{
+    {albedo}:{sensor/spark_catcher_albedo.png}
+    {normal}:{sensor/spark_catcher_normal.png}
+    {resolution}:{16}
+}
+
+{extractor}:{
+    {albedo}:{machine/extractor_albedo.png}
+    {normal}:{machine/extractor_normal.png}
+    {resolution}:{16}
+}
+{arc_furnace}:{
+    {albedo}:{machine/arc_furnace_albedo.png}
+    {normal}:{machine/arc_furnace_normal.png}
+    {resolution}:{16}
+}
+{combiner}:{
+    {albedo}:{machine/combiner_albedo.png}
+    {normal}:{machine/combiner_normal.png}
+    {resolution}:{16}
+}
+{motor}:{
+    {albedo}:{machine/motor_albedo.png}
+    {normal}:{machine/motor_normal.png}
+    {resolution}:{16}
+}
+{manipulator}:{
+    {albedo}:{machine/manipulator_albedo.png}
+    {normal}:{machine/manipulator_normal.png}
+    {resolution}:{16}
+}
+{mantler}:{
+    {albedo}:{machine/mantler_albedo.png}
+    {normal}:{machine/mantler_normal.png}
+    {resolution}:{16}
+}
+{dismantler}:{
+    {albedo}:{machine/dismantler_albedo.png}
+    {normal}:{machine/dismantler_normal.png}
+    {resolution}:{16}
+}
+{destroyer}:{
+    {albedo}:{machine/destroyer_albedo.png}
+    {normal}:{machine/destroyer_normal.png}
+    {resolution}:{16}
+}
+{collector}:{
+    {albedo}:{machine/collector_albedo.png}
+    {normal}:{machine/collector_normal.png}
+    {resolution}:{16}
+}
+{injector}:{
+    {albedo}:{machine/injector_albedo.png}
+    {normal}:{machine/injector_normal.png}
+    {resolution}:{16}
+}
+{spark_emitter}:{
+    {albedo}:{machine/spark_emitter_albedo.png}
+    {normal}:{machine/spark_emitter_normal.png}
+    {resolution}:{16}
+}
+{bomb_emitter}:{
+    {albedo}:{machine/bomb_emitter_albedo.png}
+    {normal}:{machine/bomb_emitter_normal.png}
+    {resolution}:{16}
+}
+
+
+{roller}:{
+    {albedo}:{movers/roller_albedo.png}
+    {normal}:{movers/roller_normal.png}
+    {resolution}:{16}
+}
+{dynamic_roller}:{
+    {albedo}:{movers/dynamic_roller_albedo.png}
+    {normal}:{movers/roller_normal.png}
+    {resolution}:{16}
+}
+{ice}:{
+    {albedo}:{movers/ice_albedo.png}
+    {normal}:{movers/ice_normal.png}
+    {resolution}:{16}
+    {rimlight}:{movers/ice_rimlight.png}
+}
+{slime}:
+{
+    {albedo}:{movers/slime_albedo.png}
+    {normal}:{movers/slime_normal.png}
+    {resolution}:{16}
+    {rimlight}:{movers/ice_rimlight.png}
+}
+{slime_ice}:
+{
+    {albedo}:{movers/slime_ice_albedo.png}
+    {normal}:{movers/slime_ice_normal.png}
+    {resolution}:{16}
+    {rimlight}:{movers/ice_rimlight.png}
+}
+{magnet}:{
+    {albedo}:{movers/magnet_albedo.png}
+    {normal}:{movers/magnet_normal.png}
+    {resolution}:{16}
+}
+#actuator
+{actuator_head}:{
+    {albedo}:{movers/actuator_head_albedo.png}
+    {normal}:{movers/actuator_head_normal.png}
+    {resolution}:{16}
+}
+{actuator_base}:{
+    {albedo}:{movers/actuator_base_albedo.png}
+    {normal}:{movers/actuator_base_normal.png}
+    {resolution}:{16}
+}
+{teleportore}:{
+    {albedo}:{movers/teleportore_albedo.png}
+    {normal}:{movers/teleportore_normal.png}
+    {resolution}:{16}
+}
+{telecross}:{
+    {albedo}:{movers/telecross_albedo.png}
+    {normal}:{movers/telecross_normal.png}
+    {resolution}:{16}
+}
+{telewall}:{
+    {albedo}:{movers/telewall_albedo.png}
+    {normal}:{movers/telewall_normal.png}
+    {resolution}:{16}
+}
+
+{residue}:{
+    {albedo}:{beam/residue_albedo.png}
+    {normal}:{beam/residue_normal.png}
+    {resolution}:{16}
+}
+{flower_magenta}:{
+    {albedo}:{beam/flower_magenta_albedo.png}
+    {normal}:{beam/flower_normal.png}
+    {resolution}:{16}
+}
+{flower_yellow}:{
+    {albedo}:{beam/flower_yellow_albedo.png}
+    {normal}:{beam/flower_normal.png}
+    {resolution}:{16}
+}
+{glass}:{
+    {albedo}:{beam/glass_albedo.png}
+    {normal}:{beam/glass_normal.png}
+    {resolution}:{16}
+}
+{glass_magenta}:{
+    {albedo}:{beam/glass_magenta_albedo.png}
+    {normal}:{beam/glass_normal.png}
+    {resolution}:{16}
+}
+{glass_yellow}:{
+    {albedo}:{beam/glass_yellow_albedo.png}
+    {normal}:{beam/glass_normal.png}
+    {resolution}:{16}
+}
+{glass_cyan}:{
+    {albedo}:{beam/glass_cyan_albedo.png}
+    {normal}:{beam/glass_normal.png}
+    {resolution}:{16}
+}
+{beam_core}:{
+    {albedo}:{beam/beam_core_albedo.png}
+    {normal}:{beam/beam_core_normal.png}
+    {resolution}:{16}
+}
+{mirror}:{
+    {albedo}:{beam/mirror_albedo.png}
+    {normal}:{beam/mirror_normal.png}
+    {resolution}:{16}
+}
+{prism}:{
+    {albedo}:{beam/prism_albedo.png}
+    {normal}:{beam/prism_normal.png}
+    {resolution}:{16}
+}
+
+{core_ore}:{
+    {albedo}:{core/core_ore_albedo.png}
+    {normal}:{core/core_ore_normal.png}
+    {resolution}:{16}
+}
+{raw_core}:{
+    {albedo}:{core/raw_core_albedo.png}
+    {normal}:{core/raw_core_normal.png}
+    {resolution}:{16}
+}
+{mass_core}:{
+    {albedo}:{core/mass_core_albedo.png}
+    {normal}:{core/mass_core_normal.png}
+    {resolution}:{16}
+}
+{rail_core}:{
+    {albedo}:{core/rail_core_albedo.png}
+    {normal}:{core/rail_core_normal.png}
+    {resolution}:{16}
+}
+{force_core}:{
+    {albedo}:{core/force_core_albedo.png}
+    {normal}:{core/force_core_normal.png}
+    {resolution}:{16}
+}
+{refined_core}:{
+    {albedo}:{core/refined_core_albedo.png}
+    {normal}:{core/refined_core_normal.png}
+    {resolution}:{16}
+}
+{catalyst_core}:{
+    {albedo}:{core/catalyst_core_albedo.png}
+    {normal}:{core/catalyst_core_normal.png}
+    {rimlight}:{core/catalyst_core_rimlight.png}
+    {resolution}:{16}
+}
+{soul_core}:{
+    {albedo}:{core/soul_core_albedo.png}
+    {normal}:{core/soul_core_normal.png}
+    {resolution}:{16}
+}
+{pedestal}:{
+    {albedo}:{core/pedestal_albedo.png}
+    {normal}:{core/pedestal_normal.png}
+    {rimlight}:{core/pedestal_rimlight.png}
+    {resolution}:{16}
+}
+{summonore}:{
+    {albedo}:{core/summonore_albedo.png}
+    {normal}:{core/summonore_normal.png}
+    {rimlight}:{core/pedestal_rimlight.png}
+    {resolution}:{16}
+}
