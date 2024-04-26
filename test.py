@@ -16,21 +16,33 @@ for x in rawdata:
 
 print(json.dumps({dk:[*set([k for x in d for k in x.keys()])] for dk,d in data.items()},indent=2))
 
-tags=collections.defaultdict(list)
+tags={}
 
 for tag in data['tag']:
     tag=copy.deepcopy(tag)
     name=tag['name']
     del tag['name']
-    tags[name].append(tag['blocks'])
+    assert name not in tags
+    tags[name]=tag['blocks']
+
+def handletags(s:str) -> str | list:
+    if s.startswith('$'):
+        s,*extra = s.split()
+        if s[1:] in tags:
+            if len(extra)==0:
+                return tags[s[1:]]
+            return [[x,*extra] for x in tags[s[1:]]]
+        print(f'{s} is Just a Normal name starts with $ ???????')
+    return s
 
 heat=collections.defaultdict(list)
 
 for h in data['heat']:
     h=copy.deepcopy(h)
-    if 'needs_entity' in h and h['needs_entity']=='1':
-        h['needs_entity']=True
-    heat[h['product']].append(h)
+    h['needs_entity'] = 'needs_entity' in h and h['needs_entity']=='1'
+    product = h['product']
+    del h['product']
+    heat[product].append(h)
 
 extract=collections.defaultdict(list)
 
@@ -63,24 +75,26 @@ for e in data['extra_display']: # i don't want to deal with this now
     e=copy.deepcopy(e)
     product=e['product']
     del e['product']
-    e['product']=product['filter']
-    e['amount']=product.get('amount',1)
-    extra_display[e['product']].append(e)
+    products = handletags(product['filter'])
+    if isinstance(products,str):
+        products = [products]
+    print(products)
+    for p in products:
+        e2=copy.deepcopy(e)
+        e2['product']=p
+        e2['amount']=product.get('amount',1)
+        extra_display[e2['product']].append(e2)
 
-summonore_pill=collections.defaultdict(list)
+summonore_pill=set()
 
 for s in data['summonore_pill']: # there is literally only one
     s=copy.deepcopy(s)
-    summonore_pill[s['filter']].append(s)
-things = [
-    tags,
-    heat,
-    extract,
-    inject,
-    combine,
-    extra_display,
-    summonore_pill,
-]
+    products = handletags(s['filter'])
+    if isinstance(products,str):
+        products = [products]
+    for p in products:
+        summonore_pill.add(p)
+
 # filters:
 # grassy
 # non_air
@@ -89,5 +103,82 @@ things = [
 # not_water
 # needs_container_count5
 
-for thing in things:
-    print([x for x in thing.keys() if ' ' in x])
+import schema
+
+tagschema=schema.Schema({str:[str]})
+tags = tagschema.validate(tags)
+
+heatschema=schema.Schema({str:[{
+    'ingredient':str,
+    'time':schema.Use(int),
+    'needs_entity':bool,
+    schema.Optional('surrounding'):{
+        'block':str,
+        'minimum':schema.Use(int),
+    },
+}]})
+heat = heatschema.validate(heat)
+
+extractschema=schema.Schema({str:[{
+    'product':str,
+    'amount':schema.Use(int),
+    'ingredient':str,
+    'time':schema.Use(int),
+    schema.Optional('post_action'):schema.Or('destroy','reduce_container_count5')
+}]})
+extract = extractschema.validate(extract)
+
+injectschema=schema.Schema({str:[{
+    'product':schema.Or(
+        {
+            'transform_receiver':str
+        },
+        {
+            'fertilizer':schema.Use(int)
+        }
+    ),
+    'pill':str,
+    'receiver':str,
+    schema.Optional('needs_passive'):str
+}]})
+inject = injectschema.validate(inject)
+
+combineschema=schema.Schema({str:[{
+    'grid':[[schema.Use(handletags)]],
+    'product':str,
+    'amount':schema.Use(int),
+    schema.Optional('needs_passive'):str
+}]})
+combine = combineschema.validate(combine)
+
+def fixemptygrid(g):
+    if g == '':
+        return [[]]
+    else:
+        raise ValueError('bad grid')
+
+def handlepos(p):
+    x,y = p.split(',')
+    return (int(x),int(y))
+
+extra_displayschema=schema.Schema({str:[{
+    'grid':schema.Or(schema.Use(fixemptygrid),[[schema.Use(handletags)]]),
+    'product':str,
+    'amount':schema.Use(int),
+    schema.Optional('arrow_sprite'):schema.Use(int),
+    schema.Optional('guidebook_page_blacklist'):[str],
+    schema.Optional('guidebook_page_whitelist'):[str],
+    schema.Optional('weldall'):schema.Use(int),
+    schema.Optional('needs_passive'):str,
+    schema.Optional('research_requirement_override'):str,
+    schema.Optional('entity'):{
+        'type':str,
+        'position':schema.Use(handlepos)
+    },
+    schema.Optional('guidebook_use_only'):schema.Use(int),
+    schema.Optional('match_filter_modulo'):schema.Use(int),
+}]})
+extra_display = extra_displayschema.validate(extra_display)
+
+summonore_pillschema=schema.Schema({str})
+summonore_pill = summonore_pillschema.validate(summonore_pill)
