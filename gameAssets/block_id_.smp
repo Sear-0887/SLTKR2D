@@ -102,9 +102,9 @@
 {prism}: {101}
 {slime}: {102}
 {slime_ice}: {103}
-{?}: {104}
-{?}: {105}
-{?}: {106}
-{?}: {107}
-{?}: {108}
-{?}: {109}
+{chert}: {104}
+{compressed_chert}: {105}
+{spark_catcher}: {106}
+{spark_emitter}: {107}
+{bomb_emitter}: {108}
+{divider}: {109}
