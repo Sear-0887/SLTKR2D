@@ -370,7 +370,7 @@ def twowayfilter(data:BlockData) -> BlockData:
 @functools.cache
 def _getblocktexture(block:str,offsetx:int,offsety:int,sizex:int,sizey:int) -> ImageBit:
 	im1, im2 = getblockims(block)
-	return ImageBit((im1,im2),offsetx,offsety,offsetx+sizex,offsety+sizey)
+	return ImageBit((im1,im2),offsetx,offsety,offsetx+sizex,offsety+sizey,blockinfos[block]['id'])
 
 def getblocktexture(data:BlockData) -> ImageBit:
 	block=data['type']
