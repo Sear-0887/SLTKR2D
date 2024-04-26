@@ -261,7 +261,7 @@ dataschema = schema.Schema({
                 'transform_receiver':block
             },
             {
-                'fertilizer':num
+                'fertilizer':flag
             }
         ),
         'pill':block,
@@ -283,8 +283,8 @@ dataschema = schema.Schema({
             schema.Optional('amount',default = 1):num,
         },
         schema.Optional('arrow_sprite'):num,
-        schema.Optional('guidebook_page_blacklist'):[block],
-        schema.Optional('guidebook_page_whitelist'):[block],
+        schema.Optional('guidebook_page_blacklist',default = []):[block], # don't put this on 
+        schema.Optional('guidebook_page_whitelist',default = []):[block],
         schema.Optional('weldall',default = True):flag,
         schema.Optional('needs_passive'):research,
         schema.Optional('research_requirement_override'):research,
@@ -293,7 +293,7 @@ dataschema = schema.Schema({
             'position':schema.Use(handlepos)
         },
         schema.Optional('guidebook_use_only',default = False):flag,
-        schema.Optional('match_filter_modulo'):num, # flag?
+        schema.Optional('match_filter_modulo'):flag, # the changing blocks all match
     }],
     'summonore_pill':[{'filter':blocktag}],
     'sensor_natural':[{'filter':blocktag}],
