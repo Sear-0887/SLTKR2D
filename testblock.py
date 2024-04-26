@@ -1,9 +1,9 @@
-from pyfunc.block import makeimage
 from pyfunc.assetload import assetinit
 assetinit()
+from pyfunc.block import makeimage
 
 im = makeimage([
-	['iron_bar']
+	['silicon']
 ])
 
 im.show()
