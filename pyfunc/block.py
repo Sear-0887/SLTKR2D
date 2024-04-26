@@ -144,7 +144,13 @@ class ImageBit:
 		self.rotation += r
 
 	def getim(self) -> PIL.Image.Image:
-		im = self.im.crop((self.x, self.y, self.x + self.w, self.y + self.h))
+		albedo = self.im.crop((self.x, self.y, self.x + self.w, self.y + self.h))
+		if self.normal is not None:
+			normal = self.normal.crop((self.x, self.y, self.x + self.w, self.y + self.h))
+		else:
+			normal = None
+
+		im = apply_normalmap(albedo, normal, self.rotation, self.block_id, self.flip)
 		# i have to calculate the diffuse and "rimlight"
 		# self.flip = flip_uv_x
 		# self.rotate = either rotation or (3 - rotation)
