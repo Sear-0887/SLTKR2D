@@ -102,6 +102,7 @@ def generates(grid,ratio,assertconnected=True) -> list[Image.Image]:
         width, height = gen.size # Get width, height
         gen = gen.resize((width*ratio, height*ratio), Image.NEAREST).convert("RGBA") # Resize to dimension*Ratio
         ims.append(gen)
+        indices=[0 for _ in tags]
         for i in reversed(range(len(tags))):
             indices[i]+=1
             if indices[i]>=len(tags[i]):
