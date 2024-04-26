@@ -7,6 +7,7 @@ import collections
 import re
 import typing
 import numpy as np
+from pyfunc.assetload import blockinfos
 
 rimlights:dict[int, np.ndarray] = {}
 
