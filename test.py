@@ -2,6 +2,8 @@ import pyfunc.smp as smp
 import collections
 import copy
 import json
+from pyfunc.assetload import assetinit,blockinfos
+assetinit()
 
 with open("content/recipes.smp") as f:
     rawdata = smp.getsmpvalue(f.read())
@@ -31,7 +33,7 @@ def handletags(s:str) -> str | list:
         if s[1:] in tags:
             if len(extra)==0:
                 return tags[s[1:]]
-            return [[x,*extra] for x in tags[s[1:]]]
+            return [' '.join([x,*extra]) for x in tags[s[1:]]]
         print(f'{s} is Just a Normal name starts with $ ???????')
     return s
 
@@ -78,7 +80,6 @@ for e in data['extra_display']: # i don't want to deal with this now
     products = handletags(product['filter'])
     if isinstance(products,str):
         products = [products]
-    print(products)
     for p in products:
         e2=copy.deepcopy(e)
         e2['product']=p
@@ -189,13 +190,39 @@ def strtobool(s):
 
 def assertblock(s):
     assert s[0] != '$'
+    if s == 'NIC':
+        return 'air'
+    assert s.split()[0] in blockinfos
+    if ' display_facing ' in s:
+        b,_,d = s.split()
+        rotation = {
+            'up':0,
+            'down':2,
+            'east':3,
+            'west':1,
+        }[d]
+        return {'type':b,'rotate':rotation}
+    return s
 
 def assertresearch(s):
     assert True
+    return s
+
+def handlespecialblock(s):
+    try:
+        return assertblock(s)
+    except AssertionError:
+        print(f'"{s}" is not a block')
+
+def asserttags(s):
+    s = handletags(s)
+    if isinstance(s,str):
+        return handlespecialblock(s)
+    return [handlespecialblock(b) for b in s]
 
 block = schema.Use(assertblock)
 research = schema.Use(assertresearch)
-blocktag = schema.Use(handletags)
+blocktag = schema.Use(asserttags)
 num = schema.Use(int)
 flag = schema.Use(strtobool)
 
@@ -235,7 +262,7 @@ dataschema = schema.Schema({
         schema.Optional('needs_passive'):research
     }],
     'combine':[{
-        'grid':[[schema.Use(handletags)]],
+        'grid':[[blocktag]],
         'product':{
             'block':block,
             'amount':num,
@@ -243,7 +270,7 @@ dataschema = schema.Schema({
         schema.Optional('needs_passive'):research
     }],
     'extra_display':[{
-        'grid':schema.Or(schema.Use(fixemptygrid),[[schema.Use(handletags)]]),
+        'grid':schema.Or(schema.Use(fixemptygrid),[[blocktag]]),
         'product':{
             'filter':blocktag,
             schema.Optional('amount',default = 1):num,
@@ -267,3 +294,6 @@ dataschema = schema.Schema({
 })
 
 data2=dataschema.validate(data)
+
+with open('data.json','w') as f:
+    json.dump(data2,f,indent = 2)
