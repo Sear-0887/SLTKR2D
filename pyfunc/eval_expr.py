@@ -10,25 +10,26 @@
 # add it to the pops list
 # add a case in applypop()
 
+import random
 import re
 import math
 
-uops = ['-']
-pops=['!']
+prefixOperators = ['-']
+postfixOperators=['!']
 
 NUM   = 'NUM'   # Token: number
 LPAR  = 'LPAR'  # Token: left paren
 RPAR  = 'RPAR'  # Token: right paren
-OP    = 'OP'    # Token: binary operator
+BOP   = 'BOP'   # Token: binary operator
 UOP   = 'UOP'   # Token: unary operator
 SYM   = 'SYM'   # Token: symbol (variable or function)
 EXPR  = 'EXPR'  # Token: expression (output of evaluate)
 CALL  = 'CALL'  # Token: left paren after function name
 POP   = 'POP'   # Token: postfix operator
-LEFT  = 'LEFT'  # associativity: left
-RIGHT = 'RIGHT' # associativity: right
+LEFT  = 'LEFT'  # Associativity: left
+RIGHT = 'RIGHT' # Associativity: right
 
-ops={
+binaryOperators = {
   '//' : (5, LEFT ),
   'div': (5, LEFT ),
   '%'  : (4, LEFT ),
@@ -41,7 +42,7 @@ ops={
   '-'  : (1, LEFT )
 }
 
-symbols={
+symbols = {
   'φ'  : (1 + 5 ** 0.5) / 2,
   'phi': (1 + 5 ** 0.5) / 2,
   'pi' : math.pi,
@@ -50,79 +51,69 @@ symbols={
   'i'  : 1j,
 }
 
-def mypow(a,b):
+def customPowerOperation(a,b):
   if b>100000: # or maybe timeout
     raise TimeoutError([a, b])
   return a**b
 
-def applyop(op,v1,v2):
-  print(op, v1, v2)
-  # apply op to v1 and v2
-  # remember, they are all [type,value] pairs
-  if v1[0] != NUM or v2[0] != NUM:
-    return [EXPR, op[1], v1, v2]
-  if op[1] == '+':
-    return [NUM, v1[1]+v2[1]]
-  if op[1] == '-':
-    return [NUM, v1[1]-v2[1]]
-  if op[1] == '*':
-    return [NUM, v1[1]*v2[1]]
-  if op[1] == '/':
-    return [NUM, v1[1]/v2[1]]
-  if op[1] == '^' or op[1] == '**':
-    return [NUM, mypow(v1[1],v2[1])]
-  if op[1] == '%' or op[1] == 'mod':
-    return [NUM, v1[1]%v2[1]]
-  if op[1] == '//' or op[1] == 'div':
-    return [NUM, v1[1]//v2[1]]
-  raise KeyError(["binary", op[1]])
+# apply operation to operand1 and operand2
+# remember, they are all [type,value] pairs
+def applyBinaryOperations(operation, operand1, operand2):
+  print(f"Applying {operation} to {operand1}, {operand2}")
+  operationSymbol = operation[1]
+  operand1Type, operand1Value = operand1[:2]
+  operand2Type, operand2Value = operand2[:2]
+  if operand1Type != NUM or operand2Type != NUM:
+    return [EXPR, operationSymbol, operand1, operand2]
+  match operationSymbol:
+    case '+':          return [NUM, operand1Value + operand2Value]
+    case '-':          return [NUM, operand1Value - operand2Value]
+    case '*':          return [NUM, operand1Value * operand2Value]
+    case '/':          return [NUM, operand1Value / operand2Value]
+    case '^'  | '**' : return [NUM, customPowerOperation(operand1Value,operand2Value)]
+    case '%'  | 'mod': return [NUM, operand1Value % operand2Value]
+    case '//' | 'div': return [NUM, operand1Value // operand2Value]
+    case _:            raise  KeyError(["binary", operationSymbol])
 
-def applyuop(op,v):
-  # apply op to v
-  # remember, they are both [type,value] pairs
-  if v[0] != NUM:
-    return [EXPR, op[1], v]
-  if op[1] == '-':
-    return [NUM, -v[1]]
-  raise KeyError(["unary", op[1]])
+def applyPrefixOperation(operation, operand):
+  print(f"Applying {operation} to {operand}")
+  operationSymbol = operation[1]
+  operandType, operandValue = operand
+  if operandType != NUM:
+    return [EXPR, operationSymbol, operandValue]
+  if operationSymbol == '-':
+    return [NUM, -operandValue]
+  raise KeyError(["unary", operandValue])
 
-def applypop(op,v):
-  # apply op to v
-  # remember, they are both [type,value] pairs
-  if v[0]!=NUM:
-    return [EXPR,op[1],v]
-  if op[1]=='!':
-    return [NUM,math.factorial(v[1])]
-  raise KeyError(["postfix", op[1]])
+def applyPostfixOperation(operation, operand):
+  print(f"Applying {operation} to {operand}")
+  operationSymbol = operation[1]
+  operandType, operandValue = operand[:2]
+  if operandType != NUM:
+    return [EXPR, operationSymbol, operand]
+  if operationSymbol=='!':
+    return [NUM, math.factorial(operandValue)]
+  raise KeyError(["postfix", operationSymbol])
 
-def applyfunc(f,v):
-  print(f, v)
-  if v[0]!=NUM:
-    return [EXPR,'(',f,v]
-  if f=='log':
-    return [NUM,math.log(v[1],10)]
-  if f=='ln':
-    return [NUM,math.log(v[1])]
-  if f=='sqrt' or f=='√':
-    return [NUM,math.sqrt(v[1])]
-  if f=='asin' or f == 'arcsin':
-    return [NUM,math.asin(v[1])]
-  if f=='acos' or f == 'arccos':
-    return [NUM,math.acos(v[1])]
-  if f=='atan' or f == 'arctan':
-    return [NUM, math.atan(v[1])]
-  if f=='degree' or f=='deg':
-    return [NUM, math.degrees(v[1])]
-  if f=='radian' or f=='rad':
-    return [NUM, math.radians(v[1])]
-  if f=='sin':
-    return [NUM,math.sin(v[1])]
-  if f=='cos':
-    return [NUM,math.cos(v[1])]
-  if f=='tan':
-    return [NUM,math.tan(v[1])]
-  return [EXPR,'(',f,v]
-
+def applyFunction(functionName,operand):
+  print(functionName, operand)
+  operandType, operandValue = operand[:2]
+  if operandType != NUM:
+    return [EXPR,'(',functionName,operand]
+  match functionName:
+    case 'log'            : return [NUM, math.log(operandValue, 10)]
+    case 'ln'             : return [NUM, math.log(operandValue)]
+    case 'sqrt' | '√'     : return [NUM, math.sqrt(operandValue)]
+    case 'asin' | 'arcsin': return [NUM, math.asin(operandValue)]
+    case 'acos' | 'arccos': return [NUM, math.acos(operandValue)]
+    case 'atan' | 'arctan': return [NUM, math.atan(operandValue)]
+    case 'degree' | 'deg' : return [NUM, math.degrees(operandValue)]
+    case 'radian' | 'rad' : return [NUM, math.radians(operandValue)]
+    case 'sin'            : return [NUM, math.sin(operandValue)]
+    case 'cos'            : return [NUM, math.cos(operandValue)]
+    case 'tan'            : return [NUM, math.tan(operandValue)]
+    case 'rdm'            : return [NUM, random.random()*operandValue]
+    case _                : return [EXPR,'(',functionName,operand]
 # here starts RbCaVi's code
 # please know what you are doing, sear.
 
@@ -143,162 +134,169 @@ Floatnumber = group(Pointfloat, Expfloat)
 Number = group(Floatnumber, Intnumber)
 # end from cpython Tokenize.py
 
-def getNum(s):
-  # an actual number
-  # not a variable
-  m=re.match(Floatnumber,s)
-  if m:
-    return float(s[:m.end()]),s[m.end():]
-  m=re.match(Intnumber,s)
-  if m:
-    return int(s[:m.end()], base=0),s[m.end():] # Open to python to inter. the base
-  return None,s
+def getANumber(expression):
+  # Get an actual number, not a variable or symbol
+  if matched := re.match(Floatnumber, expression):
+    return float(expression[:matched.end()]), expression[matched.end():]
+  if matched := re.match(Intnumber, expression):
+    # Open to python to inter. the base
+    return int(expression[:matched.end()], base=0), expression[matched.end():]
+  return None,expression
 
-def getSym(s):
-  # a symbol
-  m=re.match('[a-zA-Z][a-zA-Z0-9]*',s)
-  if m:
-    return s[:m.end()],s[m.end():]
+def getASymbol(expression):
+  # Get a actual symbol, not a variable or number
+  if m := re.match('[a-zA-Z][a-zA-Z0-9]*',expression):
+    return expression[:m.end()],expression[m.end():]
   for symbol in symbols:
-    if s[0]==symbol:
-      return symbol,s[1:]
-  return None,s
+    if expression[0]==symbol:
+      return symbol,expression[1:]
+  return None,expression
 
-def moreTokens(s):
+def ifMoreTokens(expression):
   # are there more tokens?
-  return s.strip()!=''
+  return expression.strip() != ''
 
-def getToken(s,lastType):
+def getToken(ss,lastType):
   # get one token
-  # types accepted depand on last token
-  # for example, can't have op after lpar
-  ss=s.lstrip()
+  # the types accepted is depended on the last token
+  # for example, you can't have a operator after (
+  ss=ss.lstrip()
   if lastType in [NUM,SYM,RPAR,POP]:
-    for pop in pops:
-      if ss.startswith(pop):
-        return [POP,pop],ss[len(pop):]
-    for op in ops:
+    for pfoperator in postfixOperators:
+      if ss.startswith(pfoperator):
+        return [POP,pfoperator] ,ss[len(pfoperator):]
+    for op in binaryOperators:
       if ss.startswith(op):
-        return [OP,op],ss[len(op):]
+        return [BOP,op],ss[len(op):]
     if ss.startswith(')'):
       return [RPAR],ss[1:]
     if lastType==SYM:
       if ss.startswith('('):
         return [CALL],ss[1:]
-    raise ArithmeticError(s)
-  if lastType in [LPAR,CALL,OP,UOP]:
+    raise ArithmeticError(ss)
+  if lastType in [LPAR,CALL,BOP,UOP]:
     if ss.startswith('('):
       return [LPAR],ss[1:]
-    for uop in uops:
+    for uop in prefixOperators:
       if ss.startswith(uop):
         return [UOP,uop],ss[len(uop):]
-    num,snew=getNum(ss)
+    num,snew=getANumber(ss)
     if num is not None:
       return [NUM,num],snew
-    sym,snew=getSym(ss)
+    sym,snew=getASymbol(ss)
     if sym is not None:
       return [SYM,sym],snew
-    raise ArithmeticError(s)
+    raise ArithmeticError(ss)
 
-def precedence(token):
+def getPrecedenceOfOperator(token):
   # get the precedence of a binary operator
-  return ops[token[1]][0]
+  return binaryOperators[token[1]][0]
 
 def rightassoc(op):
-  return ops[op][1]==RIGHT
+  return binaryOperators[op][1]==RIGHT
 
 def leftassoc(op):
-  return ops[op][1]==LEFT
+  return binaryOperators[op][1]==LEFT
 
-def evaluate(expr):
-  values=[]
-  ops=[]
+def listparti(lst, index):
+  # print(f"Partied {lst} to {lst[:index], lst[index:]}")
+  if abs(index) == 1: # For single-isolated element
+    return (lst[:index], lst[index])
+  else:
+    return (lst[:index], lst[index:])
 
-  s=expr
+def evaluate(originalExpression):
+  valueStack = []
+  operatorStack = []
+
+  expression = originalExpression
 
   # basic shunting yard parser
-  lastType=OP # a valid expression can always come after an operator
-  while moreTokens(s): # parse all the tokens
-    #print('s1',s)
-    #print('o1',ops)
-    #print('v1',values)
-    token,s=getToken(s,lastType)
-    if token[0] in [NUM,SYM]: # number or symbol token
-      values.append(token)
-    if token[0] in [NUM,SYM,EXPR]: # number, symbol, or expression
-      while len(ops)>0 and ops[-1][0]==UOP: # apply all unary operators on the stack
-        op=ops[-1]
-        ops=ops[:-1]
-        values[-1]=applyuop(op,values[-1])
-    if token[0]==LPAR: # left paren
-      ops.append(token)
-    if token[0]==CALL: # left paren of function
-      ops.append(token)
+  lastType=BOP # a valid expression can always come after an operator
+  while ifMoreTokens(expression): # parse all the tokens
+    token, expression = getToken(expression,lastType)
+    tokenType = token[0]
+    if tokenType in [NUM,SYM]: # number or symbol token
+      valueStack.append(token)
+    if tokenType in [NUM,SYM,EXPR]: # number, symbol, or expression
+      while len(operatorStack) > 0 and operatorStack[-1][0] == UOP: # apply all unary operators on the stack
+        operatorStack, lastoperator = listparti(operatorStack, -1)
+        valueStack[-1] = applyPrefixOperation(lastoperator,valueStack[-1])
+    if tokenType==LPAR: # left paren
+      operatorStack.append(token)
+    if tokenType==CALL: # left paren of function
+      operatorStack.append(token)
     else:
-      if len(values)>0 and values[-1][0]==SYM:
-        if values[-1][1] in symbols:
-          values[-1]=[NUM,symbols[values[-1][1]]]
-    if token[0]==UOP: # unary operator
-      ops.append(token)
-    if token[0]==POP: # postfix operator
-      values[-1]=applypop(token,values[-1])
-    if token[0]==RPAR: # right paren
-      while ops[-1][0] not in [LPAR,CALL]: # finish the parenthesized expression
-        op=ops[-1]
-        ops=ops[:-1]
-        v1,v2=values[-2:]
-        values=values[:-2]
-        values.append(applyop(op,v1,v2))
-      if ops[-1][0]==CALL:
-        v1,v2=values[-2:]
-        values=values[:-2]
-        assert v1[0]==SYM # the function should always be a symbol
-        values.append(applyfunc(v1[1],v2))
-      ops=ops[:-1] # pop the left paren as well
-      while len(ops)>0 and ops[-1][0]==UOP: # apply all unary operators on the stack
-        op=ops[-1]
-        ops=ops[:-1]
-        values[-1]=applyuop(op,values[-1])
-    if token[0]==OP:
-      while len(ops)>0 and ops[-1][0] not in [LPAR,CALL] and (precedence(ops[-1])>precedence(token) or (precedence(ops[-1])==precedence(token) and leftassoc(ops[-1][1]))):
+      if len(valueStack)>0 and valueStack[-1][0]==SYM:
+        if valueStack[-1][1] in symbols:
+          valueStack[-1]=[NUM,symbols[valueStack[-1][1]]]
+    if tokenType==UOP: # unary operator
+      operatorStack.append(token)
+    if tokenType==POP: # postfix operator
+      valueStack[-1]=applyPostfixOperation(token,valueStack[-1])
+    if tokenType==RPAR: # right paren
+      while operatorStack[-1][0] not in [LPAR,CALL]: # finish the parenthesized expression
+        operatorStack, lastoperator = listparti(operatorStack, -1)
+        valueStack, operands = listparti(valueStack, -2)
+        operand1, operand2 = operands
+        valueStack.append(applyBinaryOperations(lastoperator, operand1, operand2))
+      if operatorStack[-1][0]==CALL:
+        valueStack, operands = listparti(valueStack, -2)
+        operand1, operand2 = operands
+        assert operand1[0]==SYM # the function should always be a symbol
+        valueStack.append(applyFunction(operand1[1],operand2))
+      operatorStack.pop()
+      while len(operatorStack)>0 and operatorStack[-1][0]==UOP: # apply all unary operators on the stack
+        operatorStack, lastoperator = listparti(operatorStack, -1)
+        valueStack[-1]=applyPrefixOperation(lastoperator,valueStack[-1])
+    if tokenType==BOP:
+      while (
+        len(operatorStack) > 0 and 
+        operatorStack[-1][0] not in [LPAR,CALL] and 
+        (
+          getPrecedenceOfOperator(operatorStack[-1])>getPrecedenceOfOperator(token) or 
+          (
+            getPrecedenceOfOperator(operatorStack[-1]) == getPrecedenceOfOperator(token) and 
+            leftassoc(operatorStack[-1][1])
+          )
+          )
+        ):
         # apply all operators to the left with a lower precedence
-        op=ops[-1]
-        ops=ops[:-1]
-        v1,v2=values[-2:]
-        values=values[:-2]
-        values.append(applyop(op,v1,v2))
-      ops.append(token) # push this operator
-    lastType=token[0] # type of last token
-    #print('s',s)
-    #print('o',ops)
-    #print('v',values)
-  while len(ops)>0: # apply the rest of the operators
-    op=ops[-1]
-    ops=ops[:-1]
-    v1,v2=values[-2:]
-    values=values[:-2]
-    values.append(applyop(op,v1,v2))
-  if len(values)>1: # each operator reduces the number of values by 1
-    raise ValueError('Not enough operators')
-  if len(values)==0: # how
-    raise ValueError('Empty expression')
-  return values[0]
+        operatorStack, lastoperator = listparti(operatorStack, -1)
+        valueStack, operands = listparti(valueStack, -2)
+        operand1, operand2 = operands
+        valueStack.append(applyBinaryOperations(lastoperator,operand1,operand2))
+      operatorStack.append(token) # push this operator
+    lastType = tokenType # type of last token
 
-def stringifyexpr(e):
+  # No more tokens found then:
+  while len(operatorStack) > 0: # apply the rest of the operators
+    operatorStack, lastoperator = listparti(operatorStack, -1)
+    valueStack, operands = listparti(valueStack, -2)
+    print(f"{operands = }")
+    operand1, operand2 = operands
+    valueStack.append(applyBinaryOperations(lastoperator,operand1,operand2))
+  if len(valueStack) > 1: # each operator reduces the number of values by 1
+    raise ValueError('Not enough operators to finish operation')
+  if len(valueStack) == 0: # empty expression passed in
+    raise ValueError('Empty expression')
+  return valueStack[0]
+
+def stringifyexpr(expression):
   # convert an expr from evaluate to a string, so evaluate on that string will probably give back the same expr
-  if e[0] in [SYM,NUM]:
-    return str(e[1])
-  if e[1]=='(':
-    return f'{e[2]}({",".join(map(stringifyexpr,e[3:]))})'
-  if len(e) == 3:
-    if len(e[2]) == 4:
-      return f'{e[1]}({stringifyexpr(e[2])})' # -(a+b)
-    return f'{e[1]}{stringifyexpr(e[2])}' # a
-  if len(e) == 4:
-    _,op,left,right = e
-    p1 = precedence(e)
-    pleft = precedence(left) if left[0] in [OP,EXPR] else math.inf
-    pright = precedence(right) if right[0] in [OP,EXPR] else math.inf
+  if expression[0] in [SYM,NUM]:
+    return str(expression[1])
+  if expression[1]=='(':
+    return f'{expression[2]}({",".join(map(stringifyexpr,expression[3:]))})'
+  if len(expression) == 3:
+    if len(expression[2]) == 4:
+      return f'{expression[1]}({stringifyexpr(expression[2])})' # -(a+b)
+    return f'{expression[1]}{stringifyexpr(expression[2])}' # a
+  if len(expression) == 4:
+    _,op,left,right = expression
+    p1 = getPrecedenceOfOperator(expression)
+    pleft = getPrecedenceOfOperator(left) if left[0] in [BOP,EXPR] else math.inf
+    pright = getPrecedenceOfOperator(right) if right[0] in [BOP,EXPR] else math.inf
     leftparen = pleft<p1 or (pleft==p1 and rightassoc(op))
     rightparen = pright<p1 or (pright==p1 and leftassoc(op))
     sleft=stringifyexpr(left)
