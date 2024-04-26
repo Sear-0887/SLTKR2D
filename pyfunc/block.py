@@ -120,19 +120,24 @@ class ImageBit:
 	h:int
 	flip:bool
 	rotation:int
+	block_id:int
 
-	def __init__(self,im:tuple[PIL.Image.Image,PIL.Image.Image | None] | typing.Self,x:int=0,y:int=0,w:int=16,h:int=16) -> None:
+	def __init__(self,im:tuple[PIL.Image.Image,PIL.Image.Image | None] | typing.Self,x:int=0,y:int=0,w:int=16,h:int=16,block_id:int | None = None) -> None:
 		# the dimensions of the part of the image to use
 		self.x = x
 		self.y = y
 		self.w = w
 		self.h = h
+		self.block_id = block_id
 		if isinstance(im,ImageBit):
 			# gonna just assume x,y,w,h stays inside the image
 			self.x += im.x
 			self.y += im.y
+			self.block_id = im.block_id
 			im = im.im, im.normal
 		self.im, self.normal = im
+		if self.block_id is None:
+			raise ValueError('no block id')
 		# rotation
 		self.flip = False # first
 		self.rotation = 0 # second
