@@ -204,6 +204,10 @@ def assertblock(s):
         return {'type':b,'rotate':rotation}
     if s.split() == ['foam','needs_container_count5']:
         return {'type':'foam','offsetx':32}
+    if s.split() == ['dirt','grassy']:
+        return {'type':'dirt','offsetx':64}
+    if s.split() == ['spark_catcher','needs_container_count5']:
+        return {'type':'spark_catcher','data':'5'}
     assert ' ' not in s
     return s
 
