@@ -202,6 +202,9 @@ def assertblock(s):
             'west':1,
         }[d]
         return {'type':b,'rotate':rotation}
+    if s.split() == ['foam','needs_container_count5']:
+        return {'type':'foam','offsetx':32}
+    assert ' ' not in s
     return s
 
 def assertresearch(s):
@@ -275,18 +278,18 @@ dataschema = schema.Schema({
             'filter':blocktag,
             schema.Optional('amount',default = 1):num,
         },
-        schema.Optional('arrow_sprite'):schema.Use(int),
+        schema.Optional('arrow_sprite'):num,
         schema.Optional('guidebook_page_blacklist'):[block],
         schema.Optional('guidebook_page_whitelist'):[block],
-        schema.Optional('weldall'):schema.Use(int),
+        schema.Optional('weldall',default = True):flag,
         schema.Optional('needs_passive'):research,
         schema.Optional('research_requirement_override'):research,
         schema.Optional('entity'):{
             'type':str,
             'position':schema.Use(handlepos)
         },
-        schema.Optional('guidebook_use_only'):schema.Use(int),
-        schema.Optional('match_filter_modulo'):schema.Use(int),
+        schema.Optional('guidebook_use_only',default = False):flag,
+        schema.Optional('match_filter_modulo'):num, # flag?
     }],
     'summonore_pill':[{'filter':blocktag}],
     'sensor_natural':[{'filter':blocktag}],
