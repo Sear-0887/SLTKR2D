@@ -3,7 +3,7 @@ import collections
 import copy
 import json
 
-with open("gameAssets/recipes.smp") as f:
+with open("content/recipes.smp") as f:
     rawdata = smp.getsmpvalue(f.read())
 
 data=collections.defaultdict(list)
@@ -20,9 +20,9 @@ tags=collections.defaultdict(list)
 
 for tag in data['tag']:
     tag=copy.deepcopy(tag)
-    name=x['name']
-    del x['name']
-    tags[name].append(x['blocks'])
+    name=tag['name']
+    del tag['name']
+    tags[name].append(tag['blocks'])
 
 heat=collections.defaultdict(list)
 
@@ -61,15 +61,26 @@ extra_display=collections.defaultdict(list)
 
 for e in data['extra_display']: # i don't want to deal with this now
     e=copy.deepcopy(e)
+    product=e['product']
+    del e['product']
+    e['product']=product['filter']
+    e['amount']=product.get('amount',1)
     extra_display[e['product']].append(e)
 
 summonore_pill=collections.defaultdict(list)
 
 for s in data['summonore_pill']: # there is literally only one
     s=copy.deepcopy(s)
-    hmm
-    summonore_pill[s['product']].append(s)
-
+    summonore_pill[s['filter']].append(s)
+things = [
+    tags,
+    heat,
+    extract,
+    inject,
+    combine,
+    extra_display,
+    summonore_pill,
+]
 # filters:
 # grassy
 # non_air
@@ -77,3 +88,6 @@ for s in data['summonore_pill']: # there is literally only one
 # buildable
 # not_water
 # needs_container_count5
+
+for thing in things:
+    print([x for x in thing.keys() if ' ' in x])
