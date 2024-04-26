@@ -13,39 +13,39 @@ rimlights:dict[int, np.ndarray] = {}
 vec3:typing.TypeAlias = tuple[float, float, float]
 
 def dot(normal:np.ndarray, light:vec3):
-    return np.einsum('ijk,k->ij',normal,light)
+	return np.einsum('ijk,k->ij',normal,light)
 
 def diffuse(normal:np.ndarray, light:vec3):
-    return np.fmax(dot(normal, light), 0.0)
+	return np.fmax(dot(normal, light), 0.0)
 
 def quarter_rotate(v:vec3, r):
-    match r:
-        case 0:
-            return v
-        case 1:
-            return (-v[1], v[0], v[2])
-        case 2:
-            return (-v[0], -v[1], v[2])
-        case 3:
-            return (v[1], -v[0], v[2])
+	match r:
+		case 0:
+			return v
+		case 1:
+			return (-v[1], v[0], v[2])
+		case 2:
+			return (-v[0], -v[1], v[2])
+		case 3:
+			return (v[1], -v[0], v[2])
 
 def calc_diffuse_ambient_light(lightdir:vec3, normal:np.ndarray) -> np.ndarray:
-    # calculate diffuse light
-    light_diffuse = diffuse(normal, lightdir)
+	# calculate diffuse light
+	light_diffuse = diffuse(normal, lightdir)
 
-    return light_diffuse * 0.5 + 0.5
+	return light_diffuse * 0.5 + 0.5
 
 def calc_highlights(lightdir:vec3, normal:np.ndarray, rimlight:np.ndarray):
-    lightdir2 = (lightdir[0], lightdir[1], 0)
-    intensity:np.ndarray = dot(normal, lightdir2) # how much the normal faces toward the light
-    s0,s1 = intensity.shape
-    highlights = np.empty((s0,s1,3))
-    for i in range(s0):
-        for j in range(s1):
-            pixel = rimlight[255 * (intensity[i, j] + 1) / 2]
-            pixel = tuple(c * 0.3 for c in pixel)
-            highlights[i, j] = pixel
-    return highlights
+	lightdir2 = (lightdir[0], lightdir[1], 0)
+	intensity:np.ndarray = dot(normal, lightdir2) # how much the normal faces toward the light
+	s0,s1 = intensity.shape
+	highlights = np.empty((s0,s1,3))
+	for i in range(s0):
+		for j in range(s1):
+			pixel = rimlight[255 * (intensity[i, j] + 1) / 2]
+			pixel = tuple(c * 0.3 for c in pixel)
+			highlights[i, j] = pixel
+	return highlights
 
 fullbright_lightdir = (-0.5, -1.0, 1.0)
 
