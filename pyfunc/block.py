@@ -238,9 +238,9 @@ def rotatexy(x:float, y:float, r:int, flip:bool) -> tuple[float,float]:
 blockpaths={}
 pthblocktexture = cfg("localGame.texture.texturePathFile")
 with open(pthblocktexture) as f:
-  data=smp.getsmpvalue(f.read())
+	data=smp.getsmpvalue(f.read())
 for name,texture in data.items():
-  blockpaths[name] = texture
+	blockpaths[name] = texture
 
 @functools.cache
 def getblockims(block:str) -> tuple[PIL.Image.Image,PIL.Image.Image | None]:
