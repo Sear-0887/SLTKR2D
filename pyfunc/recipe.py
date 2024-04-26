@@ -2,30 +2,19 @@ import PIL.Image
 import collections
 import glob
 from PIL import Image
-import os
 import pyfunc.gif as gif
-# import gif
 from typing import Any
 from pyfunc.lang import botinit, cfg, getarrowcoords
 from pyfunc.smp import getsmpvalue
-from pyfunc.block import canweld, get, makeimage, rotatewelded
-from pyfunc.assetload import blockinfos
-
+from pyfunc.block import canweld, get, makeimage, bottomtypes, topbottomtypes, sidestypes, notoptypes, norotatetypes, twowaytypes
+import itertools
 
 botinit()
 
-def cropempty(img: PIL.Image):
-    return img.crop(img.getbbox())
+def massstrip(l:list[str]) -> list[str]:
+    return [s.strip() for s in l]
 
-def sumtuple(*tuples):
-    return tuple(map(sum, zip(*tuples)))
-
-def massstrip(l:list):
-    for i, j in enumerate(l):
-        l[i] = j.strip()
-    return l
-
-def handletags(s:Any, organdict:dict) -> str | list:
+def handletags(s:str, organdict:dict) -> str | list:
     if not isinstance(s, str): return s 
     if s.startswith('$'):
         if s[1:] in organdict['tag'].keys():
@@ -33,11 +22,14 @@ def handletags(s:Any, organdict:dict) -> str | list:
         print('Just a Normal name starts with $ ???????')
     return s
 
-def handlegridtags(s:list, organdict:dict) -> tuple[list, str]:
-    for y, xaxis in enumerate(s):
-        for x, critem in enumerate(xaxis):
-            s[y][x] = handletags(critem, organdict)
-    return s
+def handlegridtags(s:list[list[str]], organdict:dict) -> list[list[str | list]]:
+    return [
+        [
+            handletags(critem, organdict)
+            for critem in row
+        ]
+        for row in s
+    ]
 
 def getarrowimg(name):
     icox, icoy = getarrowcoords()[name]
@@ -47,11 +39,12 @@ def getarrowimg(name):
         ).resize((64, 64), Image.NEAREST
     )
 
-def addentries(i, entryname:str, typ:str, organdict:dict, includestr:str) -> list:
-    includes = massstrip(includestr.split(','))
-    entries = collections.defaultdict(None)
+def addentries(i:dict[str, Any], entryname:str, typ:str, organdict:dict, includekeys:str) -> list:
+    includekeys = massstrip(includekeys.split(','))
+    entries = {}
     for key, item in i.items():
-        item = handletags(item, organdict)
+        if isinstance(item, str):
+            item = handletags(item, organdict)
         if isinstance(item, str) and item.isdigit(): # Handle Numbers Differently
             item = int(item)
         if typ == 'heat' and key == 'needs_entity': # True for needs_entity
@@ -59,7 +52,7 @@ def addentries(i, entryname:str, typ:str, organdict:dict, includestr:str) -> lis
         if typ == 'combine' and key == 'grid': # Handles combine grid properties
             item = handlegridtags(item, organdict)
         i[key] = item
-        if key in includes:
+        if key in includekeys:
             entries[key] = i[key]
     if entryname not in organdict[typ].keys():
         organdict[typ][entryname] = []
@@ -102,152 +95,146 @@ def testing():
     return organdict
 returned = testing()
 
+def generates(grid,ratio,assertconnected=True) -> list[Image.Image]:
+    tags=[]
+    for y,row in enumerate(grid):
+        for x,block in enumerate(row):
+            if isinstance(block, list): # If it's a list, it's a tag, which
+                tags.append([(x,y,{"type":t,"rotate":0,"weld":[True]*4,"data":None}) for t in block])
+            elif isinstance(block, str): # It's normal and needed to NORMALIZE
+                grid[y][x] = {"type":block,"rotate":0,"weld":[True]*4,"data":None} # Actions
+    # now have a list of tags and coordinates
+    ims=[]
+    while True:
+        gen=genimage(grid,assertconnected)
 
-# Massive Comments Below to perform the Rubber duck debugging (https://en.wikipedia.org/wiki/Rubber_duck_debugging)
-def generates(generated, recipenum=0, prodname="unknown", replacedhistroy="", pthname=None, ratio=4):
-    pthname = pthname or f"cache/recipeframe-{prodname}-{recipenum}{replacedhistroy}.png"
-    print(f"Generating | {pthname}") # Debug Purpose, Not removing in case
-    for y, yaxis in enumerate(generated): # Open Grid
-        for x, critem in enumerate(yaxis): # Scan through each block
-            if critem == "NIC": critem = "air" # Convert NIC to air
-            if isinstance(critem, list): # If it's a list, it's a tag, which
-                place = critem # Store the original list for the next iter to process
-                for i in critem: # loops through tags element
-                    generated[y][x] = {"type":i,"rotate":0,"weld":[True]*4,"data":None} # Modify the list element to be the block
-                    generates(generated, recipenum, prodname, f"{replacedhistroy}~{i}") # Recursive, Passes the copy and informations to the sub process
-                generated[y][x] = place # Places back the original list for the next iter to process
-                return # Terminates the attempt as it is useless
-            elif isinstance(critem, str): # It's normal and needed to be NORMALIZE
-                generated[y][x] = {"type":critem,"rotate":0,"weld":[True]*4,"data":None} # Actions
-    else: 
-        for y, yaxis in enumerate(generated): # Open Grid
-            for x, critem in enumerate(yaxis): # Scan through each block
-                print(get(generated, x, y))
-                copy = critem
-                for i in range(4):
-                    if (
-                        canweld('right',copy) and canweld('left',get(generated,x+1,y)) or
-                        canweld('left',copy) and canweld('right',get(generated,x-1,y)) or
-                        canweld('bottom',copy) and canweld('top',get(generated,x,y+1)) or
-                        canweld('top',copy) and canweld('bottom',get(generated,x,y-1))
-                        ):
-                        print(f"found")
-                        copy = critem
-                        generated[y][x] = copy
-                        break
-                    else:
-                        print("No possible welding found, rotates")
-                        copy['rotate'] += 1
-                        copy['rotate'] %= 4
-                        copy['weld'] = rotatewelded(copy['weld'], copy['rotate'])
-                
-        ... 
-        gen = makeimage(generated) # Make Image
         width, height = gen.size # Get width, height
         gen = gen.resize((width*ratio, height*ratio), Image.NEAREST).convert("RGBA") # Resize to dimension*Ratio
-        gen.save(pthname) # Save the final image
+        ims.append(gen)
+        for i in reversed(range(len(tags))):
+            indices[i]+=1
+            if indices[i]>=len(tags[i]):
+                indices[i]=0 # roll over
+            x,y,b=tags[i][indices[i]]
+            grid[y][x]=b
+            if indices[i]!=0: # didn't roll over
+                break
+        else:
+            break # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
+    return ims
 
-def generaterecipe(name, apng=False):
-    if name not in blockinfos.keys(): raise KeyError({'block':name})
-    finimage = gif.gif((50, 50, 50))
-    crsm = finimage.movecursor
-    crss = finimage.setcursor
-    generates([[
-            {"type":"combiner","rotate":2,"weld":[True]*4,"data":None}, 
-            {"type":"transistor","rotate":1,"weld":[True]*4,"data":None}
-            ]], pthname='cache/combinerimg.png', ratio=4)
-    generates([[
-            {"type":"extractor","rotate":2,"weld":[True]*4,"data":None}, 
-            {"type":"transistor","rotate":1,"weld":[True]*4,"data":None}
-            ]], pthname='cache/extractorimg.png', ratio=4)
-    combinerimg = Image.open("cache/combinerimg.png")
-    extractorimg = Image.open("cache/extractorimg.png")
-    typfound = {}
+def genimage(generated,assertconnected=True):
+    rotations=[]
+    for y,row in enumerate(generated):
+        for x,block in enumerate(row):
+            if block in norotatetypes:
+                continue
+            elif block['type'] not in bottomtypes+topbottomtypes+sidestypes+notoptypes:
+                print('block',block,'welds on all sides')
+                # the block welds on all sides
+                # no reason to check
+                # wired blocks might change this
+                # but would be complicated
+                # would have to save all valid states and a score of how many wired blocks output onto wires
+                continue
+            elif block['type'] in twowaytypes:
+                rotations.append([(x,y,r) for r in [0,1]]) # don't need to check all ways
+            else:
+                rotations.append([(x,y,r) for r in [0,2,1,3]])
+    def floodfill():
+        filled=set([(0,0)])
+        edgeblocks=[(0,0)] # the blocks that are welded to a filled block
+        sideinfo=[ # do not change
+            ['right','left',+1, 0],
+            ['left','right',-1, 0],
+            ['bottom','top', 0,+1],
+            ['top','bottom', 0,-1],
+        ]
+        while len(edgeblocks)>0:
+            newedgeblocks=[]
+            for x,y in edgeblocks:
+                b=get(generated,x,y)
+                for thisside,otherside,dx,dy in sideinfo:
+                    if (x+dx,y+dy) not in filled and canweld(thisside,b) and canweld(otherside,get(generated,x+dx,y+dy)):
+                        # spread to that block
+                        newedgeblocks.append((x+dx,y+dy))
+                        filled.add((x+dx,y+dy))
+            edgeblocks=newedgeblocks
+        return len(filled)==sum(map(len,generated)) # all blocks are connected
+    # a ?optimized? itertools.product that changes only the ones that change in each iteration
+    indices=[0 for _ in rotations]
+    while True:
+        if floodfill():
+            break
+        for i in reversed(range(len(rotations))):
+            indices[i]+=1
+            if indices[i]>=len(rotations[i]):
+                indices[i]=0 # roll over
+            x,y,r=rotations[i][indices[i]]
+            generated[y][x]['rotate']=r
+            if indices[i]!=0: # didn't roll over
+                break
+        else:
+            if assertconnected:
+                raise Exception('disconnected recipe') # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
+            else:
+                break
+                
+    ... 
+    gen = makeimage(generated) # Make Image
+    return gen
+
+def getarrow(typ:str) -> Image.Image:
+    icox, icoy = getarrowcoords()[typ]
+    return Image.open(
+        cfg("localGame.texture.guidebookArrowFile")
+    ).crop(
+        (16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))
+    ).resize(
+        (64, 64), Image.NEAREST
+    )
+
+def generaterecipe(name) -> None:
     for typ in returned.keys():
         if name in returned[typ]:
             print(f"{typ}: {returned[typ][name]}")
-            typfound[typ] = returned[typ][name]
-            
-    amountimgtable = {}
-    for typ, multientri in typfound.items():
-        match typ:
-            case "combine":
-                for num, entri in enumerate(multientri):
-                    generates(entri['grid'], num, name)
-                    img = Image.new("RGBA", (128, 640))
-                    generates([[
-                    {"type":entri['block'],"rotate":0,"weld":[True]*4,"data":None}
-                    ]], pthname="cache/amount.png", ratio=4)
-                    for i in range(entri['amount']):
-                        img.alpha_composite(
-                            Image.open("cache/amount.png"),
-                            (i%2*64, i//2*64)
-                        )
-                    amountimgtable[num] = cropempty(img)
-                    print()
-                for recipenum in range(0, 99):
-                    md = (0, 0)
-                    pthf = glob.glob(f"cache/recipeframe-{name}-{recipenum}*.png")
-                    if len(pthf) == 0: break
-                    print(f"{name} {recipenum} has {len(pthf)}")
-                    frmct = []
-                    for pth in pthf:
-                        img = Image.open(pth)
-                        frmct.append(img)
-                        md = gif.tuple_max(md, img.size)
-                    print(f"product dm = {md}")
-                    productimg = amountimgtable[recipenum]
-                    finimage.addgifframes(frmct)
-                    crss(x=0)
-                    finimage.addimageframes(combinerimg, movecursor=False)
-                    crsm(x=md[0]+64, y=-md[1])
+            gridpos = returned[typ][name]
+            if typ == "combine":
+                results:list[dict] = []
+                for i,recipe in enumerate(gridpos):
+                    imgs=generates(recipe['grid'],ratio=4)
+                    result=[{"type":recipe['block'],"rotate":0,"weld":[False]*4,"data":None}]*recipe['amount']
+                    img=generates([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
+                    results.append({'recipeframes':imgs,'result':img})
+                finimage = gif.gif((50, 50, 50))
+                combiner=generates([[
+                    {"type":"combiner","rotate":2,"weld":[True]*4,"data":None}, 
+                    {"type":"transistor","rotate":1,"weld":[True]*4,"data":None}
+                ]],ratio=4)[0]
+                maxdim = gif.tuple_max((64*2, 0),*[img.size for recipeimgs in results for img in recipeimgs['recipeframes']]) # fancy double iteration # the recipe is at least 2 blocks wide
+                for recipenum,recipeimgs in enumerate(results):
+                    y = recipenum*(
+                        maxdim[1]+ # the tallest recipe
+                        64+        # the combiner
+                        32         # mandatory 32 pixel gap
+                    )
+                    finimage.addgifframes(
+                        recipeimgs['recipeframes'],
+                        pos=(0, y)
+                    )
                     finimage.addimageframes(
-                        getarrowimg('combiner'), movecursor=False,
-                        pos=sumtuple(finimage.cursor, (0, md[1]//2)))
-                    crsm(x=128)
-                    finimage.addimageframes(productimg)
-                    if productimg.height < md[0]:
-                        crsm(y=md[0]-productimg.height-64)
-                    crss(x=0)
-                    crsm(y=32)
-            case "extract":
-                amountimgtable = {}
-                print("EXTRACT RECIPE")
-                for num, entri in enumerate(multientri):
-                    generates([[entri['ingredient']]], num, name, pthname=f"cache/extract-{name}-{num}.png")
-                    img = Image.new("RGBA", (128, 640))
-                    generates([[
-                    {"type":name,"rotate":0,"weld":[True]*4,"data":None}
-                    ]], pthname="cache/amount.png", ratio=4)
-                    for i in range(entri['amount']):
-                        img.alpha_composite(
-                            Image.open("cache/amount.png"),
-                            (i%2*64, i//2*64)
-                        )
-                    amountimgtable[num] = cropempty(img)
-                    print()
-                for recipenum in range(0, 99):
-                    md = (64, 64)
-                    pthf = glob.glob(f"cache/extract-{name}-{recipenum}.png")
-                    if len(pthf) == 0: break
-                    img = Image.open(pthf[0])
-                    md = gif.tuple_max(md, img.size)
-                    productimg = amountimgtable[recipenum]
-                    finimage.addimageframes(img)
-                    crss(x=0)
-                    finimage.addimageframes(extractorimg, movecursor=False)
-                    crsm(x=md[0]+128, y=-md[1])
+                        combiner,
+                        pos=(0, y+maxdim[1])
+                    )
                     finimage.addimageframes(
-                        getarrowimg('extractor'), movecursor=False,
-                        pos=sumtuple(finimage.cursor, (0, md[1]//2)))
-                    crsm(x=128)
-                    finimage.addimageframes(productimg)
-                    crss(x=0)
-                    crsm(y=64+32)
-        
-    finimage.export(f"cache/recipe-{name}.gif", apng=apng)
-    return typfound
-    
+                        recipeimgs['result'],
+                        pos=(maxdim[0]+64+64+64, y)
+                    )
+                    finimage.addimageframes(
+                        getarrow("combiner"),
+                        pos=(maxdim[0]+64, y+maxdim[1]//2)
+                    )
+                finimage.export(f"cache/recipe-{name}.gif")
 
 
 if __name__ == "__main__":

@@ -373,17 +373,22 @@ def get(vss,xi,yi):
 		return normalize("air");
 	return vs[xi]
 
+bottomtypes=['cap','flower_magenta','flower_yellow','grass','motor','pedestal','spikes'] # Only Bottom
+topbottomtypes=['actuator_head','wire_spool','telewall'] # Only Top / Bottom
+sidestypes=['combiner','extractor','injector','platform'] # no Top / Bottom
+notoptypes=['arc_furnace','beam_core','collector','creator','destroyer','dismantler','magnet','manipulator','mantler','teleportore','summonore']
+
 # can this block weld on this side?
 def canweld(side,block):
 	if block['type'] in noweldtypes:
 		return False
-	elif block['type'] in ['cap','flower_magenta','flower_yellow','grass','motor','pedestal','spikes']: # Only Bottom
+	elif block['type'] in bottomtypes:
 		sides=[False,False,True,False]
-	elif block['type'] in ['actuator_head','wire_spool','telewall']: # Only Top / Bottom
+	elif block['type'] in topbottomtypes:
 		sides=[True,False,True,False]
-	elif block['type'] in ['combiner','extractor','injector','platform']: # no Top / Bottom
+	elif block['type'] in sidestypes:
 		sides=[False,True,False,True]
-	elif block['type'] in ['arc_furnace','beam_core','collector','creator','destroyer','dismantler','magnet','manipulator','mantler','teleportore','summonore']: 
+	elif block['type'] in notoptypes:
 		sides=[False,True,True,True]
 	else:
 		sides=[True,True,True,True]
