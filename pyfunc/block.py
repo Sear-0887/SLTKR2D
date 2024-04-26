@@ -1,7 +1,7 @@
 import PIL.Image
 import pyfunc.smp as smp
 import os
-from pyfunc.lang import cfg
+from pyfunc.lang import cfg, lprint
 import functools
 import collections
 import re
@@ -42,7 +42,7 @@ def calc_highlights(lightdir:vec3, normal:np.ndarray, rimlight:np.ndarray):
 	highlights = np.empty((s0,s1,3))
 	for i in range(s0):
 		for j in range(s1):
-			pixel = rimlight[255 * (intensity[i, j] + 1) / 2]
+			pixel = rimlight[int(255 * (intensity[i, j] + 1) / 2)]
 			pixel = tuple(c * 0.3 for c in pixel)
 			highlights[i, j] = pixel
 	return highlights
@@ -85,6 +85,8 @@ def apply_normalmap(albedo:PIL.Image.Image, normal:PIL.Image.Image | None, rotat
 
 	if block_id in rimlights:
 		highlights = calc_highlights(lightdir, normal_array, rimlights[block_id]);
+		highlights = highlights * 255
+		highlights = highlights.astype('uint8')
 		highlightsim:PIL.Image.Image = PIL.Image.fromarray(highlights)
 		out = PIL.ImageChops.add(out,highlightsim)
 			
@@ -248,6 +250,11 @@ with open(pthblocktexture) as f:
 	data=smp.getsmpvalue(f.read())
 for name,texture in data.items():
 	blockpaths[name] = texture
+	if 'rimlight' in texture:
+		rimlight = PIL.Image.open(os.path.join(cfg("localGame.texture.texturePathFolder"),blockpaths[name]['rimlight'])).convert('RGB')
+		rimlight_array:np.ndarray = np.asarray(rimlight)[0]
+		lprint(name,'has a rimlight wth shape',rimlight_array.shape)
+		rimlights[blockinfos[name]['id']] = rimlight_array
 
 @functools.cache
 def getblockims(block:str) -> tuple[PIL.Image.Image,PIL.Image.Image | None]:
