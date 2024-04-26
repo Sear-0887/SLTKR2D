@@ -1,4 +1,12 @@
 from pyfunc.block import makeimage
+from pyfunc.assetload import assetinit
+assetinit()
+
+im = makeimage([
+	['iron_bar']
+])
+
+im.show()
 
 im = makeimage([
 	['iron_bar','air',{'type':'iron_bar','rotate':1}],
