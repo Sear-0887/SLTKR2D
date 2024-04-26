@@ -32,8 +32,7 @@ def quarter_rotate(v:vec3, r):
 def calc_diffuse_ambient_light(lightdir:vec3, normal:np.ndarray) -> np.ndarray:
 	# calculate diffuse light
 	light_diffuse = diffuse(normal, lightdir)
-
-	return light_diffuse * 0.5 + 0.5
+	return np.fmin(light_diffuse * 0.5 + 0.5, 1.0) # overflow error
 
 def calc_highlights(lightdir:vec3, normal:np.ndarray, rimlight:np.ndarray):
 	lightdir2 = (lightdir[0], lightdir[1], 0)
