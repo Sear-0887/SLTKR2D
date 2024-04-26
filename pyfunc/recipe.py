@@ -6,10 +6,13 @@ import pyfunc.gif as gif
 from typing import Any
 from pyfunc.lang import botinit, cfg, getarrowcoords
 from pyfunc.smp import getsmpvalue
-from pyfunc.block import canweld, get, makeimage, bottomtypes, topbottomtypes, sidestypes, notoptypes, norotatetypes, twowaytypes
+from pyfunc.block import canweld, get, makeimage, bottomtypes, topbottomtypes, sidestypes, notoptypes, norotatetypes, twowaytypes, normalize, makeweldside
 import itertools
 
 botinit()
+
+noweld = (makeweldside(False),) * 4
+fullweld = (makeweldside(True),) * 4
 
 def massstrip(l:list[str]) -> list[str]:
     return [s.strip() for s in l]
@@ -19,7 +22,7 @@ def handletags(s:str, organdict:dict) -> str | list:
     if s.startswith('$'):
         if s[1:] in organdict['tag'].keys():
             return organdict['tag'][s[1:]]
-        print('Just a Normal name starts with $ ???????')
+        print(f'{s} is Just a Normal name starts with $ ???????')
     return s
 
 def handlegridtags(s:list[list[str]], organdict:dict) -> list[list[str | list]]:
@@ -100,18 +103,18 @@ def generates(grid,ratio,assertconnected=True) -> list[Image.Image]:
     for y,row in enumerate(grid):
         for x,block in enumerate(row):
             if isinstance(block, list): # If it's a list, it's a tag, which
-                tags.append([(x,y,{"type":t,"rotate":0,"weld":[True]*4,"data":None}) for t in block])
+                tags.append([(x,y,normalize(t)) for t in block])
+                grid[y][x] = normalize(block[0]) # Actions
             elif isinstance(block, str): # It's normal and needed to NORMALIZE
-                grid[y][x] = {"type":block,"rotate":0,"weld":[True]*4,"data":None} # Actions
+                grid[y][x] = normalize(block) # Actions
     # now have a list of tags and coordinates
     ims=[]
+    indices=[0 for _ in tags]
     while True:
         gen=genimage(grid,assertconnected)
-
         width, height = gen.size # Get width, height
         gen = gen.resize((width*ratio, height*ratio), Image.NEAREST).convert("RGBA") # Resize to dimension*Ratio
         ims.append(gen)
-        indices=[0 for _ in tags]
         for i in reversed(range(len(tags))):
             indices[i]+=1
             if indices[i]>=len(tags[i]):
@@ -131,7 +134,7 @@ def genimage(generated,assertconnected=True):
             if block in norotatetypes:
                 continue
             elif block['type'] not in bottomtypes+topbottomtypes+sidestypes+notoptypes:
-                print('block',block,'welds on all sides')
+                print(f'block {block["type"]} at {x},{y} welds on all sides, does not rotate')
                 # the block welds on all sides
                 # no reason to check
                 # wired blocks might change this
@@ -204,13 +207,13 @@ def generaterecipe(name) -> None:
                 results:list[dict] = []
                 for i,recipe in enumerate(gridpos):
                     imgs=generates(recipe['grid'],ratio=4)
-                    result=[{"type":recipe['block'],"rotate":0,"weld":[False]*4,"data":None}]*recipe['amount']
+                    result=[{"type":recipe['block'],"rotate":0,"weld":noweld,"data":None}]*recipe['amount']
                     img=generates([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
                     results.append({'recipeframes':imgs,'result':img})
                 finimage = gif.gif((50, 50, 50))
                 combiner=generates([[
-                    {"type":"combiner","rotate":2,"weld":[True]*4,"data":None}, 
-                    {"type":"transistor","rotate":1,"weld":[True]*4,"data":None}
+                    {"type":"combiner","rotate":2,"weld":fullweld,"data":None}, 
+                    {"type":"transistor","rotate":1,"weld":fullweld,"data":None}
                 ]],ratio=4)[0]
                 maxdim = gif.tuple_max((64*2, 0),*[img.size for recipeimgs in results for img in recipeimgs['recipeframes']]) # fancy double iteration # the recipe is at least 2 blocks wide
                 for recipenum,recipeimgs in enumerate(results):
