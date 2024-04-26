@@ -70,23 +70,18 @@ def apply_normalmap(albedo:PIL.Image.Image, normal:PIL.Image.Image | None, rotat
 
 	normal_array[:, :, 1] = -normal_array[:, :, 1]
 
-	light = calc_diffuse_ambient_light(lightdir, normal_array);
-	print(light.shape,light[0][0])
+	light = calc_diffuse_ambient_light(lightdir, normal_array)
 	light = np.array([light, light, light])
-	print(light.shape,light[0][0])
 	light = np.moveaxis(light, 0, 2)
 	light = light * 255
 	light = light.astype('uint8')
-	print(light.shape,light.dtype,light[0][0])
 	lightim:PIL.Image.Image = PIL.Image.fromarray(light)
 
 	alpha:PIL.Image.Image = albedo.getchannel('A')
 	color:PIL.Image.Image = albedo.convert('RGB')
-	print(color.mode,lightim.mode)
 	diffused:PIL.Image.Image = PIL.ImageChops.multiply(color, lightim)
 	out:PIL.Image.Image
 	out = diffused
-	out = color
 
 	if block_id in rimlights:
 		highlights = calc_highlights(lightdir, normal_array, rimlights[block_id]);
