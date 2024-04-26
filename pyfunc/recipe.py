@@ -1,7 +1,7 @@
+import PIL.Image
 import collections
 import glob
 from PIL import Image
-#import os
 import pyfunc.gif as gif
 from typing import Any
 from pyfunc.lang import botinit, cfg, getarrowcoords
@@ -31,6 +31,13 @@ def handlegridtags(s:list[list[str]], organdict:dict) -> list[list[str | list]]:
         for row in s
     ]
 
+def getarrowimg(name):
+    icox, icoy = getarrowcoords()[name]
+    return Image.open(
+        cfg("localGame.texture.guidebookArrowFile")).crop(
+            (16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))
+        ).resize((64, 64), Image.NEAREST
+    )
 
 def addentries(i:dict[str, Any], entryname:str, typ:str, organdict:dict, includekeys:str) -> list:
     includekeys = massstrip(includekeys.split(','))
@@ -42,7 +49,7 @@ def addentries(i:dict[str, Any], entryname:str, typ:str, organdict:dict, include
             item = int(item)
         if typ == 'heat' and key == 'needs_entity': # True for needs_entity
             item = bool(item)
-        if typ == 'combine' and key == 'grid': # True for needs_entity
+        if typ == 'combine' and key == 'grid': # Handles combine grid properties
             item = handlegridtags(item, organdict)
         i[key] = item
         if key in includekeys:
@@ -62,7 +69,7 @@ def testing():
                 organdict['tag'][i['name']] = i['blocks']
                 continue
             elif i['type'] == 'heat': # Heating Recipe
-                producename = i['product'], 
+                producename = i['product']
                 col = 'ingredient, time, surrounding, needs_entity'
             elif i['type'] == 'extract': # Extracting Recipe
                 producename = i['product']
@@ -81,9 +88,10 @@ def testing():
             addentries(
                 i, 
                 producename, 
-                "combine", 
+                i['type'], 
                 organdict, 
                 col)
+            ...
     return organdict
 returned = testing()
 
@@ -99,6 +107,7 @@ def generates(grid,ratio,assertconnected=True) -> list[Image.Image]:
     ims=[]
     while True:
         gen=genimage(grid,assertconnected)
+
         width, height = gen.size # Get width, height
         gen = gen.resize((width*ratio, height*ratio), Image.NEAREST).convert("RGBA") # Resize to dimension*Ratio
         ims.append(gen)
@@ -227,12 +236,18 @@ def generaterecipe(name) -> None:
                     )
                 finimage.export(f"cache/recipe-{name}.gif")
 
+
 if __name__ == "__main__":
-    generaterecipe(returned, "extractor")
-    generaterecipe(returned, "destroyer")
-    generaterecipe(returned, "inductor")
-    # generaterecipe(returned, "compressed_stone")
+    generaterecipe("galvanometer", apng=True)
+    generaterecipe("pulp")
+    # generaterecipe("air")
+    # generaterecipe("destroyer")
+    generaterecipe("compressed_stone")
+    generaterecipe("inductor")
     # generaterecipe(returned, "galvanometer")
     # generaterecipe(returned, "potentiometer")
     # generaterecipe(returned, "galvanometer")
     # generaterecipe(returned, "prism")
+    for maderecipecache in glob.glob(f"cache/recipeframe-*.png"):
+        try: os.remove(maderecipecache)
+        except: pass

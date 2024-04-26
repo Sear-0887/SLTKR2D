@@ -7,20 +7,20 @@ from nextcord.ext import commands, tasks
 from pyfunc.lang import cfg, evl, keywords, phraser, phrasermodule, getkws
 from pyfunc.gettoken import gettoken
 from pyfunc.commanddec import MainCommand
-from pyfunc.block import get
-import nextcord
 
 botinit()
+# Intents
 intents = nextcord.Intents.default()
 intents.members = True
 intents.message_content = True
+# Bot Instance
 bot = commands.Bot(command_prefix=cfg("PREFIX"), intents=intents, help_command=None)
 # TimeOn must be a datetime, or else error will be raised when !help
 TimeOn: datetime.datetime = datetime.datetime.now() 
 # initialize some things
 keywords = getkws()
 
-# reload the command locale
+# Reloads the command locale
 @MainCommand(bot, "reloadlocale")
 async def reloadlocal(ctx,module=None):
     if module is None:
@@ -35,7 +35,7 @@ async def reloadlocal(ctx,module=None):
         else:
             await ctx.send(f"Did not find any locale files for {module}")
 
-# get help for a command or display info about the bot
+# Get help texts for a command or display info about the bot
 @MainCommand(bot,"help")
 async def help(ctx, cmdname=None):
     async def gethelplist(interaction:nextcord.Interaction):
@@ -63,10 +63,10 @@ async def help(ctx, cmdname=None):
         view = nextcord.ui.View()
         getlistbtn = nextcord.ui.Button(style=nextcord.ButtonStyle.blurple, label="Help List")
         getlistbtn.callback = gethelplist
-        view.add_item(getlistbtn) # with a button that prints a list of commands
+        view.add_item(getlistbtn) # Adding a button that prints a list of commands in an ephemeral embed
         await ctx.send(embed=embed, view=view)
     else:
-        # search through the commands and their aliases
+        # searches through the commands and their aliases
         cmds={alias:cmd for cmd in bot.commands for alias in cmd.aliases+[cmd.name]}
         if cmdname in cmds:
             cmd=cmds[cmdname]
@@ -91,6 +91,11 @@ async def ping(ctx):
 @MainCommand(bot,"scream")
 async def scream(ctx, n:int=32):
     await ctx.send("A"*n)
+    
+# represent sear's sanity... again?
+@MainCommand(bot,"wee")
+async def scream(ctx, e:int=32):
+    await ctx.send("W"+"e"*e)
 
 # send a link
 @MainCommand(bot,"link")
@@ -108,6 +113,7 @@ async def credit(ctx):
     devstr = '\n'.join([f'### [{dev["name"]}]({dev["github_link"]}){dev["desc"]}' for dev in devs])
     await ctx.send(evl("credit.display").format(devstr))
 
+# Presence Message Loop
 @tasks.loop(seconds=60)
 async def changepresence():
     statuses: dict[list] = cfg("botInfo.Messages") # General whole Statuses
