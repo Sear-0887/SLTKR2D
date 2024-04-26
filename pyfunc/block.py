@@ -50,42 +50,52 @@ def calc_highlights(lightdir:vec3, normal:np.ndarray, rimlight:np.ndarray):
 fullbright_lightdir = (-0.5, -1.0, 1.0)
 
 def apply_normalmap(albedo:PIL.Image.Image, normal:PIL.Image.Image | None, rotation:int, block_id:int, flip:bool):
-    # rotate the light so when the block is rotated back the light is in the right direction
-    lightdir:vec3 = quarter_rotate(fullbright_lightdir, rotation);
+	# rotate the light so when the block is rotated back the light is in the right direction
+	lightdir:vec3 = quarter_rotate(fullbright_lightdir, rotation);
 
-    light:np.ndarray
-    highlights:np.ndarray | None = None
+	light:np.ndarray
+	highlights:np.ndarray | None = None
 
-    if normal is None:
-        s0,s1 = albedo.size
-        normal_array = np.full((s0,s1,3),(0.5,0.5,0.5))
-    else:
-        normal_array:np.ndarray = np.asarray(normal) / 255 * 2 - 1
-        normal_array = normal_array / np.linalg.norm(normal_array, axis = 2)
-        # shape (any, any, 3)
+	if normal is None:
+		s0,s1 = albedo.size
+		normal_array = np.full((s0,s1,3),(0.5,0.5,0.5))
+	else:
+		normal_array:np.ndarray = np.asarray(normal) / 255 * 2 - 1
+		normal_array = normal_array / np.atleast_3d(np.linalg.norm(normal_array, axis = 2))
+		normal_array = normal_array[:, :, :3]
+		# shape (any, any, 3)
 
-    if flip:
-    	normal_array[:, :, 2] = -normal_array[:, :, 2]
+	if flip: # flip_uv_x
+		normal_array[:, :, 0] = -normal_array[:, :, 0]
 
-    light = calc_diffuse_ambient_light(lightdir, normal_array);
-    lightim:PIL.Image.Image = PIL.Image.fromarray(light)
+	normal_array[:, :, 1] = -normal_array[:, :, 1]
 
-    alpha:PIL.Image.Image = albedo.getchannel('A')
-    color:PIL.Image.Image = albedo.convert('RGB')
-    diffused:PIL.Image.Image = PIL.ImageChops.multiply(color, lightim)
-    out:PIL.Image.Image
-    out = diffused
+	light = calc_diffuse_ambient_light(lightdir, normal_array);
+	print(light.shape,light[0][0])
+	light = np.array([light, light, light])
+	print(light.shape,light[0][0])
+	light = np.moveaxis(light, 0, 2)
+	light = light * 255
+	light = light.astype('uint8')
+	print(light.shape,light.dtype,light[0][0])
+	lightim:PIL.Image.Image = PIL.Image.fromarray(light)
 
-    if block_id in rimlights:
-        highlights = calc_highlights(lightdir, normal_array, rimlights[block_id]);
-        highlightsim:PIL.Image.Image = PIL.Image.fromarray(highlights)
-        out = PIL.ImageChops.add(out,highlightsim)
-        
-    out.putalpha(alpha)
+	alpha:PIL.Image.Image = albedo.getchannel('A')
+	color:PIL.Image.Image = albedo.convert('RGB')
+	print(color.mode,lightim.mode)
+	diffused:PIL.Image.Image = PIL.ImageChops.multiply(color, lightim)
+	out:PIL.Image.Image
+	out = diffused
+	out = color
 
-    # and rotate out
+	if block_id in rimlights:
+		highlights = calc_highlights(lightdir, normal_array, rimlights[block_id]);
+		highlightsim:PIL.Image.Image = PIL.Image.fromarray(highlights)
+		out = PIL.ImageChops.add(out,highlightsim)
+			
+	out.putalpha(alpha)
 
-    return out
+	return out
 
 #welded=top,left,bottom,right
 #rotate= 0    1    2      3
