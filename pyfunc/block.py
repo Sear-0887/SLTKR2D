@@ -658,18 +658,7 @@ notoptypes=['arc_furnace','beam_core','collector','creator','destroyer','dismant
 
 # can this block weld on this side?
 def canweld(side:str,block:BlockData) -> bool:
-	if block['type'] in noweldtypes:
-		return False
-	elif block['type'] in bottomtypes:
-		sides=[False,False,True,False]
-	elif block['type'] in topbottomtypes:
-		sides=[True,False,True,False]
-	elif block['type'] in sidestypes:
-		sides=[False,True,False,True]
-	elif block['type'] in notoptypes:
-		sides=[False,True,True,True]
-	else:
-		sides=[True,True,True,True]
+	sides = blockinfos[block['type']]['weldablesides']
 	i={'top':0,'bottom':2,'left':1,'right':3}[side]+4-block['rotate']
 	i=i%4
 	return sides[i] and iswelded(block['weld'][{'top':0,'bottom':2,'left':1,'right':3}[side]])
