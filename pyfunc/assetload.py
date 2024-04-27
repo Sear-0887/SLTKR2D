@@ -121,5 +121,6 @@ def getlocale():
 
 def assetinit():
     getblockids()
+    getblockdefs()
     geticoncoords()
     getlocale()
