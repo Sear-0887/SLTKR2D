@@ -294,10 +294,6 @@ wiretypes=[
 # all blocks that connect to wire
 
 wiredtypes=getblocksbyattr("wire_connect")
-# unweldable blocks
-noweldtypes=[
-	"copper_ore","iron_ore","pulp","sand","silicon","spawner","air","sawdust","telecross"
-]
 # blocks that only face one direction
 norotatetypes=getblocksbynotattr("rotatable")
 # blocks that only face two directions
@@ -344,14 +340,9 @@ def setwireside(side:WeldSide,other:bool) -> WeldSide:
 def blockdesc() -> BlockDesc:
 	return {
 		'wired':False, # does this block connect to wires beside it?
-		'datafilters':[], # change the block data (noweld/norotate)
+		'datafilters':[], # change the block data (norotate)
 		'layers':[] # the layers of the block (actuator/any wire component)
 	}
-
-def noweldfilter(data:BlockData) -> BlockData:
-	data={**data}
-	data['weld']=(makeweldside(False),makeweldside(False),makeweldside(False),makeweldside(False))
-	return data
 
 def norotatefilter(data:BlockData) -> BlockData:
 	data={**data}
@@ -528,9 +519,6 @@ def wiresetting(data:BlockData) -> Image:
 	raise NotImplemented
 
 blocktypes:collections.defaultdict[str,BlockDesc]=collections.defaultdict(blockdesc)
-
-for t in noweldtypes:
-	blocktypes[t]['datafilters'].append(noweldfilter)
 
 for t in norotatetypes:
 	blocktypes[t]['datafilters'].append(norotatefilter)
