@@ -267,6 +267,12 @@ def getblockims(block:str) -> tuple[PIL.Image.Image,PIL.Image.Image | None]:
 		normal,
 	)
 
+def getblocksbyattr(attr):
+	return [b for b,data in blockinfos.items() if attr in data['attributes']]
+
+def getblocksbynotattr(attr):
+	return [b for b,data in blockinfos.items() if attr not in data['attributes']]
+
 # wire components on a wafer
 wafertypes=[
 	"accelerometer","capacitor","diode",
@@ -286,37 +292,16 @@ wiretypes=[
 	"detector","port","toggler","trigger"
 ]
 # all blocks that connect to wire
-wiredtypes=[
-	'actuator','motor','telewall','injector','pedestal',
-	'actuator_base','display',"lamp",'combiner',
-	'arc_furnace','extractor','beam_core','creator',
-	'destroyer','dismantler','magnet','manipulator',
-	'mantler','wire','wire_board'
-]+wafertypes+wiretypes
+
+wiredtypes=getblocksbyattr("wire_connect")
 # unweldable blocks
 noweldtypes=[
-	"copper_ore","iron_ore","pulp","sand","silicon","spawner","air","sawdust"
+	"copper_ore","iron_ore","pulp","sand","silicon","spawner","air","sawdust","telecross"
 ]
 # blocks that only face one direction
-norotatetypes=[
-	'pedestal','dirt','sediment','stone','rubber',
-	'leaf_maple','iron_vein','iron_bar','iron_plate',
-	'cast_iron','copper_vein','copper_bar','frame',
-	'toggler','capacitor','inductor','roller',
-	'dynamic_roller','chair','chair_pilot','display',
-	'core_ore','raw_core','mass_core','refined_core',
-	'catalyst_core','command_block','boundary',
-	'spawner','calcium_bar','water','foam','oxide',
-	'soul_core','adobe','peltmellow','glass',
-	'glass_cyan','glass_magenta','glass_yellow',
-	'grass','flower_magenta','flower_yellow','residue',
-	'ice','compressed_stone','wafer'
-]+noweldtypes
-noweldtypes.append('telecross') # literally the only rotatable but unweldable block
+norotatetypes=getblocksbynotattr("rotatable")
 # blocks that only face two directions
-twowaytypes=[
-	"wire_spool",'log_maple','log_pine',"mirror"
-]
+twowaytypes=getblocksbyattr("symmetrical")
 frametypes=wiretypes+['frame','wire']
 
 def iswelded(side:WeldSide) -> bool:
