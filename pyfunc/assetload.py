@@ -31,6 +31,28 @@ modifiers={
     'd':past,
 }
 
+blockdefregex = 'BLOCK_DEF\\((?P<name>[a-z_]+),(?P<collision>collision::[a-z_]+(\\|collision::[a-z_]+)*),(?P<attr>atb::[a-z_]+(\\|atb::[a-z_]+)*),0b(?P<weld>\\d\\d\\d\\d),(?P<weldtime>\\d+)\\)'
+def getblockdefs():
+    with open(cfg("localGame.texture.blockDefsFile"), encoding="utf-8") as f:
+        data = f.read()
+    for line in data.split('\n'):
+        line = ''.join(line.split()) # remove spaces
+        match = re.match(blockdefregex,line)
+        if match is not None:
+            name = match['name']
+            collision = match['collision']
+            collision = collision.split('|')
+            collision = [re.fullmatch('collision::(?P<name>[a-z_]+)',c)['name'] for c in collision]
+            attr = match['attr']
+            attr = attr.split('|')
+            attr = [re.fullmatch('atb::(?P<name>[a-z_]+)',c)['name'] for c in attr]
+            weld = match['weld']
+            weld = [s == '1' for s in weld]
+            #weldtime = match['weldtime']
+            blockinfos[name]['collision'] = collision
+            blockinfos[name]['attributes'] = attr
+            blockinfos[name]['weldablesides'] = weld
+
 def getblockids():
     with open(cfg("localGame.texture.blockIDFile"), encoding="utf-8") as f:
         data=smp.getsmpvalue(f.read())
