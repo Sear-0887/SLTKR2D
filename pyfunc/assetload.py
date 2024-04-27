@@ -48,10 +48,11 @@ def getblockdefs():
             attr = [re.fullmatch('atb::(?P<name>[a-z_]+)',c)['name'] for c in attr]
             weld = match['weld']
             weld = [s == '1' for s in weld]
+            left,bottom,right,top = weld
             #weldtime = match['weldtime']
             blockinfos[name]['collision'] = collision
             blockinfos[name]['attributes'] = attr
-            blockinfos[name]['weldablesides'] = weld
+            blockinfos[name]['weldablesides'] = top,left,bottom,right
 
 def getblockids():
     with open(cfg("localGame.texture.blockIDFile"), encoding="utf-8") as f:
