@@ -292,7 +292,6 @@ wiretypes=[
 	"detector","port","toggler","trigger"
 ]
 # all blocks that connect to wire
-
 wiredtypes=getblocksbyattr("wire_connect")
 # blocks that only face one direction
 norotatetypes=getblocksbynotattr("rotatable")
@@ -317,7 +316,7 @@ def platformx(side:WeldSide) -> int:
 def makeweldside(side:WeldSideIn) -> WeldSide:
 	if isinstance(side,dict):
 		return side
-	return {'weld':side,'wire':False,'platform':False,'frame':False,'id':id(side)}
+	return {'weld':side,'wire':False,'platform':False,'frame':False}
 
 weldedside = makeweldside(True)
 unweldedside = makeweldside(False)
@@ -540,16 +539,16 @@ blocktypes['platform']['layers']=[platform]
 
 for t in wafertypes:
 	blocktypes[t]['layers']=[wafer,wire,wiretop]
-	blocktypes[t]['datafilters']=[wirecomponent]
+	blocktypes[t]['datafilters'].append(wirecomponent)
 
 for t in wiretypes:
 	blocktypes[t]['layers']=[frame,wire,wiretop]
-	blocktypes[t]['datafilters']=[wirecomponent]
+	blocktypes[t]['datafilters'].append(wirecomponent)
 
 for t in ["potentiometer","sensor"]:
 	blocktypes[t]['layers']=[frame,wire,wiretop,wiresetting]
 
-blocktypes[t]['datafilters']=[counterfilter]
+blocktypes['counter']['datafilters'].append(counterfilter)
 blocktypes['counter']['layers']=[wafer,wire,counter]
 
 blocktypes['wire_board']['layers']=[wafer,wire]
