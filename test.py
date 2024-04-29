@@ -160,18 +160,18 @@ dataschema = schema.Schema({
             'filter':blocktag,
             schema.Optional('amount',default = 1):num,
         },
-        schema.Optional('arrow_sprite'):num,
-        schema.Optional('guidebook_page_blacklist',default = []):[block], # don't put this on 
-        schema.Optional('guidebook_page_whitelist',default = []):[block],
-        schema.Optional('weldall',default = True):flag,
+        schema.Optional('arrow_sprite',default = 0):num,
+        schema.Optional('guidebook_page_blacklist',default = []):[block], # don't put this on these pages, even if the recipe contains those blocks
+        schema.Optional('guidebook_page_whitelist',default = []):[block], # put this on these pages, even if the recipe doesn't contain those blocks
+        schema.Optional('weldall',default = True):flag, # weld all blocks?
         schema.Optional('needs_passive'):research,
-        schema.Optional('research_requirement_override'):research,
+        schema.Optional('research_requirement_override'):research, # the research that makes  this "recipe" appear in the guidebook
         schema.Optional('entity'):{
             'type':str,
             'position':schema.Use(handlepos)
         },
         schema.Optional('guidebook_use_only',default = False):flag,
-        schema.Optional('match_filter_modulo'):flag, # the changing blocks all match
+        schema.Optional('match_filter_modulo',default = False):flag, # true if the changing blocks all match
     }],
     'summonore_pill':[{
         'type':'summonore_pill',
