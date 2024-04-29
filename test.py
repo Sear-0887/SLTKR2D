@@ -236,6 +236,18 @@ class SurroundingBlock(typing.TypedDict):
     block:BlockDataIn
     minimum:int
 
+class Product(typing.TypedDict):
+    block:BlockDataIn
+    amount:int
+
+class EntityPos(typing.TypedDict):
+    type:str
+    position:tuple[int,int]
+
+class FilterProduct(typing.TypedDict):
+    filter:BlockDataIn | Tag
+    amount:int
+
 class HeatRecipe(typing.TypedDict):
     product:BlockDataIn
     ingredient:BlockDataIn | Tag
@@ -244,25 +256,44 @@ class HeatRecipe(typing.TypedDict):
     surrounding:typing.NotRequired[SurroundingBlock]
 
 class ExtractRecipe(typing.TypedDict):
-    pass
+    product:BlockDataIn
+    amount:int
+    ingredient:BlockDataIn | Tag
+    time:int
+    post_action:typing.NotRequired[str]
 
 class InjectRecipe(typing.TypedDict):
-    pass
+    product:BlockDataIn | typing.Literal['__fertilizer']
+    pill:BlockDataIn
+    receiver:BlockDataIn
+    needs_passive:typing.NotRequired[Passive]
 
 class CombineRecipe(typing.TypedDict):
-    pass
+    grid:list[list[BlockDataIn | Tag]]
+    product:Product
+    needs_passive:typing.NotRequired[Passive]
 
 class ExtraDisplayRecipe(typing.TypedDict):
-    pass
+    grid:list[list[BlockDataIn | Tag]]
+    product:FilterProduct
+    arrow_sprite:int
+    guidebook_page_blacklist:list[str], # don't put this on these pages, even if the recipe contains those blocks
+    guidebook_page_whitelist:list[str], # put this on these pages, even if the recipe doesn't contain those blocks
+    weldall:bool, # weld all blocks?
+    needs_passive:typing.NotRequired[Passive],
+    research_requirement_override:typing.NotRequired[Research], # the research that makes  this "recipe" appear in the guidebook
+    entity:typing.NotRequired[EntityPos]
+    guidebook_use_only:bool
+    match_filter_modulo:bool # true if the changing blocks all match
 
 class SummonorePillRecipe(typing.TypedDict):
-    pass
+    filter:BlockDataIn | Tag
 
 class SensorNaturalRecipe(typing.TypedDict):
-    pass
+    filter:BlockDataIn | Tag
 
 class SensorRareResourceRecipe(typing.TypedDict):
-    pass
+    filter:BlockDataIn | Tag
 
 
 heat:dict[str,list[HeatRecipe]]=collections.defaultdict(list)
