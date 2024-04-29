@@ -1,7 +1,6 @@
 import pyfunc.smp as smp
 import collections
 import copy
-import json
 from pyfunc.assetload import assetinit,blockinfos
 assetinit()
 from pyfunc.block import BlockDataIn
@@ -233,17 +232,9 @@ class SurroundingBlock(typing.TypedDict):
     block:BlockDataIn
     minimum:int
 
-class Product(typing.TypedDict):
-    block:BlockDataIn
-    amount:int
-
 class EntityPos(typing.TypedDict):
     type:str
     position:tuple[int,int]
-
-class FilterProduct(typing.TypedDict):
-    filter:BlockDataIn | Tag
-    amount:int
 
 class HeatRecipe(typing.TypedDict):
     product:BlockDataIn
