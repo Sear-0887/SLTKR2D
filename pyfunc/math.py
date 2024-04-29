@@ -1,13 +1,13 @@
 from collections import defaultdict
 
-def primefactor(n):
+def primefactor(n:int) -> dict[int, int]:
     # rbcavi implementation
     smallprimes=[2,3,5,7,11,13,17,19] # i hope i didn't miss any
     # you can add more primes
     # just don't skip any
     if n==1:
         return {1:1}
-    factors=defaultdict(int) # a dict of primes to powers, all 0
+    factors:dict[int, int]=defaultdict(int) # a dict of primes to powers, all 0
     for prime in smallprimes:
         while n%prime==0: # assumes 1 isn't in the list
             n//=prime

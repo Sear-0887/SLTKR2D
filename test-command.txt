@@ -1,0 +1,8 @@
+# install mypy type checker
+# replace python3.12 with your python version/executable
+
+python3.12 -m pip install mypy==1.8
+
+# the test
+
+mypy *.py pyfunc/*.py --explicit-package-bases

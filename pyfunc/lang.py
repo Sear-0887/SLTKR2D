@@ -5,29 +5,33 @@
 
 # the links as one string (used to format into !link description)
 
+import logging
 import time
 import os
-
+from pyfunc.smp import getsmpvalue
 import json
 from datetime import datetime
 import glob
 import re
 from dotenv import dotenv_values
 import collections
-config = None
-devs = None
-keywords = {}
+
+cmdi:dict[str, dict[str, str]] = {}
+config = {}
+devs = {}
+keywords:dict[str, dict[str, str]] = {}
+l = logging.getLogger()
 
 # write_to_log, basically similar to print, with extra steps...
 # ptnt is print_to_normal_terminal, ats is add_timestamp
-def lprint(*values: object, sep: str | None = " ",end: str | None = "\n", ptnt: bool = False, ats: bool = True) -> None:
+def lprint(*values: object, sep: str = " ",end: str = "\n", ptnt: bool = False, ats: bool = True) -> None:
+    valuesstr:str = sep.join(list(map(str, values))) + end
+    if ats:
+        valuesstr = time.strftime("%H:%M:%S", time.localtime()) + " | " + valuesstr
     with open(f"cache/log/cache-{datetime.now():%d-%m-%Y}.txt", "a+", encoding="utf-8") as fil:
-        values = sep.join(list(map(str, values))) + end
-        if ats:
-            values = time.strftime("%H:%M:%S", time.localtime()) + " | " + values
-        fil.write(values)
+        fil.write(valuesstr)
     if ptnt:
-        print(values,end='')
+        print(valuesstr,end='')
 
 cmdi = collections.defaultdict(dict)
 
@@ -48,19 +52,19 @@ def phraserfile(fname,lang):
             cmdi[lang][key]=value
 
 # load the command locale
-def phraser():
+def phraser() -> None:
     loademoji()
     for lang in os.listdir(cfg('locale.localePath')):
         for i in os.listdir(os.path.join(cfg('locale.localePath'),lang)):
             phraserfile(i,lang)
-    print(cmdi['en']["help.aliases"])
+    l.debug(cmdi['en']["help.aliases"])
     # EXCEPTIONS
     cmdi['en']["link.desc"] = cmdi['en']["link.desc"].format("".join([
         f"{name} ({data['link']})\nKeywords: `{'`, `'.join(data['kw'])}`\n"
         for name,data in keywords.items()
     ]))
 
-def phrasermodule(module): # reloads the locale from one file in each locale folder
+def phrasermodule(module:str): # reloads the locale from one file in each locale folder
     found=False # did it find any locale files?
     for langpth in glob.glob("lang/*"):
         lang = langpth[5:]
@@ -70,7 +74,7 @@ def phrasermodule(module): # reloads the locale from one file in each locale fol
             phraserfile(os.path.join('lang',lang,module+'.txt'),lang)
             found=True
         except FileNotFoundError:
-            lprint(f"WARNING: locale for {module} in {lang} wasn't found")
+            l.info(f"WARNING: locale for {module} in {lang} wasn't found")
     return found
 
 # get a locale entry
@@ -81,14 +85,21 @@ def evl(*args, lang="en") -> str | list:
     except:
         return ""
 
-def handlehostid():
+def handlehostid() -> tuple[int, list[bool]]:
     raw = ""
     try:
-        raw = dotenv_values("cred/client.env")['HOSTID']
+        raw2 = dotenv_values("cred/client.env")['HOSTID']
+        if raw2 is None:
+            raise Exception("No HOSTID.")
+        raw = raw2
     except Exception as e:
-        print(f"ReadingHostID Failed {e}")
+        l.warning(f"ReadingHostID Failed {e}")
         raw = "CLIENT--0"
-    auid, setting = re.fullmatch(r"^CLIENT\-(\w*)\-(.*)", raw).groups()
+    match = re.fullmatch(r"^CLIENT\-(\w*)\-(.*)", raw)
+    if match is not None:
+        auid, setting = match.groups()
+    else:
+        auid, setting = '', '0'
     if not auid: auid = "0"
     returntup = ( int(auid, 16), list(map(lambda x:x=="1", list(setting))) )
     return returntup
@@ -100,6 +111,7 @@ def loadconfig():
         hostid, settings = handlehostid()
         config['ShowHost'] = settings[0]
         config['HostDCID'] = hostid
+        config['PREFIX'] = dotenv_values("cred/client.env")['PREFIX']
     return config
 
 def cfg(*target):
@@ -126,6 +138,12 @@ def getdevs():
     with open(cfg("infoPath.devInfoPath"), encoding="utf-8") as f:
         global devs
         devs = json.load(f)
+        
+def getpresense():
+    with open(cfg("infoPath.presenseInfoPath"), encoding="utf-8") as f:
+        global presensemsg
+        presensemsg = json.load(f)
+    return presensemsg
 
 def getkws(): 
     with open(cfg("infoPath.kwInfoPath"), encoding="utf-8") as f:
@@ -133,7 +151,17 @@ def getkws():
         keywords = json.load(f)
     return keywords
 
+def getarrowcoords():
+    racord = {}
+    with open(cfg("localGame.texture.guidebookArrowCordFile"), encoding="utf-8") as f:
+        data=getsmpvalue(f.read())
+    for icon,xy in data.items():
+        x,y=xy.split(',')
+        racord[icon] = (int(x), int(y))
+    return racord
+
 def botinit():
+    
     from pyfunc.assetload import assetinit
     os.makedirs(cfg('cacheFolder'), exist_ok=True) # directory to put images and other output in
     os.makedirs(cfg('logFolder'), exist_ok=True) # logs folder (may be in cache)
@@ -141,5 +169,6 @@ def botinit():
     global keywords
     keywords = getkws()
     phraser() # command locale
+    getpresense()
     getdevs()
     assetinit() # roody locale and blocks
