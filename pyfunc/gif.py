@@ -1,12 +1,11 @@
 from PIL import Image
+from pyfunc.datafunc import tuple_max, tuple_min
+import logging
 
-def tuple_max(*tuples) -> tuple[int]:
-    return tuple(map(max, zip(*tuples)))
-def tuple_min(*tuples) -> tuple[int]:
-    return tuple(map(min, zip(*tuples)))
+l = logging.getLogger()
 
 class gif_frame:
-    def __init__(self, image=None):
+    def __init__(self, image:Image.Image | None=None) -> None:
         self.images: list[tuple[Image.Image, tuple[int, int]]] = []
         self.addimage(image or Image.new("RGBA", (0, 0)))
         
@@ -21,7 +20,7 @@ class gif_frame:
         return copy
 
 class gif:
-    def __init__(self, defaultbg):
+    def __init__(self, defaultbg: tuple[int, int, int]):
         self.cursor = (0, 0)
         self.perimage = []
         self.framelist: list[gif_frame] = []
@@ -47,11 +46,12 @@ class gif:
         oframelist=self.framelist
         while len(self.framelist) != len(giflist):
             if len(self.framelist) > len(giflist):
-                print("Adding giflist")
+                l.debug("Adding giflist")
                 giflist += ogiflist
             elif len(self.framelist) < len(giflist):
-                print("Adding framelist")
+                l.debug("Adding framelist")
                 self.framelist += oframelist
+
         maxdm = (0, 0)
         for gifframe, selfframe in zip(giflist[i], self.framelist[i]):
             if selfframe is None: return

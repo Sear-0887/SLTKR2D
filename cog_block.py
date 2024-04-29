@@ -17,8 +17,8 @@ class Block(commands.Cog):
         self.bot = bot
 
     @CogCommand("block")
-    async def block(self,ctx, *, block=None):
-        if block:
+    async def block(self,ctx, *, block:str | None=None):
+        if block is not None:
             if block.isdigit(): # if the argument is a number, get the corresponding block name
                 block = idtoblock.get(int(block),'NIC')
             block = block.replace(" ", "_")
@@ -40,12 +40,11 @@ class Block(commands.Cog):
             await self.block(ctx, str(random.choice([*idtoblock.keys()])))
 
     @CogCommand("image")
-    async def image(self,ctx, *, x="[[16][20]][[16][16]]"):
-        blocklist = collections.defaultdict(int)
-        blocks=smp.getsmpvalue(x)
+    async def image(self,ctx, *, build:str="[[16][20]][[16][16]]"):
+        blocklist:dict[str, int] = collections.defaultdict(int)
+        blocks=smp.getsmpvalue(build)
         for y,row in enumerate(blocks):
             for x,b in enumerate(row):
-                print(b, x, y)
                 b=b.lower().strip()
                 b=''.join(b.split()) # remove all whitespace
                 turn=0
@@ -104,12 +103,11 @@ class Block(commands.Cog):
             )
             
     @CogCommand("recipe")
-    async def recipe(self,ctx, *, block='extractor'):
+    async def recipe(self,ctx, *, block:str='extractor'):
         if block.isdigit(): # if the argument is a number, get the corresponding block name
             block = idtoblock.get(int(block),'NIC')
         block = block.replace(" ", "_").lower()
-        info = generaterecipe(block)
-        print(info)
+        generaterecipe(block)
         embed = nextcord.Embed()
         embed.title = f"{block}'s Recipe"
         embed.set_image(url="attachment://f.gif")

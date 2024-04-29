@@ -1,0 +1,52 @@
+version: 1
+disableExistingLoggers: False
+formatters:
+  general:
+    format: "%(asctime)s | [%(levelname)s] | %(name)s | %(funcName)s | %(message)s"
+
+handlers:
+  console:
+      class : logging.StreamHandler
+      formatter: general
+      level   : INFO
+      stream  : ext://sys.stdout
+  debugFile:
+      encoding: utf-8
+      class : logging.FileHandler
+      formatter: general
+      level: DEBUG
+      filename: ./cache/log/latest-debug.log
+      # mode: w
+  infoFile:
+      encoding: utf-8
+      class : logging.FileHandler
+      formatter: general
+      level: INFO
+      filename: ./cache/log/latest-info.log
+  warnFile:
+      encoding: utf-8
+      class : logging.FileHandler
+      formatter: general
+      level: WARN
+      filename: ./cache/log/latest-warn.log
+  errorFile:
+      encoding: utf-8
+      class : logging.FileHandler
+      formatter: general
+      level: ERROR
+      filename: ./cache/log/latest-error.log
+      # mode: w
+
+# loggers:
+#   Lang:
+#     level: INFO
+#     propagate: 0
+#     handlers: [infoFile]
+#   debug:
+#     level: DEBUG
+#     propagate: 0
+#     handlers: [debugFile]
+
+root:
+    level: DEBUG
+    handlers: [console, debugFile, infoFile, warnFile, errorFile]
