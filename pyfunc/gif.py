@@ -1,9 +1,8 @@
 from PIL import Image
+from pyfunc.datafunc import tuple_max, tuple_min
+import logging
 
-def tuple_max(*tuples) -> tuple[int]:
-    return tuple(map(max, zip(*tuples)))
-def tuple_min(*tuples) -> tuple[int]:
-    return tuple(map(min, zip(*tuples)))
+l = logging.getLogger()
 
 class gif_frame:
     def __init__(self, image=None):
@@ -42,9 +41,9 @@ class gif:
         pos = pos or self.cursor
         if len(self.framelist) == 0:
             self.addframe()
-        # print(f"GIF adding img at pos {pos}")
+        l.debug(f"GIF adding img at pos {pos}")
         while len(self.framelist) > len(giflist):
-            print("Adding")
+            l.debug("Adding")
             giflist += giflist
         if len(self.framelist) < len(giflist):
             for _ in range( len(giflist) - len(self.framelist) ):

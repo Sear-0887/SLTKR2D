@@ -76,8 +76,5 @@ def setup(bot):
             branch=line.partition("refs/heads/")[2]
             break
 
-    # https://stackoverflow.com/a/77686288
-    #process = subprocess.Popen(["git", "branch", "--show-current"], stdout=subprocess.PIPE)
-    #branch_name, branch_error = process.communicate()
 
     bot.add_cog(Misc(bot,branch))

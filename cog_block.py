@@ -45,7 +45,6 @@ class Block(commands.Cog):
         blocks=smp.getsmpvalue(x)
         for y,row in enumerate(blocks):
             for x,b in enumerate(row):
-                print(b, x, y)
                 b=b.lower().strip()
                 b=''.join(b.split()) # remove all whitespace
                 turn=0
@@ -108,8 +107,7 @@ class Block(commands.Cog):
         if block.isdigit(): # if the argument is a number, get the corresponding block name
             block = idtoblock.get(int(block),'NIC')
         block = block.replace(" ", "_").lower()
-        info = generaterecipe(block)
-        print(info)
+        generaterecipe(block)
         embed = nextcord.Embed()
         embed.title = f"{block}'s Recipe"
         embed.set_image(url="attachment://f.gif")
