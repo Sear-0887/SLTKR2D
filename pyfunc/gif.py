@@ -41,16 +41,19 @@ class gif:
         pos = pos or self.cursor
         if len(self.framelist) == 0:
             self.addframe()
-        l.debug(f"GIF adding img at pos {pos}")
-        while len(self.framelist) > len(giflist):
-            l.debug("Adding")
-            giflist += giflist
-        if len(self.framelist) < len(giflist):
-            for _ in range( len(giflist) - len(self.framelist) ):
-                self.addframe()
+        # print(f"GIF adding img at pos {pos}")
+        ogiflist=giflist
+        oframelist=self.framelist
+        while len(self.framelist) != len(giflist):
+            if len(self.framelist) > len(giflist):
+                l.debug("Adding giflist")
+                giflist += ogiflist
+            elif len(self.framelist) < len(giflist):
+                l.debug("Adding framelist")
+                self.framelist += oframelist
+
         maxdm = (0, 0)
-        for i in range(len(giflist)):
-            gifframe, selfframe = giflist[i], self.framelist[i]
+        for gifframe, selfframe in zip(giflist[i], self.framelist[i]):
             if selfframe is None: return
             selfframe.addimage(gifframe, pos)
             maxdm = tuple_max(maxdm, gifframe.size)
