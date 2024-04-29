@@ -17,8 +17,8 @@ from dotenv import dotenv_values
 import collections
 
 cmdi:dict[str, dict[str, str]] = {}
-config = {}
-devs = {}
+config = None
+devs = None
 keywords:dict[str, dict[str, str]] = {}
 l = logging.getLogger()
 

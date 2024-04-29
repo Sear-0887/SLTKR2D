@@ -53,7 +53,7 @@ class gif:
                 self.framelist += oframelist
 
         maxdm = (0, 0)
-        for gifframe, selfframe in zip(giflist[i], self.framelist[i]):
+        for gifframe, selfframe in zip(giflist, self.framelist):
             if selfframe is None: return
             selfframe.addimage(gifframe, pos)
             maxdm = tuple_max(maxdm, gifframe.size)
