@@ -5,7 +5,7 @@ import logging
 l = logging.getLogger()
 
 class gif_frame:
-    def __init__(self, image=None):
+    def __init__(self, image:Image.Image | None=None) -> None:
         self.images: list[tuple[Image.Image, tuple[int, int]]] = []
         self.addimage(image or Image.new("RGBA", (0, 0)))
         
@@ -20,7 +20,7 @@ class gif_frame:
         return copy
 
 class gif:
-    def __init__(self, defaultbg):
+    def __init__(self, defaultbg: tuple[int, int, int]):
         self.cursor = (0, 0)
         self.perimage = []
         self.framelist: list[gif_frame] = []

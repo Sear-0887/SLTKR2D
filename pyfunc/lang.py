@@ -14,24 +14,24 @@ from datetime import datetime
 import glob
 import re
 from dotenv import dotenv_values
-cmdi = {}
-config = None
-devs = None
-keywords = {}
+cmdi:dict[str, dict[str, str]] = {}
+config = {}
+devs = {}
+keywords:dict[str, dict[str, str]] = {}
 l = logging.getLogger()
 
 # write_to_log, basically similar to print, with extra steps...
 # ptnt is print_to_normal_terminal, ats is add_timestamp
-def lprint(*values: object, sep: str | None = " ",end: str | None = "\n", ptnt: bool = False, ats: bool = True) -> None:
+def lprint(*values: object, sep: str = " ",end: str = "\n", ptnt: bool = False, ats: bool = True) -> None:
+    valuesstr:str = sep.join(list(map(str, values))) + end
+    if ats:
+        valuesstr = time.strftime("%H:%M:%S", time.localtime()) + " | " + valuesstr
     with open(f"cache/log/cache-{datetime.now():%d-%m-%Y}.txt", "a+", encoding="utf-8") as fil:
-        values = sep.join(list(map(str, values))) + end
-        if ats:
-            values = time.strftime("%H:%M:%S", time.localtime()) + " | " + values
-        fil.write(values)
+        fil.write(valuesstr)
     if ptnt:
-        print(values,end='')
+        print(valuesstr,end='')
 
-def phraserfile(fname,lang):
+def phraserfile(fname:str,lang:str) -> None:
     with open(fname , "r", encoding='utf-8') as f:
         fc = re.sub(r"\\\s*\n", r"\\", f.read())
         for line in fc.split("\n"):
@@ -46,7 +46,7 @@ def phraserfile(fname,lang):
                 l.debug(f"{(expr, val) =}")
 
 # load the command locale
-def phraser():
+def phraser() -> None:
     loademoji()
     for langpth in glob.glob("lang/*"):
         lang = langpth[5:]
@@ -61,7 +61,7 @@ def phraser():
         for name,data in keywords.items()
     ]))
 
-def phrasermodule(module): # reloads the locale from one file in each locale folder
+def phrasermodule(module:str): # reloads the locale from one file in each locale folder
     found=False # did it find any locale files?
     for langpth in glob.glob("lang/*"):
         lang = langpth[5:]
@@ -82,14 +82,21 @@ def evl(*args, lang="en") -> str | list:
     except:
         return ""
 
-def handlehostid():
+def handlehostid() -> tuple[int, list[bool]]:
     raw = ""
     try:
-        raw = dotenv_values("cred/client.env")['HOSTID']
+        raw2 = dotenv_values("cred/client.env")['HOSTID']
+        if raw2 is None:
+            raise Exception("No HOSTID.")
+        raw = raw2
     except Exception as e:
         l.warning(f"ReadingHostID Failed {e}")
         raw = "CLIENT--0"
-    auid, setting = re.fullmatch(r"^CLIENT\-(\w*)\-(.*)", raw).groups()
+    match = re.fullmatch(r"^CLIENT\-(\w*)\-(.*)", raw)
+    if match is not None:
+        auid, setting = match.groups()
+    else:
+        auid, setting = '', '0'
     if not auid: auid = "0"
     returntup = ( int(auid, 16), list(map(lambda x:x=="1", list(setting))) )
     return returntup

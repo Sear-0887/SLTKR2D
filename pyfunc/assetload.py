@@ -4,11 +4,13 @@ import pyfunc.smp as smp
 import glob
 from pyfunc.datafunc import capitalize, plural, past
 from pyfunc.lang import cfg
-idtoblock = {}
+from typing import Any
 
-blockinfos = collections.defaultdict(dict)
+idtoblock:dict[int, str] = {}
 
-locale = {}
+blockinfos:dict[str, dict[str, Any]] = collections.defaultdict(dict)
+
+locale:dict[tuple[str, ...], str] = {}
 
 modifiers={
     '^':capitalize,

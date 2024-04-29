@@ -31,6 +31,7 @@ async def ErrorHandler(name, e, args, kwargs, interaction=None, ctx=None):
     if replacingerror:
         le.info(f"Other Error Message found for {name}: {replacingerror}")
         expecterr = replacingerror
+    assert isinstance(expecterr,str)
     try:
         le.debug(f"{e.args=}")
         eargs = e.args[0]
@@ -61,8 +62,8 @@ f'''
 '''
     )
     await sendtoch(expecterr)
-    author = ctx.author if ctxorintr == ctx else interaction.user
     guild = ctx.guild if ctxorintr == ctx else interaction.guild
+    author = ctx.author if ctxorintr == ctx else interaction.user
     trigger = ctx.message.clean_content if ctxorintr == ctx else "<INTERACTION>"
     errorpacket = {
         "user": {
