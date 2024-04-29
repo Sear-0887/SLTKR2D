@@ -14,6 +14,8 @@ from datetime import datetime
 import glob
 import re
 from dotenv import dotenv_values
+import collections
+
 cmdi:dict[str, dict[str, str]] = {}
 config = {}
 devs = {}
@@ -31,28 +33,29 @@ def lprint(*values: object, sep: str = " ",end: str = "\n", ptnt: bool = False, 
     if ptnt:
         print(valuesstr,end='')
 
-def phraserfile(fname:str,lang:str) -> None:
-    with open(fname , "r", encoding='utf-8') as f:
-        fc = re.sub(r"\\\s*\n", r"\\", f.read())
-        for line in fc.split("\n"):
-            if line.startswith("##"): continue
-            for expr, val in re.findall(r"^([\w.]+)\s*=\s*(.+)", line):
-                val = val.replace("\\", "\n")
-                if re.match(r"^\[.*\]$", val):
-                    val = val[1:-1].split(", ")
-                    if val == ['']: val = []
-                val = replacemoji(val)
-                cmdi[lang][expr] = val
-                l.debug(f"{(expr, val) =}")
+cmdi = collections.defaultdict(dict)
+
+def phraserfile(fname,lang):
+    with open(os.path.join(cfg('locale.localePath'),lang,fname), "r", encoding='utf-8') as f:
+        linesiter=iter(f)
+        for line in linesiter:
+            while line.endswith('\\\n'):
+                line=line[:-2].strip()+'\n'+next(linesiter) # add the next line to this if this line ends with a backslash
+            line=re.sub('#.*$','',line) # remove comments
+            if '=' not in line:
+                continue
+            key,value=line.split('=',maxsplit=1)
+            value=replacemoji(value.strip())
+            if value.startswith('[') and value.endswith(']'):
+                value=[v.strip() for v in value[1:-1].split(',') if len(v.strip())>0]
+            key=key.strip()
+            cmdi[lang][key]=value
 
 # load the command locale
 def phraser() -> None:
     loademoji()
-    for langpth in glob.glob("lang/*"):
-        lang = langpth[5:]
-        try: cmdi[lang]
-        except: cmdi[lang] = {}
-        for i in glob.glob("lang/en/*.txt"):
+    for lang in os.listdir(cfg('locale.localePath')):
+        for i in os.listdir(os.path.join(cfg('locale.localePath'),lang)):
             phraserfile(i,lang)
     l.debug(cmdi['en']["help.aliases"])
     # EXCEPTIONS
