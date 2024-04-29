@@ -4,6 +4,8 @@ import copy
 import json
 from pyfunc.assetload import assetinit,blockinfos
 assetinit()
+from pyfunc.block import BlockDataIn
+import typing
 
 with open("content/recipes.smp") as f:
     rawdata = smp.getsmpvalue(f.read())
@@ -17,12 +19,18 @@ for x in rawdata:
 
 print(json.dumps({dk:[*set([k for x in d for k in x.keys()])] for dk,d in data.items()},indent=2))
 
-tags={}
+Research = typing.NewType('Research', str)
+Passive = typing.NewType('Passive', str)
+
+Tag:typing.TypeAlias = list[BlockDataIn]
+
+tags:dict[str,Tag]={}
 
 for tag in data['tag']:
     tag=copy.deepcopy(tag)
     name=tag['name']
     del tag['name']
+    del tag['type']
     assert name not in tags
     tags[name]=tag['blocks']
 
@@ -44,23 +52,25 @@ def handletags(s:str) -> str | list:
 # not_water
 # needs_container_count5
 
-import schema
+import schema # type: ignore # no type hints
 
-def fixemptygrid(g):
-    if g == '':
-        return [[]]
-    else:
-        raise ValueError('bad grid')
+def fixemptygrid(g:str|list[list[BlockDataIn]]) -> list[list[BlockDataIn]]:
+    if isinstance(g,str):
+        if g == '':
+            return [[]]
+        else:
+            raise ValueError('bad grid')
+    return g
 
-def handlepos(p):
+def handlepos(p:str) -> tuple[int,int]:
     x,y = p.split(',')
     return (int(x),int(y))
 
-def strtobool(s):
+def strtobool(s:str) -> bool:
     assert s in ['0','1']
     return s == '1'
 
-def assertblock(s):
+def assertblock(s:str) -> BlockDataIn:
     assert s[0] != '$'
     if s == 'NIC':
         return 'air'
@@ -83,21 +93,21 @@ def assertblock(s):
     assert ' ' not in s
     return s
 
-def assertresearch(s):
+def assertresearch(s:str) -> Research:
     assert True
-    return s
+    return Research(s)
 
-def handlespecialblock(s):
+def handlespecialblock(s:str) -> BlockDataIn:
     try:
         return assertblock(s)
     except AssertionError:
         print(f'"{s}" is not a block')
 
-def asserttags(s):
-    s = handletags(s)
-    if isinstance(s,str):
-        return handlespecialblock(s)
-    return [handlespecialblock(b) for b in s]
+def asserttags(s:str) -> list[BlockDataIn] | BlockDataIn:
+    s2 = handletags(s)
+    if isinstance(s2,str):
+        return handlespecialblock(s2)
+    return [handlespecialblock(b) for b in s2]
 
 block = schema.Use(assertblock)
 research = schema.Use(assertresearch)
@@ -186,6 +196,8 @@ dataschema = schema.Schema({
         'filter':blocktag
     }],
 })
+
+
 
 data2=dataschema.validate(data)
 
