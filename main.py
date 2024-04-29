@@ -1,13 +1,20 @@
 import glob
 import nextcord
+import logging
+import os
+from pyfunc.log import LoggerInit
+import yaml
 import datetime
 import random
 from pyfunc.lang import botinit, devs
 from nextcord.ext import commands, tasks
-from pyfunc.lang import cfg, evl, keywords, phraser, phrasermodule, getkws
+from pyfunc.lang import cfg, evl, keywords, phraser, phrasermodule, getkws, getpresense
 from pyfunc.gettoken import gettoken
 from pyfunc.commanddec import MainCommand
-
+from pyfunc.block import get
+LoggerInit()
+l = logging.getLogger()
+l.info("Logging System Loaded!")
 botinit()
 # Intents
 intents = nextcord.Intents.default()
@@ -19,6 +26,8 @@ bot = commands.Bot(command_prefix=cfg("PREFIX"), intents=intents, help_command=N
 TimeOn: datetime.datetime = datetime.datetime.now() 
 # initialize some things
 keywords = getkws()
+presencemsg = getpresense()
+
 
 # Reloads the command locale
 @MainCommand(bot, "reloadlocale")
@@ -90,7 +99,7 @@ async def help(ctx, cmdname:str | None=None):
 @MainCommand(bot,"ping")
 async def ping(ctx):
     s=f"Pong! ({bot.latency*1000} ms)"
-    print(s)
+    l.info(s)
     await ctx.send(s)
 
 # represent sear's sanity
@@ -122,7 +131,7 @@ async def credit(ctx):
 # Presence Message Loop
 @tasks.loop(seconds=60)
 async def changepresence() -> None:
-    statuses: dict[str, list] = cfg("botInfo.Messages") # General whole Statuses
+    statuses: dict[str, list] = presencemsg # General whole Statuses
     categories: list[str] = list(statuses.keys()) # Keys
     weights: list[int] = [len(statuses[c]) for c in categories] # Weights of keys
     category: str = random.choices(categories,weights)[0] # Choosing a category
@@ -151,8 +160,10 @@ token = gettoken()
 
 # load all cogs
 for cog_name in glob.glob("cog_*.py"):
-    print(cog_name, "LOAD")
+    l.info(f"{cog_name} LOADED")
     bot.load_extension(cog_name[:-3])
+
+
 
 # and run the bot
 bot.run(token)

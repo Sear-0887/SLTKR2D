@@ -13,6 +13,9 @@
 import random
 import re
 import math
+import logging
+
+l = logging.getLogger()
 
 prefixOperators = ['-']
 postfixOperators=['!']
@@ -59,7 +62,7 @@ def customPowerOperation(a,b):
 # apply operation to operand1 and operand2
 # remember, they are all [type,value] pairs
 def applyBinaryOperations(operation, operand1, operand2):
-  print(f"Applying {operation} to {operand1}, {operand2}")
+  l.debug(f"Applying Binary {operation} to {operand1}, {operand2}")
   operationSymbol = operation[1]
   operand1Type, operand1Value = operand1[:2]
   operand2Type, operand2Value = operand2[:2]
@@ -76,7 +79,7 @@ def applyBinaryOperations(operation, operand1, operand2):
     case _:            raise  KeyError(["binary", operationSymbol])
 
 def applyPrefixOperation(operation, operand):
-  print(f"Applying {operation} to {operand}")
+  l.debug(f"Applying Prefix {operation} to {operand}")
   operationSymbol = operation[1]
   operandType, operandValue = operand
   if operandType != NUM:
@@ -86,7 +89,7 @@ def applyPrefixOperation(operation, operand):
   raise KeyError(["unary", operandValue])
 
 def applyPostfixOperation(operation, operand):
-  print(f"Applying {operation} to {operand}")
+  l.debug(f"Applying Postfix{operation} to {operand}")
   operationSymbol = operation[1]
   operandType, operandValue = operand[:2]
   if operandType != NUM:
@@ -96,7 +99,7 @@ def applyPostfixOperation(operation, operand):
   raise KeyError(["postfix", operationSymbol])
 
 def applyFunction(functionName,operand):
-  print(functionName, operand)
+  l.debug(f"Applying Function {functionName} to {operand}")
   operandType, operandValue = operand[:2]
   if operandType != NUM:
     return [EXPR,'(',functionName,operand]
@@ -273,7 +276,6 @@ def evaluate(originalExpression):
   while len(operatorStack) > 0: # apply the rest of the operators
     operatorStack, lastoperator = listparti(operatorStack, -1)
     valueStack, operands = listparti(valueStack, -2)
-    print(f"{operands = }")
     operand1, operand2 = operands
     valueStack.append(applyBinaryOperations(lastoperator,operand1,operand2))
   if len(valueStack) > 1: # each operator reduces the number of values by 1

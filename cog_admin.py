@@ -7,8 +7,9 @@ from pyfunc.commanddec import CogCommand
 from collections import defaultdict
 from itertools import takewhile,count
 import datetime
+import logging
 
-
+l = logging.getLogger()
 class Admin(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -120,7 +121,7 @@ class Admin(commands.Cog):
         errs.sort(key=lambda x:datetime.datetime.fromisoformat(x[1]['time']))
         errs=[*reversed([*reversed(errs)][:count])]
         count = len(errs)
-        print(f"printing {count} errors")
+        l.debug(f"printing {count} errors")
         for fname,err in errs:
             try:
                 await senderr(err, fname)

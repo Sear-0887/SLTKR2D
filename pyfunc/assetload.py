@@ -2,6 +2,7 @@ import re
 import collections
 import pyfunc.smp as smp
 import glob
+from pyfunc.datafunc import capitalize, plural, past
 from pyfunc.lang import cfg
 from typing import Any
 
@@ -10,22 +11,6 @@ idtoblock:dict[int, str] = {}
 blockinfos:dict[str, dict[str, Any]] = collections.defaultdict(dict)
 
 locale:dict[tuple[str, ...], str] = {}
-
-def capitalize(s):
-    s=s[0].upper()+s[1:]
-    return s
-
-def plural(s):
-    if s.endswith('y'): # just in case
-        s=s[:-1]+'ie'
-    s+="s"
-    return s
-
-def past(s):
-    if s.endswith('e'):
-        s=s[:-1]
-    s+="ed"
-    return s
 
 modifiers={
     '^':capitalize,

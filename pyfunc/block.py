@@ -1,13 +1,17 @@
 import PIL.Image
+import logging
 import pyfunc.smp as smp
 import os
-from pyfunc.lang import cfg, lprint
+from pyfunc.lang import cfg
 import functools
 import collections
 import re
 import typing
 import numpy as np
-from pyfunc.assetload import blockinfos
+from pyfunc.assetload import blockinfos, assetinit
+
+l = logging.getLogger()
+assetinit()
 
 rimlights:dict[int, np.ndarray] = {}
 
@@ -253,7 +257,7 @@ for name,texture in data.items():
 	if 'rimlight' in texture:
 		rimlight = PIL.Image.open(os.path.join(cfg("localGame.texture.texturePathFolder"),blockpaths[name]['rimlight'])).convert('RGB')
 		rimlight_array:np.ndarray = np.asarray(rimlight)[0]
-		lprint(name,'has a rimlight wth shape',rimlight_array.shape)
+		l.debug(f'{name} has a rimlight wth shape {rimlight_array.shape}')
 		rimlights[blockinfos[name]['id']] = rimlight_array
 
 @functools.cache

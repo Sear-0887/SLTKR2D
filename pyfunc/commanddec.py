@@ -7,23 +7,14 @@ from pyfunc.lang import cfg, evl
 from colorama import Fore, init
 from nextcord.ext import commands
 import traceback
-
+import logging 
 init() # colorama's init(), not assetload's
 RED = Fore.RED
 BLUE = Fore.BLUE
 GREEN = Fore.GREEN
 RESET = Fore.RESET
+le = logging.getLogger()
 
-# User: {errorpacket['user']['displayname']}/{errorpacket['user']['globalname']}
-# | (<@{errorpacket['user']['id']}> in Server {errorpacket['user']['servername']})
-# At: {errorpacket['time']}'
-# {errorpacket['trigger']}
-# {errorpacket['arg']}
-# {errorpacket['kwarg']}
-# ExceptionName: " {errorpacket['errname']} "
-# Detail:
-# {errorpacket['errline']}
-# Exc- {excstr}
 async def ErrorHandler(name, e, args, kwargs, interaction=None, ctx=None):
     ctxorintr = ctx or interaction
     async def sendtoch(msg):
@@ -38,13 +29,13 @@ async def ErrorHandler(name, e, args, kwargs, interaction=None, ctx=None):
     errortype = repr(type(e)).split("\'")[1] # <class '[KeyError]'>
     replacingerror = evl(f"{name}.error.{errortype}")
     if replacingerror:
-        print(f"Other Error Message found for {name}: {replacingerror}")
+        le.info(f"Other Error Message found for {name}: {replacingerror}")
         expecterr = replacingerror
     assert isinstance(expecterr,str)
     try:
-        print(f"{e.args=}")
+        le.debug(f"{e.args=}")
         eargs = e.args[0]
-        print(eargs)
+        le.info(eargs)
         if isinstance(eargs, str):
             expecterr = expecterr.format(*args, e=eargs, **kwargs)
         elif isinstance(eargs, list):
@@ -52,9 +43,9 @@ async def ErrorHandler(name, e, args, kwargs, interaction=None, ctx=None):
         elif type(eargs) == dict:
             expecterr = expecterr.format(*args, **eargs, **kwargs)
     except Exception as EX:
-        print(f"Unknown Error Happened when tring to replace keyword: {EX}")
+        le.error(f"Unknown Error Happened when tring to replace keyword: {EX}")
         pass
-    print(
+    le.error(
 f'''
 {'-'*20}
 {RED}Exception: " {BLUE}{e} {RED}"
@@ -157,6 +148,6 @@ def InteractionCogCommand_Local(name):
         return nextcord.slash_command(
             name        = name,
             description = evl(f"{name}.desc") or "*No Description Found.*",
-            guild_ids   = cfg("localICCServer")
+            guild_ids   = cfg("botInfo.localICCServer")
         )( trycmd(cmd) )
     return fixcmd
