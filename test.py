@@ -362,6 +362,3 @@ for srecipe in data['sensor_rare_resource']:
         out = [srecipe['filter']]
     for p in out:
         sensor_rare_resource.add(p)
-
-with open('data.json','w') as f:
-    json.dump(data,f,indent = 2)
