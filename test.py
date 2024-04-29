@@ -24,8 +24,6 @@ for x in rawdata:
     typ=x['type']
     data[typ].append(x)
 
-print(json.dumps({dk:[*set([k for x in d for k in x.keys()])] for dk,d in data.items()},indent=2))
-
 Research = typing.NewType('Research', str)
 Passive = typing.NewType('Passive', str)
 
@@ -88,7 +86,6 @@ def handlespecialblock(s:str) -> list[BlockDataIn]:
     try:
         return [assertblock(s)]
     except AssertionError:
-        print(s)
         if s.split()[0] in ['any','non_air']:
             typ,filtertype,filtervalue = s.split()
             assert filtertype in ['needs_attribute','needs_collision']
@@ -270,12 +267,12 @@ class InjectRecipe(typing.TypedDict):
 
 class CombineRecipe(typing.TypedDict):
     grid:list[list[BlockDataIn | Tag]]
-    product:Product
+    amount:int
     needs_passive:typing.NotRequired[Passive]
 
 class ExtraDisplayRecipe(typing.TypedDict):
     grid:list[list[BlockDataIn | Tag]]
-    product:FilterProduct
+    amount:int
     arrow_sprite:int
     guidebook_page_blacklist:list[str] # don't put this on these pages, even if the recipe contains those blocks
     guidebook_page_whitelist:list[str] # put this on these pages, even if the recipe doesn't contain those blocks
@@ -285,16 +282,6 @@ class ExtraDisplayRecipe(typing.TypedDict):
     entity:typing.NotRequired[EntityPos]
     guidebook_use_only:bool
     match_filter_modulo:bool # true if the changing blocks all match
-
-class SummonorePillRecipe(typing.TypedDict):
-    filter:BlockDataIn | Tag
-
-class SensorNaturalRecipe(typing.TypedDict):
-    filter:BlockDataIn | Tag
-
-class SensorRareResourceRecipe(typing.TypedDict):
-    filter:BlockDataIn | Tag
-
 
 heat:dict[str,list[HeatRecipe]]=collections.defaultdict(list)
 for hrecipe in data['heat']:
@@ -307,99 +294,74 @@ for erecipe in data['extract']:
     extract[erecipe['product']].append(erecipe)
     del erecipe['product']
     del erecipe['type']
-{
-    'type':'extract',
-    'product':block,
-    'amount':num,
-    'ingredient':blocktag,
-    'time':num,
-    schema.Optional('post_action'):schema.Or('destroy','reduce_container_count5')
-}
+
 inject:dict[str,list[InjectRecipe]] = collections.defaultdict(list)
 for irecipe in data['inject']:
-    inject[irecipe['product']].append(irecipe)
+    product = irecipe['product']
+    if 'fertilizer' in product and product['fertilizer']:
+        key = '__fertilizer'
+    else:
+        key = product['transform_receiver']
+    inject[key].append(irecipe)
     del irecipe['product']
     del irecipe['type']
-{
-    'type':'inject',
-    'product':schema.Or(
-        {
-            'transform_receiver':block
-        },
-        {
-            'fertilizer':flag
-        }
-    ),
-    'pill':block,
-    'receiver':block,
-    schema.Optional('needs_passive'):research
-}
+
 combine:dict[str,list[CombineRecipe]] = collections.defaultdict(list)
 for crecipe in data['combine']:
-    combine[crecipe['product']].append(crecipe)
+    product = crecipe['product']
+    crecipe['amount'] = product['amount']
+    combine[product['block']].append(crecipe)
     del crecipe['product']
     del crecipe['type']
-{
-    'type':'combine',
-    'grid':[[blocktag]],
-    'product':{
-        'block':block,
-        'amount':num,
-    },
-    schema.Optional('needs_passive'):research
-}
+
 extra_display:dict[str,list[ExtraDisplayRecipe]] = collections.defaultdict(list)
 for erecipe in data['extra_display']:
-    extra_display[erecipe['product']].append(erecipe)
-    del erecipe['product']
+    product = erecipe['product']
+    erecipe['amount'] = product['amount']
+    if isinstance(product['filter'],list):
+        out = product['filter']
+    elif isinstance(product['filter'],dict):
+        out = [product['filter']['type']]
+    else:
+        out = [product['filter']]
     del erecipe['type']
-{
-    'type':'extra_display',
-    'grid':schema.Or(schema.Use(fixemptygrid),[[blocktag]]),
-    'product':{
-        'filter':blocktag,
-        schema.Optional('amount',default = 1):num,
-    },
-    schema.Optional('arrow_sprite',default = 0):num,
-    schema.Optional('guidebook_page_blacklist',default = []):[block], # don't put this on these pages, even if the recipe contains those blocks
-    schema.Optional('guidebook_page_whitelist',default = []):[block], # put this on these pages, even if the recipe doesn't contain those blocks
-    schema.Optional('weldall',default = True):flag, # weld all blocks?
-    schema.Optional('needs_passive'):research,
-    schema.Optional('research_requirement_override'):research, # the research that makes  this "recipe" appear in the guidebook
-    schema.Optional('entity'):{
-        'type':str,
-        'position':schema.Use(handlepos)
-    },
-    schema.Optional('guidebook_use_only',default = False):flag,
-    schema.Optional('match_filter_modulo',default = False):flag, # true if the changing blocks all match
-}
-summonore_pill:dict[str,list[SummonorePillRecipe]] = collections.defaultdict(list)
+    for p in out:
+        erecipe = copy.deepcopy(erecipe)
+        erecipe['product'] = p
+        extra_display[p].append(erecipe)
+
+summonore_pill:set[str] = set()
 for srecipe in data['summonore_pill']:
-    summonore_pill[srecipe['product']].append(srecipe)
-    del srecipe['product']
-    del srecipe['type']
-{
-    'type':'summonore_pill',
-    'filter':blocktag
-}
-sensor_natural:dict[str,list[SensorNaturalRecipe]] = collections.defaultdict(list)
+    if isinstance(srecipe['filter'],list):
+        out = srecipe['filter']
+    elif isinstance(srecipe['filter'],dict):
+        out = [srecipe['filter']['type']]
+    else:
+        out = [srecipe['filter']]
+    for p in out:
+        summonore_pill.add(p)
+
+sensor_natural:set[str] = set()
 for srecipe in data['sensor_natural']:
-    sensor_natural[srecipe['product']].append(srecipe)
-    del srecipe['product']
-    del srecipe['type']
-{
-    'type':'sensor_natural',
-    'filter':blocktag
-}
-sensor_rare_resource:dict[str,list[SensorRareResourceRecipe]] = collections.defaultdict(list)
+    if isinstance(srecipe['filter'],list):
+        out = srecipe['filter']
+    elif isinstance(srecipe['filter'],dict):
+        out = [srecipe['filter']['type']]
+    else:
+        out = [srecipe['filter']]
+    for p in out:
+        sensor_natural.add(p)
+
+sensor_rare_resource:set[str] = set()
 for srecipe in data['sensor_rare_resource']:
-    sensor_rare_resource[srecipe['product']].append(srecipe)
-    del srecipe['product']
-    del srecipe['type']
-{
-    'type':'sensor_rare_resource',
-    'filter':blocktag
-}
+    if isinstance(srecipe['filter'],list):
+        out = srecipe['filter']
+    elif isinstance(srecipe['filter'],dict):
+        out = [srecipe['filter']['type']]
+    else:
+        out = [srecipe['filter']]
+    for p in out:
+        sensor_rare_resource.add(p)
 
 with open('data.json','w') as f:
     json.dump(data,f,indent = 2)
