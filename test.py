@@ -6,52 +6,6 @@ from pyfunc.assetload import assetinit,blockinfos
 assetinit()
 from pyfunc.block import BlockDataIn
 import typing
-
-with open("content/recipes.smp") as f:
-    rawdata = smp.getsmpvalue(f.read())
-
-data=collections.defaultdict(list)
-
-for x in rawdata:
-    x=copy.deepcopy(x)
-    typ=x['type']
-    data[typ].append(x)
-
-print(json.dumps({dk:[*set([k for x in d for k in x.keys()])] for dk,d in data.items()},indent=2))
-
-Research = typing.NewType('Research', str)
-Passive = typing.NewType('Passive', str)
-
-Tag:typing.TypeAlias = list[BlockDataIn]
-
-tags:dict[str,Tag]={}
-
-for tag in data['tag']:
-    tag=copy.deepcopy(tag)
-    name=tag['name']
-    del tag['name']
-    del tag['type']
-    assert name not in tags
-    tags[name]=tag['blocks']
-
-def handletags(s:str) -> str | list:
-    if s.startswith('$'):
-        s,*extra = s.split()
-        if s[1:] in tags:
-            if len(extra)==0:
-                return tags[s[1:]]
-            return [' '.join([x,*extra]) for x in tags[s[1:]]]
-        print(f'{s} is Just a Normal name starts with $ ???????')
-    return s
-
-# filters:
-# grassy
-# non_air
-# needs_collision
-# buildable
-# not_water
-# needs_container_count5
-
 import schema # type: ignore # no type hints
 
 def fixemptygrid(g:str|list[list[BlockDataIn]]) -> list[list[BlockDataIn]]:
@@ -114,6 +68,57 @@ research = schema.Use(assertresearch)
 blocktag = schema.Use(asserttags)
 num = schema.Use(int)
 flag = schema.Use(strtobool)
+
+with open("content/recipes.smp") as f:
+    rawdata = smp.getsmpvalue(f.read())
+
+data=collections.defaultdict(list)
+
+for x in rawdata:
+    x=copy.deepcopy(x)
+    typ=x['type']
+    data[typ].append(x)
+
+print(json.dumps({dk:[*set([k for x in d for k in x.keys()])] for dk,d in data.items()},indent=2))
+
+Research = typing.NewType('Research', str)
+Passive = typing.NewType('Passive', str)
+
+Tag:typing.TypeAlias = list[BlockDataIn]
+
+tags:dict[str,Tag]={}
+
+tagschema:schema.Schema = [{
+    'type':'tag',
+    'name':str,
+    'blocks':[block]
+}]
+
+tagdata = schema.validate(tagschema,data['tag'])
+
+for tag in data['tag']:
+    tag=copy.deepcopy(tag)
+    assert tag['name'] not in tags
+    assert isinstance(tag['blocks'],list) 
+    tags[tag['name']]=typing.cast(Tag, tag['blocks'])
+
+def handletags(s:str) -> str | list:
+    if s.startswith('$'):
+        s,*extra = s.split()
+        if s[1:] in tags:
+            if len(extra)==0:
+                return tags[s[1:]]
+            return [' '.join([x,*extra]) for x in tags[s[1:]]]
+        print(f'{s} is Just a Normal name starts with $ ???????')
+    return s
+
+# filters:
+# grassy
+# non_air
+# needs_collision
+# buildable
+# not_water
+# needs_container_count5
 
 dataschema = schema.Schema({
     'tag':[{
