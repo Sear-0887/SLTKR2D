@@ -98,7 +98,7 @@ def handlespecialblock(s:str) -> list[BlockDataIn]:
                 blocks = getblocksbycollision(filtervalue)
             if typ == 'non_air':
                 blocks = [b for b in blocks if b != 'air']
-            return blocks
+            return typing.cast(list[BlockDataIn],blocks) # list[str] can't auto cast to list[str | other stuff]
         raise ValueError(f'"{s}" is not a block')
 
 def asserttags(s:str) -> list[BlockDataIn] | BlockDataIn:
@@ -277,11 +277,11 @@ class ExtraDisplayRecipe(typing.TypedDict):
     grid:list[list[BlockDataIn | Tag]]
     product:FilterProduct
     arrow_sprite:int
-    guidebook_page_blacklist:list[str], # don't put this on these pages, even if the recipe contains those blocks
-    guidebook_page_whitelist:list[str], # put this on these pages, even if the recipe doesn't contain those blocks
-    weldall:bool, # weld all blocks?
-    needs_passive:typing.NotRequired[Passive],
-    research_requirement_override:typing.NotRequired[Research], # the research that makes  this "recipe" appear in the guidebook
+    guidebook_page_blacklist:list[str] # don't put this on these pages, even if the recipe contains those blocks
+    guidebook_page_whitelist:list[str] # put this on these pages, even if the recipe doesn't contain those blocks
+    weldall:bool # weld all blocks?
+    needs_passive:typing.NotRequired[Passive]
+    research_requirement_override:typing.NotRequired[Research] # the research that makes  this "recipe" appear in the guidebook
     entity:typing.NotRequired[EntityPos]
     guidebook_use_only:bool
     match_filter_modulo:bool # true if the changing blocks all match
