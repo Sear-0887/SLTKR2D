@@ -8,6 +8,12 @@ from pyfunc.block import BlockDataIn
 import typing
 import schema # type: ignore # no type hints
 
+def getblocksbyattr(attr:str) -> list[str]:
+    return [b for b,data in blockinfos.items() if attr in data['attributes']]
+
+def getblocksbycollision(collision:str) -> list[str]:
+    return [b for b,data in blockinfos.items() if collision in data['collision']]
+
 with open("content/recipes.smp") as f:
     rawdata = smp.getsmpvalue(f.read())
 
@@ -82,18 +88,28 @@ def handlespecialblock(s:str) -> list[BlockDataIn]:
     try:
         return [assertblock(s)]
     except AssertionError:
-        if s.split()[0] == 'any':
-            _,filtertype,filtervalue = s.split()
+        print(s)
+        if s.split()[0] in ['any','non_air']:
+            typ,filtertype,filtervalue = s.split()
             assert filtertype in ['needs_attribute','needs_collision']
             if filtertype == 'needs_attribute':
+                blocks = getblocksbyattr(filtervalue)
             if filtertype == 'needs_collision':
+                blocks = getblocksbycollision(filtervalue)
+            if typ == 'non_air':
+                blocks = [b for b in blocks if b != 'air']
+            return blocks
         raise ValueError(f'"{s}" is not a block')
 
 def asserttags(s:str) -> list[BlockDataIn] | BlockDataIn:
     s2 = handletags(s)
     if isinstance(s2,str):
-        return handlespecialblock(s2)
-    return [handlespecialblock(b) for b in s2]
+        l = handlespecialblock(s2)
+    else:
+        l = [x for b in s2 for x in handlespecialblock(b)]
+    if len(l) == 1:
+        return l[0]
+    return l
 
 block = schema.Use(assertblock)
 research = schema.Use(assertresearch)
