@@ -13,7 +13,7 @@ RED = Fore.RED
 BLUE = Fore.BLUE
 GREEN = Fore.GREEN
 RESET = Fore.RESET
-le = logging.getLogger()
+l = logging.getLogger()
 
 async def ErrorHandler(name, e, args, kwargs, interaction=None, ctx=None):
     ctxorintr = ctx or interaction
@@ -29,13 +29,13 @@ async def ErrorHandler(name, e, args, kwargs, interaction=None, ctx=None):
     errortype = repr(type(e)).split("\'")[1] # <class '[KeyError]'>
     replacingerror = evl(f"{name}.error.{errortype}")
     if replacingerror:
-        le.info(f"Other Error Message found for {name}: {replacingerror}")
+        l.info(f"Other Error Message found for {name}: {replacingerror}")
         expecterr = replacingerror
     assert isinstance(expecterr,str)
     try:
-        le.debug(f"{e.args=}")
+        l.debug(f"{e.args=}")
         eargs = e.args[0]
-        le.info(eargs)
+        l.info(eargs)
         if isinstance(eargs, str):
             expecterr = expecterr.format(*args, e=eargs, **kwargs)
         elif isinstance(eargs, list):
@@ -43,9 +43,9 @@ async def ErrorHandler(name, e, args, kwargs, interaction=None, ctx=None):
         elif type(eargs) == dict:
             expecterr = expecterr.format(*args, **eargs, **kwargs)
     except Exception as EX:
-        le.error(f"Unknown Error Happened when tring to replace keyword: {EX}")
+        l.error(f"Unknown Error Happened when tring to replace keyword: {EX}")
         pass
-    le.error(
+    l.error(
 f'''
 {'-'*20}
 {RED}Exception: " {BLUE}{e} {RED}"
