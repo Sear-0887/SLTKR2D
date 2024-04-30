@@ -13,16 +13,6 @@ def getblocksbyattr(attr:str) -> list[str]:
 def getblocksbycollision(collision:str) -> list[str]:
     return [b for b,data in blockinfos.items() if collision in data['collision']]
 
-with open("content/recipes.smp") as f:
-    rawdata = smp.getsmpvalue(f.read())
-
-data=collections.defaultdict(list)
-
-for x in rawdata:
-    x=copy.deepcopy(x)
-    typ=x['type']
-    data[typ].append(x)
-
 Research = typing.NewType('Research', str)
 Passive = typing.NewType('Passive', str)
 
@@ -118,13 +108,6 @@ tagschema:schema.Schema = schema.Schema([{
     'name':str,
     'blocks':[schema.Use(assertblockstr)]
 }])
-
-tagdata = tagschema.validate(data['tag'])
-
-for tag in data['tag']:
-    assert tag['name'] not in tags
-    assert isinstance(tag['blocks'],list)
-    tags[tag['name']]=typing.cast(Tag, tag['blocks'])
 
 def handletags(s:str) -> str | list[str]:
     if s.startswith('$'):
@@ -226,8 +209,6 @@ dataschema = schema.Schema({
     }],
 })
 
-data=dataschema.validate(data)
-
 class SurroundingBlock(typing.TypedDict):
     block:BlockDataIn
     minimum:int
@@ -275,18 +256,43 @@ class ExtraDisplayRecipe(typing.TypedDict):
     match_filter_modulo:bool # true if the changing blocks all match
 
 heat:dict[str,list[HeatRecipe]]=collections.defaultdict(list)
+extract:dict[str,list[ExtractRecipe]] = collections.defaultdict(list)
+inject:dict[str,list[InjectRecipe]] = collections.defaultdict(list)
+combine:dict[str,list[CombineRecipe]] = collections.defaultdict(list)
+extra_display:dict[str,list[ExtraDisplayRecipe]] = collections.defaultdict(list)
+summonore_pill:set[str] = set()
+sensor_natural:set[str] = set()
+sensor_rare_resource:set[str] = set()
+
+with open("content/recipes.smp") as f:
+    rawdata = smp.getsmpvalue(f.read())
+
+data=collections.defaultdict(list)
+
+for x in rawdata:
+    x=copy.deepcopy(x)
+    typ=x['type']
+    data[typ].append(x)
+
+for tag in data['tag']:
+    assert tag['name'] not in tags
+    assert isinstance(tag['blocks'],list)
+    tags[tag['name']]=typing.cast(Tag, tag['blocks'])
+
+tagdata = tagschema.validate(data['tag'])
+
+data=dataschema.validate(data)
+
 for hrecipe in data['heat']:
     heat[hrecipe['product']].append(hrecipe)
     del hrecipe['product']
     del hrecipe['type']
 
-extract:dict[str,list[ExtractRecipe]] = collections.defaultdict(list)
 for erecipe in data['extract']:
     extract[erecipe['product']].append(erecipe)
     del erecipe['product']
     del erecipe['type']
 
-inject:dict[str,list[InjectRecipe]] = collections.defaultdict(list)
 for irecipe in data['inject']:
     product = irecipe['product']
     if 'fertilizer' in product and product['fertilizer']:
@@ -297,7 +303,6 @@ for irecipe in data['inject']:
     del irecipe['product']
     del irecipe['type']
 
-combine:dict[str,list[CombineRecipe]] = collections.defaultdict(list)
 for crecipe in data['combine']:
     product = crecipe['product']
     crecipe['amount'] = product['amount']
@@ -305,7 +310,6 @@ for crecipe in data['combine']:
     del crecipe['product']
     del crecipe['type']
 
-extra_display:dict[str,list[ExtraDisplayRecipe]] = collections.defaultdict(list)
 for erecipe in data['extra_display']:
     product = erecipe['product']
     erecipe['amount'] = product['amount']
@@ -321,7 +325,6 @@ for erecipe in data['extra_display']:
         erecipe['product'] = p
         extra_display[p].append(erecipe)
 
-summonore_pill:set[str] = set()
 for srecipe in data['summonore_pill']:
     if isinstance(srecipe['filter'],list):
         out = srecipe['filter']
@@ -332,7 +335,6 @@ for srecipe in data['summonore_pill']:
     for p in out:
         summonore_pill.add(p)
 
-sensor_natural:set[str] = set()
 for srecipe in data['sensor_natural']:
     if isinstance(srecipe['filter'],list):
         out = srecipe['filter']
@@ -343,7 +345,6 @@ for srecipe in data['sensor_natural']:
     for p in out:
         sensor_natural.add(p)
 
-sensor_rare_resource:set[str] = set()
 for srecipe in data['sensor_rare_resource']:
     if isinstance(srecipe['filter'],list):
         out = srecipe['filter']
