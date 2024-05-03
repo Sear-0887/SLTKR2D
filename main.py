@@ -148,12 +148,9 @@ async def changepresence() -> None:
 # the bot is ready now
 @bot.event
 async def on_ready():
-    l.info(
-        f"ONLINE as {bot.user} \n" +
-        f"appearing {bot.user.display_name}, \n" +
-        f"id {bot.user.id}."
-        
-        )
+    l.info(f"ONLINE as {bot.user}")
+    l.info(f"Display Name: {bot.user.display_name}")
+    l.info(f"ID: {bot.user.id}.")
     global TimeOn
     TimeOn = datetime.datetime.now() # updating the real TimeOnline
     changepresence.start()
