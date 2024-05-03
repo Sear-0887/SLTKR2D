@@ -8,9 +8,12 @@ CREDITS sounds=Sound Creators from freesound.org\
 	EminYILDIRIM\
 	ingudios\
 	ivolipa\
+	JackMenhorn\
 	Owlish Media\
 	PaulMorek\
-	Robinhood76
+	Robinhood76\
+	Sheyvan\
+	SieuAmThanh
 CREDITS discord_contributors=Discord Alpha Contributors\
 	asof\
 	Dredonkey\

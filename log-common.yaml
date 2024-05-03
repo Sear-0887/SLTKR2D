@@ -16,7 +16,7 @@ handlers:
       formatter: general
       level: DEBUG
       filename: ./cache/log/latest-debug.log
-      # mode: w
+      mode: w
   infoFile:
       encoding: utf-8
       class : logging.FileHandler
@@ -49,4 +49,5 @@ handlers:
 
 root:
     level: DEBUG
+    propagate: 0
     handlers: [console, debugFile, infoFile, warnFile, errorFile]

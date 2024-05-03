@@ -68,18 +68,37 @@ OPERATOR or=or
 title=Roody:2d
 
 GIF starting=starting recording
+GIF saving  =saving gif as
 GIF finished=recording saved as
 
-ENTITY player           =player
-ENTITY player_corpse    =player corpse
-ENTITY chomer           =chomer
+ENTITY player               =player
+ENTITY_TITLE player         =Player
+ENTITY player_corpse        =player
+ENTITY_TITLE player_corpse  =Player Corpse
+
+ENTITY chomer               =chomer
+ENTITY_TITLE chomer         =Chomer
 #chomer is a monster that chomps with a big mouth. A "chom[p]er"
-ENTITY chomer_corpse    =chomer corpse
-ENTITY bushbert         =bushbert
+
+ENTITY chomer_corpse        =chomer corpse
+ENTITY_TITLE chomer_corpse  =Chomer Corpse
+
+ENTITY bushbert             =bushbert
+ENTITY_TITLE bushbert       =Bushbert
 #bushberts are passive creatures that don't attack. They are green colored and burrow in the ground. They used to be called "burrower" but got the novel name "bushbert"
-ENTITY button           =button
+
+ENTITY button               =button
+ENTITY_TITLE button         =Button
 #buttons are spherical monsters that float around. They have a UFO extraterrestrial alien atmosphere and are the most difficult monster to encounter. The "button" is like a shirt button, since shirt buttons are circular.
-ENTITY entity           =creature
+
+ENTITY spark                =spark
+ENTITY_TITLE spark          =Spark
+#"spark" is a small glowing piece of metal that flies up when you cut/grind/weld something. "spark" also has connotations with "energy"
+
+ENTITY bomb                 =bomb
+ENTITY_TITLE bomb           =Bomb
+
+ENTITY entity               =creature
 #in-engine, monsters and corpses are called "entity", but for the player, all the text uses the "Creature" term.
 ENTITY none=none
 

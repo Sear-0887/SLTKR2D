@@ -18,6 +18,7 @@ def massstrip(l:list[str]) -> list[str]:
 
 def handletags(s:str, organdict:dict) -> str | list:
     if not isinstance(s, str): return s 
+    s = s.split(" ")[0]
     if s.startswith('$'):
         if s[1:] in organdict['tag'].keys():
             return organdict['tag'][s[1:]]

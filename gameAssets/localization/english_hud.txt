@@ -46,6 +46,7 @@ RESEARCH lamp               =Lamp
 RESEARCH sensors            =Sensors
 RESEARCH injector           =Injector
 #should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
+RESEARCH sediment_composition=Sediment Composition
 RESEARCH core_economy       =Core Economy
 #this research unlocks the ability to infinitly craft core blocks. Now core blocks are much cheaper, so they will be more prolific. "Economy" is a term because cores will be flowing everywhere in a system, and because "economic" can mean cheaper.
 RESEARCH compressed_stone   =Compressed Stone
@@ -53,6 +54,16 @@ RESEARCH compressed_stone   =Compressed Stone
 RESEARCH summonore          =Summonore
 #should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
 RESEARCH prism              =Prism
+#should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
+RESEARCH slime              =Slime
+#should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
+RESEARCH slime_ice          =Slimeice
+#should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
+RESEARCH spark_catcher      =Spark Catcher
+#should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
+RESEARCH spark_emitter      =Spark Emitter
+#should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
+RESEARCH bomb_emitter       =Bomb Emitter
 #should align with the BLOCK name. It isn't a sub-translation because RESEARCH is its own special color
 
 RESEARCH level_completed_tutorial=Completed tutorial level
@@ -62,15 +73,17 @@ HINT_RESEARCH injector          =The {BLOCK injector} can use {BLOCK sawdust} to
 
 PASSIVE longer_reach            =longer reach
 PASSIVE roller_replication      =a new recipe to replicate {BLOCK roller|s}
+PASSIVE sediment_composition    =a recipe to create new {BLOCK sediment}
 PASSIVE destroyer_everything    =destroyer can destroy critical processing machines
 PASSIVE faster_unwelding        =faster unwelding
 PASSIVE faster_welding          =faster welding
 PASSIVE higher_jump             =higher jump
 PASSIVE bigger_inventory        =bigger backpack
-PASSIVE core_economy            =a new recipe to combine {BLOCK stone} and {BLOCK residue} to make {BLOCK core_ore}
+PASSIVE core_economy            =a new recipe to combine {BLOCK compressed_stone} and {BLOCK slime} to make new {BLOCK core_ore|s}
 PASSIVE level_completed_tutorial=this research completes this tutorial level
 PASSIVE level_completed_demo    =finish the demo
 PASSIVE dummy_door              =this research opens a door
+PASSIVE faster_freezing         =faster freezing and picking up large structures
 
 RESEARCH_BOOK missing_prerequisites=Needs prerequisites
 RESEARCH_BOOK needs_costs       =Needs materials
@@ -148,6 +161,10 @@ BLOCK_STATE orientation         =orientation
 BLOCK_STATE layers              =layers
 #snow can stack up in "layers"
 BLOCK_STATE distance            =distance
+BLOCK_STATE individual          =individual
+BLOCK_STATE cluster             =cluster
+BLOCK_STATE quotient            =quotient
+BLOCK_STATE remainder           =remainder
 
 SCAN stack                      =stack
 #in the inventory, you can store multiple blocks on top of eachother. "stack" is a common video game term for this
@@ -155,6 +172,9 @@ SCAN researched                 =researched
 SCAN unresearched               =unresearched
 SCAN remove_on_research         =press [open_research] to see how to unlock
 #remove_on_research blocks form a door that is opened when a certain research is achieved
+ENTITY_STATE health             =health
+ENTITY_STATE age                =age
+ENTITY_STATE charge             =charge
 
 SENSOR_SELECTION none               =none
 SENSOR_SELECTION_HINT none              =does not send a signal

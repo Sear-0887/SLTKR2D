@@ -8,6 +8,7 @@
 import logging
 import time
 import os
+from pyfunc.gettoken import getclientenv
 from pyfunc.smp import getsmpvalue
 import json
 from datetime import datetime
@@ -74,7 +75,7 @@ def phrasermodule(module:str): # reloads the locale from one file in each locale
             phraserfile(os.path.join('lang',lang,module+'.txt'),lang)
             found=True
         except FileNotFoundError:
-            l.info(f"WARNING: locale for {module} in {lang} wasn't found")
+            l.warning(f"locale for {module} in {lang} wasn't found")
     return found
 
 # get a locale entry
@@ -86,15 +87,7 @@ def evl(*args, lang="en") -> str | list:
         return ""
 
 def handlehostid() -> tuple[int, list[bool]]:
-    raw = ""
-    try:
-        raw2 = dotenv_values("cred/client.env")['HOSTID']
-        if raw2 is None:
-            raise Exception("No HOSTID.")
-        raw = raw2
-    except Exception as e:
-        l.warning(f"ReadingHostID Failed {e}")
-        raw = "CLIENT--0"
+    raw = getclientenv('HOSTID') or  "CLIENT--0"
     match = re.fullmatch(r"^CLIENT\-(\w*)\-(.*)", raw)
     if match is not None:
         auid, setting = match.groups()
@@ -111,7 +104,7 @@ def loadconfig():
         hostid, settings = handlehostid()
         config['ShowHost'] = settings[0]
         config['HostDCID'] = hostid
-        config['PREFIX'] = dotenv_values("cred/client.env")['PREFIX']
+        config['PREFIX'] = getclientenv('PREFIX') or "!"
     return config
 
 def cfg(*target):

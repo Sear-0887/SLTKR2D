@@ -1,7 +1,8 @@
 #the BLOCK_TITLE is just capitalized versions of BLOCK. Used at the top of the guidebook, for example
 BLOCK air                       =air
 BLOCK_TITLE air                 =Air
-BLOCK_TUTORIAL air              =It's empty space for you to build.
+BLOCK_TUTORIAL air              =It's empty space for you to build.\
+If you need more of it, don't be afraid to use the {BLOCK destroyer}.
 
 BLOCK command_block             =command block
 BLOCK_TITLE command_block       =Command Block
@@ -37,7 +38,13 @@ BLOCK_TUTORIAL sediment         =It's not quite {BLOCK dirt} and not quite {BLOC
 
 BLOCK stone                     =stone
 BLOCK_TITLE stone               =Stone
-BLOCK_TUTORIAL stone            =You can find valuable resources deep in the {BLOCK stone}. When {BLOCK stone} is naturally generated, it can be immune to movement.
+BLOCK_TUTORIAL stone            =You can find valuable resources deep in the {BLOCK stone}.\
+When {BLOCK stone} is naturally generated, it can be immune to movement.
+
+BLOCK chert                     =chert
+BLOCK_TITLE chert               =Chert
+BLOCK_TUTORIAL chert            =A harder type of rock.\
+When {BLOCK chert} is naturally generated, it can be immune to movement.
 
 BLOCK iron_vein                 =iron vein
 BLOCK_TITLE iron_vein           =Iron Vein
@@ -57,13 +64,14 @@ BLOCK_TUTORIAL copper_ore       =This needs to be processed with an {BLOCK arc_f
 
 BLOCK sand                      =sand
 BLOCK_TITLE sand                =Sand
-BLOCK_TUTORIAL sand             =This block won't connect to any other. Don't try to tower it up too high.\
+BLOCK_TUTORIAL sand             =This block won't connect to any other. Slides off other blocks.\
 Use an {BLOCK arc_furnace} to turn it into {BLOCK silicon} and then {BLOCK glass}.
 #sand, pulp, and sawdust have similar properties
 
 BLOCK leaf_maple                =maple leaf
 BLOCK_TITLE leaf_maple          =Maple Leaf
-BLOCK_TUTORIAL leaf_maple       =Flammable
+BLOCK_TUTORIAL leaf_maple       =Flammable.\
+Will not grow if the new spot does not have another {BLOCK air} above it.
 
 BLOCK log_maple                 =maple log
 BLOCK_TITLE log_maple           =Maple Log
@@ -71,7 +79,8 @@ BLOCK_TUTORIAL log_maple        =For a rustic look.
 
 BLOCK leaf_pine                 =pine needle
 BLOCK_TITLE leaf_pine           =Pine Needle
-BLOCK_TUTORIAL leaf_pine        =Flammable
+BLOCK_TUTORIAL leaf_pine        =Flammable.\
+Will not grow if the new spot does not have another {BLOCK air} above it.
 
 BLOCK log_pine                  =pine log
 BLOCK_TITLE log_pine            =Pine Log
@@ -86,7 +95,8 @@ BLOCK snow                      =snow
 BLOCK_TITLE snow                =Snow
 BLOCK_TUTORIAL snow             =Frozen matter that can be squished into nothing.
 
-#material catagory
+
+#material category
 
 BLOCK iron_bar                  =iron bar
 BLOCK_TITLE iron_bar            =Iron Bar
@@ -129,7 +139,7 @@ BLOCK_TUTORIAL wafer            =A necessary base for electrical components.
 
 BLOCK pulp                      =pulp
 BLOCK_TITLE pulp                =Pulp
-BLOCK_TUTORIAL pulp             =This block won't connect to any other. Don't try to tower it up too high.\
+BLOCK_TUTORIAL pulp             =This block won't connect to any other. Slides off other blocks.\
 Use an {BLOCK arc_furnace} to turn it into {BLOCK rubber}.
 #sand, pulp, and sawdust have similar properties
 
@@ -140,7 +150,7 @@ BLOCK_TUTORIAL rubber           =A non-magnetic material.
 
 BLOCK sawdust                   =sawdust
 BLOCK_TITLE sawdust             =Sawdust
-BLOCK_TUTORIAL sawdust          =This block won't connect to any other. Don't try to tower it up too high.\
+BLOCK_TUTORIAL sawdust          =This block won't connect to any other. Slides off other blocks.\
 Put into an {BLOCK injector} to fertilize {BLOCK dirt} or turn {BLOCK oxide} into {BLOCK sediment}.
 #sand, pulp, and sawdust have similar properties
 
@@ -165,8 +175,13 @@ BLOCK_TITLE compressed_stone    =Compressed Stone
 BLOCK_TUTORIAL compressed_stone =A way to store large amounts of {BLOCK stone} slightly inefficiently.
 #25 stone can be turned into 1 compressed stone, and 1 compressed stone can be turned into 24 stone. This is "slightly inefficient", and this BLOCK_TUTORIAL should help the player notice this
 
+BLOCK compressed_chert          =compressed chert
+BLOCK_TITLE compressed_chert    =Compressed Stone
+BLOCK_TUTORIAL compressed_chert =A way to store large amounts of {BLOCK chert} slightly inefficiently.
+#25 chert can be turned into 1 compressed chert, and 1 compressed chert can be turned into 24 chert. This is "slightly inefficient", and this BLOCK_TUTORIAL should help the player notice this
 
-#building catagory
+
+#building category
 
 BLOCK frame                     =frame
 BLOCK_TITLE frame               =Frame
@@ -220,7 +235,7 @@ BLOCK_TUTORIAL adobe            =A solid foundation.
 #this BLOCK_TUTORIAL is useless filler text
 
 
-#wire catagory
+#wire category
 
 BLOCK wire                      =wire
 BLOCK_TITLE wire                =Wire
@@ -265,6 +280,13 @@ BLOCK galvanometer              =galvanometer
 BLOCK_TITLE galvanometer        =Galvanometer
 BLOCK_TUTORIAL galvanometer     =If the left and right inputs are imbalanced, it selects the higher {BLOCK_STATE charge} and then subtracts the back input.
 
+BLOCK divider                   =divider
+BLOCK_TITLE divider             =Divider
+BLOCK_TUTORIAL divider          =Divides the back input {BLOCK_STATE charge} by 2.\
+The {BLOCK_STATE quotient} is output on the front.\
+The {BLOCK_STATE remainder} is output on the sides.
+
+
 BLOCK counter                   =counter
 BLOCK_TITLE counter             =Counter
 BLOCK_TUTORIAL counter          =Counts {BLOCK_STATE charge} pulses entering back side. When the {BLOCK_STATE count} reaches the {BLOCK_STATE setting}, it lets the last pulse through, then resets.\
@@ -273,10 +295,11 @@ Adjust {BLOCK_STATE setting} with [adjust].\
 
 BLOCK capacitor                 =capacitor
 BLOCK_TITLE capacitor           =Capacitor
-BLOCK_TUTORIAL capacitor        =Can hold a {BLOCK_STATE charge} for a time.
+BLOCK_TUTORIAL capacitor        =Can hold a {BLOCK_STATE charge} for a time.\
+Slowly discharges if it has some connection to a block that takes {BLOCK_STATE charge} input.
 
 
-#sensor catagory
+#sensor category
 
 BLOCK toggler                   =toggler
 BLOCK_TITLE toggler             =Toggler
@@ -298,14 +321,21 @@ BLOCK_TUTORIAL detector         =Sends a {BLOCK_STATE charge} when a {ENTITY ent
 
 BLOCK matcher                   =matcher
 BLOCK_TITLE matcher             =Matcher
-BLOCK_TUTORIAL matcher          =Sends a {BLOCK_STATE charge} when the two adjacent blocks match.
+BLOCK_TUTORIAL matcher          =Sends a {BLOCK_STATE charge} when the two adjacent blocks match.\
+{BLOCK matcher|^s} can be welded together to sense when multiple blocks all match.
 
 BLOCK accelerometer             =accelerometer
 BLOCK_TITLE accelerometer       =Accelerometer
 BLOCK_TUTORIAL accelerometer    =Sends a {BLOCK_STATE charge} when it's moving along that axis.
 #axis as in x axis or y axis. The accelerometer can be rotated to align with either axis
 
-#machine catagory
+BLOCK spark_catcher             =spark catcher
+BLOCK_TITLE spark_catcher       =Spark Catcher
+BLOCK_TUTORIAL spark_catcher    =Place this directly under a block that is being processed and it will collect {ENTITY spark|s}.\
+Sends a {BLOCK_STATE charge} pulse when it collects a spark (even when full).
+
+
+#machine category
 
 BLOCK extractor                 =extractor
 BLOCK_TITLE extractor           =Extractor
@@ -351,9 +381,24 @@ BLOCK_TITLE destroyer           =Destroyer
 BLOCK_TUTORIAL destroyer        =Grinds away any connections on a block, and the block.\
 Needs a {BLOCK_STATE charge} to function.
 
+BLOCK spark_emitter             =spark emitter
+BLOCK_TITLE spark_emitter       =Spark Emitter
+BLOCK_TUTORIAL spark_emitter    =A {BLOCK_STATE charge} will make the {BLOCK spark_emitter} shoot a {ENTITY spark}.\
+Needs to be supplied {ENTITY spark|s} by being welded to a {BLOCK spark_catcher}.\
+{ENTITY spark|s^} can be caught by {BLOCK spark_catcher|s}.
+
+BLOCK bomb_emitter              =bomb emitter
+BLOCK_TITLE bomb_emitter        =Bomb Emitter
+BLOCK_TUTORIAL bomb_emitter     =A {BLOCK_STATE charge} will make the {BLOCK bomb_emitter} shoot a {ENTITY bomb}.\
+Uses {ENTITY spark|s} as ammo by being welded to a {BLOCK spark_catcher}.\
+{ENTITY bomb|^s} unweld blocks in an area, and can knock back {ENTITY entity|s} or other {ENTITY bomb|s}.
+
 BLOCK collector                 =collector
 BLOCK_TITLE collector           =Collector
 BLOCK_TUTORIAL collector        =Collects research samples to find recipes for new blocks.
+
+
+#mover category
 
 BLOCK roller                    =roller
 BLOCK_TITLE roller              =Roller
@@ -370,6 +415,15 @@ BLOCK ice                       =ice
 BLOCK_TITLE ice                 =Ice
 BLOCK_TUTORIAL ice              =A slippery material.\
 Can be produced infinitely after researching {RESEARCH rehydration} and {RESEARCH refined_core}.
+
+BLOCK slime                     =slime
+BLOCK_TITLE slime               =Slime
+BLOCK_TUTORIAL slime            ={BLOCK slime|^} sticks to blocks, but blocks don't stick to {BLOCK slime}.\
+Quickly moving {BLOCK slime} back and forth can detach blocks.
+
+BLOCK slime_ice                 =slimice
+BLOCK_TITLE slime_ice           =Slimice
+BLOCK_TUTORIAL slime_ice        ={BLOCK slime|^} doesn't stick to cold blocks.
 
 BLOCK magnet                    =magnet
 BLOCK_TITLE magnet              =Magnet
@@ -546,3 +600,7 @@ HINT_GOTBLOCK wire_spool        =The locks on the hotbar protect a slot from [pi
 HINT_GOTBLOCK latch             =Holding [build_mode_not] while pressing [rotate_left] or [rotate_right] flips your hand.
 HINT_GOTBLOCK trigger           =Stop a production line from overflowing by turning it off with a {BLOCK trigger} observing the output pile.
 HINT_GOTBLOCK residue           =Filling up the space around a {BLOCK spawner} with solid blocks will prevent {ENTITY entity|s} from spawning.
+HINT_GOTBLOCK foam              =Large tanks of {BLOCK water} can lag the game. It works best in thin pipes.
+HINT_GOTBLOCK telewall          ={ENTITY entity|^s} falling down a one-block-wide shaft will always trigger a {BLOCK telewall}.
+HINT_GOTBLOCK spark_emitter     ={ENTITY spark|^s} remember the specific {BLOCK_STATE charge} level they were emitted with, so a {BLOCK spark_emitter} can send different {BLOCK_STATE charge} levels to a {BLOCK spark_catcher}.
+HINT_GOTBLOCK bomb_emitter      ={BLOCK slime|^} still sticks together when unwelded, so use it when you need to build near a {ENTITY bomb}.

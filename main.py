@@ -9,7 +9,7 @@ import random
 from pyfunc.lang import botinit, devs
 from nextcord.ext import commands, tasks
 from pyfunc.lang import cfg, evl, keywords, phraser, phrasermodule, getkws, getpresense
-from pyfunc.gettoken import gettoken
+from pyfunc.gettoken import getclientenv
 from pyfunc.commanddec import MainCommand
 from pyfunc.block import get
 LoggerInit()
@@ -142,21 +142,25 @@ async def changepresence() -> None:
         'watch':nextcord.ActivityType.watching,
     }
     presence=nextcord.Activity(type=types[category], name=status)
-    print(f"Changed Presence to {category}: {status}")
+    l.debug(f"Changed Presence to {category}: {status}")
     await bot.change_presence(status=nextcord.Status.online, activity=presence)
 
 # the bot is ready now
 @bot.event
 async def on_ready():
-    print(f"ONLINE as {bot.user} appearing {bot.user.display_name}, id {bot.user.id}.")
-    print("Done.")
+    l.info(
+        f"ONLINE as {bot.user} \n" +
+        f"appearing {bot.user.display_name}, \n" +
+        f"id {bot.user.id}."
+        
+        )
     global TimeOn
     TimeOn = datetime.datetime.now() # updating the real TimeOnline
     changepresence.start()
 
 
 # get the bot token
-token = gettoken()
+token = getclientenv("TOKEN")
 
 # load all cogs
 for cog_name in glob.glob("cog_*.py"):

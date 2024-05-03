@@ -42,6 +42,8 @@ MENU_HINT hold_backpack_position=When closing and opening the backpack, it will 
 MENU null_cancel_movement       =null cancel movement
 #"null cancel movement" comes from a common source engine game script where holding both left and right keys DONT make the player stop. So stopping ("null") is "cancelled"
 MENU_HINT null_cancel_movement  =Changes the behavior when holding both west and east movement keys
+MENU build_mode_scroll_control=build mode scroll control
+MENU_HINT build_mode_scroll_control=When on, the mouse-wheel in welding mode will zoom and the mouse-wheel in building mode will select the hotbar
 MENU persistent_WAILA           =persistent {WAILA abbreviation}
 MENU_HINT persistent_WAILA      =Shows you "{WAILA spelled_out}" at all times, instead of only when focus-ing
 MENU persistent_research        =persistent research
@@ -54,6 +56,14 @@ MENU UI_scale                   =UI Scale
 MENU_HINT UI_scale              =Change how big menu elements appear
 MENU autosave_minimum           =Autosave minutes
 MENU_HINT autosave_minimum      =Change how often worlds automatically save in minutes. Zero turns off autosave
+MENU use_shaders                =Use shaders
+MENU_HINT use_shaders           =Enables smooth lighting and normal mapping
+MENU disable_diorama            =Flatland experience
+MENU_HINT disable_diorama       =Disables the fancy sky with clouds and mountains
+MENU open_saves_directory       =Open saves directory
+MENU_HINT open_saves_directory  =Opens the file manager in order to delete or copy saves. Do this while {title} is open for Steam Cloud to recognize your changes
+MENU pick_block_on_empty_hand   =auto refill hotbar
+MENU_HINT pick_block_on_empty_hand   =When building, if your stack of items hits zero, more items will automatically be pulled from your backpack
 
 MENU volume                     =Volume
 MENU main                       =main
@@ -83,6 +93,7 @@ MENU_HINT player_customization  =Change how the player looks
 MENU hat        =Hat
 ENUM helmet         =Helmet
 ENUM shield         =Shield
+ENUM goggles        =Goggles
 
 MENU head       =Head
 ENUM focus          =Focus
@@ -97,8 +108,10 @@ MENU torso      =Torso
 ENUM short          =Short
 ENUM tall           =Tall
 
-MENU default_inputs         =Default Inputs
-MENU_HINT default_inputs    =Resets all keybindings to factory settings
+MENU input_scheme_default       =Reset Input Scheme: Default
+MENU_HINT input_scheme_default  =Resets all keybindings to factory settings
+MENU input_scheme_combomouse    =Reset Input Scheme: Combomouse
+MENU_HINT input_scheme_combomouse =MOUSE_LEFT to place and remove blocks. MOUSE_RIGHT to weld and unweld.
 
 MENU resume                 =Resume
 MENU save                   =Save

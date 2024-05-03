@@ -29,7 +29,7 @@
             "guidebookArrowCordFile": "gameAssets/recipe_arrow_cord.smp"
         }
     },
-    "TOKENPATH": "cred/.env",
+    "TOKENPATH": "cred/client.env",
     "cacheFolder": "cache/",
     "logFolder": "cache/log",
     "configPath": "config.json",
