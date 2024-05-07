@@ -127,6 +127,12 @@ def generates(grid,ratio,assertconnected=True) -> list[Image.Image]:
             break # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
     return ims
 
+def doublemap(f,ll):
+    return [[f(x) for x in l] for l in ll]
+
+def isblock(b):
+    return b['type'] != 'air'
+
 def genimage(generated,assertconnected=True):
     rotations=[]
     for y,row in enumerate(generated):
@@ -164,7 +170,7 @@ def genimage(generated,assertconnected=True):
                         newedgeblocks.append((x+dx,y+dy))
                         filled.add((x+dx,y+dy))
             edgeblocks=newedgeblocks
-        return len(filled)==sum(map(len,generated)) # all blocks are connected
+        return len(filled)==sum(map(sum,doublemap(isblock,generated))) # all blocks are connected
     # a ?optimized? itertools.product that changes only the ones that change in each iteration
     indices=[0 for _ in rotations]
     while True:
