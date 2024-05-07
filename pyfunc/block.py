@@ -622,6 +622,9 @@ def normalize(block:BlockDataIn) -> BlockData:
 		weld = block.get('weld') or (True,True,True,True)
 	weld2=tuple(makeweldside(w) for w in weld)
 	assert len(weld2)==4
+	typ = typ.lower()
+	if typ == 'nic':
+		typ = 'air'
 	return {
 		"type":typ,
 		"rotate":rotate,
