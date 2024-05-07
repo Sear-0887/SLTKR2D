@@ -1,8 +1,7 @@
 import pyfunc.smp as smp
 import collections
 import copy
-from pyfunc.assetload import assetinit,blockinfos
-assetinit()
+from pyfunc.assetload import blockinfos
 from pyfunc.block import BlockDataIn
 import typing
 import schema # type: ignore # no type hints
@@ -267,19 +266,26 @@ sensor_rare_resource:set[str] = set()
 with open("content/recipes.smp") as f:
     rawdata = smp.getsmpvalue(f.read())
 
+del f
+
 data=collections.defaultdict(list)
 
 for x in rawdata:
-    x=copy.deepcopy(x)
     typ=x['type']
     data[typ].append(x)
 
-for tag in data['tag']:
+del x
+del rawdata
+
+tagdata = tagschema.validate(data['tag'])
+
+for tag in tagdata:
     assert tag['name'] not in tags
     assert isinstance(tag['blocks'],list)
     tags[tag['name']]=typing.cast(Tag, tag['blocks'])
 
-tagdata = tagschema.validate(data['tag'])
+del tag
+del tagdata
 
 data=dataschema.validate(data)
 
@@ -335,6 +341,8 @@ for srecipe in data['summonore_pill']:
     for p in out:
         summonore_pill.add(p)
 
+del p
+
 for srecipe in data['sensor_natural']:
     if isinstance(srecipe['filter'],list):
         out = srecipe['filter']
@@ -354,3 +362,11 @@ for srecipe in data['sensor_rare_resource']:
         out = [srecipe['filter']]
     for p in out:
         sensor_rare_resource.add(p)
+
+del hrecipe
+del irecipe
+del crecipe
+del erecipe
+del srecipe
+
+del data
