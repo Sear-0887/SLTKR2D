@@ -216,19 +216,16 @@ def generaterecipe(name) -> None:
                     {"type":"transistor","rotate":1,"weld":fullweld,"data":None}
                 ]],ratio=4)[0]
                 maxdim = gif.tuple_max((64*2, 0),*[img.size for recipeimgs in results for img in recipeimgs['recipeframes']]) # fancy double iteration # the recipe is at least 2 blocks wide
+                y = 0
                 for recipenum,recipeimgs in enumerate(results):
-                    y = recipenum*(
-                        maxdim[1]+ # the tallest recipe
-                        64+        # the combiner
-                        32         # mandatory 32 pixel gap
-                    )
+                    _,h = gif.tuple_max((64*2, 0),*[img.size for img in recipeimgs['recipeframes']])
                     finimage.addgifframes(
                         recipeimgs['recipeframes'],
                         pos=(0, y)
                     )
                     finimage.addimageframes(
                         combiner,
-                        pos=(0, y+maxdim[1])
+                        pos=(0, y+h)
                     )
                     finimage.addimageframes(
                         recipeimgs['result'],
@@ -236,7 +233,12 @@ def generaterecipe(name) -> None:
                     )
                     finimage.addimageframes(
                         getarrow("combiner"),
-                        pos=(maxdim[0]+64, y+maxdim[1]//2)
+                        pos=(maxdim[0]+64, y+h//2)
+                    )
+                    y += (
+                        h +        # the recipe height
+                        64 +       # the combiner
+                        32         # mandatory 32 pixel gap
                     )
                 finimage.export(f"cache/recipe-{name}.gif")
 
