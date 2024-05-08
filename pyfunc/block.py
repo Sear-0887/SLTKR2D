@@ -572,9 +572,9 @@ def rotateoverlayib(im:Image,rotate:int) -> Image:
 	if rotate==0:
 		pass
 	if rotate==3:
-		im.rotate(3)
-	if rotate==1:
 		im.rotate(1)
+	if rotate==1:
+		im.rotate(3)
 	if rotate==2:
 		im.rotate(2)
 	return im
