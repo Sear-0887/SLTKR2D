@@ -1,8 +1,17 @@
-def gettoken():
-	try:
-		from dotenv import dotenv_values
-		print("test")
-		return dotenv_values("cred/client.env")['TOKEN']
+import logging
 
-	except:
-		print("Error on Loading TOKEN.")
+
+l = logging.getLogger()
+
+def getclientenv(key: str) -> str:
+	# try:
+		from pyfunc.lang import cfg
+		from dotenv import dotenv_values
+		value = dotenv_values(cfg("TOKENPATH"))
+		if key not in value.keys():
+			l.error(f"Unable to fetch {key} from {cfg('TOKENPATH')}. Returned None.")
+			return None
+		value = value[key]
+		return value
+	# except:
+	# 	raise Exception("Error on Loading TOKEN.")

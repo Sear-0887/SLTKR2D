@@ -1,13 +1,20 @@
 import glob
 import nextcord
+import logging
+import os
+from pyfunc.log import LoggerInit
+import yaml
 import datetime
 import random
 from pyfunc.lang import botinit, devs
 from nextcord.ext import commands, tasks
-from pyfunc.lang import cfg, evl, keywords, phraser, phrasermodule, getkws
-from pyfunc.gettoken import gettoken
+from pyfunc.lang import cfg, evl, keywords, phraser, phrasermodule, getkws, getpresense
+from pyfunc.gettoken import getclientenv
 from pyfunc.commanddec import MainCommand
-
+from pyfunc.block import get
+LoggerInit()
+l = logging.getLogger()
+l.info("Logging System Loaded!")
 botinit()
 # Intents
 intents = nextcord.Intents.default()
@@ -19,6 +26,8 @@ bot = commands.Bot(command_prefix=cfg("PREFIX"), intents=intents, help_command=N
 TimeOn: datetime.datetime = datetime.datetime.now() 
 # initialize some things
 keywords = getkws()
+presencemsg = getpresense()
+
 
 # Reloads the command locale
 @MainCommand(bot, "reloadlocale")
@@ -37,7 +46,7 @@ async def reloadlocal(ctx,module=None):
 
 # Get help texts for a command or display info about the bot
 @MainCommand(bot,"help")
-async def help(ctx, cmdname=None):
+async def help(ctx, cmdname:str | None=None):
     async def gethelplist(interaction:nextcord.Interaction):
         preparedlist = []
         for cmd in bot.commands:
@@ -49,25 +58,31 @@ async def help(ctx, cmdname=None):
             preparedlist.append(s)
         sembed = nextcord.Embed()
         sembed.title = evl("help.helplist.title")
-        sembed.description = evl("help.helplist.desc").format("\n".join(preparedlist))
+        desc = evl("help.helplist.desc")
+        assert isinstance(desc,str)
+        sembed.description = desc.format("\n".join(preparedlist))
         await interaction.send(ephemeral=True, embed=sembed)
 
     if not cmdname:
         # send an info embed about the bot if no command given
         embed = nextcord.Embed()
         if cfg('ShowHost'):
-            showdisplay = evl("help.blankdisplay.server").format(cfg('HostDCID'))
+            showdisplay = evl("help.blankdisplay.server")
+            assert isinstance(showdisplay,str)
+            showdisplay = showdisplay.format(cfg('HostDCID'))
         else:
             showdisplay = ""
-        embed.description = evl("help.blankdisplay").format(datetime.datetime.now()-TimeOn, showdisplay)
+        desc = evl("help.blankdisplay")
+        assert isinstance(desc,str)
+        embed.description = desc.format(datetime.datetime.now()-TimeOn, showdisplay)
         view = nextcord.ui.View()
         getlistbtn = nextcord.ui.Button(style=nextcord.ButtonStyle.blurple, label="Help List")
         getlistbtn.callback = gethelplist
         view.add_item(getlistbtn) # Adding a button that prints a list of commands in an ephemeral embed
         await ctx.send(embed=embed, view=view)
     else:
-        # searches through the commands and their aliases
-        cmds={alias:cmd for cmd in bot.commands for alias in cmd.aliases+[cmd.name]}
+        # search through the commands and their aliases
+        cmds={alias:cmd for cmd in bot.commands for alias in [*cmd.aliases,cmd.name]}
         if cmdname in cmds:
             cmd=cmds[cmdname]
             embed = nextcord.Embed()
@@ -84,7 +99,7 @@ async def help(ctx, cmdname=None):
 @MainCommand(bot,"ping")
 async def ping(ctx):
     s=f"Pong! ({bot.latency*1000} ms)"
-    print(s)
+    l.info(s)
     await ctx.send(s)
 
 # represent sear's sanity
@@ -99,7 +114,7 @@ async def scream(ctx, e:int=32):
 
 # send a link
 @MainCommand(bot,"link")
-async def link(ctx, typ="r2d"):
+async def link(ctx, typ:str="r2d"):
     for i in keywords:
         if typ in keywords[i]["kw"]:
             await ctx.send(f"`{i}` - {keywords[i]['link']}")
@@ -115,8 +130,8 @@ async def credit(ctx):
 
 # Presence Message Loop
 @tasks.loop(seconds=60)
-async def changepresence():
-    statuses: dict[list] = cfg("botInfo.Messages") # General whole Statuses
+async def changepresence() -> None:
+    statuses: dict[str, list] = presencemsg # General whole Statuses
     categories: list[str] = list(statuses.keys()) # Keys
     weights: list[int] = [len(statuses[c]) for c in categories] # Weights of keys
     category: str = random.choices(categories,weights)[0] # Choosing a category
@@ -127,26 +142,29 @@ async def changepresence():
         'watch':nextcord.ActivityType.watching,
     }
     presence=nextcord.Activity(type=types[category], name=status)
-    print(f"Changed Presence to {category}: {status}")
+    l.debug(f"Changed Presence to {category}: {status}")
     await bot.change_presence(status=nextcord.Status.online, activity=presence)
 
 # the bot is ready now
 @bot.event
 async def on_ready():
-    print(f"ONLINE as {bot.user} appearing {bot.user.display_name}, id {bot.user.id}.")
-    print("Done.")
+    l.info(f"ONLINE as {bot.user}")
+    l.info(f"Display Name: {bot.user.display_name}")
+    l.info(f"ID: {bot.user.id}.")
     global TimeOn
     TimeOn = datetime.datetime.now() # updating the real TimeOnline
     changepresence.start()
 
 
 # get the bot token
-token = gettoken()
+token = getclientenv("TOKEN")
 
 # load all cogs
 for cog_name in glob.glob("cog_*.py"):
-    print(cog_name, "LOAD")
+    l.info(f"{cog_name} LOADED")
     bot.load_extension(cog_name[:-3])
+
+
 
 # and run the bot
 bot.run(token)

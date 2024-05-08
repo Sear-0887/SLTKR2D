@@ -1,13 +1,12 @@
 from PIL import Image
 from typing import Self
+from pyfunc.datafunc import tuple_max, tuple_min
+import logging
 
-def tuple_max(*tuples) -> tuple[int]:
-    return tuple(map(max, zip(*tuples)))
-def tuple_min(*tuples) -> tuple[int]:
-    return tuple(map(min, zip(*tuples)))
+l = logging.getLogger()
 
 class gif_frame:
-    def __init__(self, image=None):
+    def __init__(self, image:Image.Image | None=None) -> None:
         self.images: list[tuple[Image.Image, tuple[int, int]]] = []
         if image is not None:
             self.addimage(image)
@@ -27,7 +26,7 @@ class gif_frame:
         return copy
 
 class gif:
-    def __init__(self, defaultbg):
+    def __init__(self, defaultbg: tuple[int, int, int]):
         self.cursor = (0, 0)
         self.perimage = []
         self.framelist: list[gif_frame] = []
@@ -49,15 +48,19 @@ class gif:
         if len(self.framelist) == 0:
             self.addframe()
         # print(f"GIF adding img at pos {pos}")
-        while len(self.framelist) > len(giflist):
-            print("Adding")
-            giflist += giflist
-        if len(self.framelist) < len(giflist):
-            for _ in range( len(giflist) - len(self.framelist) ):
-                self.addframe() # but consider: loops of different lengths multiply to their LCM
+        # but consider: loops of different lengths multiply to their LCM
+        ogiflist=giflist
+        oframelist=self.framelist
+        while len(self.framelist) != len(giflist):
+            if len(self.framelist) > len(giflist):
+                l.debug("Adding giflist")
+                giflist += ogiflist
+            elif len(self.framelist) < len(giflist):
+                l.debug("Adding framelist")
+                self.framelist += oframelist
+
         maxdm = (0, 0)
-        for i in range(len(giflist)):
-            gifframe, selfframe = giflist[i], self.framelist[i]
+        for gifframe, selfframe in zip(giflist, self.framelist):
             if selfframe is None: return
             selfframe.addimage(gifframe, pos)
             maxdm = tuple_max(maxdm, gifframe.size)

@@ -1,110 +1,110 @@
-{air}: {0}
-{dirt}: {1}
-{sediment}: {2}
-{stone}: {3}
-{sand}: {4}
-{pulp}: {5}
-{rubber}: {6}
-{cap}: {7}
-{silicon}: {8}
-{wafer}: {9}
-{log_maple}: {10}
-{leaf_maple}: {11}
-{iron_vein}: {12}
-{iron_ore}: {13}
-{iron_bar}: {14}
-{iron_plate}: {15}
-{cast_iron}: {16}
-{copper_vein}: {17}
-{copper_ore}: {18}
-{copper_bar}: {19}
-{wire_spool}: {20}
-{frame}: {21}
-{wire}: {22}
-{wire_board}: {23}
-{port}: {24}
-{toggler}: {25}
-{detector}: {26}
-{sensor}: {27}
-{accelerometer}: {28}
-{capacitor}: {29}
-{diode}: {30}
-{potentiometer}: {31}
-{transistor}: {32}
-{cascade}: {33}
-{galvanometer}: {34}
-{latch}: {35}
-{inductor}: {36}
-{platform}: {37}
-{actuator}: {38}
-{actuator_base}: {39}
-{actuator_head}: {40}
-{roller}: {41}
-{dynamic_roller}: {42}
-{magnet}: {43}
-{motor}: {44}
-{manipulator}: {45}
-{combiner}: {46}
-{mantler}: {47}
-{dismantler}: {48}
-{destroyer}: {49}
-{extractor}: {50}
-{arc_furnace}: {51}
-{chair}: {52}
-{chair_pilot}: {53}
-{display}: {54}
-{core_ore}: {55}
-{raw_core}: {56}
-{mass_core}: {57}
-{force_core}: {58}
-{refined_core}: {59}
-{beam_core}: {60}
-{catalyst_core}: {61}
-{teleportore}: {62}
-{command_block}: {63}
-{boundary}: {64}
-{creator}: {65}
-{spawner}: {66}
-{calcium_bar}: {67}
-{spikes}: {68}
-{water}: {69}
-{foam}: {70}
-{oxide}: {71}
-{soul_core}: {72}
-{adobe}: {73}
-{peltmellow}: {74}
-{glass}: {75}
-{lamp}: {76}
-{collector}: {77}
-{trigger}: {78}
-{matcher}: {79}
-{telewall}: {80}
-{telecross}: {81}
-{mirror}: {82}
-{glass_cyan}: {83}
-{glass_magenta}: {84}
-{glass_yellow}: {85}
-{grass}: {86}
-{flower_magenta}: {87}
-{flower_yellow}: {88}
-{residue}: {89}
-{injector}: {90}
-{rail_core}: {91}
-{ice}: {92}
-{compressed_stone}: {93}
-{pedestal}: {94}
-{summonore}: {95}
-{counter}: {96}
-{log_pine}: {97}
-{leaf_pine}: {98}
-{sawdust}: {99}
-{snow}: {100}
-{prism}: {101}
-{slime}: {102}
-{slime_ice}: {103}
-{chert}: {104}
-{compressed_chert}: {105}
-{spark_catcher}: {106}
-{spark_emitter}: {107}
-{bomb_emitter}: {108}
-{divider}: {109}
+{air}                       : {0}
+{dirt}                      : {1}
+{sediment}                  : {2}
+{stone}                     : {3}
+{sand}                      : {4}
+{pulp}                      : {5}
+{rubber}                    : {6}
+{cap}                       : {7}
+{silicon}                   : {8}
+{wafer}                     : {9}
+{log_maple}                 : {10}
+{leaf_maple}                : {11}
+{iron_vein}                 : {12}
+{iron_ore}                  : {13}
+{iron_bar}                  : {14}
+{iron_plate}                : {15}
+{cast_iron}                 : {16}
+{copper_vein}               : {17}
+{copper_ore}                : {18}
+{copper_bar}                : {19}
+{wire_spool}                : {20}
+{frame}                     : {21}
+{wire}                      : {22}
+{wire_board}                : {23}
+{port}                      : {24}
+{toggler}                   : {25}
+{detector}                  : {26}
+{sensor}                    : {27}
+{accelerometer}             : {28}
+{capacitor}                 : {29}
+{diode}                     : {30}
+{potentiometer}             : {31}
+{transistor}                : {32}
+{cascade}                   : {33}
+{galvanometer}              : {34}
+{latch}                     : {35}
+{inductor}                  : {36}
+{platform}                  : {37}
+{actuator}                  : {38}
+{actuator_base}             : {39}
+{actuator_head}             : {40}
+{roller}                    : {41}
+{dynamic_roller}            : {42}
+{magnet}                    : {43}
+{motor}                     : {44}
+{manipulator}               : {45}
+{combiner}                  : {46}
+{mantler}                   : {47}
+{dismantler}                : {48}
+{destroyer}                 : {49}
+{extractor}                 : {50}
+{arc_furnace}               : {51}
+{chair}                     : {52}
+{chair_pilot}               : {53}
+{display}                   : {54}
+{core_ore}                  : {55}
+{raw_core}                  : {56}
+{mass_core}                 : {57}
+{force_core}                : {58}
+{refined_core}              : {59}
+{beam_core}                 : {60}
+{catalyst_core}             : {61}
+{teleportore}               : {62}
+{command_block}             : {63}
+{boundary}                  : {64}
+{creator}                   : {65}
+{spawner}                   : {66}
+{calcium_bar}               : {67}
+{spikes}                    : {68}
+{water}                     : {69}
+{foam}                      : {70}
+{oxide}                     : {71}
+{soul_core}                 : {72}
+{adobe}                     : {73}
+{peltmellow}                : {74}
+{glass}                     : {75}
+{lamp}                      : {76}
+{collector}                 : {77}
+{trigger}                   : {78}
+{matcher}                   : {79}
+{telewall}                  : {80}
+{telecross}                 : {81}
+{mirror}                    : {82}
+{glass_cyan}                : {83}
+{glass_magenta}             : {84}
+{glass_yellow}              : {85}
+{grass}                     : {86}
+{flower_magenta}            : {87}
+{flower_yellow}             : {88}
+{residue}                   : {89}
+{injector}                  : {90}
+{rail_core}                 : {91}
+{ice}                       : {92}
+{compressed_stone}          : {93}
+{pedestal}                  : {94}
+{summonore}                 : {95}
+{counter}                   : {96}
+{log_pine}                  : {97}
+{leaf_pine}                 : {98}
+{sawdust}                   : {99}
+{snow}                      : {100}
+{prism}                     : {101}
+{slime}                     : {102}
+{slime_ice}                 : {103}
+{chert}                     : {104}
+{compressed_chert}          : {105}
+{spark_catcher}             : {106}
+{spark_emitter}             : {107}
+{bomb_emitter}              : {108}
+{divider}                   : {109}

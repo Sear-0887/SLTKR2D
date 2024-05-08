@@ -1,62 +1,12 @@
 {
     "botInfo": {
         "ID": 1195952074861584514,
-        "Messages": {
-            "play": [
-                "with Roody:2D",
-                "Roody:2D",
-                "roody2d.wiki.gg",
-                "Minecraft",
-                "Something",
-                "Roody:3D ???",
-                "Roody:4D :O",
-                "Roody:infinity, Maybe",
-                "with Sear's Brain",
-                "with RbCaVi's Brain",
-                "A Message or sth idk",
-                "with !help",
-                "with !link",
-                "with !image",
-                "HELP ME I AM GOING INSANE",
-                "help me I'm trapped in a Discord bot factory",
-                "Assets",
-                "sounds on your computer",
-                "with Sear's Sanity",
-                "Never Gonna Give You Up"
-            ],
-            "listen": [
-                "Welding Sounds",
-                "Some Music",
-                "Task 1: Situation",
-                "the Sound of Sorting",
-                "*Win7 Error Sound*",
-                "Music",
-                "Podcast",
-                "001: Roody:2D",
-                "Something",
-                "Stupid Ideas™ by Sear",
-                "Never Gonna Give You Up"
-            ],
-            "watch": [
-                "Sear losing his mind",
-                "Roody:2D Speedruns",
-                "the Roody:2D Trailer",
-                "Redinator's Videos",
-                "a Discord.py Tutorial",
-                "Console",
-                "Debug Console",
-                "Your Messages",
-                "roody2d.wiki.gg pages",
-                "Youtube",
-                "Something",
-                "Sear breaking down",
-                "the file system",
-                "a Video",
-                "101 Block Textures",
-                "The graph of y=sin(x)",
-                "Never Gonna Give You Up"
-            ]
-        }
+        "localICCServer": [
+            629118014440079380,
+            1155016107963453462,
+            967600751985709066,
+            1203529312016400435
+        ]
     },
     "locale": {
         "defaultName": "en",
@@ -70,29 +20,30 @@
             }
         },
         "texture": {
-            "texturePathFolder": "content/textures/blocks",
-            "texturePathFile": "content/block_textures.smp",
+            "texturePathFolder": "gameAssets/textures/blocks",
+            "texturePathFile": "gameAssets/block_textures.smp",
             "blockIconFile": "gameAssets/block_zoo.png",
             "blockIDFile": "gameAssets/block_id_.smp",
-            "iconLocationFile": "content/block_icons.smp",
+            "iconLocationFile": "gameAssets/block_icons.smp",
             "guidebookArrowFile": "gameAssets/recipe_arrow_test.png",
             "guidebookArrowCordFile": "gameAssets/recipe_arrow_cord.smp",
             "blockDefsFile": "gameAssets/blockdefs.cc"
         }
     },
-    "TOKENPATH": "cred/.env",
+    "TOKENPATH": "cred/client.env",
     "cacheFolder": "cache/",
     "logFolder": "cache/log",
     "configPath": "config.json",
     "infoPath":{
         "devInfoPath": "json/devs.json",
         "emojiInfoPath": "json/emoji.json",
-        "kwInfoPath": "json/kwlink.json"
+        "kwInfoPath": "json/kwlink.json",
+        "presenseInfoPath": "json/presense.json"
     },
-    "localICCServer": [
-        629118014440079380,
-        1155016107963453462,
-        967600751985709066,
-        1203529312016400435
-    ]
+    "recipeSetting": {
+        "recipeBackground": [50, 50, 50],
+        "recipeMarginY": 32,
+        "recipeMarginX": 64
+    },
+    "logConfigPath": "log-common.yaml"
 }

@@ -58,8 +58,8 @@
 ]
 [
     {type}:{tag}
-        {name}:{rough_materials}
-        {blocks}:{[oxide][calcium_bar][spikes]}
+        {name}:{cutting_materials}
+        {blocks}:{[chert][calcium_bar][spikes]}
 ]
 [
     {type}:{tag}
@@ -75,6 +75,36 @@
     {type}:{tag}
         {name}:{animal_matter}
         {blocks}:{[peltmellow][calcium_bar]}
+]
+[
+    {type}:{tag}
+        {name}:{compressed_solid}
+        {blocks}:{[compressed_stone][compressed_chert]}
+]
+[
+    {type}:{tag}
+        {name}:{rare_resource}
+        {blocks}:{[iron_vein][copper_vein][core_ore][spawner]}
+]
+[
+    {type}:{tag}
+        {name}:{deep_in_stone}
+        {blocks}:{[stone][chert][iron_vein][copper_vein][core_ore]}
+]
+[
+    {type}:{tag}
+        {name}:{mining_products}
+        {blocks}:{[dirt][sediment][stone][chert][iron_vein][copper_vein][core_ore]}
+]
+[
+    {type}:{tag}
+        {name}:{convert_chert_products}
+        {blocks}:{[chert][stone]}
+]
+[
+    {type}:{tag}
+        {name}:{convert_compressed_chert_products}
+        {blocks}:{[compressed_chert][compressed_stone]}
 ]
 ######## heat #############################################################
 [
@@ -208,6 +238,22 @@
 ]
 [
     {type}:{extract}
+        {product}:{chert}
+        {amount}:{24}
+        {ingredient}:{compressed_chert}
+        {time}:{6}
+        {post_action}:{destroy}
+]
+[
+    {type}:{extract}
+        {product}:{residue}
+        {amount}:{3}
+        {ingredient}:{slime}
+        {time}:{6}
+        {post_action}:{destroy}
+]
+[
+    {type}:{extract}
         {product}:{water}
         {amount}:{1}
         {ingredient}:{foam needs_container_count5}
@@ -302,9 +348,9 @@
     {type}:{combine}
         {product}:{{block}:{inductor}{amount}:{3}}
         {grid}:{
-            [[wire_spool][iron_bar][wire_spool]]
-            [[wire_spool][iron_bar][wire_spool]]
-            [[wire_spool][iron_bar][wire_spool]]
+            [[wire_spool display_facing east][iron_bar][wire_spool display_facing east]]
+            [[wire_spool display_facing east][iron_bar][wire_spool display_facing east]]
+            [[wire_spool display_facing east][iron_bar][wire_spool display_facing east]]
         }
 ]
 [
@@ -356,8 +402,8 @@
     {type}:{combine}
         {product}:{{block}:{latch}{amount}:{1}}
         {grid}:{
-            [[transistor][$wire]]
-            [[$wire][transistor]]
+            [[transistor display_facing down][$wire]]
+            [[$wire][transistor display_facing up]]
         }
 ]
 [
@@ -431,8 +477,8 @@
     {type}:{combine}
         {product}:{{block}:{magnet}{amount}:{2}}
         {grid}:{
-            [[iron_bar][wire_spool][iron_bar]]
-            [[iron_bar][wire_spool][iron_bar]]
+            [[iron_bar][wire_spool display_facing east][iron_bar]]
+            [[iron_bar][wire_spool display_facing east][iron_bar]]
         }
 ]
 [
@@ -517,7 +563,7 @@
     {type}:{combine}
         {product}:{{block}:{dismantler}{amount}:{2}}
         {grid}:{
-            [[$rough_materials][motor]]
+            [[$cutting_materials][motor]]
             [[iron_plate][iron_plate]]
         }
 ]
@@ -526,14 +572,14 @@
         {product}:{{block}:{destroyer}{amount}:{1}}
         {grid}:{
             [[iron_plate][dismantler][iron_plate]]
-            [[$rough_materials][motor][$rough_materials]]
+            [[$cutting_materials][motor display_facing down][$cutting_materials]]
         }
 ]
 [
     {type}:{combine}
         {product}:{{block}:{extractor}{amount}:{1}}
         {grid}:{
-            [[motor][$iron_product][$rough_materials]]
+            [[motor][$iron_product][$cutting_materials]]
         }
 ]
 [
@@ -572,8 +618,8 @@
     {type}:{combine}
         {product}:{{block}:{refined_core}{amount}:{2}}
         {grid}:{
-            [[rail_core][NIC]]
-            [[mass_core][rail_core]]
+            [[rail_core display_facing up][NIC]]
+            [[mass_core][rail_core display_facing east]]
         }
 ]
 [
@@ -616,7 +662,7 @@
         {product}:{{block}:{manipulator}{amount}:{1}}
         {grid}:{
             [[motor]]
-            [[trigger]]
+            [[trigger display_facing down]]
         }
 ]
 [
@@ -677,7 +723,7 @@
     {type}:{combine}
         {product}:{{block}:{platform}{amount}:{6}}
         {grid}:{
-            [[$log][$log]]
+            [[$log display_facing east][$log display_facing east]]
             [[frame][frame]]
         }
 ]
@@ -728,16 +774,26 @@
         {product}:{{block}:{injector}{amount}:{2}}
         {grid}:{
             [[iron_plate][glass][iron_plate]]
-            [[iron_plate][actuator][iron_plate]]
+            [[iron_plate][actuator display_facing down][iron_plate]]
         }
 ]
 [
     {type}:{combine}
         {product}:{{block}:{core_ore}{amount}:{1}}
         {grid}:{
-            [[residue][compressed_stone][residue]]
-            [[compressed_stone][residue][compressed_stone]]
-            [[residue][compressed_stone][residue]]
+            [[slime][$compressed_solid][slime]]
+            [[$compressed_solid][slime][$compressed_solid]]
+            [[slime][$compressed_solid][slime]]
+        }
+        {needs_passive}:{core_economy}
+]
+[
+    {type}:{combine}
+        {product}:{{block}:{core_ore}{amount}:{1}}
+        {grid}:{
+            [[$compressed_solid][slime][$compressed_solid]]
+            [[slime][$compressed_solid][slime]]
+            [[$compressed_solid][slime][$compressed_solid]]
         }
         {needs_passive}:{core_economy}
 ]
@@ -785,6 +841,17 @@
 ]
 [
     {type}:{combine}
+        {product}:{{block}:{compressed_chert}{amount}:{1}}
+        {grid}:{
+            [[chert][chert][chert][chert][chert]]
+            [[chert][chert][chert][chert][chert]]
+            [[chert][chert][chert][chert][chert]]
+            [[chert][chert][chert][chert][chert]]
+            [[chert][chert][chert][chert][chert]]
+        }
+]
+[
+    {type}:{combine}
         {product}:{{block}:{oxide}{amount}:{2}}
         {grid}:{
             [[oxide][cast_iron]]
@@ -805,7 +872,7 @@
         {product}:{{block}:{summonore}{amount}:{1}}
         {grid}:{
             [[$animal_matter][collector][$animal_matter]]
-            [[sensor][soul_core][teleportore]]
+            [[sensor display_facing west][soul_core][teleportore display_facing east]]
         }
 ]
 [
@@ -817,6 +884,57 @@
             [[wire_board][galvanometer][glass]]
             [[wire_board][galvanometer][glass]]
             [[wire_board][wire_board][NIC]]
+        }
+]
+[
+    {type}:{combine}
+        {product}:{{block}:{divider}{amount}:{4}}
+        {grid}:{
+            [[capacitor][potentiometer][capacitor]]
+            [[capacitor][potentiometer][capacitor]]
+            [[capacitor][potentiometer][capacitor]]
+            [[capacitor][potentiometer][capacitor]]
+        }
+]
+[
+    {type}:{combine}
+        {product}:{{block}:{slime}{amount}:{1}}
+        {grid}:{
+            [[residue][residue]]
+            [[residue][residue]]
+        }
+]
+[
+    {type}:{combine}
+        {product}:{{block}:{slime_ice}{amount}:{1}}
+        {grid}:{
+            [[ice]]
+            [[slime]]
+        }
+]
+[
+    {type}:{combine}
+        {product}:{{block}:{spark_catcher}{amount}:{1}}
+        {grid}:{
+            [[chert][frame]]
+            [[chert][chert]]
+        }
+]
+[
+    {type}:{combine}
+        {product}:{{block}:{spark_emitter}{amount}:{1}}
+        {grid}:{
+            [[chert][NIC][chert]]
+            [[chert][copper_bar][chert]]
+        }
+]
+[
+    {type}:{combine}
+        {product}:{{block}:{bomb_emitter}{amount}:{1}}
+        {grid}:{
+            [[NIC][spark_emitter][NIC]]
+            [[NIC][compressed_chert][NIC]]
+            [[inductor][inductor][inductor]]
         }
 ]
 ######## extra display #############################################################
@@ -908,6 +1026,7 @@
         }
         {weldall}:{0}
         {arrow_sprite}:{1}
+        {guidebook_page_blacklist}:{[actuator][inductor]}
 ]
 [
     {type}:{extra_display}
@@ -975,6 +1094,7 @@
         }
         {weldall}:{0}
         {research_requirement_override}:{beam_core}
+        {guidebook_page_blacklist}:{[inductor]}
 ]
 [
     {type}:{extra_display}
@@ -988,6 +1108,7 @@
         }
         {weldall}:{0}
         {research_requirement_override}:{beam_core}
+        {guidebook_page_blacklist}:{[inductor]}
 ]
 [
     {type}:{extra_display}
@@ -1001,80 +1122,14 @@
 ]
 [
     {type}:{extra_display}
-        {product}:{{filter}:{dirt}}
+        {product}:{{filter}:{$mining_products}}
         {grid}:{
             [[dirt grassy][dirt grassy][dirt grassy]]
             [[sediment][sediment][sediment]]
             [[stone][stone][stone]]
-            [[stone][stone][stone]]
-            [[stone][stone][stone]]
-        }
-        {guidebook_page_restrict}:{dirt}
-        {arrow_sprite}:{3}
-]
-[
-    {type}:{extra_display}
-        {product}:{{filter}:{sediment}}
-        {grid}:{
-            [[dirt grassy][dirt grassy][dirt grassy]]
-            [[sediment][sediment][sediment]]
-            [[stone][stone][stone]]
-            [[stone][stone][stone]]
+            [[stone][$deep_in_stone][stone]]
             [[stone][stone][stone]]
         }
-        {guidebook_page_restrict}:{sediment}
-        {arrow_sprite}:{3}
-]
-[
-    {type}:{extra_display}
-        {product}:{{filter}:{stone}}
-        {grid}:{
-            [[dirt grassy][dirt grassy][dirt grassy]]
-            [[sediment][sediment][sediment]]
-            [[stone][stone][stone]]
-            [[stone][stone][stone]]
-            [[stone][stone][stone]]
-        }
-        {guidebook_page_restrict}:{stone}
-        {arrow_sprite}:{3}
-]
-[
-    {type}:{extra_display}
-        {product}:{{filter}:{iron_vein}}
-        {grid}:{
-            [[dirt grassy][dirt grassy][dirt grassy]]
-            [[sediment][sediment][sediment]]
-            [[stone][stone][stone]]
-            [[stone][iron_vein][stone]]
-            [[stone][stone][stone]]
-        }
-        {guidebook_page_restrict}:{iron_vein}
-        {arrow_sprite}:{3}
-]
-[
-    {type}:{extra_display}
-        {product}:{{filter}:{copper_vein}}
-        {grid}:{
-            [[dirt grassy][dirt grassy][dirt grassy]]
-            [[sediment][sediment][sediment]]
-            [[stone][stone][stone]]
-            [[stone][copper_vein][stone]]
-            [[stone][stone][stone]]
-        }
-        {guidebook_page_restrict}:{copper_vein}
-        {arrow_sprite}:{3}
-]
-[
-    {type}:{extra_display}
-        {product}:{{filter}:{core_ore}}
-        {grid}:{
-            [[dirt grassy][dirt grassy][dirt grassy]]
-            [[sediment][sediment][sediment]]
-            [[stone][stone][stone]]
-            [[stone][core_ore][stone]]
-            [[stone][stone][stone]]
-        }
-        {guidebook_page_restrict}:{core_ore}
         {arrow_sprite}:{3}
 ]
 [
@@ -1086,6 +1141,7 @@
             [[adobe][adobe]]
         }
         {research_requirement_override}:{silicon}
+        {guidebook_page_whitelist}:{[silicon][air]}
 ]
 [
     {type}:{extra_display}
@@ -1096,7 +1152,7 @@
         }
         {research_requirement_override}:{destroyer}
         {weldall}:{0}
-        {guidebook_page_restrict}:{destroyer}
+        {guidebook_page_whitelist}:{[destroyer][air]}
 ]
 [
     {type}:{extra_display}
@@ -1107,21 +1163,7 @@
             [[potentiometer][air][air][potentiometer]]
         }
         {match_filter_modulo}:{1}
-        {research_requirement_override}:{summonore}
-        {guidebook_page_restrict}:{summonore}
-        {guidebook_use_only}:{1}
-]
-[
-    {type}:{extra_display}
-        {product}:{{filter}:{non_air needs_collision buildable}}
-        {grid}:{
-            [[non_air needs_collision buildable][air][air][$plant_matter]]
-            [[pedestal][air][non_air needs_collision buildable][summonore]]
-            [[potentiometer][air][air][potentiometer]]
-        }
-        {match_filter_modulo}:{1}
-        {research_requirement_override}:{pedestal}
-        {guidebook_page_restrict}:{pedestal}
+        {guidebook_page_whitelist}:{[summonore][pedestal]}
         {guidebook_use_only}:{1}
 ]
 [
@@ -1132,11 +1174,109 @@
             [[foam]]
         }
 ]
-######## summonore_pill #############################################################
+[
+    {type}:{extra_display}
+        {product}:{{filter}:{spark_catcher needs_container_count5}}
+        {grid}:{
+            [[inductor][spark_emitter display_facing east][air][air][spark_catcher]]
+            [[air][spark_catcher needs_container_count5][air][air][air]]
+        }
+        {research_requirement_override}:{spark_emitter}
+        {weldall}:{1}
+        {arrow_sprite}:{4}
+        {guidebook_page_blacklist}:{[inductor]}
+]
+[
+    {type}:{extra_display}
+        {product}:{{filter}:{spark_catcher needs_container_count5}}
+        {grid}:{
+            [[extractor display_facing west][iron_vein]]
+            [[inductor][spark_catcher]]
+        }
+        {guidebook_page_whitelist}:{[spark_catcher]}
+        {weldall}:{0}
+        {arrow_sprite}:{4}
+]
+[
+    {type}:{extra_display}
+        {product}:{{filter}:{spark_catcher needs_container_count5}}
+        {grid}:{
+            [[destroyer display_facing east][stone]]
+            [[inductor][spark_catcher]]
+        }
+        {research_requirement_override}:{spark_catcher}
+        {guidebook_page_whitelist}:{[spark_catcher]}
+        {weldall}:{0}
+        {arrow_sprite}:{4}
+]
+[
+    {type}:{extra_display}
+        {product}:{{filter}:{spark_catcher needs_container_count5}}
+        {grid}:{
+            [[air][dismantler display_facing down][air]]
+            [[wire_spool display_facing east][wire_spool display_facing east][wire_spool display_facing east]]
+            [[air][spark_catcher][air]]
+        }
+        {research_requirement_override}:{spark_catcher}
+        {guidebook_page_whitelist}:{[spark_catcher]}
+        {weldall}:{1}
+        {arrow_sprite}:{4}
+]
+[
+    {type}:{extra_display}
+        {product}:{{filter}:{spark_catcher needs_container_count5}}
+        {grid}:{
+            [[air][iron_plate][spark_catcher]]
+            [[mantler display_facing east][iron_plate][spark_catcher]]
+            [[air][iron_plate][spark_catcher]]
+        }
+        {research_requirement_override}:{spark_catcher}
+        {guidebook_page_whitelist}:{[spark_catcher]}
+        {weldall}:{0}
+        {arrow_sprite}:{4}
+]
+[
+    {type}:{extra_display}
+        {product}:{{filter}:{$convert_chert_products}{amount}:{3}}
+        {grid}:{
+            [[air][air][air][stone]]
+            [[bomb_emitter][spark_catcher needs_container_count5][air][stone]]
+            [[inductor][air][air][stone]]
+        }
+        {entity}:{
+            {type}:{bomb}
+            {position}:{0,0}
+        }
+        {research_requirement_override}:{bomb_emitter}
+        {guidebook_page_blacklist}:{[inductor]}
+]
+[
+    {type}:{extra_display}
+        {product}:{{filter}:{$convert_compressed_chert_products}{amount}:{3}}
+        {grid}:{
+            [[air][air][air][compressed_stone]]
+            [[bomb_emitter][spark_catcher needs_container_count5][air][compressed_stone]]
+            [[inductor][air][air][compressed_stone]]
+        }
+        {entity}:{
+            {type}:{bomb}
+            {position}:{0,0}
+        }
+        {research_requirement_override}:{bomb_emitter}
+        {guidebook_page_blacklist}:{[inductor]}
+]
+######## other tags #############################################################
 [
     {type}:{summonore_pill}
         {filter}:{$plant_matter}
 ]
-
+[
+    {type}:{sensor_natural}
+        {filter}:{non_air needs_attribute dungeon_replaceable}
+]
+[
+    {type}:{sensor_rare_resource}
+        {filter}:{$rare_resource}
+]
 
 
