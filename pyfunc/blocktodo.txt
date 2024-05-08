@@ -1,0 +1,62 @@
+roller direction
+dynamic roller direction
+do i need animation tick?
+beam things?
+
+on/off
+magnet
+teleportore
+telewall
+telecross
+combiner
+arc furnace
+manipulator
+mantler
+force core
+mass core
+spawner
+command block
+lamp
+beam core?
+
+animation
+roller
+dynamic roller
+destroyer
+extractor
+motor
+water
+
+different textures
+yellow flower
+magenta flower
+grass
+
+leaf-wood
+maple log
+pine log
+
+burn
+pine leaf
+maple leaf
+
+other states
+potentiometer
+counter
+catalyst core
+sensor
+injector "pill"
+prism
+pilot chair
+display
+foam
+pedestal
+raw core
+summonore
+snow
+
+# Sear
+Extract, Heat Recipe (5/5)
+Extra Display/Inject (4/5)
+Optimize Code (3/5)
+Organize Code (3/5)

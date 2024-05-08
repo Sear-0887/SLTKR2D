@@ -19,3 +19,13 @@ dir is eswn
 
 image.error = Unable to make image from {x}.
 image.syntax = !image <string>
+
+## recipe
+recipe.aliases = []
+recipe.desc = Makes an image of a block's combine recipe. \
+Note that this command is HIGHLY UNFINISHED.
+
+recipe.error = Unable to find block {block}.
+recipe.error.KeyError = No recipe found for {name}.
+recipe.error.IndexError = Recipe is currently not supported for {name}.
+recipe.syntax = !recipe <string>

@@ -7,8 +7,9 @@ from pyfunc.commanddec import CogCommand
 from collections import defaultdict
 from itertools import takewhile,count
 import datetime
+import logging
 
-
+l = logging.getLogger()
 class Admin(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -26,7 +27,7 @@ class Admin(commands.Cog):
 
     @commands.has_permissions(administrator=True)
     @CogCommand("loadcog")
-    async def loadcog(self,ctx, tar):
+    async def loadcog(self,ctx, tar:str):
         try:
             self.bot.load_extension("cog_"+tar)
             await ctx.send("LOADED "+"cog_"+tar+".py")
@@ -37,7 +38,7 @@ class Admin(commands.Cog):
 
     @commands.has_permissions(administrator=True)
     @CogCommand("unloadcog")
-    async def unloadcog(self,ctx, tar):
+    async def unloadcog(self,ctx, tar:str):
         try:
             if tar == "admin":
                 await ctx.send("You can't unload cog_admin!") # prevent softlock
@@ -51,7 +52,7 @@ class Admin(commands.Cog):
 
     @commands.has_permissions(administrator=True)
     @CogCommand("reloadcog")
-    async def reloadcog(self,ctx, tar):
+    async def reloadcog(self,ctx, tar:str):
         try:
             self.bot.unload_extension("cog_"+tar)
             self.bot.load_extension("cog_"+tar)
@@ -74,7 +75,7 @@ class Admin(commands.Cog):
         await ctx.send("Done.")
 
     @CogCommand("viewerr")
-    async def viewerr(self, ctx, count: int=1, user: nextcord.User=None, ):
+    async def viewerr(self, ctx, count: int=1, user: nextcord.User | None=None):
         if count == "*": count = 999999 # All 
         if user is None: user = ctx.author
         async def senderr(values, filname):
@@ -120,7 +121,7 @@ class Admin(commands.Cog):
         errs.sort(key=lambda x:datetime.datetime.fromisoformat(x[1]['time']))
         errs=[*reversed([*reversed(errs)][:count])]
         count = len(errs)
-        print(f"printing {count} errors")
+        l.debug(f"printing {count} errors")
         for fname,err in errs:
             try:
                 await senderr(err, fname)
