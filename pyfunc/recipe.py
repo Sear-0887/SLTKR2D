@@ -224,7 +224,7 @@ def generaterecipe2(name) -> None:
         results:list[dict] = []
         for i,recipe in enumerate(gridpos):
             imgs=generates(recipe['grid'],ratio=4)
-            result=[{"type":recipe['block'],"rotate":0,"weld":noweld,"data":None}]*recipe['amount']
+            result=[{"type":name,"rotate":0,"weld":noweld,"data":None}]*recipe['amount']
             img=generates([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
             results.append({'recipeframes':imgs,'result':img})
         finimage = gif.gif(tuple(cfg("recipeSetting.recipeBackground")))
