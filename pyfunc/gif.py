@@ -28,7 +28,6 @@ class gif_frame:
 class gif:
     def __init__(self, defaultbg: tuple[int, int, int]):
         self.cursor = (0, 0)
-        self.perimage = []
         self.framelist: list[gif_frame] = []
         self.defaultbg: tuple[int, int, int] = defaultbg
     
@@ -84,7 +83,8 @@ class gif:
         pos = pos or self.cursor
         if len(self.framelist) == 0:
             self.addframe()
-        self.perimage.append((image, pos))
+        for f in self.framelist:
+            f.addimage(image, pos)
         # print(f"GIF adding img at pos {pos}")
         # for i in self.framelist:
         #     i.addimage(image, pos)
@@ -94,8 +94,6 @@ class gif:
     def export(self, pth="cache/exported.gif", duration=1000, apng=False):
         framel = []
         for f in self.framelist:
-            for perim, pos in self.perimage:
-                f.addimage(perim, pos)
             im = f.exportframe()
             bge = Image.new("RGBA", im.size, self.defaultbg)
             bge.alpha_composite(im)
