@@ -10,7 +10,7 @@ from pyfunc.lang import cfg
 from pyfunc.commanddec import CogCommand
 from pyfunc.block import makeimage as blockmakeimage
 import pyfunc.smp as smp
-from pyfunc.recipe import generaterecipe
+from pyfunc.recipe import generaterecipe2 as generaterecipe
 
 class Block(commands.Cog):
     def __init__(self, bot):

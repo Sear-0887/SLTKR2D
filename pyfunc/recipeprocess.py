@@ -1,6 +1,7 @@
 import pyfunc.smp as smp
 import collections
 import copy
+from pyfunc.lang import cfg
 from pyfunc.assetload import blockinfos
 from pyfunc.block import BlockDataIn
 import typing
@@ -263,7 +264,7 @@ summonore_pill:set[str] = set()
 sensor_natural:set[str] = set()
 sensor_rare_resource:set[str] = set()
 
-with open("content/recipes.smp") as f:
+with open(cfg('localGame.texture.recipesFile')) as f:
     rawdata = smp.getsmpvalue(f.read())
 
 del f

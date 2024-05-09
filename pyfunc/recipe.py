@@ -6,11 +6,12 @@ from PIL import Image
 import pyfunc.gif as gif
 from typing import Any
 from pyfunc.datafunc import tuple_max, tuple_min
-from pyfunc.lang import botinit, cfg, getarrowcoords
+from pyfunc.lang import cfg, getarrowcoords
 from pyfunc.smp import getsmpvalue
 from pyfunc.block import canweld, get, makeimage, bottomtypes, topbottomtypes, sidestypes, notoptypes, norotatetypes, twowaytypes, normalize, makeweldside
 import itertools
 import logging
+from pyfunc.recipeprocess import heat, extract, inject, combine, extra_display, summonore_pill
 
 l = logging.getLogger()
 
@@ -258,11 +259,6 @@ def generaterecipe2(name) -> None:
                 cfg("recipeSetting.recipeMarginY") # mandatory gap between recipes
             )
         finimage.export(f"cache/recipe-{name}.gif")
-    for typ in returned.keys():
-        if name in returned[typ]:
-            print(f"{typ}: {returned[typ][name]}")
-            gridpos = returned[typ][name]
-            if typ == "combine":
 
 def generaterecipe(name) -> None:
     for typ in returned.keys():
