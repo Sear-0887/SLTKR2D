@@ -116,7 +116,6 @@ def generates(grid,ratio,assertconnected=True) -> list[Image.Image]:
     ims=[]
     indices=[0 for _ in tags]
     while True:
-        indices=[0 for _ in tags]
         gen=genimage(grid,assertconnected)
         width, height = gen.size # Get width, height
         gen = gen.resize((width*ratio, height*ratio), Image.NEAREST).convert("RGBA") # Resize to dimension*Ratio
