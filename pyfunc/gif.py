@@ -49,9 +49,10 @@ class gif:
             self.addframe()
         # print(f"GIF adding img at pos {pos}")
         # but consider: loops of different lengths multiply to their LCM
-        ogiflist=giflist
-        oframelist=self.framelist
+        ogiflist=[*giflist]
+        oframelist=[*self.framelist]
         while len(self.framelist) != len(giflist):
+            print(len(self.framelist),len(giflist))
             if len(self.framelist) > len(giflist):
                 l.debug("Adding giflist")
                 giflist += ogiflist
