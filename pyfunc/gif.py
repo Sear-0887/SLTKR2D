@@ -25,6 +25,11 @@ class gif_frame:
         copy = copy.crop(copy.getbbox())
         return copy
 
+def copygifframe(f):
+    f2 = gif_frame()
+    f2.addgifframe(f)
+    return f2
+
 class gif:
     def __init__(self, defaultbg: tuple[int, int, int]):
         self.cursor = (0, 0)
@@ -54,10 +59,10 @@ class gif:
             print(len(self.framelist),len(giflist))
             if len(self.framelist) > len(giflist):
                 l.debug("Adding giflist")
-                giflist += ogiflist
+                giflist += [copygifframe(f) for f in ogiflist]
             elif len(self.framelist) < len(giflist):
                 l.debug("Adding framelist")
-                self.framelist += oframelist
+                self.framelist += [copygifframe(f) for f in oframelist]
 
         maxdm = (0, 0)
         for gifframe, selfframe in zip(giflist, self.framelist):
