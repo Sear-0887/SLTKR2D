@@ -234,7 +234,7 @@ def generaterecipe2(name) -> None:
         ]],ratio=4)[0]
         maxdim = tuple_max((64*2, 0),*[img.size for recipeimgs in results for img in recipeimgs['recipeframes']]) # fancy double iteration # the recipe is at least 2 blocks wide
         y = 0
-        for recipenum,recipeimgs in enumerate(results):
+        for recipeimgs in results:
             _,h = gif.tuple_max((64*2, 0),*[img.size for img in recipeimgs['recipeframes']])
             finimage.addgifframes(
                 recipeimgs['recipeframes'],
