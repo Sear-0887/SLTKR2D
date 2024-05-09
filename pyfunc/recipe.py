@@ -211,6 +211,59 @@ def getarrow(typ:str) -> Image.Image:
         (64, 64), Image.NEAREST
     )
 
+# heat
+# extract
+# inject
+# combine
+# extra_display
+# summonore_pill
+
+def generaterecipe2(name) -> None:
+    if name in combine:
+        gridpos = combine[name]
+        results:list[dict] = []
+        for i,recipe in enumerate(gridpos):
+            imgs=generates(recipe['grid'],ratio=4)
+            result=[{"type":recipe['block'],"rotate":0,"weld":noweld,"data":None}]*recipe['amount']
+            img=generates([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
+            results.append({'recipeframes':imgs,'result':img})
+        finimage = gif.gif(cfg("recipeSetting.recipeBackground"))
+        combiner=generates([[
+            {"type":"combiner","rotate":2,"weld":fullweld,"data":None}, 
+            {"type":"transistor","rotate":1,"weld":fullweld,"data":None}
+        ]],ratio=4)[0]
+        maxdim = tuple_max((64*2, 0),*[img.size for recipeimgs in results for img in recipeimgs['recipeframes']]) # fancy double iteration # the recipe is at least 2 blocks wide
+        y = 0
+        for recipenum,recipeimgs in enumerate(results):
+            _,h = gif.tuple_max((64*2, 0),*[img.size for img in recipeimgs['recipeframes']])
+            finimage.addgifframes(
+                recipeimgs['recipeframes'],
+                pos=(0, y)
+            )
+            finimage.addimageframes(
+                combiner,
+                pos=(0, y+h)
+            )
+            finimage.addimageframes(
+                recipeimgs['result'],
+                pos=(maxdim[0]+64+64+64, y)
+            )
+            finimage.addimageframes(
+                getarrow("combiner"),
+                pos=(maxdim[0]+64, y+h//2)
+            )
+            y += (
+                h +                                # the recipe height
+                64 +                               # the combiner
+                cfg("recipeSetting.recipeMarginY") # mandatory gap between recipes
+            )
+        finimage.export(f"cache/recipe-{name}.gif")
+    for typ in returned.keys():
+        if name in returned[typ]:
+            print(f"{typ}: {returned[typ][name]}")
+            gridpos = returned[typ][name]
+            if typ == "combine":
+
 def generaterecipe(name) -> None:
     for typ in returned.keys():
         if name in returned[typ]:
