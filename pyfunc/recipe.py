@@ -4,11 +4,11 @@ import glob
 import os
 from PIL import Image
 import pyfunc.gif as gif
-from typing import Any
+from typing import Any, TypeVar, Callable
 from pyfunc.datafunc import tuple_max, tuple_min
 from pyfunc.lang import cfg, getarrowcoords
 from pyfunc.smp import getsmpvalue
-from pyfunc.block import canweld, get, makeimage, bottomtypes, topbottomtypes, sidestypes, notoptypes, norotatetypes, twowaytypes, normalize, makeweldside
+from pyfunc.block import canweld, get, makeimage, bottomtypes, topbottomtypes, sidestypes, notoptypes, norotatetypes, twowaytypes, normalize, makeweldside, BlockDataIn, BlockData
 import itertools
 import logging
 from pyfunc.recipeprocess import heat, extract, inject, combine, extra_display, summonore_pill
@@ -39,7 +39,7 @@ def handlegridtags(s:list[list[str]], organdict:dict) -> list[list[str | list]]:
         for row in s
     ]
 
-def getarrowimg(name):
+def getarrowimg(name:str) -> Image.Image:
     icox, icoy = getarrowcoords()[name]
     return Image.open(
         cfg("localGame.texture.guidebookArrowFile")).crop(
@@ -47,8 +47,8 @@ def getarrowimg(name):
         ).resize((64, 64), Image.NEAREST
     )
 
-def addentries(i:dict[str, Any], entryname:str, typ:str, organdict:dict, includekeys:str) -> list:
-    includekeys = massstrip(includekeys.split(','))
+def addentries(i:dict[str, Any], entryname:str, typ:str, organdict:dict, includekeysstr:str) -> None:
+    includekeys = massstrip(includekeysstr.split(','))
     entries = {}
     for key, item in i.items():
         if isinstance(item, str):
@@ -66,10 +66,11 @@ def addentries(i:dict[str, Any], entryname:str, typ:str, organdict:dict, include
         organdict[typ][entryname] = []
     organdict[typ][entryname].append(entries)
     
-def testing():
+def testing() -> dict[str,Any]:
     with open("gameAssets/recipes.smp") as f:
-        organdict = collections.defaultdict(dict)
+        organdict:dict = collections.defaultdict(dict)
         rawdata = getsmpvalue(f.read())
+        assert isinstance(rawdata,dict)
         for i in rawdata:
             producename = ""
             col = ""
@@ -103,7 +104,7 @@ def testing():
     return organdict
 returned = testing()
 
-def generates(grid,ratio,assertconnected=True) -> list[Image.Image]:
+def generates(grid:list[list[BlockDataIn]],ratio:int,assertconnected:bool=True) -> list[Image.Image]:
     tags=[]
     for y,row in enumerate(grid):
         for x,block in enumerate(row):
@@ -132,13 +133,16 @@ def generates(grid,ratio,assertconnected=True) -> list[Image.Image]:
             break # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
     return ims
 
-def doublemap(f,ll):
+T1 = TypeVar('T1')
+T2 = TypeVar('T2')
+
+def doublemap(f:Callable[[T1],T2],ll:list[list[T1]]) -> list[list[T2]]:
     return [[f(x) for x in l] for l in ll]
 
-def isblock(b):
+def isblock(b:BlockData) -> bool:
     return b['type'] != 'air'
 
-def genimage(generated,assertconnected=True):
+def genimage(generated:list[list[BlockData]],assertconnected:bool=True) -> Image.Image:
     rotations=[]
     for y,row in enumerate(generated):
         for x,block in enumerate(row):
@@ -156,14 +160,14 @@ def genimage(generated,assertconnected=True):
                 rotations.append([(x,y,r) for r in [0,1]]) # don't need to check all ways
             else:
                 rotations.append([(x,y,r) for r in [0,2,1,3]])
-    def floodfill():
+    def floodfill() -> bool:
         filled=set([(0,0)])
         edgeblocks=[(0,0)] # the blocks that are welded to a filled block
         sideinfo=[ # do not change
-            ['right','left', +1,  0],
-            ['left','right', -1,  0],
-            ['bottom','top',  0, +1],
-            ['top','bottom',  0, -1],
+            ('right','left', +1,  0),
+            ('left','right', -1,  0),
+            ('bottom','top',  0, +1),
+            ('top','bottom',  0, -1),
         ]
         while len(edgeblocks)>0:
             newedgeblocks=[]
@@ -218,7 +222,7 @@ def getarrow(typ:str) -> Image.Image:
 # extra_display
 # summonore_pill
 
-def generaterecipe2(name) -> None:
+def generaterecipe(name:str) -> None:
     if name in combine:
         gridpos = combine[name]
         results:list[dict] = []
@@ -229,8 +233,8 @@ def generaterecipe2(name) -> None:
             results.append({'recipeframes':imgs,'result':img})
         finimage = gif.gif(tuple(cfg("recipeSetting.recipeBackground")))
         combiner=generates([[
-            {"type":"combiner","rotate":2,"weld":fullweld,"data":None}, 
-            {"type":"transistor","rotate":1,"weld":fullweld,"data":None}
+            {"type":"combiner","rotate":2,"weld":fullweld}, 
+            {"type":"transistor","rotate":1,"weld":fullweld}
         ]],ratio=4)[0]
         maxdim = tuple_max((64*2, 0),*[img.size for recipeimgs in results for img in recipeimgs['recipeframes']]) # fancy double iteration # the recipe is at least 2 blocks wide
         y = 0
@@ -259,53 +263,9 @@ def generaterecipe2(name) -> None:
             )
         finimage.export(f"cache/recipe-{name}.gif")
 
-def generaterecipe(name) -> None:
-    for typ in returned.keys():
-        if name in returned[typ]:
-            print(f"{typ}: {returned[typ][name]}")
-            gridpos = returned[typ][name]
-            if typ == "combine":
-                results:list[dict] = []
-                for i,recipe in enumerate(gridpos):
-                    imgs=generates(recipe['grid'],ratio=4)
-                    result=[{"type":recipe['block'],"rotate":0,"weld":noweld,"data":None}]*recipe['amount']
-                    img=generates([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
-                    results.append({'recipeframes':imgs,'result':img})
-                finimage = gif.gif(cfg("recipeSetting.recipeBackground"))
-                combiner=generates([[
-                    {"type":"combiner","rotate":2,"weld":fullweld,"data":None}, 
-                    {"type":"transistor","rotate":1,"weld":fullweld,"data":None}
-                ]],ratio=4)[0]
-                maxdim = tuple_max((64*2, 0),*[img.size for recipeimgs in results for img in recipeimgs['recipeframes']]) # fancy double iteration # the recipe is at least 2 blocks wide
-                y = 0
-                for recipenum,recipeimgs in enumerate(results):
-                    _,h = gif.tuple_max((64*2, 0),*[img.size for img in recipeimgs['recipeframes']])
-                    finimage.addgifframes(
-                        recipeimgs['recipeframes'],
-                        pos=(0, y)
-                    )
-                    finimage.addimageframes(
-                        combiner,
-                        pos=(0, y+h)
-                    )
-                    finimage.addimageframes(
-                        recipeimgs['result'],
-                        pos=(maxdim[0]+64+64+64, y)
-                    )
-                    finimage.addimageframes(
-                        getarrow("combiner"),
-                        pos=(maxdim[0]+64, y+h//2)
-                    )
-                    y += (
-                        h +                                # the recipe height
-                        64 +                               # the combiner
-                        cfg("recipeSetting.recipeMarginY") # mandatory gap between recipes
-                    )
-                finimage.export(f"cache/recipe-{name}.gif")
-
 
 if __name__ == "__main__":
-    generaterecipe("galvanometer", apng=True)
+    generaterecipe("galvanometer")
     generaterecipe("pulp")
     # generaterecipe("air")
     # generaterecipe("destroyer")

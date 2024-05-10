@@ -14,7 +14,7 @@ def past(s:str) -> str:
     s+="ed"
     return s
 
-def tuple_max(*tuples:tuple[tuple[int,int],...]) -> tuple[int,int]:
+def tuple_max(*tuples:tuple[int,int]) -> tuple[int,int]:
     return tuple(map(max, zip(*tuples)))
-def tuple_min(*tuples:tuple[tuple[int,int],...]) -> tuple[int,int]:
+def tuple_min(*tuples:tuple[int,int]) -> tuple[int,int]:
     return tuple(map(min, zip(*tuples)))
