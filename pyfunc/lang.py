@@ -156,8 +156,6 @@ def getarrowcoords():
 def botinit():
     
     from pyfunc.assetload import assetinit
-    os.makedirs(cfg('cacheFolder'), exist_ok=True) # directory to put images and other output in
-    os.makedirs(cfg('logFolder'), exist_ok=True) # logs folder (may be in cache)
     loadconfig()
     global keywords
     keywords = getkws()
