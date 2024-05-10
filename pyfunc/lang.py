@@ -17,7 +17,7 @@ import re
 from dotenv import dotenv_values
 import collections
 
-cmdi:dict[str, dict[str, str]] = {}
+cmdi:dict[str, dict[str, str | list[str]]] = {}
 config = None
 devs = None
 keywords:dict[str, dict[str, str]] = {}
@@ -45,13 +45,15 @@ def phraserfile(fname:str,lang:str) -> None:
             line=re.sub('#.*$','',line) # remove comments
             if '=' not in line:
                 continue
-            value:str | list[str] # can't annotate unpacking
             key,value=line.split('=',maxsplit=1)
             value=replacemoji(value.strip())
+            value2:str | list[str]
             if value.startswith('[') and value.endswith(']'):
-                value=[v.strip() for v in value[1:-1].split(',') if len(v.strip())>0]
+                value2=[v.strip() for v in value[1:-1].split(',') if len(v.strip())>0]
+            else:
+                value2 = value
             key=key.strip()
-            cmdi[lang][key]=value
+            cmdi[lang][key]=value2
 
 # load the command locale
 def phraser() -> None:
@@ -98,7 +100,7 @@ def handlehostid() -> tuple[int, list[bool]]:
     returntup = ( int(auid, 16), list(map(lambda x:x=="1", list(setting))) )
     return returntup
 
-def loadconfig():
+def loadconfig() -> None:
     with open("config.json", encoding="utf-8") as f:
         global config
         config = json.load(f)
@@ -106,9 +108,17 @@ def loadconfig():
         config['ShowHost'] = settings[0]
         config['HostDCID'] = hostid
         config['PREFIX'] = getclientenv('PREFIX') or "!"
-    return config
 
-def cfg(*target):
+def cfgstr(*target) -> str:
+    if config is None: loadconfig()
+    base = config
+    target = ".".join(target)
+    for tv in target.split("."):
+        base = base[tv]
+    assert isinstance(base,str)
+    return base
+
+def cfg(*target) -> int | str | list | dict:
     if config is None: loadconfig()
     base = config
     target = ".".join(target)
@@ -116,37 +126,34 @@ def cfg(*target):
         base = base[tv]
     return base
 
-def loademoji():
+def loademoji() -> None:
     with open(cfg("infoPath.emojiInfoPath"), encoding="utf-8") as f:
         global emojidict
         emojidict = json.load(f)
-    return emojidict
 
-def replacemoji(tar):
+def replacemoji(tar:str) -> str:
     if type(tar) != str: return tar
     for key, item in emojidict.items():
         tar = tar.replace(f":{key}:", item)
     return tar
 
-def getdevs():
+def getdevs() -> None:
     with open(cfg("infoPath.devInfoPath"), encoding="utf-8") as f:
         global devs
         devs = json.load(f)
         
-def getpresense():
+def getpresense() -> None:
     with open(cfg("infoPath.presenseInfoPath"), encoding="utf-8") as f:
         global presensemsg
         presensemsg = json.load(f)
-    return presensemsg
 
-def getkws(): 
+def getkws() -> None: 
     with open(cfg("infoPath.kwInfoPath"), encoding="utf-8") as f:
         global keywords
         keywords = json.load(f)
-    return keywords
 
-def getarrowcoords():
-    racord = {}
+def getarrowcoords() -> dict[tuple[int, int]]:
+    racord:dict[tuple[int, int]] = {}
     with open(cfg("localGame.texture.guidebookArrowCordFile"), encoding="utf-8") as f:
         data=getsmpvalue(f.read())
     for icon,xy in data.items():
@@ -160,8 +167,7 @@ def botinit():
     os.makedirs(cfg('cacheFolder'), exist_ok=True) # directory to put images and other output in
     os.makedirs(cfg('logFolder'), exist_ok=True) # logs folder (may be in cache)
     loadconfig()
-    global keywords
-    keywords = getkws()
+    getkws()
     phraser() # command locale
     getpresense()
     getdevs()
