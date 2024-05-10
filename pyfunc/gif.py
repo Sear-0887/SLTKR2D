@@ -1,4 +1,5 @@
 from PIL import Image
+from typing import Self
 from pyfunc.datafunc import tuple_max, tuple_min
 import logging
 
@@ -7,22 +8,31 @@ l = logging.getLogger()
 class gif_frame:
     def __init__(self, image:Image.Image | None=None) -> None:
         self.images: list[tuple[Image.Image, tuple[int, int]]] = []
-        self.addimage(image or Image.new("RGBA", (0, 0)))
+        if image is not None:
+            self.addimage(image)
         
     def addimage(self, img=None, pos=(0,0)):
         self.images.append((img, pos))
+
+    def addgifframe(self, img:Self, pos=(0,0)):
+        for frame,(x,y) in img.images:
+            self.addimage(frame, (x+pos[0],y+pos[1]))
     
     def exportframe(self):
-        copy = Image.new("RGBA", (4096, 4096))
+        copy = Image.new("RGBA", (4096, 4096)) # i don't like hard limits # like what if someone makes a 100 block tall recipe? # what then?
         for i, pos in self.images:
             copy.alpha_composite(i, pos)
         copy = copy.crop(copy.getbbox())
         return copy
 
+def copygifframe(f):
+    f2 = gif_frame()
+    f2.addgifframe(f)
+    return f2
+
 class gif:
     def __init__(self, defaultbg: tuple[int, int, int]):
         self.cursor = (0, 0)
-        self.perimage = []
         self.framelist: list[gif_frame] = []
         self.defaultbg: tuple[int, int, int] = defaultbg
     
@@ -42,15 +52,17 @@ class gif:
         if len(self.framelist) == 0:
             self.addframe()
         # print(f"GIF adding img at pos {pos}")
-        ogiflist=giflist
-        oframelist=self.framelist
+        # but consider: loops of different lengths multiply to their LCM
+        ogiflist=[*giflist]
+        oframelist=[*self.framelist]
         while len(self.framelist) != len(giflist):
+            print(len(self.framelist),len(giflist))
             if len(self.framelist) > len(giflist):
                 l.debug("Adding giflist")
-                giflist += ogiflist
+                giflist += [copygifframe(f) for f in ogiflist]
             elif len(self.framelist) < len(giflist):
                 l.debug("Adding framelist")
-                self.framelist += oframelist
+                self.framelist += [copygifframe(f) for f in oframelist]
 
         maxdm = (0, 0)
         for gifframe, selfframe in zip(giflist, self.framelist):
@@ -59,13 +71,25 @@ class gif:
             maxdm = tuple_max(maxdm, gifframe.size)
         if movecursor: self.movecursor(x=maxdm[0], y=maxdm[1])
         return self
+        
+    def addgif(self, newgif:Self, pos=(0, 0)): # ignore the background of newgif
+        print(f"GIF adding gif at pos {pos}")
+        if len(self.framelist) < len(newgif.framelist):
+            for _ in range( len(newgif.framelist) - len(self.framelist) ):
+                self.addframe()
+        for i in range(len(newgif.framelist)):
+            gifframe, selfframe = newgif.framelist[i], self.framelist[i]
+            if selfframe is None: return
+            selfframe.addgifframe(gifframe, pos)
+        return self
             
         
     def addimageframes(self, image, pos=None, movecursor=True):
         pos = pos or self.cursor
         if len(self.framelist) == 0:
             self.addframe()
-        self.perimage.append((image, pos))
+        for f in self.framelist:
+            f.addimage(image, pos)
         # print(f"GIF adding img at pos {pos}")
         # for i in self.framelist:
         #     i.addimage(image, pos)
@@ -75,8 +99,6 @@ class gif:
     def export(self, pth="cache/exported.gif", duration=1000, apng=False):
         framel = []
         for f in self.framelist:
-            for perim, pos in self.perimage:
-                f.addimage(perim, pos)
             im = f.exportframe()
             bge = Image.new("RGBA", im.size, self.defaultbg)
             bge.alpha_composite(im)

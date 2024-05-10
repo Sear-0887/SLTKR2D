@@ -1,4 +1,4 @@
-import PIL.Image
+import PIL.Image, PIL.ImageChops
 import logging
 import pyfunc.smp as smp
 import os
@@ -17,13 +17,13 @@ rimlights:dict[int, np.ndarray] = {}
 
 vec3:typing.TypeAlias = tuple[float, float, float]
 
-def dot(normal:np.ndarray, light:vec3):
+def dot(normal:np.ndarray, light:vec3) -> np.ndarray:
 	return np.einsum('ijk,k->ij',normal,light)
 
-def diffuse(normal:np.ndarray, light:vec3):
+def diffuse(normal:np.ndarray, light:vec3) -> np.ndarray:
 	return np.fmax(dot(normal, light), 0.0)
 
-def quarter_rotate(v:vec3, r):
+def quarter_rotate(v:vec3, r:int) -> vec3:
 	match r:
 		case 0:
 			return v
@@ -33,13 +33,14 @@ def quarter_rotate(v:vec3, r):
 			return (-v[0], -v[1], v[2])
 		case 3:
 			return (v[1], -v[0], v[2])
+	raise ValueError('bad rotate')
 
 def calc_diffuse_ambient_light(lightdir:vec3, normal:np.ndarray) -> np.ndarray:
 	# calculate diffuse light
 	light_diffuse = diffuse(normal, lightdir)
 	return np.fmin(light_diffuse * 0.5 + 0.5, 1.0) # overflow error
 
-def calc_highlights(lightdir:vec3, normal:np.ndarray, rimlight:np.ndarray):
+def calc_highlights(lightdir:vec3, normal:np.ndarray, rimlight:np.ndarray) -> np.ndarray:
 	lightdir2 = (lightdir[0], lightdir[1], 0)
 	intensity:np.ndarray = dot(normal, lightdir2) # how much the normal faces toward the light
 	s0,s1 = intensity.shape
@@ -47,24 +48,24 @@ def calc_highlights(lightdir:vec3, normal:np.ndarray, rimlight:np.ndarray):
 	for i in range(s0):
 		for j in range(s1):
 			pixel = rimlight[int(255 * (intensity[i, j] + 1) / 2)]
-			pixel = tuple(c * 0.3 for c in pixel)
-			highlights[i, j] = pixel
+			highlights[i, j] = tuple(c * 0.3 for c in pixel)
 	return highlights
 
 fullbright_lightdir = (-0.5, -1.0, 1.0)
 
-def apply_normalmap(albedo:PIL.Image.Image, normal:PIL.Image.Image | None, rotation:int, block_id:int, flip:bool):
+def apply_normalmap(albedo:PIL.Image.Image, normal:PIL.Image.Image | None, rotation:int, block_id:int, flip:bool) -> PIL.Image.Image:
 	# rotate the light so when the block is rotated back the light is in the right direction
 	lightdir:vec3 = quarter_rotate(fullbright_lightdir, rotation);
 
 	light:np.ndarray
-	highlights:np.ndarray | None = None
+
+	normal_array:np.ndarray
 
 	if normal is None:
 		s0,s1 = albedo.size
 		normal_array = np.full((s0,s1,3),(0.5,0.5,0.5))
 	else:
-		normal_array:np.ndarray = np.asarray(normal) / 255 * 2 - 1
+		normal_array = np.asarray(normal) / 255 * 2 - 1
 		normal_array = normal_array / np.atleast_3d(np.linalg.norm(normal_array, axis = 2))
 		normal_array = normal_array[:, :, :3]
 		# shape (any, any, 3)
@@ -88,7 +89,7 @@ def apply_normalmap(albedo:PIL.Image.Image, normal:PIL.Image.Image | None, rotat
 	out = diffused
 
 	if block_id in rimlights:
-		highlights = calc_highlights(lightdir, normal_array, rimlights[block_id]);
+		highlights:np.ndarray = calc_highlights(lightdir, normal_array, rimlights[block_id]);
 		highlights = highlights * 255
 		highlights = highlights.astype('uint8')
 		highlightsim:PIL.Image.Image = PIL.Image.fromarray(highlights)
@@ -106,7 +107,6 @@ class WeldSide(typing.TypedDict):
 	wire:bool
 	platform:bool
 	frame:bool
-	id:int
 
 WeldSides: typing.TypeAlias = tuple[WeldSide,WeldSide,WeldSide,WeldSide]
 WeldSideIn: typing.TypeAlias = WeldSide | bool
@@ -129,16 +129,16 @@ class ImageBit:
 		self.y = y
 		self.w = w
 		self.h = h
-		self.block_id = block_id
 		if isinstance(im,ImageBit):
 			# gonna just assume x,y,w,h stays inside the image
 			self.x += im.x
 			self.y += im.y
-			self.block_id = im.block_id
+			block_id = im.block_id
 			im = im.im, im.normal
+		if block_id is None:
+			raise ValueError('no block id given/inherited')
+		self.block_id = block_id
 		self.im, self.normal = im
-		if self.block_id is None:
-			raise ValueError('no block id')
 		# rotation
 		self.flip = False # first
 		self.rotation = 0 # second
@@ -271,6 +271,12 @@ def getblockims(block:str) -> tuple[PIL.Image.Image,PIL.Image.Image | None]:
 		normal,
 	)
 
+def getblocksbyattr(attr:str) -> list[str]:
+	return [b for b,data in blockinfos.items() if attr in data['attributes']]
+
+def getblocksbynotattr(attr:str) -> list[str]:
+	return [b for b,data in blockinfos.items() if attr not in data['attributes']]
+
 # wire components on a wafer
 wafertypes=[
 	"accelerometer","capacitor","diode",
@@ -290,37 +296,11 @@ wiretypes=[
 	"detector","port","toggler","trigger"
 ]
 # all blocks that connect to wire
-wiredtypes=[
-	'actuator','motor','telewall','injector','pedestal',
-	'actuator_base','display',"lamp",'combiner',
-	'arc_furnace','extractor','beam_core','creator',
-	'destroyer','dismantler','magnet','manipulator',
-	'mantler','wire','wire_board'
-]+wafertypes+wiretypes
-# unweldable blocks
-noweldtypes=[
-	"copper_ore","iron_ore","pulp","sand","silicon","spawner","air","sawdust"
-]
+wiredtypes=getblocksbyattr("wire_connect")
 # blocks that only face one direction
-norotatetypes=[
-	'pedestal','dirt','sediment','stone','rubber',
-	'leaf_maple','iron_vein','iron_bar','iron_plate',
-	'cast_iron','copper_vein','copper_bar','frame',
-	'toggler','capacitor','inductor','roller',
-	'dynamic_roller','chair','chair_pilot','display',
-	'core_ore','raw_core','mass_core','refined_core',
-	'catalyst_core','command_block','boundary',
-	'spawner','calcium_bar','water','foam','oxide',
-	'soul_core','adobe','peltmellow','glass',
-	'glass_cyan','glass_magenta','glass_yellow',
-	'grass','flower_magenta','flower_yellow','residue',
-	'ice','compressed_stone','wafer'
-]+noweldtypes
-noweldtypes.append('telecross') # literally the only rotatable but unweldable block
+norotatetypes=getblocksbynotattr("rotatable")
 # blocks that only face two directions
-twowaytypes=[
-	"wire_spool",'log_maple','log_pine',"mirror"
-]
+twowaytypes=getblocksbyattr("symmetrical")
 frametypes=wiretypes+['frame','wire']
 
 def iswelded(side:WeldSide) -> bool:
@@ -340,7 +320,7 @@ def platformx(side:WeldSide) -> int:
 def makeweldside(side:WeldSideIn) -> WeldSide:
 	if isinstance(side,dict):
 		return side
-	return {'weld':side,'wire':False,'platform':False,'frame':False,'id':id(side)}
+	return {'weld':side,'wire':False,'platform':False,'frame':False}
 
 weldedside = makeweldside(True)
 unweldedside = makeweldside(False)
@@ -363,14 +343,9 @@ def setwireside(side:WeldSide,other:bool) -> WeldSide:
 def blockdesc() -> BlockDesc:
 	return {
 		'wired':False, # does this block connect to wires beside it?
-		'datafilters':[], # change the block data (noweld/norotate)
+		'datafilters':[], # change the block data (norotate)
 		'layers':[] # the layers of the block (actuator/any wire component)
 	}
-
-def noweldfilter(data:BlockData) -> BlockData:
-	data={**data}
-	data['weld']=(makeweldside(False),makeweldside(False),makeweldside(False),makeweldside(False))
-	return data
 
 def norotatefilter(data:BlockData) -> BlockData:
 	data={**data}
@@ -548,9 +523,6 @@ def wiresetting(data:BlockData) -> Image:
 
 blocktypes:collections.defaultdict[str,BlockDesc]=collections.defaultdict(blockdesc)
 
-for t in noweldtypes:
-	blocktypes[t]['datafilters'].append(noweldfilter)
-
 for t in norotatetypes:
 	blocktypes[t]['datafilters'].append(norotatefilter)
 
@@ -571,16 +543,16 @@ blocktypes['platform']['layers']=[platform]
 
 for t in wafertypes:
 	blocktypes[t]['layers']=[wafer,wire,wiretop]
-	blocktypes[t]['datafilters']=[wirecomponent]
+	blocktypes[t]['datafilters'].append(wirecomponent)
 
 for t in wiretypes:
 	blocktypes[t]['layers']=[frame,wire,wiretop]
-	blocktypes[t]['datafilters']=[wirecomponent]
+	blocktypes[t]['datafilters'].append(wirecomponent)
 
 for t in ["potentiometer","sensor"]:
 	blocktypes[t]['layers']=[frame,wire,wiretop,wiresetting]
 
-blocktypes[t]['datafilters']=[counterfilter]
+blocktypes['counter']['datafilters'].append(counterfilter)
 blocktypes['counter']['layers']=[wafer,wire,counter]
 
 blocktypes['wire_board']['layers']=[wafer,wire]
@@ -604,9 +576,9 @@ def rotateoverlayib(im:Image,rotate:int) -> Image:
 	if rotate==0:
 		pass
 	if rotate==3:
-		im.rotate(3)
-	if rotate==1:
 		im.rotate(1)
+	if rotate==1:
+		im.rotate(3)
 	if rotate==2:
 		im.rotate(2)
 	return im
@@ -654,6 +626,9 @@ def normalize(block:BlockDataIn) -> BlockData:
 		weld = block.get('weld') or (True,True,True,True)
 	weld2=tuple(makeweldside(w) for w in weld)
 	assert len(weld2)==4
+	typ = typ.lower()
+	if typ == 'nic':
+		typ = 'air'
 	return {
 		"type":typ,
 		"rotate":rotate,
@@ -677,18 +652,7 @@ notoptypes=['arc_furnace','beam_core','collector','creator','destroyer','dismant
 
 # can this block weld on this side?
 def canweld(side:str,block:BlockData) -> bool:
-	if block['type'] in noweldtypes:
-		return False
-	elif block['type'] in bottomtypes:
-		sides=[False,False,True,False]
-	elif block['type'] in topbottomtypes:
-		sides=[True,False,True,False]
-	elif block['type'] in sidestypes:
-		sides=[False,True,False,True]
-	elif block['type'] in notoptypes:
-		sides=[False,True,True,True]
-	else:
-		sides=[True,True,True,True]
+	sides = blockinfos[block['type']]['weldablesides']
 	i={'top':0,'bottom':2,'left':1,'right':3}[side]+4-block['rotate']
 	i=i%4
 	return sides[i] and iswelded(block['weld'][{'top':0,'bottom':2,'left':1,'right':3}[side]])

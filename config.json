@@ -26,7 +26,9 @@
             "blockIDFile": "gameAssets/block_id_.smp",
             "iconLocationFile": "gameAssets/block_icons.smp",
             "guidebookArrowFile": "gameAssets/recipe_arrow_test.png",
-            "guidebookArrowCordFile": "gameAssets/recipe_arrow_cord.smp"
+            "guidebookArrowCordFile": "gameAssets/recipe_arrow_cord.smp",
+            "blockDefsFile": "gameAssets/blockdefs.cc",
+            "recipesFile": "gameAssets/recipes.smp"
         }
     },
     "TOKENPATH": "cred/client.env",

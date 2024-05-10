@@ -10,7 +10,7 @@ from pyfunc.lang import cfg
 from pyfunc.commanddec import CogCommand
 from pyfunc.block import makeimage as blockmakeimage
 import pyfunc.smp as smp
-from pyfunc.recipe import generaterecipe
+from pyfunc.recipe import generaterecipe2 as generaterecipe
 
 class Block(commands.Cog):
     def __init__(self, bot):
@@ -71,8 +71,6 @@ class Block(commands.Cog):
                     turn='nwse'.index(turnm)
                 if weldm is not None:
                     weld=[c=='1' for c in reversed(weldm)]
-                if b=='nic': # nic is treated as air
-                    b='air'
                 if b.isdigit():
                     b = idtoblock[int(b)]
                 blocks[y][x] = {"type":b,"rotate":turn,"weld":weld,"data":bdata}
