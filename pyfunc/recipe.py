@@ -6,13 +6,18 @@ from PIL import Image
 import pyfunc.gif as gif
 from typing import Any
 from pyfunc.datafunc import tuple_max, tuple_min
-from pyfunc.lang import botinit, cfg, getarrowcoords
+from pyfunc.lang import cfg, getarrowcoords
 from pyfunc.smp import getsmpvalue
-from pyfunc.block import canweld, get, makeimage, bottomtypes, topbottomtypes, sidestypes, notoptypes, norotatetypes, twowaytypes
+from pyfunc.block import canweld, get, makeimage, bottomtypes, topbottomtypes, sidestypes, notoptypes, norotatetypes, twowaytypes, normalize, makeweldside
 import itertools
 import logging
+from pyfunc.recipeprocess import heat, extract, inject, combine, extra_display, summonore_pill
 
 l = logging.getLogger()
+
+noweld = (makeweldside(False),) * 4
+fullweld = (makeweldside(True),) * 4
+
 def massstrip(l:list[str]) -> list[str]:
     return [s.strip() for s in l]
 
@@ -22,7 +27,7 @@ def handletags(s:str, organdict:dict) -> str | list:
     if s.startswith('$'):
         if s[1:] in organdict['tag'].keys():
             return organdict['tag'][s[1:]]
-        l.warning('Just a Normal name starts with $ ???????')
+        l.warning(f'{s} is Just a Normal name starts with $ ???????')
     return s
 
 def handlegridtags(s:list[list[str]], organdict:dict) -> list[list[str | list]]:
@@ -103,13 +108,14 @@ def generates(grid,ratio,assertconnected=True) -> list[Image.Image]:
     for y,row in enumerate(grid):
         for x,block in enumerate(row):
             if isinstance(block, list): # If it's a list, it's a tag, which
-                tags.append([(x,y,{"type":t,"rotate":0,"weld":[True]*4,"data":None}) for t in block])
+                tags.append([(x,y,normalize(t)) for t in block])
+                grid[y][x] = normalize(block[0]) # Actions
             elif isinstance(block, str): # It's normal and needed to NORMALIZE
-                grid[y][x] = {"type":block,"rotate":0,"weld":[True]*4,"data":None} # Actions
+                grid[y][x] = normalize(block) # Actions
     # now have a list of tags and coordinates
     ims=[]
+    indices=[0 for _ in tags]
     while True:
-        indices=[0 for _ in tags]
         gen=genimage(grid,assertconnected)
         width, height = gen.size # Get width, height
         gen = gen.resize((width*ratio, height*ratio), Image.NEAREST).convert("RGBA") # Resize to dimension*Ratio
@@ -126,6 +132,12 @@ def generates(grid,ratio,assertconnected=True) -> list[Image.Image]:
             break # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
     return ims
 
+def doublemap(f,ll):
+    return [[f(x) for x in l] for l in ll]
+
+def isblock(b):
+    return b['type'] != 'air'
+
 def genimage(generated,assertconnected=True):
     rotations=[]
     for y,row in enumerate(generated):
@@ -133,7 +145,7 @@ def genimage(generated,assertconnected=True):
             if block in norotatetypes:
                 continue
             elif block['type'] not in bottomtypes+topbottomtypes+sidestypes+notoptypes:
-                print('block',block,'welds on all sides')
+                print(f'block {block["type"]} at {x},{y} welds on all sides, does not rotate')
                 # the block welds on all sides
                 # no reason to check
                 # wired blocks might change this
@@ -163,7 +175,7 @@ def genimage(generated,assertconnected=True):
                         newedgeblocks.append((x+dx,y+dy))
                         filled.add((x+dx,y+dy))
             edgeblocks=newedgeblocks
-        return len(filled)==sum(map(len,generated)) # all blocks are connected
+        return len(filled)==sum(map(sum,doublemap(isblock,generated))) # all blocks are connected
     # a ?optimized? itertools.product that changes only the ones that change in each iteration
     indices=[0 for _ in rotations]
     while True:
@@ -199,6 +211,54 @@ def getarrow(typ:str) -> Image.Image:
         (64, 64), Image.NEAREST
     )
 
+# heat
+# extract
+# inject
+# combine
+# extra_display
+# summonore_pill
+
+def generaterecipe2(name) -> None:
+    if name in combine:
+        gridpos = combine[name]
+        results:list[dict] = []
+        for i,recipe in enumerate(gridpos):
+            imgs=generates(recipe['grid'],ratio=4)
+            result=[{"type":name,"rotate":0,"weld":noweld,"data":None}]*recipe['amount']
+            img=generates([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
+            results.append({'recipeframes':imgs,'result':img})
+        finimage = gif.gif(tuple(cfg("recipeSetting.recipeBackground")))
+        combiner=generates([[
+            {"type":"combiner","rotate":2,"weld":fullweld,"data":None}, 
+            {"type":"transistor","rotate":1,"weld":fullweld,"data":None}
+        ]],ratio=4)[0]
+        maxdim = tuple_max((64*2, 0),*[img.size for recipeimgs in results for img in recipeimgs['recipeframes']]) # fancy double iteration # the recipe is at least 2 blocks wide
+        y = 0
+        for recipeimgs in results:
+            _,h = gif.tuple_max((64*2, 0),*[img.size for img in recipeimgs['recipeframes']])
+            finimage.addgifframes(
+                recipeimgs['recipeframes'],
+                pos=(0, y)
+            )
+            finimage.addimageframes(
+                combiner,
+                pos=(0, y+h)
+            )
+            finimage.addimageframes(
+                recipeimgs['result'],
+                pos=(maxdim[0]+64+64+64, y)
+            )
+            finimage.addimageframes(
+                getarrow("combiner"),
+                pos=(maxdim[0]+64, y+h//2)
+            )
+            y += (
+                h +                                # the recipe height
+                64 +                               # the combiner
+                cfg("recipeSetting.recipeMarginY") # mandatory gap between recipes
+            )
+        finimage.export(f"cache/recipe-{name}.gif")
+
 def generaterecipe(name) -> None:
     for typ in returned.keys():
         if name in returned[typ]:
@@ -208,28 +268,25 @@ def generaterecipe(name) -> None:
                 results:list[dict] = []
                 for i,recipe in enumerate(gridpos):
                     imgs=generates(recipe['grid'],ratio=4)
-                    result=[{"type":recipe['block'],"rotate":0,"weld":[False]*4,"data":None}]*recipe['amount']
+                    result=[{"type":recipe['block'],"rotate":0,"weld":noweld,"data":None}]*recipe['amount']
                     img=generates([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
                     results.append({'recipeframes':imgs,'result':img})
                 finimage = gif.gif(cfg("recipeSetting.recipeBackground"))
                 combiner=generates([[
-                    {"type":"combiner","rotate":2,"weld":[True]*4,"data":None}, 
-                    {"type":"transistor","rotate":1,"weld":[True]*4,"data":None}
+                    {"type":"combiner","rotate":2,"weld":fullweld,"data":None}, 
+                    {"type":"transistor","rotate":1,"weld":fullweld,"data":None}
                 ]],ratio=4)[0]
                 maxdim = tuple_max((64*2, 0),*[img.size for recipeimgs in results for img in recipeimgs['recipeframes']]) # fancy double iteration # the recipe is at least 2 blocks wide
+                y = 0
                 for recipenum,recipeimgs in enumerate(results):
-                    y = recipenum*(
-                        maxdim[1]+                                 # the tallest recipe
-                        64+                                        # the combiner
-                        cfg("recipeSetting.recipeMarginY")         # mandatory 32 pixel gap
-                    )
+                    _,h = gif.tuple_max((64*2, 0),*[img.size for img in recipeimgs['recipeframes']])
                     finimage.addgifframes(
                         recipeimgs['recipeframes'],
                         pos=(0, y)
                     )
                     finimage.addimageframes(
                         combiner,
-                        pos=(0, y+maxdim[1])
+                        pos=(0, y+h)
                     )
                     finimage.addimageframes(
                         recipeimgs['result'],
@@ -237,7 +294,12 @@ def generaterecipe(name) -> None:
                     )
                     finimage.addimageframes(
                         getarrow("combiner"),
-                        pos=(maxdim[0]+64, y+maxdim[1]//2)
+                        pos=(maxdim[0]+64, y+h//2)
+                    )
+                    y += (
+                        h +                                # the recipe height
+                        64 +                               # the combiner
+                        cfg("recipeSetting.recipeMarginY") # mandatory gap between recipes
                     )
                 finimage.export(f"cache/recipe-{name}.gif")
 
