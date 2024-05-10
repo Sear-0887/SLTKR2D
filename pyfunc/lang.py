@@ -23,6 +23,7 @@ devs = None
 keywords:dict[str, dict[str, str]] = {}
 l = logging.getLogger()
 presensemsg = None
+emojidict = None
 
 # write_to_log, basically similar to print, with extra steps...
 # ptnt is print_to_normal_terminal, ats is add_timestamp
@@ -64,7 +65,9 @@ def phraser() -> None:
             phraserfile(i,lang)
         l.debug(cmdi[lang]["help.aliases"])
         # EXCEPTIONS
-        cmdi[lang]["link.desc"] = cmdi[lang]["link.desc"].format("".join([
+        linkdesc = cmdi[lang]["link.desc"]
+        assert isinstance(linkdesc, str)
+        cmdi[lang]["link.desc"] = linkdesc.format("".join([
             f"{name} ({data['link']})\nKeywords: `{'`, `'.join(data['kw'])}`\n"
             for name,data in keywords.items()
         ]))
@@ -114,17 +117,19 @@ def cfgstr(target:str) -> str:
     if config is None: loadconfig()
     base = config
     for tv in target.split("."):
+        assert isinstance(base,dict)
         base = base[tv]
     assert isinstance(base,str)
     return base
 
-def opencfg(target, *args, **kwargs):
+def opencfg(target:str, *args:Any, **kwargs:Any):
     return open(cfgstr(target), *args, **kwargs)
 
 def cfg(target:str) -> int | str | list | dict:
     if config is None: loadconfig()
     base = config
     for tv in target.split("."):
+        assert isinstance(base,dict)
         base = base[tv]
     return base
 
@@ -154,8 +159,8 @@ def getkws() -> None:
         global keywords
         keywords = json.load(f)
 
-def getarrowcoords() -> dict[tuple[int, int]]:
-    racord:dict[tuple[int, int]] = {}
+def getarrowcoords() -> dict[str, tuple[int, int]]:
+    racord:dict[str, tuple[int, int]] = {}
     with opencfg("localGame.texture.guidebookArrowCordFile", encoding="utf-8") as f:
         data=getsmpvalue(f.read())
     for icon,xy in data.items():

@@ -43,7 +43,7 @@ def handlegridtags(s:list[list[str]], organdict:dict) -> list[list[str | list]]:
 def getarrowimg(name:str) -> Image.Image:
     icox, icoy = getarrowcoords()[name]
     return Image.open(
-        cfg("localGame.texture.guidebookArrowFile")).crop(
+        cfgstr("localGame.texture.guidebookArrowFile")).crop(
             (16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))
         ).resize((64, 64), Image.NEAREST
     )
@@ -210,7 +210,7 @@ def genimage(generated:list[list[BlockData]],assertconnected:bool=True) -> Image
 def getarrow(typ:str) -> Image.Image:
     icox, icoy = getarrowcoords()[typ]
     return Image.open(
-        cfg("localGame.texture.guidebookArrowFile")
+        cfgstr("localGame.texture.guidebookArrowFile")
     ).crop(
         (16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))
     ).resize(
@@ -233,7 +233,9 @@ def generaterecipe(name:str) -> None:
             result=[{"type":name,"rotate":0,"weld":noweld,"data":None}]*recipe['amount']
             img=generates([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
             results.append({'recipeframes':imgs,'result':img})
-        finimage = gif.gif(tuple(cfg("recipeSetting.recipeBackground")))
+        bg = cfg("recipeSetting.recipeBackground")
+        assert isinstance(bg,list)
+        finimage = gif.gif(tuple(bg))
         combiner=generates([[
             {"type":"combiner","rotate":2,"weld":fullweld}, 
             {"type":"transistor","rotate":1,"weld":fullweld}
