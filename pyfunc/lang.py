@@ -22,6 +22,7 @@ config = None
 devs = None
 keywords:dict[str, dict[str, str]] = {}
 l = logging.getLogger()
+presensemsg = None
 
 # write_to_log, basically similar to print, with extra steps...
 # ptnt is print_to_normal_terminal, ats is add_timestamp
@@ -112,7 +113,6 @@ def loadconfig() -> None:
 def cfgstr(target:str) -> str:
     if config is None: loadconfig()
     base = config
-    target = ".".join(target)
     for tv in target.split("."):
         base = base[tv]
     assert isinstance(base,str)
@@ -124,7 +124,6 @@ def opencfg(target, *args, **kwargs):
 def cfg(target:str) -> int | str | list | dict:
     if config is None: loadconfig()
     base = config
-    target = ".".join(target)
     for tv in target.split("."):
         base = base[tv]
     return base

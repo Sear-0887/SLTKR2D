@@ -1,7 +1,7 @@
 import pyfunc.smp as smp
 import collections
 import copy
-from pyfunc.lang import cfg
+from pyfunc.lang import opencfg
 from pyfunc.assetload import blockinfos
 from pyfunc.block import BlockDataIn
 import typing

@@ -8,7 +8,7 @@ import datetime
 import random
 from pyfunc.lang import botinit, devs
 from nextcord.ext import commands, tasks
-from pyfunc.lang import cfg, evl, keywords, phraser, phrasermodule, getkws, getpresense
+from pyfunc.lang import cfg, evl, phraser, phrasermodule
 from pyfunc.gettoken import getclientenv
 from pyfunc.commanddec import MainCommand
 from pyfunc.block import get
@@ -16,6 +16,7 @@ LoggerInit()
 l = logging.getLogger()
 l.info("Logging System Loaded!")
 botinit()
+from pyfunc.lang import presensemsg as presencemsg, keywords # has to be imported after botinit for reasons
 # Intents
 intents = nextcord.Intents.default()
 intents.members = True
@@ -25,8 +26,6 @@ bot = commands.Bot(command_prefix=cfg("PREFIX"), intents=intents, help_command=N
 # TimeOn must be a datetime, or else error will be raised when !help
 TimeOn: datetime.datetime = datetime.datetime.now() 
 # initialize some things
-keywords = getkws()
-presencemsg = getpresense()
 
 
 # Reloads the command locale
@@ -115,6 +114,7 @@ async def scream(ctx, e:int=32):
 # send a link
 @MainCommand(bot,"link")
 async def link(ctx, typ:str="r2d"):
+    print(keywords)
     for i in keywords:
         if typ in keywords[i]["kw"]:
             await ctx.send(f"`{i}` - {keywords[i]['link']}")

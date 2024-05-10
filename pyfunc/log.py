@@ -1,6 +1,6 @@
 import yaml
 import logging
-from pyfunc.lang import cfg
+from pyfunc.lang import opencfg
 from logging import config
 
 def LoggerInit():

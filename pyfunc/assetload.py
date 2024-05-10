@@ -3,7 +3,7 @@ import collections
 import pyfunc.smp as smp
 import glob
 from pyfunc.datafunc import capitalize, plural, past
-from pyfunc.lang import cfg
+from pyfunc.lang import opencfg, cfg
 from typing import Any
 
 idtoblock:dict[int, str] = {}
