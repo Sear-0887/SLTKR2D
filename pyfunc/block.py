@@ -252,6 +252,7 @@ blockpaths={}
 pthblocktexture = cfg("localGame.texture.texturePathFile")
 with open(pthblocktexture) as f:
 	data=smp.getsmpvalue(f.read())
+assert isinstance(data,dict)
 for name,texture in data.items():
 	blockpaths[name] = texture
 	if 'rimlight' in texture:

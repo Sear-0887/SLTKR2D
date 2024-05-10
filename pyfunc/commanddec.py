@@ -6,8 +6,10 @@ import nextcord
 from pyfunc.lang import cfg, evl
 from colorama import Fore, init
 from nextcord.ext import commands
+import nextcord
 import traceback
 import logging 
+import typing
 init() # colorama's init(), not assetload's
 RED = Fore.RED
 BLUE = Fore.BLUE
@@ -15,13 +17,16 @@ GREEN = Fore.GREEN
 RESET = Fore.RESET
 l = logging.getLogger()
 
-async def ErrorHandler(name, e, args, kwargs, interaction=None, ctx=None):
-    ctxorintr = ctx or interaction
-    async def sendtoch(msg):
-        if isinstance(ctxorintr, commands.Context):
+Context:typing.TypeAlias = commands.context.Context
+
+async def ErrorHandler(name:str, e:BaseException, args:tuple[typing.Any], kwargs:dict[str,typing.Any], interaction:nextcord.Interaction | None=None, ctx:Context | None=None) -> None:
+    async def sendtoch(msg:str) -> None:
+        if ctx is not None:
             await ctx.send(msg)
-        elif isinstance(ctxorintr, nextcord.Interaction):
+        elif interaction is not None:
             await interaction.response.send_message(msg)
+        else:
+            logging.error("something terrible has occurred! there's neither a context nor an interaction!")
     # handle the error e
     # from a function call f(ctx,*args,**kwargs)
     # print a message with cool colors to the console
@@ -62,15 +67,41 @@ f'''
 '''
     )
     await sendtoch(expecterr)
-    guild = ctx.guild if ctxorintr == ctx else interaction.guild
-    author = ctx.author if ctxorintr == ctx else interaction.user
-    trigger = ctx.message.clean_content if ctxorintr == ctx else "<INTERACTION>"
+    author:nextcord.user.User | nextcord.member.Member | None
+    if ctx is not None:
+        guild = ctx.guild
+        author = ctx.author
+        trigger = ctx.message.clean_content
+    elif interaction is not None:
+        guild = interaction.guild
+        author = interaction.user
+        trigger = "<INTERACTION>"
+    else:
+        guild = None
+        author = None
+        trigger = "<NONE!!!>"
+        logging.error("something terrible has occurred! there's neither a context nor an interaction!")
+
+    if author is not None:
+        author_display_name = author.display_name
+        author_global_name = author.global_name
+        author_id = author.id
+    else:
+        author_display_name = '<NO AUTHOR>'
+        author_global_name = '<NO AUTHOR>'
+        author_id = 0
+
+    if guild is not None:
+        guild_name = guild.name
+    else:
+        guild_name = '<NO GUILD>'
+
     errorpacket = {
         "user": {
-            "displayname": author.display_name,
-            "globalname": author.global_name,
-            'id': author.id,
-            "servername": guild.name
+            "displayname": author_display_name,
+            "globalname": author_global_name,
+            'id': author_id,
+            "servername": guild_name
         },
         'time': datetime.datetime.now().isoformat(),
         'trigger': trigger,
@@ -80,12 +111,14 @@ f'''
         'errname': str(type(e)),
     }
     excstrs = [str(e)]
-    while e.__context__ or e.__cause__:
-        e = e.__context__ or e.__cause__
+    while (e.__context__ or e.__cause__) is not None:
+        e2 = e.__context__ or e.__cause__
+        assert e2 is not None # seriously?
+        e = e2
         excstrs = [str(e),*excstrs]
     errorpacket['excstr'] = '\n'.join(excstrs)
     
-    errfilname = f"cache/log/error-{author.global_name}-{datetime.date.today():%d-%m-%Y}.json"
+    errfilname = f"cache/log/error-{author_global_name}-{datetime.date.today():%d-%m-%Y}.json"
     try:
         with open(errfilname, "r") as fil:
             prev = json.load(fil)

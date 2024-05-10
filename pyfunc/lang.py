@@ -36,7 +36,7 @@ def lprint(*values: object, sep: str = " ",end: str = "\n", ptnt: bool = False, 
 
 cmdi = collections.defaultdict(dict)
 
-def phraserfile(fname,lang):
+def phraserfile(fname:str,lang:str) -> None:
     with open(os.path.join(cfg('locale.localePath'),lang,fname), "r", encoding='utf-8') as f:
         linesiter=iter(f)
         for line in linesiter:
@@ -45,6 +45,7 @@ def phraserfile(fname,lang):
             line=re.sub('#.*$','',line) # remove comments
             if '=' not in line:
                 continue
+            value:str | list[str] # can't annotate unpacking
             key,value=line.split('=',maxsplit=1)
             value=replacemoji(value.strip())
             if value.startswith('[') and value.endswith(']'):
@@ -65,7 +66,7 @@ def phraser() -> None:
             for name,data in keywords.items()
         ]))
 
-def phrasermodule(module:str): # reloads the locale from one file in each locale folder
+def phrasermodule(module:str) -> bool: # reloads the locale from one file in each locale folder
     found=False # did it find any locale files?
     for langpth in glob.glob("lang/*"):
         lang = langpth[5:]
@@ -79,7 +80,7 @@ def phrasermodule(module:str): # reloads the locale from one file in each locale
     return found
 
 # get a locale entry
-def evl(*args, lang="en") -> str | list:
+def evl(*args:str, lang:str="en") -> str | list:
     target = ".".join(args)
     try:
         return cmdi[lang][target]

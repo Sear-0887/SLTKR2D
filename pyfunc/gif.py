@@ -25,7 +25,7 @@ class gif_frame:
         copy = copy.crop(copy.getbbox())
         return copy
 
-def copygifframe(f):
+def copygifframe(f:gif_frame):
     f2 = gif_frame()
     f2.addgifframe(f)
     return f2
