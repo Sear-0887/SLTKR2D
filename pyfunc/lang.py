@@ -37,7 +37,7 @@ def lprint(*values: object, sep: str = " ",end: str = "\n", ptnt: bool = False, 
 cmdi = collections.defaultdict(dict)
 
 def phraserfile(fname:str,lang:str) -> None:
-    with open(os.path.join(cfg('locale.localePath'),lang,fname), "r", encoding='utf-8') as f:
+    with open(os.path.join(cfgstr('locale.localePath'),lang,fname), "r", encoding='utf-8') as f:
         linesiter=iter(f)
         for line in linesiter:
             while line.endswith('\\\n'):
@@ -58,8 +58,8 @@ def phraserfile(fname:str,lang:str) -> None:
 # load the command locale
 def phraser() -> None:
     loademoji()
-    for lang in os.listdir(cfg('locale.localePath')):
-        for i in os.listdir(os.path.join(cfg('locale.localePath'),lang)):
+    for lang in os.listdir(cfgstr('locale.localePath')):
+        for i in os.listdir(os.path.join(cfgstr('locale.localePath'),lang)):
             phraserfile(i,lang)
         l.debug(cmdi[lang]["help.aliases"])
         # EXCEPTIONS
@@ -109,7 +109,7 @@ def loadconfig() -> None:
         config['HostDCID'] = hostid
         config['PREFIX'] = getclientenv('PREFIX') or "!"
 
-def cfgstr(*target) -> str:
+def cfgstr(target:str) -> str:
     if config is None: loadconfig()
     base = config
     target = ".".join(target)
@@ -118,7 +118,10 @@ def cfgstr(*target) -> str:
     assert isinstance(base,str)
     return base
 
-def cfg(*target) -> int | str | list | dict:
+def opencfg(target, *args, **kwargs):
+    return open(cfgstr(target), *args, **kwargs)
+
+def cfg(target:str) -> int | str | list | dict:
     if config is None: loadconfig()
     base = config
     target = ".".join(target)
@@ -127,7 +130,7 @@ def cfg(*target) -> int | str | list | dict:
     return base
 
 def loademoji() -> None:
-    with open(cfg("infoPath.emojiInfoPath"), encoding="utf-8") as f:
+    with opencfg("infoPath.emojiInfoPath", encoding="utf-8") as f:
         global emojidict
         emojidict = json.load(f)
 
@@ -138,23 +141,23 @@ def replacemoji(tar:str) -> str:
     return tar
 
 def getdevs() -> None:
-    with open(cfg("infoPath.devInfoPath"), encoding="utf-8") as f:
+    with opencfg("infoPath.devInfoPath", encoding="utf-8") as f:
         global devs
         devs = json.load(f)
         
 def getpresense() -> None:
-    with open(cfg("infoPath.presenseInfoPath"), encoding="utf-8") as f:
+    with opencfg("infoPath.presenseInfoPath", encoding="utf-8") as f:
         global presensemsg
         presensemsg = json.load(f)
 
 def getkws() -> None: 
-    with open(cfg("infoPath.kwInfoPath"), encoding="utf-8") as f:
+    with opencfg("infoPath.kwInfoPath", encoding="utf-8") as f:
         global keywords
         keywords = json.load(f)
 
 def getarrowcoords() -> dict[tuple[int, int]]:
     racord:dict[tuple[int, int]] = {}
-    with open(cfg("localGame.texture.guidebookArrowCordFile"), encoding="utf-8") as f:
+    with opencfg("localGame.texture.guidebookArrowCordFile", encoding="utf-8") as f:
         data=getsmpvalue(f.read())
     for icon,xy in data.items():
         x,y=xy.split(',')
@@ -164,8 +167,8 @@ def getarrowcoords() -> dict[tuple[int, int]]:
 def botinit():
     
     from pyfunc.assetload import assetinit
-    os.makedirs(cfg('cacheFolder'), exist_ok=True) # directory to put images and other output in
-    os.makedirs(cfg('logFolder'), exist_ok=True) # logs folder (may be in cache)
+    os.makedirs(cfgstr('cacheFolder'), exist_ok=True) # directory to put images and other output in
+    os.makedirs(cfgstr('logFolder'), exist_ok=True) # logs folder (may be in cache)
     loadconfig()
     getkws()
     phraser() # command locale

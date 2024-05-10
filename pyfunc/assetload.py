@@ -20,7 +20,7 @@ modifiers={
 
 blockdefregex = 'BLOCK_DEF\\((?P<name>[a-z_]+),(?P<collision>collision::[a-z_]+(\\|collision::[a-z_]+)*),(?P<attr>atb::[a-z_]+(\\|atb::[a-z_]+)*),0b(?P<weld>\\d\\d\\d\\d),(?P<weldtime>\\d+)\\)'
 def getblockdefs():
-    with open(cfg("localGame.texture.blockDefsFile"), encoding="utf-8") as f:
+    with opencfg("localGame.texture.blockDefsFile", encoding="utf-8") as f:
         data = f.read()
     for line in data.split('\n'):
         line = ''.join(line.split()) # remove spaces
@@ -42,14 +42,14 @@ def getblockdefs():
             blockinfos[name]['weldablesides'] = top,left,bottom,right
 
 def getblockids():
-    with open(cfg("localGame.texture.blockIDFile"), encoding="utf-8") as f:
+    with opencfg("localGame.texture.blockIDFile", encoding="utf-8") as f:
         data=smp.getsmpvalue(f.read())
     for name,i in data.items():
         blockinfos[name]["id"] = int(i)
         idtoblock[int(i)] = name
 
 def geticoncoords():
-    with open(cfg("localGame.texture.iconLocationFile"), encoding="utf-8") as f:
+    with opencfg("localGame.texture.iconLocationFile", encoding="utf-8") as f:
         data=smp.getsmpvalue(f.read())
     for icon,xy in data.items():
         x,y=xy.split(',')
