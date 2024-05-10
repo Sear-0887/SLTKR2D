@@ -5,6 +5,7 @@ import os
 from PIL import Image
 import pyfunc.gif as gif
 from typing import Any, TypeVar, Callable
+import typing
 from pyfunc.datafunc import tuple_max, tuple_min
 from pyfunc.lang import cfg, getarrowcoords
 from pyfunc.smp import getsmpvalue
@@ -70,7 +71,7 @@ def testing() -> dict[str,Any]:
     with open("gameAssets/recipes.smp") as f:
         organdict:dict = collections.defaultdict(dict)
         rawdata = getsmpvalue(f.read())
-        assert isinstance(rawdata,dict)
+        assert isinstance(rawdata,list)
         for i in rawdata:
             producename = ""
             col = ""
@@ -104,15 +105,16 @@ def testing() -> dict[str,Any]:
     return organdict
 returned = testing()
 
-def generates(grid:list[list[BlockDataIn]],ratio:int,assertconnected:bool=True) -> list[Image.Image]:
+def generates(grid1:list[list[BlockDataIn]],ratio:int,assertconnected:bool=True) -> list[Image.Image]:
     tags=[]
-    for y,row in enumerate(grid):
+    for y,row in enumerate(grid1):
         for x,block in enumerate(row):
             if isinstance(block, list): # If it's a list, it's a tag, which
                 tags.append([(x,y,normalize(t)) for t in block])
-                grid[y][x] = normalize(block[0]) # Actions
+                grid1[y][x] = normalize(block[0]) # Actions
             elif isinstance(block, str): # It's normal and needed to NORMALIZE
-                grid[y][x] = normalize(block) # Actions
+                grid1[y][x] = normalize(block) # Actions
+    grid:list[list[BlockData]] = typing.cast(list[list[BlockData]],grid1)
     # now have a list of tags and coordinates
     ims=[]
     indices=[0 for _ in tags]
@@ -202,7 +204,7 @@ def genimage(generated:list[list[BlockData]],assertconnected:bool=True) -> Image
                 break
                 
     ... 
-    gen = makeimage(generated) # Make Image
+    gen = makeimage(typing.cast(list[list[BlockDataIn]],generated)) # Make Image # the cast is to appease mypy
     return gen
 
 def getarrow(typ:str) -> Image.Image:

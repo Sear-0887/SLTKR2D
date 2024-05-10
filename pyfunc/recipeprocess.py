@@ -267,7 +267,7 @@ sensor_rare_resource:set[str] = set()
 with open(cfg('localGame.texture.recipesFile')) as f:
     rawdata = smp.getsmpvalue(f.read())
 
-assert isinstance(rawdata,dict)
+assert isinstance(rawdata,list)
 
 del f
 
