@@ -7,6 +7,7 @@ aimed to provide utility for the Roody:2D community through Discord bot applicat
 - SLTK R2D#4893 
 - *SLTKR2D Testing Environment#3876
 - *testbot#2073
+
 \* Repository is only used as source in bot.
 ## Links
 - [SLTK Wiki Server](https://discord.gg/cDAUYrtjzV)
@@ -45,6 +46,6 @@ Introduces useful commands as well.
 Roody:2d and its assets by Redinator2000.
 SLTKR2D, a discord bot made by Sear. 
 
-Do not redistribute.
+Redistribution is allowed as long as Sear is Credited in bot.
 
 All rights reserved.
