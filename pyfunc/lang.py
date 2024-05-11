@@ -16,6 +16,7 @@ import glob
 import re
 from dotenv import dotenv_values
 import collections
+from typing import Any, TextIO
 
 cmdi:dict[str, dict[str, str | list[str]]] = {}
 config = None
@@ -23,7 +24,7 @@ devs = None
 keywords:dict[str, dict[str, str]] = {}
 l = logging.getLogger()
 presensemsg = None
-emojidict = None
+emojidict:dict[str, str] = {}
 
 # write_to_log, basically similar to print, with extra steps...
 # ptnt is print_to_normal_terminal, ats is add_timestamp
@@ -122,7 +123,7 @@ def cfgstr(target:str) -> str:
     assert isinstance(base,str)
     return base
 
-def opencfg(target:str, *args:Any, **kwargs:Any):
+def opencfg(target:str, *args:Any, **kwargs:Any) -> TextIO:
     return open(cfgstr(target), *args, **kwargs)
 
 def cfg(target:str) -> int | str | list | dict:
@@ -131,6 +132,7 @@ def cfg(target:str) -> int | str | list | dict:
     for tv in target.split("."):
         assert isinstance(base,dict)
         base = base[tv]
+    assert isinstance(base, (int, str, list, dict))
     return base
 
 def loademoji() -> None:
@@ -163,13 +165,13 @@ def getarrowcoords() -> dict[str, tuple[int, int]]:
     racord:dict[str, tuple[int, int]] = {}
     with opencfg("localGame.texture.guidebookArrowCordFile", encoding="utf-8") as f:
         data=getsmpvalue(f.read())
+    assert isinstance(data,dict)
     for icon,xy in data.items():
         x,y=xy.split(',')
         racord[icon] = (int(x), int(y))
     return racord
 
-def botinit():
-    
+def botinit() -> None:
     from pyfunc.assetload import assetinit
     os.makedirs(cfgstr('cacheFolder'), exist_ok=True) # directory to put images and other output in
     os.makedirs(cfgstr('logFolder'), exist_ok=True) # logs folder (may be in cache)

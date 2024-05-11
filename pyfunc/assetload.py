@@ -19,7 +19,7 @@ modifiers={
 }
 
 blockdefregex = 'BLOCK_DEF\\((?P<name>[a-z_]+),(?P<collision>collision::[a-z_]+(\\|collision::[a-z_]+)*),(?P<attr>atb::[a-z_]+(\\|atb::[a-z_]+)*),0b(?P<weld>\\d\\d\\d\\d),(?P<weldtime>\\d+)\\)'
-def getblockdefs():
+def getblockdefs() -> None:
     with opencfg("localGame.texture.blockDefsFile", encoding="utf-8") as f:
         data = f.read()
     for line in data.split('\n'):
@@ -41,21 +41,23 @@ def getblockdefs():
             blockinfos[name]['attributes'] = attr
             blockinfos[name]['weldablesides'] = top,left,bottom,right
 
-def getblockids():
+def getblockids() -> None:
     with opencfg("localGame.texture.blockIDFile", encoding="utf-8") as f:
         data=smp.getsmpvalue(f.read())
+    assert isinstance(data,dict)
     for name,i in data.items():
         blockinfos[name]["id"] = int(i)
         idtoblock[int(i)] = name
 
-def geticoncoords():
+def geticoncoords() -> None:
     with opencfg("localGame.texture.iconLocationFile", encoding="utf-8") as f:
         data=smp.getsmpvalue(f.read())
+    assert isinstance(data,dict)
     for icon,xy in data.items():
         x,y=xy.split(',')
         blockinfos[icon]["iconcoord"] = (int(x), int(y))
 
-def substitutelocale(s):
+def substitutelocale(s:str) -> str:
     # substitute locale entries into others
     # used in descriptions
     # a reference is {category name|mods}
@@ -82,13 +84,15 @@ def substitutelocale(s):
             s=p1+localized+p3
     return s
 
-def getlocale():
+def getlocale() -> None:
     # get locale entries from config.local_game.language_path
     # a locale entry is
     # category name = value
     # value can be continued across lines with a backslash (\)
     # comments beginning with # are ignored
-    for langname, langdata in cfg("localGame.language").items():
+    langinfo = cfg("localGame.language")
+    assert isinstance(langinfo,dict)
+    for langname, langdata in langinfo.items():
         langpath=langdata['path']
         for fname in glob.glob(langpath):
             with open(fname, "r") as f:
@@ -100,14 +104,14 @@ def getlocale():
                     if '=' not in line:
                         continue
                     key,value=line.split('=',maxsplit=1)
-                    key=tuple(key.split())
+                    tkey=tuple(key.split())
                     value=value.strip()
-                    locale[key]=value
+                    locale[tkey]=value
 
-    for key,s in locale.items():
-        locale[key]=substitutelocale(s)
+    for tkey,s in locale.items():
+        locale[tkey]=substitutelocale(s)
 
-def assetinit():
+def assetinit() -> None:
     getblockids()
     getblockdefs()
     geticoncoords()

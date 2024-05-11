@@ -7,7 +7,7 @@ import pyfunc.gif as gif
 from typing import Any, TypeVar, Callable
 import typing
 from pyfunc.datafunc import tuple_max, tuple_min
-from pyfunc.lang import cfg, getarrowcoords
+from pyfunc.lang import cfg, cfgstr, getarrowcoords
 from pyfunc.smp import getsmpvalue
 from pyfunc.block import canweld, get, makeimage, bottomtypes, topbottomtypes, sidestypes, notoptypes, norotatetypes, twowaytypes, normalize, makeweldside, BlockDataIn, BlockData
 import itertools
