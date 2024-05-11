@@ -242,6 +242,8 @@ def generaterecipe(name:str) -> None:
         ]],ratio=4)[0]
         maxdim = tuple_max((64*2, 0),*[img.size for recipeimgs in results for img in recipeimgs['recipeframes']]) # fancy double iteration # the recipe is at least 2 blocks wide
         y = 0
+        ymargin = cfg("recipeSetting.recipeMarginY")
+        assert isinstance(ymargin,int)
         for recipeimgs in results:
             _,h = gif.tuple_max((64*2, 0),*[img.size for img in recipeimgs['recipeframes']])
             finimage.addgifframes(
@@ -261,9 +263,9 @@ def generaterecipe(name:str) -> None:
                 pos=(maxdim[0]+64, y+h//2)
             )
             y += (
-                h +                                # the recipe height
-                64 +                               # the combiner
-                cfg("recipeSetting.recipeMarginY") # mandatory gap between recipes
+                h +     # the recipe height
+                64 +    # the combiner
+                ymargin # mandatory gap between recipes
             )
         finimage.export(f"cache/recipe-{name}.gif")
 
