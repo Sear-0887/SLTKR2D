@@ -14,6 +14,16 @@ import itertools
 import logging
 from pyfunc.recipeprocess import heat, extract, inject, combine, extra_display, summonore_pill
 
+T1 = TypeVar('T1')
+T2 = TypeVar('T2')
+
+if hasattr(itertools,'batched'):
+    def batched(l:list[T1],n:int) -> typing.Iterable[list[T1]]:
+        return map(list,itertools.batched(l,n))
+else:
+    def batched(l:list[T1],n:int) -> typing.Iterable[list[T1]]:
+        return map(list,itertools.zip_longest(*[itertools.islice(l,i,None,n) for i in range(n)]))
+
 l = logging.getLogger()
 
 noweld = (makeweldside(False),) * 4
@@ -135,9 +145,6 @@ def generates(grid1:list[list[BlockDataIn]],ratio:int,assertconnected:bool=True)
             break # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
     return ims
 
-T1 = TypeVar('T1')
-T2 = TypeVar('T2')
-
 def doublemap(f:Callable[[T1],T2],ll:list[list[T1]]) -> list[list[T2]]:
     return [[f(x) for x in l] for l in ll]
 
@@ -231,7 +238,7 @@ def generaterecipe(name:str) -> None:
         for i,recipe in enumerate(gridpos):
             imgs=generates(recipe['grid'],ratio=4)
             result=[{"type":name,"rotate":0,"weld":noweld,"data":None}]*recipe['amount']
-            img=generates([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
+            img=generates(typing.cast(list[list[BlockDataIn]],[*batched(result,2)]),ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
             results.append({'recipeframes':imgs,'result':img})
         bg = cfg("recipeSetting.recipeBackground")
         assert isinstance(bg,list)
