@@ -167,6 +167,7 @@ def getarrowcoords() -> dict[str, tuple[int, int]]:
         data=getsmpvalue(f.read())
     assert isinstance(data,dict)
     for icon,xy in data.items():
+        assert isinstance(xy,str)
         x,y=xy.split(',')
         racord[icon] = (int(x), int(y))
     return racord

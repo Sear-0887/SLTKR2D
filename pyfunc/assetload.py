@@ -46,6 +46,7 @@ def getblockids() -> None:
         data=smp.getsmpvalue(f.read())
     assert isinstance(data,dict)
     for name,i in data.items():
+        assert isinstance(i,str)
         blockinfos[name]["id"] = int(i)
         idtoblock[int(i)] = name
 
@@ -54,6 +55,7 @@ def geticoncoords() -> None:
         data=smp.getsmpvalue(f.read())
     assert isinstance(data,dict)
     for icon,xy in data.items():
+        assert isinstance(xy,str)
         x,y=xy.split(',')
         blockinfos[icon]["iconcoord"] = (int(x), int(y))
 
