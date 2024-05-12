@@ -13,18 +13,18 @@ import pyfunc.smp as smp
 from pyfunc.recipe import generaterecipe
 
 class Block(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot:commands.Bot) -> None:
         self.bot = bot
 
     @CogCommand("block")
-    async def block(self,ctx, *, block:str | None=None):
+    async def block(self,ctx:commands.Context, *, block:str | None=None) -> None:
         if block is not None:
             if block.isdigit(): # if the argument is a number, get the corresponding block name
                 block = idtoblock.get(int(block),'NIC')
             block = block.replace(" ", "_")
             binfo=blockinfos[block]
             embed = nextcord.Embed()
-            pthblockzoo = cfg("localGame.texture.blockIconFile")
+            pthblockzoo = cfgstr("localGame.texture.blockIconFile")
             img = Image.open(pthblockzoo)
             icox, icoy = binfo["iconcoord"]
             img = img.crop((16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))).resize((128, 128), Image.NEAREST)
@@ -40,7 +40,7 @@ class Block(commands.Cog):
             await self.block(ctx, str(random.choice([*idtoblock.keys()])))
 
     @CogCommand("image")
-    async def image(self,ctx, *, build:str="[[16][20]][[16][16]]"):
+    async def image(self,ctx:commands.Context, *, build:str="[[16][20]][[16][16]]") -> None:
         blocklist:dict[str, int] = collections.defaultdict(int)
         blocks=smp.getsmpvalue(build)
         for y,row in enumerate(blocks):
@@ -101,7 +101,7 @@ class Block(commands.Cog):
             )
             
     @CogCommand("recipe")
-    async def recipe(self,ctx, *, block:str='extractor'):
+    async def recipe(self,ctx:commands.Context, *, block:str='extractor') -> None:
         if block.isdigit(): # if the argument is a number, get the corresponding block name
             block = idtoblock.get(int(block),'NIC')
         block = block.replace(" ", "_").lower()

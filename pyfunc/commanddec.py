@@ -131,7 +131,7 @@ f'''
 CmdType:typing.TypeAlias = typing.Callable[...,typing.Coroutine]
 NCmdType:typing.TypeAlias = commands.core.Command
 
-def MainCommand(bot:nextcord.Bot,name:str) -> typing.Callable[[CmdType],NCmdType]:
+def MainCommand(bot:commands.Bot,name:str) -> typing.Callable[[CmdType],NCmdType]:
     # bot command
     async def _trycmd(cmd:CmdType,ctx:commands.Context,*args:typing.Any,**kwargs:typing.Any) -> None:
         try:
