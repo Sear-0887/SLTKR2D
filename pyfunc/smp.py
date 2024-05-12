@@ -1,10 +1,14 @@
+import typing
+
+SmpType:typing.TypeAlias = str | list['SmpType'] | dict[str,'SmpType']
+
 def strip(s:str) -> str:
     s=s.lstrip()
     while len(s)>0 and s[0]=='#':
         s=(s.split('\n',maxsplit=1)+[''])[1].lstrip()
     return s
 
-def _smptostr(smp:int | str | list | dict,indented:str,indent:str) -> tuple[str,bool]:
+def _smptostr(smp:SmpType | int,indented:str,indent:str) -> tuple[str,bool]:
     if isinstance(smp,(str,int)):
         return str(smp),False # do not add newlines around
     if isinstance(smp,list):
@@ -22,7 +26,7 @@ def _smptostr(smp:int | str | list | dict,indented:str,indent:str) -> tuple[str,
             s+=f'\n{indented}{{{k}}}:{{{xs}{nl}}}'
         return s,True
 
-def smptostr(smp:int | str | list | dict,indent:str='  ') -> str:
+def smptostr(smp:SmpType | int,indent:str='  ') -> str:
     return _smptostr(smp,'',indent)[0].lstrip('\n')
 
 def _getword(s:str) -> tuple[str,str]:
@@ -38,7 +42,7 @@ def _geterrmessage(err:str,sinit:str,s:str) -> str:
     col=len(lines[-1])
     return f'Error at line {line}, column {col}: {err}'
 
-def _getsmpvalue(sinit:str) -> tuple[str,str | list | dict]:
+def _getsmpvalue(sinit:str) -> tuple[str,SmpType]:
     s=strip(sinit)
     if s.startswith('['):
         # list
@@ -74,7 +78,7 @@ def _getsmpvalue(sinit:str) -> tuple[str,str | list | dict]:
         s2,w=_getword(s)
         return s2,w.strip()
 
-def getsmpvalue(s:str) -> str | list | dict:
+def getsmpvalue(s:str) -> SmpType:
     # read an smp into a python object
     s,val = _getsmpvalue(s)
     assert s == ''
