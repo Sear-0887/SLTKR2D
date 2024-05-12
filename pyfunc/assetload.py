@@ -27,12 +27,14 @@ def getblockdefs() -> None:
         match = re.match(blockdefregex,line)
         if match is not None:
             name = match['name']
-            collision = match['collision']
-            collision = collision.split('|')
-            collision = [re.fullmatch('collision::(?P<name>[a-z_]+)',c)['name'] for c in collision]
-            attr = match['attr']
-            attr = attr.split('|')
-            attr = [re.fullmatch('atb::(?P<name>[a-z_]+)',c)['name'] for c in attr]
+            collision1 = match['collision']
+            collision2 = collision1.split('|')
+            collision3 = [re.fullmatch('collision::(?P<name>[a-z_]+)',c) for c in collision2]
+            collision = [c['name'] for c in collision3]
+            attr1 = match['attr']
+            attr2 = attr1.split('|')
+            attr3 = [re.fullmatch('atb::(?P<name>[a-z_]+)',a) for a in attr2]
+            attr = [a['name'] for a in attr3]
             weld = match['weld']
             weld = [s == '1' for s in weld]
             left,bottom,right,top = weld
