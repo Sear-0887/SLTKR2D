@@ -77,44 +77,6 @@ def addentries(i:dict[str, Any], entryname:str, typ:str, organdict:dict, include
         organdict[typ][entryname] = []
     organdict[typ][entryname].append(entries)
     
-def testing() -> dict[str,Any]:
-    with open("gameAssets/recipes.smp") as f:
-        organdict:dict = collections.defaultdict(dict)
-        rawdata = getsmpvalue(f.read())
-        assert isinstance(rawdata,list)
-        for i in rawdata:
-            producename = ""
-            col = ""
-            if i['type'] == 'tag': # Tags
-                organdict['tag'][i['name']] = i['blocks']
-                continue
-            elif i['type'] == 'heat': # Heating Recipe
-                producename = i['product']
-                col = 'ingredient, time, surrounding, needs_entity'
-            elif i['type'] == 'extract': # Extracting Recipe
-                producename = i['product']
-                col = 'ingredient, time, amount, post_action'
-            elif i['type'] == 'inject': # Injecting Recipe
-                if 'transform_receiver' in i['product'].keys(): # Normal Injection
-                    producename = i['product']['transform_receiver']
-                elif 'fertilizer' in i['product'].keys(): # Fertilizing Injection
-                    producename = i['receiver']
-                col = 'pill, receiver, needs_passive'
-            elif i['type'] == 'combine': # Combining Recipe
-                i['amount'] = i['product']['amount']
-                i['block'] = i['product']['block']
-                producename = i['block']
-                col = 'amount, grid, block'
-            addentries(
-                i, 
-                producename, 
-                i['type'], 
-                organdict, 
-                col)
-            ...
-    return organdict
-returned = testing()
-
 def generates(grid1:list[list[BlockDataIn]],ratio:int,assertconnected:bool=True) -> list[Image.Image]:
     tags=[]
     for y,row in enumerate(grid1):
