@@ -128,17 +128,20 @@ f'''
     with open(errfilname, "w") as fil:
         json.dump(prev, fil, indent=4)
 
-def MainCommand(bot,name):
+CmdType:typing.TypeAlias = typing.Callable[...,typing.Coroutine]
+NCmdType:typing.TypeAlias = commands.core.Command
+
+def MainCommand(bot:nextcord.Bot,name:str) -> typing.Callable[[CmdType],NCmdType]:
     # bot command
-    async def _trycmd(cmd,ctx,*args,**kwargs):
+    async def _trycmd(cmd:CmdType,ctx:commands.Context,*args:typing.Any,**kwargs:typing.Any) -> None:
         try:
             await ctx.trigger_typing()
             await cmd(ctx,*args,**kwargs)
         except Exception as e:
             await ErrorHandler(name, e, args, kwargs, ctx=ctx)
-    def trycmd(cmd):
+    def trycmd(cmd:CmdType) -> CmdType:
         return decorator.decorate(cmd,_trycmd) # decorator preserves the signature of cmd
-    def fixcmd(cmd):
+    def fixcmd(cmd:CmdType) -> NCmdType:
         return bot.command(
             name        =        name,
             description = evl(f"{name}.desc") or "*No Description Found.*",
@@ -146,18 +149,18 @@ def MainCommand(bot,name):
         )( trycmd(cmd) )
     return fixcmd
 
-def CogCommand(name):
+def CogCommand(name:str) -> typing.Callable[[CmdType],NCmdType]:
     # cog command
     # command gets a self argument as well
-    async def _trycmd(cmd, self, ctx:commands.Context ,*args,**kwargs):
+    async def _trycmd(cmd:CmdType, self:commands.Cog, ctx:commands.Context ,*args:typing.Any,**kwargs:typing.Any) -> None:
         try:
             await ctx.trigger_typing()
             await cmd(self, ctx,*args,**kwargs)
         except Exception as e:
             await ErrorHandler(name, e, args, kwargs, ctx=ctx)
-    def trycmd(cmd):
+    def trycmd(cmd:CmdType) -> CmdType:
         return decorator.decorate(cmd,_trycmd)
-    def fixcmd(cmd):
+    def fixcmd(cmd:CmdType) -> NCmdType:
         return commands.command(
             name        =        name,
             description = evl(f"{name}.desc") or "*No Description Found.*",
@@ -165,22 +168,26 @@ def CogCommand(name):
         )( trycmd(cmd) )
     return fixcmd
 
-def InteractionCogCommand_Local(name):
+def InteractionCogCommand_Local(name:str) -> typing.Callable[[CmdType],NCmdType]:
     # interaction cog command
     # command gets a self argument as well
-    async def _trycmd(cmd, self, interaction: nextcord.Interaction ,*args,**kwargs):
+    async def _trycmd(cmd:CmdType, self:commands.Cog, interaction: nextcord.Interaction ,*args:typing.Any,**kwargs:typing.Any) -> None:
         try:
             await cmd(self, interaction, *args,**kwargs)
             
         except Exception as e:
             await ErrorHandler(name, e, args, kwargs, interaction=interaction)
             return
-    def trycmd(cmd):
+    def trycmd(cmd:CmdType) -> CmdType:
         return decorator.decorate(cmd,_trycmd)
-    def fixcmd(cmd):
+    def fixcmd(cmd:CmdType) -> NCmdType:
+        guild_ids = cfg("botInfo.localICCServer")
+        assert isinstance(guild_ids,list)
+        desc = evl(f"{name}.desc") or "*No Description.*"
+        assert isinstance(desc,str)
         return nextcord.slash_command(
             name        = name,
-            description = evl(f"{name}.desc") or "*No Description Found.*",
-            guild_ids   = cfg("botInfo.localICCServer")
+            description = desc,
+            guild_ids   = guild_ids
         )( trycmd(cmd) )
     return fixcmd
