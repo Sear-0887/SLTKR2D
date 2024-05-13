@@ -19,9 +19,6 @@ import typing
 
 l = logging.getLogger()
 
-prefixOperators = ['-']
-postfixOperators=['!']
-
 TokenType:typing.TypeAlias = (
   typing.Literal['NUM'] |
   typing.Literal['SYM'] |
@@ -69,6 +66,11 @@ ExprToken:typing.TypeAlias = (
 )
 ValueToken:typing.TypeAlias = SymToken | NumToken | ExprToken
 
+AnyToken:typing.TypeAlias = ValueToken | BopToken | UopToken | PopToken | tuple[typing.Literal["LPAR"]] | tuple[typing.Literal["CALL"]] | tuple[typing.Literal["RPAR"]]
+
+prefixOperators:list[Uop] = ['-']
+postfixOperators:list[Pop] = ['!']
+
 binaryOperators:dict[Bop,tuple[int,Assoc]] = {
   Bop('//') : (5, LEFT ),
   Bop('div'): (5, LEFT ),
@@ -82,7 +84,7 @@ binaryOperators:dict[Bop,tuple[int,Assoc]] = {
   Bop('-')  : (1, LEFT )
 }
 
-symbols:dict[str,NumType] = {
+symbols:dict[Sym,NumType] = {
   'φ'  : (1 + 5 ** 0.5) / 2,
   'phi': (1 + 5 ** 0.5) / 2,
   'pi' : math.pi,
@@ -187,10 +189,10 @@ def getANumber(expression:str) -> tuple[int | float | None, str]:
     return int(expression[:matched.end()], base=0), expression[matched.end():]
   return None,expression
 
-def getASymbol(expression:str) -> tuple[str | None, str]:
+def getASymbol(expression:str) -> tuple[Sym | None, str]:
   # Get a actual symbol, not a variable or number
   if m := re.match('[a-zA-Z][a-zA-Z0-9]*',expression):
-    return expression[:m.end()],expression[m.end():]
+    return typing.cast(Sym,expression[:m.end()]),expression[m.end():]
   for symbol in symbols:
     if expression[0]==symbol:
       return symbol,expression[1:]
@@ -200,7 +202,7 @@ def ifMoreTokens(expression:str) -> bool:
   # are there more tokens?
   return expression.strip() != ''
 
-def getToken(ss:str,lastType:TokenType):
+def getToken(ss:str,lastType:TokenType) -> tuple[AnyToken,str]:
   # get one token
   # the types accepted depends on the last token
   # for example, you can't have a binary operator after (
@@ -208,38 +210,41 @@ def getToken(ss:str,lastType:TokenType):
   if lastType in [NUM,SYM,RPAR,POP]:
     for pfoperator in postfixOperators:
       if ss.startswith(pfoperator):
-        return [POP,pfoperator] ,ss[len(pfoperator):]
+        return (POP,pfoperator) ,ss[len(pfoperator):]
     for op in binaryOperators:
       if ss.startswith(op):
-        return [BOP,op],ss[len(op):]
+        return (BOP,op),ss[len(op):]
     if ss.startswith(')'):
-      return [RPAR],ss[1:]
+      return (RPAR,),ss[1:]
     if lastType==SYM:
       if ss.startswith('('):
-        return [CALL],ss[1:]
+        return (CALL,),ss[1:]
     raise ArithmeticError(ss)
   if lastType in [LPAR,CALL,BOP,UOP]:
     if ss.startswith('('):
-      return [LPAR],ss[1:]
+      return (LPAR,),ss[1:]
     for uop in prefixOperators:
       if ss.startswith(uop):
-        return [UOP,uop],ss[len(uop):]
+        return (UOP,uop),ss[len(uop):]
     num,snew=getANumber(ss)
     if num is not None:
-      return [NUM,num],snew
+      return (NUM,num),snew
     sym,snew=getASymbol(ss)
     if sym is not None:
-      return [SYM,sym],snew
+      return (SYM,sym),snew
     raise ArithmeticError(ss)
+  if lastType == EXPR:
+    raise ArithmeticError([ss,'how did an expr get here?'])
+  raise ArithmeticError([ss,'what other type is there?'])
 
-def getPrecedenceOfOperator(token):
+def getPrecedenceOfOperator(token:BopToken) -> int:
   # get the precedence of a binary operator
   return binaryOperators[token[1]][0]
 
-def rightassoc(op):
+def rightassoc(op:Bop) -> bool:
   return binaryOperators[op][1]==RIGHT
 
-def leftassoc(op):
+def leftassoc(op:Bop) -> bool:
   return binaryOperators[op][1]==LEFT
 
 def evaluate(originalExpression):
