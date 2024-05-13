@@ -80,68 +80,71 @@ def customPowerOperation(a:complex,b:complex) -> complex:
 
 # apply operation to operand1 and operand2
 # remember, they are all [type,value] pairs
-def applyBinaryOperations(operation, operand1, operand2):
+def applyBinaryOperations(operation:BopToken, operand1:ValueToken, operand2:ValueToken) -> ValueToken:
   l.debug(f"Applying Binary {operation} to {operand1}, {operand2}")
   operationSymbol = operation[1]
-  operand1Type, operand1Value = operand1[:2]
-  operand2Type, operand2Value = operand2[:2]
-  if operand1Type != NUM or operand2Type != NUM:
-    return [EXPR, operationSymbol, operand1, operand2]
+  if operand1[0] != NUM:
+    return (EXPR, operationSymbol, operand1, operand2)
+  if operand2[0] != NUM:
+    return (EXPR, operationSymbol, operand1, operand2)
+  operand1Value = operand1[1]
+  operand2Value = operand2[1]
   match operationSymbol:
-    case '+':          return [NUM, operand1Value + operand2Value]
-    case '-':          return [NUM, operand1Value - operand2Value]
-    case '*':          return [NUM, operand1Value * operand2Value]
-    case '/':          return [NUM, operand1Value / operand2Value]
-    case '^'  | '**' : return [NUM, customPowerOperation(operand1Value,operand2Value)]
-    case '%'  | 'mod': return [NUM, operand1Value % operand2Value]
-    case '//' | 'div': return [NUM, operand1Value // operand2Value]
+    case '+':          return (NUM, operand1Value + operand2Value)
+    case '-':          return (NUM, operand1Value - operand2Value)
+    case '*':          return (NUM, operand1Value * operand2Value)
+    case '/':          return (NUM, operand1Value / operand2Value)
+    case '^'  | '**' : return (NUM, customPowerOperation(operand1Value,operand2Value))
+    case '%'  | 'mod': return (NUM, operand1Value % operand2Value) # type: ignore # just assume it won't have complex args
+    case '//' | 'div': return (NUM, operand1Value // operand2Value) # type: ignore # just assume it won't have complex a
     case _:            raise  KeyError(["binary", operationSymbol])
 
-def applyPrefixOperation(operation, operand):
+def applyPrefixOperation(operation:UopToken, operand:ValueToken) -> ValueToken:
   l.debug(f"Applying Prefix {operation} to {operand}")
   operationSymbol = operation[1]
-  operandType, operandValue = operand
-  if operandType != NUM:
-    return [EXPR, operationSymbol, operandValue]
+  if operand[0] != NUM:
+    return (EXPR, operationSymbol, operand)
   if operationSymbol == '-':
-    return [NUM, -operandValue]
-  raise KeyError(["unary", operandValue])
+    return (NUM, -operand[1])
+  raise KeyError(["unary", operationSymbol, operand[1]])
 
-def applyPostfixOperation(operation, operand):
+def applyPostfixOperation(operation:PopToken, operand:ValueToken) -> ValueToken:
   l.debug(f"Applying Postfix{operation} to {operand}")
   operationSymbol = operation[1]
-  operandType, operandValue = operand[:2]
-  if operandType != NUM:
-    return [EXPR, operationSymbol, operand]
+  if operand[0] != NUM:
+    return (EXPR, operationSymbol, operand)
   if operationSymbol=='!':
-    return [NUM, math.factorial(operandValue)]
+    # gamma function maybe?
+    # math factorial takes int
+    # cmath gamma?
+    return (NUM, math.factorial(operand[1]))
   raise KeyError(["postfix", operationSymbol])
 
-def applyFunction(functionName,operand):
+def applyFunction(functionName:str,operand:ValueToken) -> ValueToken:
   l.debug(f"Applying Function {functionName} to {operand}")
-  operandType, operandValue = operand[:2]
-  if operandType != NUM:
-    return [EXPR,'(',functionName,operand]
+  if operand[0] != NUM:
+    return (EXPR,'(',functionName,operand)
+  operandValue = operand[1]
   match functionName:
-    case 'log'            : return [NUM, math.log(operandValue, 10)]
-    case 'ln'             : return [NUM, math.log(operandValue)]
-    case 'sqrt' | '√'     : return [NUM, math.sqrt(operandValue)]
-    case 'asin' | 'arcsin': return [NUM, math.asin(operandValue)]
-    case 'acos' | 'arccos': return [NUM, math.acos(operandValue)]
-    case 'atan' | 'arctan': return [NUM, math.atan(operandValue)]
-    case 'degree' | 'deg' : return [NUM, math.degrees(operandValue)]
-    case 'radian' | 'rad' : return [NUM, math.radians(operandValue)]
-    case 'sin'            : return [NUM, math.sin(operandValue)]
-    case 'cos'            : return [NUM, math.cos(operandValue)]
-    case 'tan'            : return [NUM, math.tan(operandValue)]
-    case 'rdm'            : return [NUM, random.random()*operandValue]
-    case _                : return [EXPR,'(',functionName,operand]
+    case 'log'            : return (NUM, cmath.log(operandValue, 10))
+    case 'ln'             : return (NUM, cmath.log(operandValue))
+    case 'sqrt' | '√'     : return (NUM, cmath.sqrt(operandValue))
+    case 'asin' | 'arcsin': return (NUM, cmath.asin(operandValue))
+    case 'acos' | 'arccos': return (NUM, cmath.acos(operandValue))
+    case 'atan' | 'arctan': return (NUM, cmath.atan(operandValue))
+    case 'degree' | 'deg' : return (NUM, math.degrees(operandValue))
+    case 'radian' | 'rad' : return (NUM, math.radians(operandValue))
+    case 'sin'            : return (NUM, cmath.sin(operandValue))
+    case 'cos'            : return (NUM, cmath.cos(operandValue))
+    case 'tan'            : return (NUM, cmath.tan(operandValue))
+    case 'rdm'            : return (NUM, random.random()*operandValue)
+    case _                : return (EXPR,'(',functionName,operand)
 # here starts RbCaVi's code
 # please know what you are doing, sear.
 
 # from cpython Tokenize.py
-def group(*choices): return '(' + '|'.join(choices) + ')'
-def maybe(*choices): return group(*choices) + '?'
+def group(*choices:str) -> str: return '(' + '|'.join(choices) + ')'
+def maybe(*choices:str) -> str: return group(*choices) + '?'
 
 Hexnumber = r'0[xX](?:_?[0-9a-fA-F])+'
 Binnumber = r'0[bB](?:_?[01])+'
@@ -156,7 +159,7 @@ Floatnumber = group(Pointfloat, Expfloat)
 Number = group(Floatnumber, Intnumber)
 # end from cpython Tokenize.py
 
-def getANumber(expression):
+def getANumber(expression:str) -> tuple[int | None, str]:
   # Get an actual number, not a variable or symbol
   if matched := re.match(Floatnumber, expression):
     return float(expression[:matched.end()]), expression[matched.end():]
@@ -165,7 +168,7 @@ def getANumber(expression):
     return int(expression[:matched.end()], base=0), expression[matched.end():]
   return None,expression
 
-def getASymbol(expression):
+def getASymbol(expression:str) -> tuple[str | None, str]:
   # Get a actual symbol, not a variable or number
   if m := re.match('[a-zA-Z][a-zA-Z0-9]*',expression):
     return expression[:m.end()],expression[m.end():]
@@ -174,14 +177,14 @@ def getASymbol(expression):
       return symbol,expression[1:]
   return None,expression
 
-def ifMoreTokens(expression):
+def ifMoreTokens(expression:str) -> bool:
   # are there more tokens?
   return expression.strip() != ''
 
 def getToken(ss,lastType):
   # get one token
-  # the types accepted is depended on the last token
-  # for example, you can't have a operator after (
+  # the types accepted depends on the last token
+  # for example, you can't have a binary operator after (
   ss=ss.lstrip()
   if lastType in [NUM,SYM,RPAR,POP]:
     for pfoperator in postfixOperators:
