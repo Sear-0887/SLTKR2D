@@ -48,7 +48,12 @@ PopToken:typing.TypeAlias = tuple[typing.Literal["POP"],Pop]
 Sym = typing.NewType('Sym',str)
 SymToken:typing.TypeAlias = tuple[typing.Literal["SYM"],Sym]
 NumToken:typing.TypeAlias = tuple[typing.Literal["NUM"],complex]
-ExprToken:typing.TypeAlias = tuple[typing.Literal["EXPR"],Uop | Pop,'ValueToken'] | tuple[typing.Literal["EXPR"],Bop,'ValueToken','ValueToken'] | tuple[typing.Literal["EXPR"],str,'ValueToken','ValueToken'] | tuple[typing.Literal["EXPR"],str,'ValueToken','ValueToken','ValueToken']
+ExprToken:typing.TypeAlias = (
+  tuple[typing.Literal["EXPR"],Uop | Pop,'ValueToken'] | 
+  #tuple[typing.Literal["EXPR"],Bop,'ValueToken','ValueToken'] | # causes an error in mypy
+  tuple[typing.Literal["EXPR"],str,'ValueToken','ValueToken'] | 
+  tuple[typing.Literal["EXPR"],str,'ValueToken','ValueToken','ValueToken']
+)
 ValueToken:typing.TypeAlias = SymToken | NumToken | ExprToken
 
 binaryOperators:dict[Bop,tuple[int,Assoc]] = {
