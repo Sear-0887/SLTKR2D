@@ -242,13 +242,6 @@ def rightassoc(op):
 def leftassoc(op):
   return binaryOperators[op][1]==LEFT
 
-def listparti(lst, index):
-  # print(f"Partied {lst} to {lst[:index], lst[index:]}")
-  if abs(index) == 1: # For single-isolated element
-    return (lst[:index], lst[index])
-  else:
-    return (lst[:index], lst[index:])
-
 def evaluate(originalExpression):
   valueStack = []
   operatorStack = []
@@ -264,7 +257,7 @@ def evaluate(originalExpression):
       valueStack.append(token)
     if tokenType in [NUM,SYM,EXPR]: # number, symbol, or expression
       while len(operatorStack) > 0 and operatorStack[-1][0] == UOP: # apply all unary operators on the stack
-        operatorStack, lastoperator = listparti(operatorStack, -1)
+        lastoperator = operatorStack.pop()
         valueStack[-1] = applyPrefixOperation(lastoperator,valueStack[-1])
     if tokenType==LPAR: # left paren
       operatorStack.append(token)
@@ -280,18 +273,18 @@ def evaluate(originalExpression):
       valueStack[-1]=applyPostfixOperation(token,valueStack[-1])
     if tokenType==RPAR: # right paren
       while operatorStack[-1][0] not in [LPAR,CALL]: # finish the parenthesized expression
-        operatorStack, lastoperator = listparti(operatorStack, -1)
-        valueStack, operands = listparti(valueStack, -2)
-        operand1, operand2 = operands
+        lastoperator = operatorStack.pop()
+        operand1 = valueStack.pop()
+        operand2 = valueStack.pop()
         valueStack.append(applyBinaryOperations(lastoperator, operand1, operand2))
       if operatorStack[-1][0]==CALL:
-        valueStack, operands = listparti(valueStack, -2)
-        operand1, operand2 = operands
+        operand1 = valueStack.pop()
+        operand2 = valueStack.pop()
         assert operand1[0]==SYM # the function should always be a symbol
         valueStack.append(applyFunction(operand1[1],operand2))
       operatorStack.pop()
       while len(operatorStack)>0 and operatorStack[-1][0]==UOP: # apply all unary operators on the stack
-        operatorStack, lastoperator = listparti(operatorStack, -1)
+        lastoperator = operatorStack.pop()
         valueStack[-1]=applyPrefixOperation(lastoperator,valueStack[-1])
     if tokenType==BOP:
       while (
@@ -306,18 +299,18 @@ def evaluate(originalExpression):
           )
         ):
         # apply all operators to the left with a lower precedence
-        operatorStack, lastoperator = listparti(operatorStack, -1)
-        valueStack, operands = listparti(valueStack, -2)
-        operand1, operand2 = operands
+        lastoperator = operatorStack.pop()
+        operand1 = valueStack.pop()
+        operand2 = valueStack.pop()
         valueStack.append(applyBinaryOperations(lastoperator,operand1,operand2))
       operatorStack.append(token) # push this operator
     lastType = tokenType # type of last token
 
   # No more tokens found then:
   while len(operatorStack) > 0: # apply the rest of the operators
-    operatorStack, lastoperator = listparti(operatorStack, -1)
-    valueStack, operands = listparti(valueStack, -2)
-    operand1, operand2 = operands
+    lastoperator = operatorStack.pop()
+    operand1 = valueStack.pop()
+    operand2 = valueStack.pop()
     valueStack.append(applyBinaryOperations(lastoperator,operand1,operand2))
   if len(valueStack) > 1: # each operator reduces the number of values by 1
     raise ValueError('Not enough operators to finish operation')
