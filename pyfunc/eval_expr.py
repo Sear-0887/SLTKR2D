@@ -22,6 +22,18 @@ l = logging.getLogger()
 prefixOperators = ['-']
 postfixOperators=['!']
 
+TokenType:typing.TypeAlias = (
+  typing.Literal['NUM'] |
+  typing.Literal['SYM'] |
+  typing.Literal['EXPR'] |
+  typing.Literal['LPAR'] |
+  typing.Literal['CALL'] |
+  typing.Literal['RPAR'] |
+  typing.Literal['BOP'] |
+  typing.Literal['UOP'] |
+  typing.Literal['POP']
+)
+
 NUM:typing.Literal['NUM']    = 'NUM'   # Token: number
 SYM:typing.Literal['SYM']    = 'SYM'   # Token: symbol (variable or function)
 EXPR:typing.Literal['EXPR']  = 'EXPR'  # Token: expression (output of evaluate)
@@ -47,7 +59,8 @@ Pop = typing.NewType('Pop',str)
 PopToken:typing.TypeAlias = tuple[typing.Literal["POP"],Pop]
 Sym = typing.NewType('Sym',str)
 SymToken:typing.TypeAlias = tuple[typing.Literal["SYM"],Sym]
-NumToken:typing.TypeAlias = tuple[typing.Literal["NUM"],complex]
+NumType:typing.TypeAlias = int | float | complex
+NumToken:typing.TypeAlias = tuple[typing.Literal["NUM"],NumType]
 ExprToken:typing.TypeAlias = (
   tuple[typing.Literal["EXPR"],Uop | Pop,'ValueToken'] | 
   #tuple[typing.Literal["EXPR"],Bop,'ValueToken','ValueToken'] | # causes an error in mypy
@@ -69,7 +82,7 @@ binaryOperators:dict[Bop,tuple[int,Assoc]] = {
   Bop('-')  : (1, LEFT )
 }
 
-symbols:dict[str,complex] = {
+symbols:dict[str,NumType] = {
   'φ'  : (1 + 5 ** 0.5) / 2,
   'phi': (1 + 5 ** 0.5) / 2,
   'pi' : math.pi,
@@ -78,7 +91,7 @@ symbols:dict[str,complex] = {
   'i'  : 1j,
 }
 
-def customPowerOperation(a:complex,b:complex) -> complex:
+def customPowerOperation(a:NumType,b:NumType) -> NumType:
   if abs(b)>100000: # or maybe timeout
     raise TimeoutError([a, b])
   return a**b
@@ -100,8 +113,8 @@ def applyBinaryOperations(operation:BopToken, operand1:ValueToken, operand2:Valu
     case '*':          return (NUM, operand1Value * operand2Value)
     case '/':          return (NUM, operand1Value / operand2Value)
     case '^'  | '**' : return (NUM, customPowerOperation(operand1Value,operand2Value))
-    case '%'  | 'mod': return (NUM, operand1Value % operand2Value) # type: ignore # just assume it won't have complex args
-    case '//' | 'div': return (NUM, operand1Value // operand2Value) # type: ignore # just assume it won't have complex a
+    case '%'  | 'mod': return (NUM, operand1Value % operand2Value) # ype: ignore # just assume it won't have complex args
+    case '//' | 'div': return (NUM, operand1Value // operand2Value) # ype: ignore # just assume it won't have complex a
     case _:            raise  KeyError(["binary", operationSymbol])
 
 def applyPrefixOperation(operation:UopToken, operand:ValueToken) -> ValueToken:
@@ -122,13 +135,14 @@ def applyPostfixOperation(operation:PopToken, operand:ValueToken) -> ValueToken:
     # gamma function maybe?
     # math factorial takes int
     # cmath gamma?
+    assert isinstance(operand[1],int)
     return (NUM, math.factorial(operand[1]))
   raise KeyError(["postfix", operationSymbol])
 
 def applyFunction(functionName:str,operand:ValueToken) -> ValueToken:
   l.debug(f"Applying Function {functionName} to {operand}")
   if operand[0] != NUM:
-    return (EXPR,'(',functionName,operand)
+    return typing.cast(ValueToken,(EXPR,'(',functionName,operand)) # for reasons
   operandValue = operand[1]
   match functionName:
     case 'log'            : return (NUM, cmath.log(operandValue, 10))
@@ -143,7 +157,7 @@ def applyFunction(functionName:str,operand:ValueToken) -> ValueToken:
     case 'cos'            : return (NUM, cmath.cos(operandValue))
     case 'tan'            : return (NUM, cmath.tan(operandValue))
     case 'rdm'            : return (NUM, random.random()*operandValue)
-    case _                : return (EXPR,'(',functionName,operand)
+    case _                : return typing.cast(ValueToken,(EXPR,'(',functionName,operand))
 # here starts RbCaVi's code
 # please know what you are doing, sear.
 
@@ -164,7 +178,7 @@ Floatnumber = group(Pointfloat, Expfloat)
 Number = group(Floatnumber, Intnumber)
 # end from cpython Tokenize.py
 
-def getANumber(expression:str) -> tuple[int | None, str]:
+def getANumber(expression:str) -> tuple[int | float | None, str]:
   # Get an actual number, not a variable or symbol
   if matched := re.match(Floatnumber, expression):
     return float(expression[:matched.end()]), expression[matched.end():]
@@ -186,7 +200,7 @@ def ifMoreTokens(expression:str) -> bool:
   # are there more tokens?
   return expression.strip() != ''
 
-def getToken(ss,lastType):
+def getToken(ss:str,lastType:TokenType):
   # get one token
   # the types accepted depends on the last token
   # for example, you can't have a binary operator after (
