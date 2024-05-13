@@ -13,39 +13,58 @@
 import random
 import re
 import math
+import cmath
 import logging
+import typing
 
 l = logging.getLogger()
 
 prefixOperators = ['-']
 postfixOperators=['!']
 
-NUM   = 'NUM'   # Token: number
-LPAR  = 'LPAR'  # Token: left paren
-RPAR  = 'RPAR'  # Token: right paren
-BOP   = 'BOP'   # Token: binary operator
-UOP   = 'UOP'   # Token: unary operator
-SYM   = 'SYM'   # Token: symbol (variable or function)
-EXPR  = 'EXPR'  # Token: expression (output of evaluate)
-CALL  = 'CALL'  # Token: left paren after function name
-POP   = 'POP'   # Token: postfix operator
-LEFT  = 'LEFT'  # Associativity: left
-RIGHT = 'RIGHT' # Associativity: right
+NUM:typing.Literal['NUM']    = 'NUM'   # Token: number
+SYM:typing.Literal['SYM']    = 'SYM'   # Token: symbol (variable or function)
+EXPR:typing.Literal['EXPR']  = 'EXPR'  # Token: expression (output of evaluate)
 
-binaryOperators = {
-  '//' : (5, LEFT ),
-  'div': (5, LEFT ),
-  '%'  : (4, LEFT ),
-  'mod': (4, LEFT ),
-  '**' : (3, RIGHT),
-  '^'  : (3, RIGHT),
-  '/'  : (2, LEFT ),
-  '*'  : (2, LEFT ),
-  '+'  : (1, LEFT ),
-  '-'  : (1, LEFT )
+LPAR:typing.Literal['LPAR']  = 'LPAR'  # Token: left paren
+CALL:typing.Literal['CALL']  = 'CALL'  # Token: left paren after function name
+RPAR:typing.Literal['RPAR']  = 'RPAR'  # Token: right paren
+
+BOP:typing.Literal['BOP']    = 'BOP'   # Token: binary operator
+UOP:typing.Literal['UOP']    = 'UOP'   # Token: unary operator
+POP:typing.Literal['POP']    = 'POP'   # Token: postfix operator
+
+Assoc:typing.TypeAlias = typing.Literal['LEFT'] | typing.Literal['RIGHT']
+
+LEFT:Assoc  = 'LEFT'  # Associativity: left
+RIGHT:Assoc = 'RIGHT' # Associativity: right
+
+Bop = typing.NewType('Bop',str)
+BopToken:typing.TypeAlias = tuple[typing.Literal["BOP"],Bop]
+Uop = typing.NewType('Uop',str)
+UopToken:typing.TypeAlias = tuple[typing.Literal["UOP"],Uop]
+Pop = typing.NewType('Pop',str)
+PopToken:typing.TypeAlias = tuple[typing.Literal["POP"],Pop]
+Sym = typing.NewType('Sym',str)
+SymToken:typing.TypeAlias = tuple[typing.Literal["SYM"],Sym]
+NumToken:typing.TypeAlias = tuple[typing.Literal["NUM"],complex]
+ExprToken:typing.TypeAlias = tuple[typing.Literal["EXPR"],Uop | Pop,'ValueToken'] | tuple[typing.Literal["EXPR"],Bop,'ValueToken','ValueToken'] | tuple[typing.Literal["EXPR"],str,'ValueToken','ValueToken'] | tuple[typing.Literal["EXPR"],str,'ValueToken','ValueToken','ValueToken']
+ValueToken:typing.TypeAlias = SymToken | NumToken | ExprToken
+
+binaryOperators:dict[Bop,tuple[int,Assoc]] = {
+  Bop('//') : (5, LEFT ),
+  Bop('div'): (5, LEFT ),
+  Bop('%')  : (4, LEFT ),
+  Bop('mod'): (4, LEFT ),
+  Bop('**') : (3, RIGHT),
+  Bop('^')  : (3, RIGHT),
+  Bop('/')  : (2, LEFT ),
+  Bop('*')  : (2, LEFT ),
+  Bop('+')  : (1, LEFT ),
+  Bop('-')  : (1, LEFT )
 }
 
-symbols = {
+symbols:dict[str,complex] = {
   'φ'  : (1 + 5 ** 0.5) / 2,
   'phi': (1 + 5 ** 0.5) / 2,
   'pi' : math.pi,
@@ -54,8 +73,8 @@ symbols = {
   'i'  : 1j,
 }
 
-def customPowerOperation(a,b):
-  if b>100000: # or maybe timeout
+def customPowerOperation(a:complex,b:complex) -> complex:
+  if abs(b)>100000: # or maybe timeout
     raise TimeoutError([a, b])
   return a**b
 
