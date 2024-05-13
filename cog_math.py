@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy
 import nextcord
 import math
-from pyfunc.math import primefactor
+from pyfunc.mathfuncs import primefactor
 from nextcord.ext import commands
 from pyfunc.commanddec import CogCommand
 from pyfunc.eval_expr import evaluate,stringifyexpr
