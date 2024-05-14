@@ -17,6 +17,22 @@ GREEN = Fore.GREEN
 RESET = Fore.RESET
 l = logging.getLogger()
 
+class User(typing.TypedDict):
+    displayname:str
+    globalname:str | None
+    id:int
+    servername:str
+
+class ErrorPacket(typing.TypedDict):
+    user:User
+    time:str
+    trigger:str
+    arg:list[str]
+    kwarg:dict[str,str]
+    errline:str
+    errname:str
+    excstr:str
+
 Context:typing.TypeAlias = commands.context.Context
 
 async def ErrorHandler(name:str, e:BaseException, args:tuple[typing.Any], kwargs:dict[str,typing.Any], interaction:nextcord.Interaction | None=None, ctx:Context | None=None) -> None:
@@ -96,7 +112,14 @@ f'''
     else:
         guild_name = '<NO GUILD>'
 
-    errorpacket = {
+    excstrs = [str(e)]
+    while (e.__context__ or e.__cause__) is not None:
+        e2 = e.__context__ or e.__cause__
+        assert e2 is not None # seriously mypy?
+        e = e2
+        excstrs = [str(e),*excstrs]
+
+    errorpacket:ErrorPacket = {
         "user": {
             "displayname": author_display_name,
             "globalname": author_global_name,
@@ -109,14 +132,8 @@ f'''
         'kwarg': {k:repr(v) for k,v in kwargs.items()},
         'errline': '\n'.join(traceback.format_exception(e)),
         'errname': str(type(e)),
+        'excstr': '\n'.join(excstrs),
     }
-    excstrs = [str(e)]
-    while (e.__context__ or e.__cause__) is not None:
-        e2 = e.__context__ or e.__cause__
-        assert e2 is not None # seriously?
-        e = e2
-        excstrs = [str(e),*excstrs]
-    errorpacket['excstr'] = '\n'.join(excstrs)
     
     errfilname = f"cache/log/error-{author_global_name}-{datetime.date.today():%d-%m-%Y}.json"
     try:

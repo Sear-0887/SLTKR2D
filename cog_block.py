@@ -114,5 +114,5 @@ class Block(commands.Cog):
         await ctx.send(embed=embed, file=nextcord.File(f"cache/recipe-{block}.gif", filename="f.gif"))  
         
         
-def setup(bot):
+def setup(bot:commands.Bot) -> None:
 	bot.add_cog(Block(bot))
