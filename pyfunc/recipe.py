@@ -218,38 +218,46 @@ def getarrow(typ:str) -> Image.Image:
 # extra_display
 # summonore_pill
 
+# the parts that are always the same
+combiner=generates([[
+    {"type":"combiner","rotate":2,"weld":fullweld,"data":None}, 
+    {"type":"transistor","rotate":1,"weld":fullweld,"data":None}
+]],ratio=4)[0]
+
 def generaterecipe2(name) -> None:
+    finimage = gif.gif(tuple(cfg("recipeSetting.recipeBackground")))
+    results:list[dict] = []
     if name in combine:
-        gridpos = combine[name]
-        results:list[dict] = []
-        for i,recipe in enumerate(gridpos):
+        crecipes = combine[name]
+        for i,recipe in enumerate(crecipes):
             imgs=generates(recipe['grid'],ratio=4)
+            _,h = gif.tuple_max((64*2, 0),*[img.size for img in imgs])
+            anim = gif.gif((0,0,0)) # the color is ignored
+            anim.addgifframes(
+                imgs,
+                pos=(0, 0)
+            )
+            anim.addimageframes(
+                combiner,
+                pos=(0, h)
+            )
             result=[{"type":name,"rotate":0,"weld":noweld,"data":None}]*recipe['amount']
             img=generates([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
-            results.append({'recipeframes':imgs,'result':img})
-        finimage = gif.gif(tuple(cfg("recipeSetting.recipeBackground")))
-        combiner=generates([[
-            {"type":"combiner","rotate":2,"weld":fullweld,"data":None}, 
-            {"type":"transistor","rotate":1,"weld":fullweld,"data":None}
-        ]],ratio=4)[0]
+            results.append({'anim':anim,'arrowsprite':'combiner','result':img})
         maxdim = tuple_max((64*2, 0),*[img.size for recipeimgs in results for img in recipeimgs['recipeframes']]) # fancy double iteration # the recipe is at least 2 blocks wide
         y = 0
         for recipeimgs in results:
-            _,h = gif.tuple_max((64*2, 0),*[img.size for img in recipeimgs['recipeframes']])
-            finimage.addgifframes(
-                recipeimgs['recipeframes'],
-                pos=(0, y)
-            )
-            finimage.addimageframes(
-                combiner,
-                pos=(0, y+h)
+            _,h = recipeimgs['anim'].getsize()
+            finimage.addgif(
+                recipeimgs['anim'],
+                pos = (0, y),
             )
             finimage.addimageframes(
                 recipeimgs['result'],
                 pos=(maxdim[0]+64+64+64, y)
             )
             finimage.addimageframes(
-                getarrow("combiner"),
+                getarrow(recipeimgs['arrowsprite']),
                 pos=(maxdim[0]+64, y+h//2)
             )
             y += (
