@@ -244,28 +244,28 @@ def generaterecipe2(name) -> None:
             result=[{"type":name,"rotate":0,"weld":noweld,"data":None}]*recipe['amount']
             img=generates([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
             results.append({'anim':anim,'arrowsprite':'combiner','result':img})
-        maxdim = tuple_max((64*2, 0),*[img.size for recipeimgs in results for img in recipeimgs['recipeframes']]) # fancy double iteration # the recipe is at least 2 blocks wide
-        y = 0
-        for recipeimgs in results:
-            _,h = recipeimgs['anim'].getsize()
-            finimage.addgif(
-                recipeimgs['anim'],
-                pos = (0, y),
-            )
-            finimage.addimageframes(
-                recipeimgs['result'],
-                pos=(maxdim[0]+64+64+64, y)
-            )
-            finimage.addimageframes(
-                getarrow(recipeimgs['arrowsprite']),
-                pos=(maxdim[0]+64, y+h//2)
-            )
-            y += (
-                h +                                # the recipe height
-                64 +                               # the combiner
-                cfg("recipeSetting.recipeMarginY") # mandatory gap between recipes
-            )
-        finimage.export(f"cache/recipe-{name}.gif")
+    maxdim = tuple_max((0, 0),*[recipeimgs['anim'].getsize() for recipeimgs in results])
+    y = 0
+    for recipeimgs in results:
+        _,h = recipeimgs['anim'].getsize()
+        finimage.addgif(
+            recipeimgs['anim'],
+            pos = (0, y),
+        )
+        finimage.addimageframes(
+            recipeimgs['result'],
+            pos=(maxdim[0]+64+64+64, y)
+        )
+        finimage.addimageframes(
+            getarrow(recipeimgs['arrowsprite']),
+            pos=(maxdim[0]+64, y+h//2)
+        )
+        y += (
+            h +                                # the recipe height
+            64 +                               # the combiner
+            cfg("recipeSetting.recipeMarginY") # mandatory gap between recipes
+        )
+    finimage.export(f"cache/recipe-{name}.gif")
 
 def generaterecipe(name) -> None:
     for typ in returned.keys():
