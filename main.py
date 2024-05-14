@@ -22,7 +22,9 @@ intents = nextcord.Intents.default()
 intents.members = True
 intents.message_content = True
 # Bot Instance
-bot = commands.Bot(command_prefix=cfg("PREFIX"), intents=intents, help_command=None)
+prefixes = cfg("PREFIX")
+assert isinstance(prefixes,(list,str))
+bot = commands.Bot(command_prefix=prefixes, intents=intents, help_command=None)
 # TimeOn must be a datetime, or else error will be raised when !help
 TimeOn: datetime.datetime = datetime.datetime.now() 
 # initialize some things
@@ -30,7 +32,7 @@ TimeOn: datetime.datetime = datetime.datetime.now()
 
 # Reloads the command locale
 @MainCommand(bot, "reloadlocale")
-async def reloadlocal(ctx,module=None):
+async def reloadlocal(ctx:commands.Context,module:str | None=None) -> None:
     if module is None:
         phraser()
         #for i in bot.commands:
@@ -97,24 +99,24 @@ async def help(ctx:commands.Context, cmdname:str | None=None) -> None:
 
 # check if the bot is up
 @MainCommand(bot,"ping")
-async def ping(ctx):
+async def ping(ctx:commands.Context) -> None:
     s=f"Pong! ({bot.latency*1000} ms)"
     l.info(s)
     await ctx.send(s)
 
 # represent sear's sanity
 @MainCommand(bot,"scream")
-async def scream(ctx, n:int=32):
+async def scream(ctx:commands.Context, n:int=32) -> None:
     await ctx.send("A"*n)
     
 # represent sear's sanity... again?
 @MainCommand(bot,"wee")
-async def scream(ctx, e:int=32):
+async def wee(ctx:commands.Context, e:int=32) -> None:
     await ctx.send("W"+"e"*e)
 
 # send a link
 @MainCommand(bot,"link")
-async def link(ctx, typ:str="r2d"):
+async def link(ctx:commands.Context, typ:str="r2d") -> None:
     print(keywords)
     for i in keywords:
         if typ in keywords[i]["kw"]:
@@ -125,7 +127,7 @@ async def link(ctx, typ:str="r2d"):
 
 # credits to the developers
 @MainCommand(bot,'credit')
-async def credit(ctx):
+async def credit(ctx:commands.Context) -> None:
     devstr = '\n'.join([f'### [{dev["name"]}]({dev["github_link"]}){dev["desc"]}' for dev in devs])
     await ctx.send(evl("credit.display").format(devstr))
 
@@ -148,7 +150,7 @@ async def changepresence() -> None:
 
 # the bot is ready now
 @bot.event
-async def on_ready():
+async def on_ready() -> None:
     l.info(f"ONLINE as {bot.user}")
     l.info(f"Display Name: {bot.user.display_name}")
     l.info(f"ID: {bot.user.id}.")
