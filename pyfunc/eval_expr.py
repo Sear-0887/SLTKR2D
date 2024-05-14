@@ -66,10 +66,17 @@ ExprToken:typing.TypeAlias = (
 )
 ValueToken:typing.TypeAlias = SymToken | NumToken | ExprToken
 
-AnyToken:typing.TypeAlias = ValueToken | BopToken | UopToken | PopToken | tuple[typing.Literal["LPAR"]] | tuple[typing.Literal["CALL"]] | tuple[typing.Literal["RPAR"]]
+LParToken:typing.TypeAlias = tuple[typing.Literal["LPAR"]]
+CallToken:typing.TypeAlias = tuple[typing.Literal["CALL"]]
 
-prefixOperators:list[Uop] = ['-']
-postfixOperators:list[Pop] = ['!']
+OpToken:typing.TypeAlias = BopToken | UopToken | PopToken | LParToken | CallToken
+
+AnyToken:typing.TypeAlias = ValueToken | BopToken | UopToken | PopToken | LParToken | CallToken | tuple[typing.Literal["RPAR"]]
+
+RealToken:typing.TypeAlias = SymToken | NumToken | BopToken | UopToken | PopToken | LParToken | CallToken | tuple[typing.Literal["RPAR"]]
+
+prefixOperators:list[Uop] = [Uop('-')]
+postfixOperators:list[Pop] = [Pop('!')]
 
 binaryOperators:dict[Bop,tuple[int,Assoc]] = {
   Bop('//') : (5, LEFT ),
@@ -85,12 +92,12 @@ binaryOperators:dict[Bop,tuple[int,Assoc]] = {
 }
 
 symbols:dict[Sym,NumType] = {
-  'φ'  : (1 + 5 ** 0.5) / 2,
-  'phi': (1 + 5 ** 0.5) / 2,
-  'pi' : math.pi,
-  'π'  : math.pi,
-  'e'  : math.e,
-  'i'  : 1j,
+  Sym('φ')  : (1 + 5 ** 0.5) / 2,
+  Sym('phi'): (1 + 5 ** 0.5) / 2,
+  Sym('pi') : math.pi,
+  Sym('π')  : math.pi,
+  Sym('e')  : math.e,
+  Sym('i')  : 1j,
 }
 
 def customPowerOperation(a:NumType,b:NumType) -> NumType:
@@ -202,7 +209,7 @@ def ifMoreTokens(expression:str) -> bool:
   # are there more tokens?
   return expression.strip() != ''
 
-def getToken(ss:str,lastType:TokenType) -> tuple[AnyToken,str]:
+def getToken(ss:str,lastType:TokenType) -> tuple[RealToken,str]:
   # get one token
   # the types accepted depends on the last token
   # for example, you can't have a binary operator after (
@@ -247,9 +254,9 @@ def rightassoc(op:Bop) -> bool:
 def leftassoc(op:Bop) -> bool:
   return binaryOperators[op][1]==LEFT
 
-def evaluate(originalExpression):
-  valueStack = []
-  operatorStack = []
+def evaluate(originalExpression:str):
+  valueStack:list[ValueToken] = []
+  operatorStack:list[OpToken] = []
 
   expression = originalExpression
 
@@ -263,6 +270,7 @@ def evaluate(originalExpression):
     if tokenType in [NUM,SYM,EXPR]: # number, symbol, or expression
       while len(operatorStack) > 0 and operatorStack[-1][0] == UOP: # apply all unary operators on the stack
         lastoperator = operatorStack.pop()
+        assert lastoperator[0] == UOP # mypy thing
         valueStack[-1] = applyPrefixOperation(lastoperator,valueStack[-1])
     if tokenType==LPAR: # left paren
       operatorStack.append(token)
