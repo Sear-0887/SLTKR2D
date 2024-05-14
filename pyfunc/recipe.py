@@ -223,6 +223,10 @@ combiner=generates([[
     {"type":"combiner","rotate":2,"weld":fullweld,"data":None}, 
     {"type":"transistor","rotate":1,"weld":fullweld,"data":None}
 ]],ratio=4)[0]
+extractor=generates([[
+    {"type":"extractor","rotate":2,"weld":fullweld,"data":None}, 
+    {"type":"transistor","rotate":1,"weld":fullweld,"data":None}
+]],ratio=4)[0]
 
 def generaterecipe2(name) -> None:
     finimage = gif.gif(tuple(cfg("recipeSetting.recipeBackground")))
@@ -239,6 +243,23 @@ def generaterecipe2(name) -> None:
             )
             anim.addimageframes(
                 combiner,
+                pos=(0, h)
+            )
+            result=[{"type":name,"rotate":0,"weld":noweld,"data":None}]*recipe['amount']
+            img=generates([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
+            results.append({'anim':anim,'arrowsprite':'combiner','result':img})
+    if name in extract:
+        erecipes = extract[name]
+        for i,recipe in enumerate(erecipes):
+            imgs=generates([[recipe['ingredient']]],ratio=4)
+            _,h = gif.tuple_max((64*2, 0),*[img.size for img in imgs])
+            anim = gif.gif((0,0,0)) # the color is ignored
+            anim.addgifframes(
+                imgs,
+                pos=(0, 0)
+            )
+            anim.addimageframes(
+                extractor,
                 pos=(0, h)
             )
             result=[{"type":name,"rotate":0,"weld":noweld,"data":None}]*recipe['amount']
