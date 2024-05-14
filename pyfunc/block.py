@@ -17,6 +17,9 @@ rimlights:dict[int, np.ndarray] = {}
 
 vec3:typing.TypeAlias = tuple[float, float, float]
 
+def clamp(a:np.ndarray) -> np.ndarray:
+	return np.fmin(np.fmax(a, 0.0), 1.0) # overflow error
+
 def dot(normal:np.ndarray, light:vec3) -> np.ndarray:
 	return np.einsum('ijk,k->ij',normal,light)
 
@@ -38,7 +41,7 @@ def quarter_rotate(v:vec3, r:int) -> vec3:
 def calc_diffuse_ambient_light(lightdir:vec3, normal:np.ndarray) -> np.ndarray:
 	# calculate diffuse light
 	light_diffuse = diffuse(normal, lightdir)
-	return np.fmin(light_diffuse * 0.5 + 0.5, 1.0) # overflow error
+	return light_diffuse * 0.5 + 0.5
 
 def calc_highlights(lightdir:vec3, normal:np.ndarray, rimlight:np.ndarray) -> np.ndarray:
 	lightdir2 = (lightdir[0], lightdir[1], 0)
@@ -78,6 +81,7 @@ def apply_normalmap(albedo:PIL.Image.Image, normal:PIL.Image.Image | None, rotat
 	light = calc_diffuse_ambient_light(lightdir, normal_array)
 	light = np.array([light, light, light])
 	light = np.moveaxis(light, 0, 2)
+	light = clamp(light)
 	light = light * 255
 	light = light.astype('uint8')
 	lightim:PIL.Image.Image = PIL.Image.fromarray(light)
@@ -90,6 +94,7 @@ def apply_normalmap(albedo:PIL.Image.Image, normal:PIL.Image.Image | None, rotat
 
 	if block_id in rimlights:
 		highlights:np.ndarray = calc_highlights(lightdir, normal_array, rimlights[block_id]);
+		highlights = clamp(highlights)
 		highlights = highlights * 255
 		highlights = highlights.astype('uint8')
 		highlightsim:PIL.Image.Image = PIL.Image.fromarray(highlights)
