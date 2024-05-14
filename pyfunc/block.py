@@ -50,7 +50,7 @@ def calc_highlights(lightdir:vec3, normal:np.ndarray, rimlight:np.ndarray) -> np
 	highlights = np.empty((s0,s1,3))
 	for i in range(s0):
 		for j in range(s1):
-			pixel = rimlight[int(255 * (intensity[i, j] + 1) / 2)]
+			pixel = rimlight[int(255 * clamp((intensity[i, j] + 1) / 2))]
 			highlights[i, j] = tuple(c * 0.3 for c in pixel)
 	return highlights
 
