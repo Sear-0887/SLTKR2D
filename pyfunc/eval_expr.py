@@ -264,27 +264,27 @@ def evaluate(originalExpression:str):
   lastType=BOP # a valid expression can always come after an operator
   while ifMoreTokens(expression): # parse all the tokens
     token, expression = getToken(expression,lastType)
-    tokenType = token[0]
-    if tokenType in [NUM,SYM]: # number or symbol token
+    # token[0] is the type of the token
+    if token[0] in [NUM,SYM]: # number or symbol token
       valueStack.append(token)
-    if tokenType in [NUM,SYM,EXPR]: # number, symbol, or expression
+    if token[0] in [NUM,SYM]: # number, symbol, or expression
       while len(operatorStack) > 0 and operatorStack[-1][0] == UOP: # apply all unary operators on the stack
         lastoperator = operatorStack.pop()
         assert lastoperator[0] == UOP # mypy thing
         valueStack[-1] = applyPrefixOperation(lastoperator,valueStack[-1])
-    if tokenType==LPAR: # left paren
+    if token[0]==LPAR: # left paren
       operatorStack.append(token)
-    if tokenType==CALL: # left paren of function
+    if token[0]==CALL: # left paren of function
       operatorStack.append(token)
     else:
       if len(valueStack)>0 and valueStack[-1][0]==SYM:
         if valueStack[-1][1] in symbols:
           valueStack[-1]=[NUM,symbols[valueStack[-1][1]]]
-    if tokenType==UOP: # unary operator
+    if token[0]==UOP: # unary operator
       operatorStack.append(token)
-    if tokenType==POP: # postfix operator
+    if token[0]==POP: # postfix operator
       valueStack[-1]=applyPostfixOperation(token,valueStack[-1])
-    if tokenType==RPAR: # right paren
+    if token[0]==RPAR: # right paren
       while operatorStack[-1][0] not in [LPAR,CALL]: # finish the parenthesized expression
         lastoperator = operatorStack.pop()
         operand1 = valueStack.pop()
@@ -299,7 +299,7 @@ def evaluate(originalExpression:str):
       while len(operatorStack)>0 and operatorStack[-1][0]==UOP: # apply all unary operators on the stack
         lastoperator = operatorStack.pop()
         valueStack[-1]=applyPrefixOperation(lastoperator,valueStack[-1])
-    if tokenType==BOP:
+    if token[0]==BOP:
       while (
         len(operatorStack) > 0 and 
         operatorStack[-1][0] not in [LPAR,CALL] and 
@@ -317,7 +317,7 @@ def evaluate(originalExpression:str):
         operand2 = valueStack.pop()
         valueStack.append(applyBinaryOperations(lastoperator,operand1,operand2))
       operatorStack.append(token) # push this operator
-    lastType = tokenType # type of last token
+    lastType = token[0] # type of last token
 
   # No more tokens found then:
   while len(operatorStack) > 0: # apply the rest of the operators
