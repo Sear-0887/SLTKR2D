@@ -43,10 +43,8 @@ async def reloadlocal(ctx,module=None):
         else:
             await ctx.send(f"Did not find any locale files for {module}")
 
-# Get help texts for a command or display info about the bot
-@MainCommand(bot,"help")
-async def help(ctx, cmdname:str | None=None):
-    async def gethelplist(interaction:nextcord.Interaction):
+class HelpButton(nextcord.ui.Button):
+    async def callback(self,interaction:nextcord.Interaction) -> None:
         preparedlist = []
         for cmd in bot.commands:
             s=f"### !{cmd.name}"
@@ -62,6 +60,10 @@ async def help(ctx, cmdname:str | None=None):
         sembed.description = desc.format("\n".join(preparedlist))
         await interaction.send(ephemeral=True, embed=sembed)
 
+# Get help texts for a command or display info about the bot
+@MainCommand(bot,"help")
+async def help(ctx:commands.Context, cmdname:str | None=None) -> None:
+
     if not cmdname:
         # send an info embed about the bot if no command given
         embed = nextcord.Embed()
@@ -75,8 +77,7 @@ async def help(ctx, cmdname:str | None=None):
         assert isinstance(desc,str)
         embed.description = desc.format(datetime.datetime.now()-TimeOn, showdisplay)
         view = nextcord.ui.View()
-        getlistbtn = nextcord.ui.Button(style=nextcord.ButtonStyle.blurple, label="Help List")
-        getlistbtn.callback = gethelplist
+        getlistbtn:nextcord.ui.Button = HelpButton(style=nextcord.ButtonStyle.blurple, label="Help List")
         view.add_item(getlistbtn) # Adding a button that prints a list of commands in an ephemeral embed
         await ctx.send(embed=embed, view=view)
     else:
