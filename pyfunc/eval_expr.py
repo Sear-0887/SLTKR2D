@@ -60,9 +60,8 @@ NumType:typing.TypeAlias = int | float | complex
 NumToken:typing.TypeAlias = tuple[typing.Literal["NUM"],NumType]
 ExprToken:typing.TypeAlias = (
   tuple[typing.Literal["EXPR"],Uop | Pop,'ValueToken'] | 
-  #tuple[typing.Literal["EXPR"],Bop,'ValueToken','ValueToken'] | # causes an error in mypy
-  tuple[typing.Literal["EXPR"],str,'ValueToken','ValueToken'] | 
-  tuple[typing.Literal["EXPR"],str,'ValueToken','ValueToken','ValueToken']
+  tuple[typing.Literal["EXPR"],Bop,'ValueToken','ValueToken'] |
+  tuple[typing.Literal["EXPR"],typing.Literal['('],'ValueToken','ValueToken']
 )
 ValueToken:typing.TypeAlias = SymToken | NumToken | ExprToken
 
@@ -254,20 +253,19 @@ def rightassoc(op:Bop) -> bool:
 def leftassoc(op:Bop) -> bool:
   return binaryOperators[op][1]==LEFT
 
-def evaluate(originalExpression:str):
+def evaluate(originalExpression:str) -> ValueToken:
   valueStack:list[ValueToken] = []
   operatorStack:list[OpToken] = []
 
   expression = originalExpression
 
   # basic shunting yard parser
-  lastType=BOP # a valid expression can always come after an operator
+  lastType:TokenType = BOP # a valid expression can always come after an operator
   while ifMoreTokens(expression): # parse all the tokens
     token, expression = getToken(expression,lastType)
     # token[0] is the type of the token
-    if token[0] in [NUM,SYM]: # number or symbol token
+    if token[0] == NUM or token[0] == SYM: # number or symbol token
       valueStack.append(token)
-    if token[0] in [NUM,SYM]: # number, symbol, or expression
       while len(operatorStack) > 0 and operatorStack[-1][0] == UOP: # apply all unary operators on the stack
         lastoperator = operatorStack.pop()
         assert lastoperator[0] == UOP # mypy thing
@@ -277,9 +275,10 @@ def evaluate(originalExpression:str):
     if token[0]==CALL: # left paren of function
       operatorStack.append(token)
     else:
+      # if the top of the stack is a symbol and not used as a function, replace it with its number value
       if len(valueStack)>0 and valueStack[-1][0]==SYM:
         if valueStack[-1][1] in symbols:
-          valueStack[-1]=[NUM,symbols[valueStack[-1][1]]]
+          valueStack[-1]=(NUM,symbols[valueStack[-1][1]])
     if token[0]==UOP: # unary operator
       operatorStack.append(token)
     if token[0]==POP: # postfix operator
@@ -287,6 +286,7 @@ def evaluate(originalExpression:str):
     if token[0]==RPAR: # right paren
       while operatorStack[-1][0] not in [LPAR,CALL]: # finish the parenthesized expression
         lastoperator = operatorStack.pop()
+        assert lastoperator[0] == BOP # might not be a mypy thing
         operand1 = valueStack.pop()
         operand2 = valueStack.pop()
         valueStack.append(applyBinaryOperations(lastoperator, operand1, operand2))
@@ -298,8 +298,10 @@ def evaluate(originalExpression:str):
       operatorStack.pop()
       while len(operatorStack)>0 and operatorStack[-1][0]==UOP: # apply all unary operators on the stack
         lastoperator = operatorStack.pop()
+        assert lastoperator[0] == UOP # mypy thing
         valueStack[-1]=applyPrefixOperation(lastoperator,valueStack[-1])
     if token[0]==BOP:
+      assert operatorStack[-1][0] == BOP
       while (
         len(operatorStack) > 0 and 
         operatorStack[-1][0] not in [LPAR,CALL] and 
@@ -313,6 +315,8 @@ def evaluate(originalExpression:str):
         ):
         # apply all operators to the left with a lower precedence
         lastoperator = operatorStack.pop()
+        assert lastoperator[0] == BOP # mypy thing
+        assert operatorStack[-1][0] == BOP # just in case an uop gets in somehow
         operand1 = valueStack.pop()
         operand2 = valueStack.pop()
         valueStack.append(applyBinaryOperations(lastoperator,operand1,operand2))
@@ -322,6 +326,7 @@ def evaluate(originalExpression:str):
   # No more tokens found then:
   while len(operatorStack) > 0: # apply the rest of the operators
     lastoperator = operatorStack.pop()
+    assert lastoperator[0] == BOP # mypy thing
     operand1 = valueStack.pop()
     operand2 = valueStack.pop()
     valueStack.append(applyBinaryOperations(lastoperator,operand1,operand2))
@@ -331,21 +336,33 @@ def evaluate(originalExpression:str):
     raise ValueError('Empty expression')
   return valueStack[0]
 
-def stringifyexpr(expression):
+def stringifyexpr(expression:ValueToken) -> str:
   # convert an expr from evaluate to a string, so evaluate on that string will probably give back the same expr
-  if expression[0] in [SYM,NUM]:
+  if expression[0] == NUM or expression[0] == SYM:
     return str(expression[1])
   if expression[1]=='(':
-    return f'{expression[2]}({",".join(map(stringifyexpr,expression[3:]))})'
-  if len(expression) == 3:
+    expression = typing.cast(
+      tuple[
+        typing.Literal["EXPR"],
+        typing.Literal['('],
+        'ValueToken',
+        'ValueToken'
+      ],
+      expression
+    ) # idk how to restrict the type without cast
+    return f'{expression[2]}({stringifyexpr(expression[3])})'
+  assert expression[1] != '('
+  if len(expression) == 3: # (EXPR,Uop/Pop,arg)
     if len(expression[2]) == 4:
       return f'{expression[1]}({stringifyexpr(expression[2])})' # -(a+b)
     return f'{expression[1]}{stringifyexpr(expression[2])}' # a
   if len(expression) == 4:
     _,op,left,right = expression
-    p1 = getPrecedenceOfOperator(expression)
-    pleft = getPrecedenceOfOperator(left) if left[0] in [BOP,EXPR] else math.inf
-    pright = getPrecedenceOfOperator(right) if right[0] in [BOP,EXPR] else math.inf
+    reveal_type(op)
+    reveal_type(expression[1])
+    p1 = getPrecedenceOfOperator((BOP,op))
+    pleft = getPrecedenceOfOperator((BOP,left[1])) if left[0] in [BOP,EXPR] else math.inf
+    pright = getPrecedenceOfOperator((BOP,right[1])) if right[0] in [BOP,EXPR] else math.inf
     leftparen = pleft<p1 or (pleft==p1 and rightassoc(op))
     rightparen = pright<p1 or (pright==p1 and leftassoc(op))
     sleft=stringifyexpr(left)
@@ -355,3 +372,4 @@ def stringifyexpr(expression):
     if rightparen:
       sright=f'({sright})'
     return f'{sleft}{op}{sright}'
+  raise ValueError('Invalid number of arguments')
