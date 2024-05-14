@@ -24,6 +24,13 @@ class gif_frame:
             copy.alpha_composite(i, pos)
         copy = copy.crop(copy.getbbox())
         return copy
+    
+    def getsize(self):
+        return tuple_max((0, 0),*[
+            (im.width + x, im.height + y)
+            for im,(x,y) in
+            self.images
+        ])
 
 def copygifframe(f):
     f2 = gif_frame()
@@ -107,3 +114,5 @@ class gif:
         if apng:
             framel[0].save(pth.replace(".gif", ".apng"), save_all=True, append_images=framel[1:], loop=0, disposal=2, duration=duration)
     
+    def getsize(self):
+        return tuple_max((0, 0),*[f.getsize() for f in self.framelist])
