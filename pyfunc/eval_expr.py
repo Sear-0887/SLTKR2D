@@ -358,11 +358,15 @@ def stringifyexpr(expression:ValueToken) -> str:
     return f'{expression[1]}{stringifyexpr(expression[2])}' # a
   if len(expression) == 4:
     _,op,left,right = expression
-    reveal_type(op)
-    reveal_type(expression[1])
+    op = typing.cast(Bop,op) # mypy issue (probably a bug)
     p1 = getPrecedenceOfOperator((BOP,op))
-    pleft = getPrecedenceOfOperator((BOP,left[1])) if left[0] in [BOP,EXPR] else math.inf
-    pright = getPrecedenceOfOperator((BOP,right[1])) if right[0] in [BOP,EXPR] else math.inf
+    def getPrecedence(e:ValueToken) -> float: # i would use int | typing.Literal[math.inf] but that's not allowed
+      if e[0] == EXPR:
+        if len(e)==4 and e[1]!='(':
+          return getPrecedenceOfOperator((BOP,e[1]))
+      return math.inf
+    pleft = getPrecedence(left)
+    pright = getPrecedence(right)
     leftparen = pleft<p1 or (pleft==p1 and rightassoc(op))
     rightparen = pright<p1 or (pright==p1 and leftassoc(op))
     sleft=stringifyexpr(left)
