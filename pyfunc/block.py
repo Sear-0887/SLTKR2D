@@ -51,7 +51,7 @@ def calc_highlights(lightdir:vec3, normal:np.ndarray, rimlight:np.ndarray) -> np
 			highlights[i, j] = tuple(c * 0.3 for c in pixel)
 	return highlights
 
-fullbright_lightdir = (-0.5, -1.0, 1.0)
+fullbright_lightdir = (-0.5, 1.0, 1.0)
 
 def apply_normalmap(albedo:PIL.Image.Image, normal:PIL.Image.Image | None, rotation:int, block_id:int, flip:bool) -> PIL.Image.Image:
 	# rotate the light so when the block is rotated back the light is in the right direction
