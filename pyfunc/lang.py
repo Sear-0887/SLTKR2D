@@ -180,8 +180,6 @@ def getarrowcoords() -> dict[str, tuple[int, int]]:
 
 def botinit() -> None:
     from pyfunc.assetload import assetinit
-    os.makedirs(cfgstr('cacheFolder'), exist_ok=True) # directory to put images and other output in
-    os.makedirs(cfgstr('logFolder'), exist_ok=True) # logs folder (may be in cache)
     loadconfig()
     getkws()
     phraser() # command locale

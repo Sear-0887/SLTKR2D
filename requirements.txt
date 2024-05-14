@@ -6,3 +6,4 @@ decorator
 colorama
 matplotlib
 PyYAML
+schema

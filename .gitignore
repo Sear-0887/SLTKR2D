@@ -1,3 +1,4 @@
 *cache*/
 .vscode/
 cred/client.env
+.ts/
