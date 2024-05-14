@@ -16,14 +16,20 @@ import glob
 import re
 from dotenv import dotenv_values
 import collections
-from typing import Any, TextIO
+from typing import Any, TextIO, TypedDict
+
+class Dev(TypedDict):
+    name:str
+    id:int
+    github_link:str
+    desc:str
 
 cmdi:dict[str, dict[str, str | list[str]]] = {}
 config = None
-devs = None
+devs:list[Dev] = []
 keywords:dict[str, dict[str, str]] = {}
 l = logging.getLogger()
-presensemsg = None
+presensemsg:dict[str, list] = {}
 emojidict:dict[str, str] = {}
 
 # write_to_log, basically similar to print, with extra steps...

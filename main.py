@@ -129,7 +129,9 @@ async def link(ctx:commands.Context, typ:str="r2d") -> None:
 @MainCommand(bot,'credit')
 async def credit(ctx:commands.Context) -> None:
     devstr = '\n'.join([f'### [{dev["name"]}]({dev["github_link"]}){dev["desc"]}' for dev in devs])
-    await ctx.send(evl("credit.display").format(devstr))
+    devformat = evl("credit.display")
+    assert isinstance(devformat,str)
+    await ctx.send(devformat.format(devstr))
 
 # Presence Message Loop
 @tasks.loop(seconds=60)
@@ -152,6 +154,7 @@ async def changepresence() -> None:
 @bot.event
 async def on_ready() -> None:
     l.info(f"ONLINE as {bot.user}")
+    assert bot.user is not None
     l.info(f"Display Name: {bot.user.display_name}")
     l.info(f"ID: {bot.user.id}.")
     global TimeOn

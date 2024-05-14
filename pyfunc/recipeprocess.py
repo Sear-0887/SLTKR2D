@@ -5,7 +5,7 @@ from pyfunc.lang import opencfg
 from pyfunc.assetload import blockinfos
 from pyfunc.block import BlockDataIn
 import typing
-import schema # type: ignore # no type hints
+import schema # type: ignore[import-untyped] # no type hints
 
 def getblocksbyattr(attr:str) -> list[str]:
     return [b for b,data in blockinfos.items() if attr in data['attributes']]
@@ -314,7 +314,6 @@ dataval=dataschema.validate(data)
 del data
 
 for hrecipe in dataval['heat']:
-    # type: ignore # i know what i'm doing
     heat[hrecipe['product']].append(hrecipe)
     del hrecipe['product']
     del hrecipe['type']

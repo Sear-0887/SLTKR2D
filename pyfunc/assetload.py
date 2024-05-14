@@ -4,7 +4,7 @@ import pyfunc.smp as smp
 import glob
 from pyfunc.datafunc import capitalize, plural, past
 from pyfunc.lang import opencfg, cfg
-from typing import Any
+from typing import Any, cast
 
 idtoblock:dict[int, str] = {}
 
@@ -30,11 +30,13 @@ def getblockdefs() -> None:
             collision1 = match['collision']
             collision2 = collision1.split('|')
             collision3 = [re.fullmatch('collision::(?P<name>[a-z_]+)',c) for c in collision2]
-            collision = [c['name'] for c in collision3]
+            assert all(c is not None for c in collision3)
+            collision = [c['name'] for c in cast(list[re.Match[str]],collision3)]
             attr1 = match['attr']
             attr2 = attr1.split('|')
             attr3 = [re.fullmatch('atb::(?P<name>[a-z_]+)',a) for a in attr2]
-            attr = [a['name'] for a in attr3]
+            assert all(a is not None for a in attr3)
+            attr = [a['name'] for a in cast(list[re.Match[str]],attr3)]
             weld = match['weld']
             weld = [s == '1' for s in weld]
             left,bottom,right,top = weld
