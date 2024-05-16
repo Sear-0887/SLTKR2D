@@ -18,91 +18,6 @@ l = logging.getLogger()
 noweld = (makeweldside(False),) * 4
 fullweld = (makeweldside(True),) * 4
 
-def massstrip(l:list[str]) -> list[str]:
-    return [s.strip() for s in l]
-
-def handletags(s:str, organdict:dict) -> str | list:
-    if not isinstance(s, str): return s 
-    s = s.split(" ")[0]
-    if s.startswith('$'):
-        if s[1:] in organdict['tag'].keys():
-            return organdict['tag'][s[1:]]
-        l.warning(f'{s} is Just a Normal name starts with $ ???????')
-    return s
-
-def handlegridtags(s:list[list[str]], organdict:dict) -> list[list[str | list]]:
-    return [
-        [
-            handletags(critem, organdict)
-            for critem in row
-        ]
-        for row in s
-    ]
-
-def getarrowimg(name):
-    icox, icoy = getarrowcoords()[name]
-    return Image.open(
-        cfg("localGame.texture.guidebookArrowFile")).crop(
-            (16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))
-        ).resize((64, 64), Image.NEAREST
-    )
-
-def addentries(i:dict[str, Any], entryname:str, typ:str, organdict:dict, includekeys:str) -> list:
-    includekeys = massstrip(includekeys.split(','))
-    entries = {}
-    for key, item in i.items():
-        if isinstance(item, str):
-            item = handletags(item, organdict)
-        if isinstance(item, str) and item.isdigit(): # Handle Numbers Differently
-            item = int(item)
-        if typ == 'heat' and key == 'needs_entity': # True for needs_entity
-            item = bool(item)
-        if typ == 'combine' and key == 'grid': # Handles combine grid properties
-            item = handlegridtags(item, organdict)
-        i[key] = item
-        if key in includekeys:
-            entries[key] = i[key]
-    if entryname not in organdict[typ].keys():
-        organdict[typ][entryname] = []
-    organdict[typ][entryname].append(entries)
-    
-def testing():
-    with open("gameAssets/recipes.smp") as f:
-        organdict = collections.defaultdict(dict)
-        rawdata = getsmpvalue(f.read())
-        for i in rawdata:
-            producename = ""
-            col = ""
-            if i['type'] == 'tag': # Tags
-                organdict['tag'][i['name']] = i['blocks']
-                continue
-            elif i['type'] == 'heat': # Heating Recipe
-                producename = i['product']
-                col = 'ingredient, time, surrounding, needs_entity'
-            elif i['type'] == 'extract': # Extracting Recipe
-                producename = i['product']
-                col = 'ingredient, time, amount, post_action'
-            elif i['type'] == 'inject': # Injecting Recipe
-                if 'transform_receiver' in i['product'].keys(): # Normal Injection
-                    producename = i['product']['transform_receiver']
-                elif 'fertilizer' in i['product'].keys(): # Fertilizing Injection
-                    producename = i['receiver']
-                col = 'pill, receiver, needs_passive'
-            elif i['type'] == 'combine': # Combining Recipe
-                i['amount'] = i['product']['amount']
-                i['block'] = i['product']['block']
-                producename = i['block']
-                col = 'amount, grid, block'
-            addentries(
-                i, 
-                producename, 
-                i['type'], 
-                organdict, 
-                col)
-            ...
-    return organdict
-returned = testing()
-
 def generates(grid,ratio,assertconnected=True) -> list[Image.Image]:
     tags=[]
     for y,row in enumerate(grid):
@@ -228,7 +143,7 @@ extractor=generates([[
     {"type":"transistor","rotate":1,"weld":fullweld,"data":None}
 ]],ratio=4)[0]
 
-def generaterecipe2(name) -> None:
+def generaterecipe(name) -> None:
     finimage = gif.gif(tuple(cfg("recipeSetting.recipeBackground")))
     results:list[dict] = []
     if name in combine:
@@ -288,51 +203,6 @@ def generaterecipe2(name) -> None:
         )
     finimage.export(f"cache/recipe-{name}.gif")
 
-def generaterecipe(name) -> None:
-    for typ in returned.keys():
-        if name in returned[typ]:
-            print(f"{typ}: {returned[typ][name]}")
-            gridpos = returned[typ][name]
-            if typ == "combine":
-                results:list[dict] = []
-                for i,recipe in enumerate(gridpos):
-                    imgs=generates(recipe['grid'],ratio=4)
-                    result=[{"type":recipe['block'],"rotate":0,"weld":noweld,"data":None}]*recipe['amount']
-                    img=generates([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
-                    results.append({'recipeframes':imgs,'result':img})
-                finimage = gif.gif(cfg("recipeSetting.recipeBackground"))
-                combiner=generates([[
-                    {"type":"combiner","rotate":2,"weld":fullweld,"data":None}, 
-                    {"type":"transistor","rotate":1,"weld":fullweld,"data":None}
-                ]],ratio=4)[0]
-                maxdim = tuple_max((64*2, 0),*[img.size for recipeimgs in results for img in recipeimgs['recipeframes']]) # fancy double iteration # the recipe is at least 2 blocks wide
-                y = 0
-                for recipenum,recipeimgs in enumerate(results):
-                    _,h = gif.tuple_max((64*2, 0),*[img.size for img in recipeimgs['recipeframes']])
-                    finimage.addgifframes(
-                        recipeimgs['recipeframes'],
-                        pos=(0, y)
-                    )
-                    finimage.addimageframes(
-                        combiner,
-                        pos=(0, y+h)
-                    )
-                    finimage.addimageframes(
-                        recipeimgs['result'],
-                        pos=(maxdim[0]+64+64+64, y)
-                    )
-                    finimage.addimageframes(
-                        getarrow("combiner"),
-                        pos=(maxdim[0]+64, y+h//2)
-                    )
-                    y += (
-                        h +                                # the recipe height
-                        64 +                               # the combiner
-                        cfg("recipeSetting.recipeMarginY") # mandatory gap between recipes
-                    )
-                finimage.export(f"cache/recipe-{name}.gif")
-
-
 if __name__ == "__main__":
     generaterecipe("galvanometer", apng=True)
     generaterecipe("pulp")
@@ -340,10 +210,10 @@ if __name__ == "__main__":
     # generaterecipe("destroyer")
     generaterecipe("compressed_stone")
     generaterecipe("inductor")
-    # generaterecipe(returned, "galvanometer")
-    # generaterecipe(returned, "potentiometer")
-    # generaterecipe(returned, "galvanometer")
-    # generaterecipe(returned, "prism")
+    # generaterecipe("galvanometer")
+    # generaterecipe("potentiometer")
+    # generaterecipe("galvanometer")
+    # generaterecipe("prism")
     for maderecipecache in glob.glob(f"cache/recipeframe-*.png"):
         try: os.remove(maderecipecache)
         except: pass
