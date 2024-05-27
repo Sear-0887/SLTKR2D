@@ -126,12 +126,11 @@ def getarrow(typ:str) -> Image.Image:
         (64, 64), Image.NEAREST
     )
 
-# heat
-# extract
+# heat yes
+# extract yes
 # inject
-# combine
+# combine yes
 # extra_display
-# summonore_pill
 
 # the parts that are always the same
 combiner=generates([[
@@ -142,10 +141,14 @@ extractor=generates([[
     {"type":"extractor","rotate":2,"weld":fullweld,"data":None}, 
     {"type":"transistor","rotate":1,"weld":fullweld,"data":None}
 ]],ratio=4)[0]
+arc_furnace=generates([[
+    {"type":"arc_furnace","rotate":0,"weld":fullweld,"data":None}
+]],ratio=4)[0]
 
 def generaterecipe(name) -> None:
     finimage = gif.gif(tuple(cfg("recipeSetting.recipeBackground")))
     results:list[dict] = []
+    print('generating recipe for',name)
     if name in combine:
         crecipes = combine[name]
         for i,recipe in enumerate(crecipes):
@@ -179,7 +182,26 @@ def generaterecipe(name) -> None:
             )
             result=[{"type":name,"rotate":0,"weld":noweld,"data":None}]*recipe['amount']
             img=generates([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
-            results.append({'anim':anim,'arrowsprite':'combiner','result':img})
+            results.append({'anim':anim,'arrowsprite':'extractor','result':img})
+    if name in heat:
+        print(name,'in heat')
+        hrecipes = heat[name]
+        for i,recipe in enumerate(hrecipes):
+            if 'surrounding' in recipe:
+                raise ValueError('no support for surrounding')
+            imgs=generates([[recipe['ingredient']]],ratio=4)
+            _,h = gif.tuple_max((64*2, 0),*[img.size for img in imgs])
+            anim = gif.gif((0,0,0)) # the color is ignored
+            anim.addgifframes(
+                imgs,
+                pos=(0, 0)
+            )
+            anim.addimageframes(
+                arc_furnace,
+                pos=(0, h)
+            )
+            img=generates([[name]],ratio=4)[0]
+            results.append({'anim':anim,'arrowsprite':'arc_furnace','result':img})
     maxdim = tuple_max((0, 0),*[recipeimgs['anim'].getsize() for recipeimgs in results])
     y = 0
     for recipeimgs in results:
