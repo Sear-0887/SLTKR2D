@@ -16,12 +16,21 @@ import glob
 import re
 from dotenv import dotenv_values
 import collections
+from typing import Any, TextIO, TypedDict
 
-cmdi:dict[str, dict[str, str]] = {}
+class Dev(TypedDict):
+    name:str
+    id:int
+    github_link:str
+    desc:str
+
+cmdi:dict[str, dict[str, str | list[str]]] = {}
 config = None
-devs = None
+devs:list[Dev] = []
 keywords:dict[str, dict[str, str]] = {}
 l = logging.getLogger()
+presensemsg:dict[str, list] = {}
+emojidict:dict[str, str] = {}
 
 # write_to_log, basically similar to print, with extra steps...
 # ptnt is print_to_normal_terminal, ats is add_timestamp
@@ -36,8 +45,8 @@ def lprint(*values: object, sep: str = " ",end: str = "\n", ptnt: bool = False, 
 
 cmdi = collections.defaultdict(dict)
 
-def phraserfile(fname,lang):
-    with open(os.path.join(cfg('locale.localePath'),lang,fname), "r", encoding='utf-8') as f:
+def phraserfile(fname:str,lang:str) -> None:
+    with open(os.path.join(cfgstr('locale.localePath'),lang,fname), "r", encoding='utf-8') as f:
         linesiter=iter(f)
         for line in linesiter:
             while line.endswith('\\\n'):
@@ -47,25 +56,30 @@ def phraserfile(fname,lang):
                 continue
             key,value=line.split('=',maxsplit=1)
             value=replacemoji(value.strip())
+            value2:str | list[str]
             if value.startswith('[') and value.endswith(']'):
-                value=[v.strip() for v in value[1:-1].split(',') if len(v.strip())>0]
+                value2=[v.strip() for v in value[1:-1].split(',') if len(v.strip())>0]
+            else:
+                value2 = value
             key=key.strip()
-            cmdi[lang][key]=value
+            cmdi[lang][key]=value2
 
 # load the command locale
 def phraser() -> None:
     loademoji()
-    for lang in os.listdir(cfg('locale.localePath')):
-        for i in os.listdir(os.path.join(cfg('locale.localePath'),lang)):
+    for lang in os.listdir(cfgstr('locale.localePath')):
+        for i in os.listdir(os.path.join(cfgstr('locale.localePath'),lang)):
             phraserfile(i,lang)
         l.debug(cmdi[lang]["help.aliases"])
         # EXCEPTIONS
-        cmdi[lang]["link.desc"] = cmdi[lang]["link.desc"].format("".join([
+        linkdesc = cmdi[lang]["link.desc"]
+        assert isinstance(linkdesc, str)
+        cmdi[lang]["link.desc"] = linkdesc.format("".join([
             f"{name} ({data['link']})\nKeywords: `{'`, `'.join(data['kw'])}`\n"
             for name,data in keywords.items()
         ]))
 
-def phrasermodule(module:str): # reloads the locale from one file in each locale folder
+def phrasermodule(module:str) -> bool: # reloads the locale from one file in each locale folder
     found=False # did it find any locale files?
     for langpth in glob.glob("lang/*"):
         lang = langpth[5:]
@@ -79,7 +93,7 @@ def phrasermodule(module:str): # reloads the locale from one file in each locale
     return found
 
 # get a locale entry
-def evl(*args, lang="en") -> str | list:
+def evl(*args:str, lang:str="en") -> str | list:
     target = ".".join(args)
     try:
         return cmdi[lang][target]
@@ -97,7 +111,7 @@ def handlehostid() -> tuple[int, list[bool]]:
     returntup = ( int(auid, 16), list(map(lambda x:x=="1", list(setting))) )
     return returntup
 
-def loadconfig():
+def loadconfig() -> None:
     with open("config.json", encoding="utf-8") as f:
         global config
         config = json.load(f)
@@ -105,60 +119,69 @@ def loadconfig():
         config['ShowHost'] = settings[0]
         config['HostDCID'] = hostid
         config['PREFIX'] = getclientenv('PREFIX') or "!"
-    return config
 
-def cfg(*target):
+def cfgstr(target:str) -> str:
     if config is None: loadconfig()
     base = config
-    target = ".".join(target)
     for tv in target.split("."):
+        assert isinstance(base,dict)
         base = base[tv]
+    assert isinstance(base,str)
     return base
 
-def loademoji():
-    with open(cfg("infoPath.emojiInfoPath"), encoding="utf-8") as f:
+def opencfg(target:str, *args:Any, **kwargs:Any) -> TextIO:
+    return open(cfgstr(target), *args, **kwargs)
+
+def cfg(target:str) -> int | str | list | dict:
+    if config is None: loadconfig()
+    base = config
+    for tv in target.split("."):
+        assert isinstance(base,dict)
+        base = base[tv]
+    assert isinstance(base, (int, str, list, dict))
+    return base
+
+def loademoji() -> None:
+    with opencfg("infoPath.emojiInfoPath", encoding="utf-8") as f:
         global emojidict
         emojidict = json.load(f)
-    return emojidict
 
-def replacemoji(tar):
+def replacemoji(tar:str) -> str:
     if type(tar) != str: return tar
     for key, item in emojidict.items():
         tar = tar.replace(f":{key}:", item)
     return tar
 
-def getdevs():
-    with open(cfg("infoPath.devInfoPath"), encoding="utf-8") as f:
+def getdevs() -> None:
+    with opencfg("infoPath.devInfoPath", encoding="utf-8") as f:
         global devs
         devs = json.load(f)
         
-def getpresense():
-    with open(cfg("infoPath.presenseInfoPath"), encoding="utf-8") as f:
+def getpresense() -> None:
+    with opencfg("infoPath.presenseInfoPath", encoding="utf-8") as f:
         global presensemsg
         presensemsg = json.load(f)
-    return presensemsg
 
-def getkws(): 
-    with open(cfg("infoPath.kwInfoPath"), encoding="utf-8") as f:
+def getkws() -> None: 
+    with opencfg("infoPath.kwInfoPath", encoding="utf-8") as f:
         global keywords
         keywords = json.load(f)
-    return keywords
 
-def getarrowcoords():
-    racord = {}
-    with open(cfg("localGame.texture.guidebookArrowCordFile"), encoding="utf-8") as f:
+def getarrowcoords() -> dict[str, tuple[int, int]]:
+    racord:dict[str, tuple[int, int]] = {}
+    with opencfg("localGame.texture.guidebookArrowCordFile", encoding="utf-8") as f:
         data=getsmpvalue(f.read())
+    assert isinstance(data,dict)
     for icon,xy in data.items():
+        assert isinstance(xy,str)
         x,y=xy.split(',')
         racord[icon] = (int(x), int(y))
     return racord
 
-def botinit():
-    
+def botinit() -> None:
     from pyfunc.assetload import assetinit
     loadconfig()
-    global keywords
-    keywords = getkws()
+    getkws()
     phraser() # command locale
     getpresense()
     getdevs()

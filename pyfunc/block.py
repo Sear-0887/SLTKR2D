@@ -2,7 +2,7 @@ import PIL.Image, PIL.ImageChops
 import logging
 import pyfunc.smp as smp
 import os
-from pyfunc.lang import cfg
+from pyfunc.lang import cfgstr
 import functools
 import collections
 import re
@@ -249,13 +249,15 @@ def rotatexy(x:float, y:float, r:int, flip:bool) -> tuple[float,float]:
 	return x, y
 
 blockpaths={}
-pthblocktexture = cfg("localGame.texture.texturePathFile")
+pthblocktexture = cfgstr("localGame.texture.texturePathFile")
 with open(pthblocktexture) as f:
 	data=smp.getsmpvalue(f.read())
+assert isinstance(data,dict)
 for name,texture in data.items():
-	blockpaths[name] = texture
+	assert isinstance(texture,dict) # and that it is str:str
+	blockpaths[name] = typing.cast(dict[str,str],texture)
 	if 'rimlight' in texture:
-		rimlight = PIL.Image.open(os.path.join(cfg("localGame.texture.texturePathFolder"),blockpaths[name]['rimlight'])).convert('RGB')
+		rimlight = PIL.Image.open(os.path.join(cfgstr("localGame.texture.texturePathFolder"),blockpaths[name]['rimlight'])).convert('RGB')
 		rimlight_array:np.ndarray = np.asarray(rimlight)[0]
 		l.debug(f'{name} has a rimlight wth shape {rimlight_array.shape}')
 		rimlights[blockinfos[name]['id']] = rimlight_array
@@ -263,11 +265,11 @@ for name,texture in data.items():
 @functools.cache
 def getblockims(block:str) -> tuple[PIL.Image.Image,PIL.Image.Image | None]:
 	try:
-		normal = PIL.Image.open(os.path.join(cfg("localGame.texture.texturePathFolder"),blockpaths[block]['normal'])).convert('RGBA')
+		normal = PIL.Image.open(os.path.join(cfgstr("localGame.texture.texturePathFolder"),blockpaths[block]['normal'])).convert('RGBA')
 	except FileNotFoundError:
 		normal = None
 	return (
-		PIL.Image.open(os.path.join(cfg("localGame.texture.texturePathFolder"),blockpaths[block]['albedo'])).convert('RGBA'),
+		PIL.Image.open(os.path.join(cfgstr("localGame.texture.texturePathFolder"),blockpaths[block]['albedo'])).convert('RGBA'),
 		normal,
 	)
 

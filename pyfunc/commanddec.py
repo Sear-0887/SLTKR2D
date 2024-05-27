@@ -6,8 +6,10 @@ import nextcord
 from pyfunc.lang import cfg, evl
 from colorama import Fore, init
 from nextcord.ext import commands
+import nextcord
 import traceback
 import logging 
+import typing
 init() # colorama's init(), not assetload's
 RED = Fore.RED
 BLUE = Fore.BLUE
@@ -15,13 +17,32 @@ GREEN = Fore.GREEN
 RESET = Fore.RESET
 l = logging.getLogger()
 
-async def ErrorHandler(name, e, args, kwargs, interaction=None, ctx=None):
-    ctxorintr = ctx or interaction
-    async def sendtoch(msg):
-        if isinstance(ctxorintr, commands.Context):
+class User(typing.TypedDict):
+    displayname:str
+    globalname:str | None
+    id:int
+    servername:str
+
+class ErrorPacket(typing.TypedDict):
+    user:User
+    time:str
+    trigger:str
+    arg:list[str]
+    kwarg:dict[str,str]
+    errline:str
+    errname:str
+    excstr:str
+
+Context:typing.TypeAlias = commands.context.Context
+
+async def ErrorHandler(name:str, e:BaseException, args:tuple[typing.Any], kwargs:dict[str,typing.Any], interaction:nextcord.Interaction | None=None, ctx:Context | None=None) -> None:
+    async def sendtoch(msg:str) -> None:
+        if ctx is not None:
             await ctx.send(msg)
-        elif isinstance(ctxorintr, nextcord.Interaction):
+        elif interaction is not None:
             await interaction.response.send_message(msg)
+        else:
+            logging.error("something terrible has occurred! there's neither a context nor an interaction!")
     # handle the error e
     # from a function call f(ctx,*args,**kwargs)
     # print a message with cool colors to the console
@@ -62,15 +83,48 @@ f'''
 '''
     )
     await sendtoch(expecterr)
-    guild = ctx.guild if ctxorintr == ctx else interaction.guild
-    author = ctx.author if ctxorintr == ctx else interaction.user
-    trigger = ctx.message.clean_content if ctxorintr == ctx else "<INTERACTION>"
-    errorpacket = {
+    author:nextcord.user.User | nextcord.member.Member | None
+    if ctx is not None:
+        guild = ctx.guild
+        author = ctx.author
+        trigger = ctx.message.clean_content
+    elif interaction is not None:
+        guild = interaction.guild
+        author = interaction.user
+        trigger = "<INTERACTION>"
+    else:
+        guild = None
+        author = None
+        trigger = "<NONE!!!>"
+        logging.error("something terrible has occurred! there's neither a context nor an interaction!")
+
+    if author is not None:
+        author_display_name = author.display_name
+        author_global_name = author.global_name
+        author_id = author.id
+    else:
+        author_display_name = '<NO AUTHOR>'
+        author_global_name = '<NO AUTHOR>'
+        author_id = 0
+
+    if guild is not None:
+        guild_name = guild.name
+    else:
+        guild_name = '<NO GUILD>'
+
+    excstrs = [str(e)]
+    while (e.__context__ or e.__cause__) is not None:
+        e2 = e.__context__ or e.__cause__
+        assert e2 is not None # seriously mypy?
+        e = e2
+        excstrs = [str(e),*excstrs]
+
+    errorpacket:ErrorPacket = {
         "user": {
-            "displayname": author.display_name,
-            "globalname": author.global_name,
-            'id': author.id,
-            "servername": guild.name
+            "displayname": author_display_name,
+            "globalname": author_global_name,
+            'id': author_id,
+            "servername": guild_name
         },
         'time': datetime.datetime.now().isoformat(),
         'trigger': trigger,
@@ -78,14 +132,10 @@ f'''
         'kwarg': {k:repr(v) for k,v in kwargs.items()},
         'errline': '\n'.join(traceback.format_exception(e)),
         'errname': str(type(e)),
+        'excstr': '\n'.join(excstrs),
     }
-    excstrs = [str(e)]
-    while e.__context__ or e.__cause__:
-        e = e.__context__ or e.__cause__
-        excstrs = [str(e),*excstrs]
-    errorpacket['excstr'] = '\n'.join(excstrs)
     
-    errfilname = f"cache/log/error-{author.global_name}-{datetime.date.today():%d-%m-%Y}.json"
+    errfilname = f"cache/log/error-{author_global_name}-{datetime.date.today():%d-%m-%Y}.json"
     try:
         with open(errfilname, "r") as fil:
             prev = json.load(fil)
@@ -95,17 +145,20 @@ f'''
     with open(errfilname, "w") as fil:
         json.dump(prev, fil, indent=4)
 
-def MainCommand(bot,name):
+CmdType:typing.TypeAlias = typing.Callable[...,typing.Coroutine]
+NCmdType:typing.TypeAlias = commands.core.Command
+
+def MainCommand(bot:commands.Bot,name:str) -> typing.Callable[[CmdType],NCmdType]:
     # bot command
-    async def _trycmd(cmd,ctx,*args,**kwargs):
+    async def _trycmd(cmd:CmdType,ctx:commands.Context,*args:typing.Any,**kwargs:typing.Any) -> None:
         try:
             await ctx.trigger_typing()
             await cmd(ctx,*args,**kwargs)
         except Exception as e:
             await ErrorHandler(name, e, args, kwargs, ctx=ctx)
-    def trycmd(cmd):
+    def trycmd(cmd:CmdType) -> CmdType:
         return decorator.decorate(cmd,_trycmd) # decorator preserves the signature of cmd
-    def fixcmd(cmd):
+    def fixcmd(cmd:CmdType) -> NCmdType:
         return bot.command(
             name        =        name,
             description = evl(f"{name}.desc") or "*No Description Found.*",
@@ -113,18 +166,18 @@ def MainCommand(bot,name):
         )( trycmd(cmd) )
     return fixcmd
 
-def CogCommand(name):
+def CogCommand(name:str) -> typing.Callable[[CmdType],NCmdType]:
     # cog command
     # command gets a self argument as well
-    async def _trycmd(cmd, self, ctx:commands.Context ,*args,**kwargs):
+    async def _trycmd(cmd:CmdType, self:commands.Cog, ctx:commands.Context ,*args:typing.Any,**kwargs:typing.Any) -> None:
         try:
             await ctx.trigger_typing()
             await cmd(self, ctx,*args,**kwargs)
         except Exception as e:
             await ErrorHandler(name, e, args, kwargs, ctx=ctx)
-    def trycmd(cmd):
+    def trycmd(cmd:CmdType) -> CmdType:
         return decorator.decorate(cmd,_trycmd)
-    def fixcmd(cmd):
+    def fixcmd(cmd:CmdType) -> NCmdType:
         return commands.command(
             name        =        name,
             description = evl(f"{name}.desc") or "*No Description Found.*",
@@ -132,22 +185,26 @@ def CogCommand(name):
         )( trycmd(cmd) )
     return fixcmd
 
-def InteractionCogCommand_Local(name):
+def InteractionCogCommand_Local(name:str) -> typing.Callable[[CmdType],NCmdType]:
     # interaction cog command
     # command gets a self argument as well
-    async def _trycmd(cmd, self, interaction: nextcord.Interaction ,*args,**kwargs):
+    async def _trycmd(cmd:CmdType, self:commands.Cog, interaction: nextcord.Interaction ,*args:typing.Any,**kwargs:typing.Any) -> None:
         try:
             await cmd(self, interaction, *args,**kwargs)
             
         except Exception as e:
             await ErrorHandler(name, e, args, kwargs, interaction=interaction)
             return
-    def trycmd(cmd):
+    def trycmd(cmd:CmdType) -> CmdType:
         return decorator.decorate(cmd,_trycmd)
-    def fixcmd(cmd):
+    def fixcmd(cmd:CmdType) -> NCmdType:
+        guild_ids = cfg("botInfo.localICCServer")
+        assert isinstance(guild_ids,list)
+        desc = evl(f"{name}.desc") or "*No Description.*"
+        assert isinstance(desc,str)
         return nextcord.slash_command(
             name        = name,
-            description = evl(f"{name}.desc") or "*No Description Found.*",
-            guild_ids   = cfg("botInfo.localICCServer")
+            description = desc,
+            guild_ids   = guild_ids
         )( trycmd(cmd) )
     return fixcmd
