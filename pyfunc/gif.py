@@ -110,6 +110,8 @@ class gif:
             bge = Image.new("RGBA", im.size, self.defaultbg)
             bge.alpha_composite(im)
             framel.append(bge)
+        for i,f in enumerate(framel):
+            framel[0].save(pth+f'-{i}.png', format="PNG")
         framel[0].save(pth, format="GIF", save_all=True, append_images=framel[1:], loop=0, disposal=2, duration=duration)
         if apng:
             framel[0].save(pth.replace(".gif", ".apng"), save_all=True, append_images=framel[1:], loop=0, disposal=2, duration=duration)
