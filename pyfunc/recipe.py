@@ -187,9 +187,20 @@ def generaterecipe(name) -> None:
         print(name,'in heat')
         hrecipes = heat[name]
         for i,recipe in enumerate(hrecipes):
+            row = [recipe['ingredient']]
+            furnacex = 0
             if 'surrounding' in recipe:
-                raise ValueError('no support for surrounding')
-            imgs=generates([[recipe['ingredient']]],ratio=4)
+                # to the right and then to the left
+                count = recipe['surrounding']['minimum']
+                block = recipe['surrounding']['block']
+                if count >= 1:
+                    row += [block]
+                if count >= 2:
+                    row = [block] + row
+                    furnacex = 64
+                if count >= 3:
+                    raise ValueError('no support for 3 surrounding')
+            imgs=generates([row],ratio=4,assertconnected=False)
             _,h = gif.tuple_max((64*2, 0),*[img.size for img in imgs])
             anim = gif.gif((0,0,0)) # the color is ignored
             anim.addgifframes(
@@ -198,7 +209,7 @@ def generaterecipe(name) -> None:
             )
             anim.addimageframes(
                 arc_furnace,
-                pos=(0, h)
+                pos=(furnacex, h)
             )
             img=generates([[name]],ratio=4)[0]
             results.append({'anim':anim,'arrowsprite':'arc_furnace','result':img})
