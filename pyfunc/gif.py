@@ -9,7 +9,7 @@ vec2:TypeAlias = tuple[int,int]
 
 class gif_frame:
     def __init__(self, image:Image.Image | None=None) -> None:
-        self.images: list[tuple[Image.Image, tuple[int, int]]] = []
+        self.images: list[tuple[Image.Image, vec2]] = []
         if image is not None:
             self.addimage(image)
         
@@ -27,7 +27,7 @@ class gif_frame:
         copy = copy.crop(copy.getbbox())
         return copy
     
-    def getsize(self):
+    def getsize(self) -> vec2:
         return tuple_max((0, 0),*[
             (im.width + x, im.height + y)
             for im,(x,y) in
@@ -112,11 +112,11 @@ class gif:
             bge = Image.new("RGBA", im.size, self.defaultbg)
             bge.alpha_composite(im)
             framel.append(bge)
-        for i,f in enumerate(framel):
-            framel[0].save(pth+f'-{i}.png', format="PNG")
+        for i,fi in enumerate(framel):
+            fi.save(pth+f'-{i}.png', format="PNG")
         framel[0].save(pth, format="GIF", save_all=True, append_images=framel[1:], loop=0, disposal=2, duration=duration)
         if apng:
             framel[0].save(pth.replace(".gif", ".apng"), save_all=True, append_images=framel[1:], loop=0, disposal=2, duration=duration)
     
-    def getsize(self):
+    def getsize(self) -> vec2:
         return tuple_max((0, 0),*[f.getsize() for f in self.framelist])
