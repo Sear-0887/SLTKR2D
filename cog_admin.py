@@ -3,9 +3,9 @@ import os
 import nextcord
 import json
 from nextcord.ext import commands
-from pyfunc.commanddec import CogCommand
+from pyfunc.commanddec import CogCommand, ErrorPacket
 from collections import defaultdict
-from itertools import takewhile,count
+from itertools import count
 import datetime
 import logging
 
@@ -16,7 +16,7 @@ class Admin(commands.Cog):
 
     @commands.has_permissions(administrator=True)
     @CogCommand("viewcog")
-    async def viewcog(self,ctx):
+    async def viewcog(self,ctx:commands.Context) -> None:
         embed = nextcord.Embed()
         embed.description = ""
         for cogname, cogins in self.bot.cogs.items():
@@ -27,7 +27,7 @@ class Admin(commands.Cog):
 
     @commands.has_permissions(administrator=True)
     @CogCommand("loadcog")
-    async def loadcog(self,ctx, tar:str):
+    async def loadcog(self,ctx:commands.Context, tar:str) -> None:
         try:
             self.bot.load_extension("cog_"+tar)
             await ctx.send("LOADED "+"cog_"+tar+".py")
@@ -38,7 +38,7 @@ class Admin(commands.Cog):
 
     @commands.has_permissions(administrator=True)
     @CogCommand("unloadcog")
-    async def unloadcog(self,ctx, tar:str):
+    async def unloadcog(self,ctx:commands.Context, tar:str) -> None:
         try:
             if tar == "admin":
                 await ctx.send("You can't unload cog_admin!") # prevent softlock
@@ -52,7 +52,7 @@ class Admin(commands.Cog):
 
     @commands.has_permissions(administrator=True)
     @CogCommand("reloadcog")
-    async def reloadcog(self,ctx, tar:str):
+    async def reloadcog(self,ctx:commands.Context, tar:str) -> None:
         try:
             self.bot.unload_extension("cog_"+tar)
             self.bot.load_extension("cog_"+tar)
@@ -62,30 +62,30 @@ class Admin(commands.Cog):
 
     @commands.has_permissions(administrator=True)
     @CogCommand("deletelog")
-    async def delog(self, ctx):
+    async def delog(self, ctx:commands.Context) -> None:
         for cachef in glob.glob("cache/log/cache-??-??-????.txt"):
             os.remove(cachef)
         await ctx.send("Done.")
 
     @commands.has_permissions(administrator=True)
     @CogCommand("deleteerr")
-    async def deleteerr(self, ctx):
+    async def deleteerr(self, ctx:commands.Context) -> None:
         for errf in glob.glob("cache/log/error-*-??-??-????.json"):
             os.remove(errf)
         await ctx.send("Done.")
 
     @CogCommand("viewerr")
-    async def viewerr(self, ctx, count: int=1, user: nextcord.User | None=None):
+    async def viewerr(self, ctx:commands.Context, count: int=1, user: nextcord.User | nextcord.Member | None=None) -> None:
         if count == "*": count = 999999 # All 
         if user is None: user = ctx.author
-        async def senderr(values, filname):
+        async def senderr(values:ErrorPacket, filname:str) -> None:
             # Values
             user=values['user']
             time=values['time']
-            cmd=values['trigger'].replace('`','ˋ')
+            cmd=values['trigger'].replace('`','ˋ') # replace the backtick (code block marker) with a lookalike
             args=values['arg']
             kwargs=values['kwarg']
-            exctb=values['errline'].replace('`','ˋ')
+            exctb=values['errline'].replace('`','ˋ') # replace the backtick (code block marker) with a lookalike
             exc=values['errname']
             excstr = values['excstr']
             # Embed
@@ -124,6 +124,7 @@ class Admin(commands.Cog):
         l.debug(f"printing {count} errors")
         for fname,err in errs:
             try:
+                # just assume that err is the right format
                 await senderr(err, fname)
             except nextcord.errors.HTTPException: # Error is STILL too long
                 await ctx.send(f'The Error is too long to be displayed.\n Please view `{fname}` for more info.')
@@ -131,5 +132,5 @@ class Admin(commands.Cog):
 
 
 
-def setup(bot):
+def setup(bot:commands.Bot) -> None:
 	bot.add_cog(Admin(bot))

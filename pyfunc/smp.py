@@ -1,20 +1,24 @@
-def strip(s):
+import typing
+
+SmpType:typing.TypeAlias = str | list['SmpType'] | dict[str,'SmpType']
+
+def strip(s:str) -> str:
     s=s.lstrip()
     while len(s)>0 and s[0]=='#':
         s=(s.split('\n',maxsplit=1)+[''])[1].lstrip()
     return s
 
-def _smptostr(smp,indented,indent):
-    if type(smp) in [str,int]:
+def _smptostr(smp:SmpType | int,indented:str,indent:str) -> tuple[str,bool]:
+    if isinstance(smp,(str,int)):
         return str(smp),False # do not add newlines around
-    if type(smp) is list:
+    if isinstance(smp,list):
         s=''
         for x in smp:
             xs,xnl=_smptostr(x,indented+indent,indent)
             nl=f'\n{indented}' if xnl else ''
             s+=f'\n{indented}[{xs}{nl}]'
         return s,True
-    if type(smp) is dict:
+    if isinstance(smp,dict):
         s=''
         for k,v in smp.items():
             xs,xnl=_smptostr(v,indented+indent,indent)
@@ -22,23 +26,23 @@ def _smptostr(smp,indented,indent):
             s+=f'\n{indented}{{{k}}}:{{{xs}{nl}}}'
         return s,True
 
-def smptostr(smp,indent='  '):
+def smptostr(smp:SmpType | int,indent:str='  ') -> str:
     return _smptostr(smp,'',indent)[0].lstrip('\n')
 
-def _getword(s):
+def _getword(s:str) -> tuple[str,str]:
     s=strip(s)
     i=0
     while i<len(s) and s[i]!='}' and s[i]!=']':
         i=i+1
     return s[i:],s[:i]
 
-def _geterrmessage(err,sinit,s):
+def _geterrmessage(err:str,sinit:str,s:str) -> str:
     lines=sinit[:len(sinit)-len(s)].split('\n')
     line=len(lines)
     col=len(lines[-1])
     return f'Error at line {line}, column {col}: {err}'
 
-def _getsmpvalue(sinit):
+def _getsmpvalue(sinit:str) -> tuple[str,SmpType]:
     s=strip(sinit)
     if s.startswith('['):
         # list
@@ -74,6 +78,8 @@ def _getsmpvalue(sinit):
         s2,w=_getword(s)
         return s2,w.strip()
 
-def getsmpvalue(s):
+def getsmpvalue(s:str) -> SmpType:
     # read an smp into a python object
-    return _getsmpvalue(s)[1]
+    s,val = _getsmpvalue(s)
+    assert s == ''
+    return val

@@ -1,4 +1,3 @@
-import datetime
 import nextcord
 from nextcord.ext import commands
 from pyfunc.commanddec import CogCommand, InteractionCogCommand_Local
@@ -9,13 +8,13 @@ from datetime import datetime, timezone
 
 
 class Misc(commands.Cog):
-    def __init__(self, bot, branch):
+    def __init__(self, bot:commands.Bot, gitbranch:str) -> None:
         self.bot = bot
-        self.branch = branch
+        self.gitbranch = gitbranch
         
     @CogCommand("branch")
-    async def branch(self, ctx:commands.Context):
-        await ctx.send(f"Current branch is {self.branch}")
+    async def branch(self, ctx:commands.Context) -> None:
+        await ctx.send(f"Current branch is {self.gitbranch}")
         
     @InteractionCogCommand_Local("timestamp")
     async def timestamp(self, 
@@ -26,7 +25,7 @@ class Misc(commands.Cog):
                      hour   : int = nextcord.SlashOption(required=False, default=None),
                      minute : int = nextcord.SlashOption(required=False, default=None),
                      second : int = nextcord.SlashOption(required=False, default=None),
-                     formating = nextcord.SlashOption(name="formating", required=False, choices=[
+                     formating:str = nextcord.SlashOption(name="formating", required=False, choices=[
                         "Default",
                         "List All",
                         "Short Time",
@@ -36,7 +35,7 @@ class Misc(commands.Cog):
                         "Short Date/Time",
                         "Long Date/Time",
                         "Relative Time"
-                    ], default="Default")):
+                    ], default="Default")) -> None:
         formatings = {
                         "Default": "",
                         "Short Time": ":t",
@@ -66,7 +65,7 @@ class Misc(commands.Cog):
                 
     
 
-def setup(bot):
+def setup(bot:commands.Bot) -> None:
     # https://stackoverflow.com/a/62724213
     head_dir = Path(".") / ".git" / "HEAD"
     with head_dir.open("r", encoding="utf-8") as f: content = f.read().splitlines()

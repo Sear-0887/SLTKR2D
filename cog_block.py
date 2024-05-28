@@ -6,25 +6,26 @@ import random
 import re
 from PIL import Image
 from nextcord.ext import commands
-from pyfunc.lang import cfg
+from pyfunc.lang import cfgstr
 from pyfunc.commanddec import CogCommand
-from pyfunc.block import makeimage as blockmakeimage
+from pyfunc.block import makeimage as blockmakeimage, BlockDataIn
 import pyfunc.smp as smp
 from pyfunc.recipe import generaterecipe
+import typing
 
 class Block(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot:commands.Bot) -> None:
         self.bot = bot
 
     @CogCommand("block")
-    async def block(self,ctx, *, block:str | None=None):
+    async def block(self,ctx:commands.Context, *, block:str | None=None) -> None:
         if block is not None:
             if block.isdigit(): # if the argument is a number, get the corresponding block name
                 block = idtoblock.get(int(block),'NIC')
             block = block.replace(" ", "_")
             binfo=blockinfos[block]
             embed = nextcord.Embed()
-            pthblockzoo = cfg("localGame.texture.blockIconFile")
+            pthblockzoo = cfgstr("localGame.texture.blockIconFile")
             img = Image.open(pthblockzoo)
             icox, icoy = binfo["iconcoord"]
             img = img.crop((16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))).resize((128, 128), Image.NEAREST)
@@ -40,11 +41,12 @@ class Block(commands.Cog):
             await self.block(ctx, str(random.choice([*idtoblock.keys()])))
 
     @CogCommand("image")
-    async def image(self,ctx, *, build:str="[[16][20]][[16][16]]"):
+    async def image(self,ctx:commands.Context, *, build:str="[[16][20]][[16][16]]") -> None:
         blocklist:dict[str, int] = collections.defaultdict(int)
-        blocks=smp.getsmpvalue(build)
+        blocks:list[list[BlockDataIn]]=typing.cast(list[list[BlockDataIn]],smp.getsmpvalue(build))
         for y,row in enumerate(blocks):
             for x,b in enumerate(row):
+                assert isinstance(b,str)
                 b=b.lower().strip()
                 b=''.join(b.split()) # remove all whitespace
                 turn=0
@@ -73,7 +75,7 @@ class Block(commands.Cog):
                     weld=[c=='1' for c in reversed(weldm)]
                 if b.isdigit():
                     b = idtoblock[int(b)]
-                blocks[y][x] = {"type":b,"rotate":turn,"weld":weld,"data":bdata}
+                blocks[y][x] = typing.cast(BlockDataIn,{"type":b,"rotate":turn,"weld":weld,"data":bdata}) # just assume
                 blocklist[b] += 1
         im=blockmakeimage(blocks)
         width, height = im.size
@@ -101,7 +103,7 @@ class Block(commands.Cog):
             )
             
     @CogCommand("recipe")
-    async def recipe(self,ctx, *, block:str='extractor'):
+    async def recipe(self,ctx:commands.Context, *, block:str='extractor') -> None:
         if block.isdigit(): # if the argument is a number, get the corresponding block name
             block = idtoblock.get(int(block),'NIC')
         block = block.replace(" ", "_").lower()
@@ -112,5 +114,5 @@ class Block(commands.Cog):
         await ctx.send(embed=embed, file=nextcord.File(f"cache/recipe-{block}.gif", filename="f.gif"))  
         
         
-def setup(bot):
+def setup(bot:commands.Bot) -> None:
 	bot.add_cog(Block(bot))

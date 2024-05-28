@@ -1,11 +1,11 @@
 import pyfunc.smp as smp
 import collections
 import copy
-from pyfunc.lang import cfg
+from pyfunc.lang import opencfg
 from pyfunc.assetload import blockinfos
 from pyfunc.block import BlockDataIn
 import typing
-import schema # type: ignore # no type hints
+import schema # type: ignore[import-untyped] # no type hints
 
 def getblocksbyattr(attr:str) -> list[str]:
     return [b for b,data in blockinfos.items() if attr in data['attributes']]
@@ -255,6 +255,15 @@ class ExtraDisplayRecipe(typing.TypedDict):
     guidebook_use_only:bool
     match_filter_modulo:bool # true if the changing blocks all match
 
+class SummonorePillRecipe(typing.TypedDict):
+    filter:BlockDataIn | Tag
+
+class SensorNaturalRecipe(typing.TypedDict):
+    filter:BlockDataIn | Tag
+
+class SensorRareResourceRecipe(typing.TypedDict):
+    filter:BlockDataIn | Tag
+
 heat:dict[str,list[HeatRecipe]]=collections.defaultdict(list)
 extract:dict[str,list[ExtractRecipe]] = collections.defaultdict(list)
 inject:dict[str,list[InjectRecipe]] = collections.defaultdict(list)
@@ -264,14 +273,17 @@ summonore_pill:set[str] = set()
 sensor_natural:set[str] = set()
 sensor_rare_resource:set[str] = set()
 
-with open(cfg('localGame.texture.recipesFile')) as f:
+with opencfg('localGame.texture.recipesFile') as f:
     rawdata = smp.getsmpvalue(f.read())
+
+assert isinstance(rawdata,list)
 
 del f
 
 data=collections.defaultdict(list)
 
 for x in rawdata:
+    assert isinstance(x,dict)
     typ=x['type']
     data[typ].append(x)
 
@@ -288,19 +300,30 @@ for tag in tagdata:
 del tag
 del tagdata
 
-data=dataschema.validate(data)
+class RecipeData:
+    heat:list[HeatRecipe]
+    extract:list[ExtractRecipe]
+    inject:list[InjectRecipe]
+    combine:list[CombineRecipe]
+    extra_display:list[ExtraDisplayRecipe]
+    summonore_pill:list[SummonorePillRecipe]
+    sensor_natural:list[SensorNaturalRecipe]
+    sensor_rare_resource:list[SensorRareResourceRecipe]
 
-for hrecipe in data['heat']:
+dataval=dataschema.validate(data)
+del data
+
+for hrecipe in dataval['heat']:
     heat[hrecipe['product']].append(hrecipe)
     del hrecipe['product']
     del hrecipe['type']
 
-for erecipe in data['extract']:
+for erecipe in dataval['extract']:
     extract[erecipe['product']].append(erecipe)
     del erecipe['product']
     del erecipe['type']
 
-for irecipe in data['inject']:
+for irecipe in dataval['inject']:
     product = irecipe['product']
     if 'fertilizer' in product and product['fertilizer']:
         key = '__fertilizer'
@@ -310,14 +333,14 @@ for irecipe in data['inject']:
     del irecipe['product']
     del irecipe['type']
 
-for crecipe in data['combine']:
+for crecipe in dataval['combine']:
     product = crecipe['product']
     crecipe['amount'] = product['amount']
     combine[product['block']].append(crecipe)
     del crecipe['product']
     del crecipe['type']
 
-for erecipe in data['extra_display']:
+for erecipe in dataval['extra_display']:
     product = erecipe['product']
     erecipe['amount'] = product['amount']
     if isinstance(product['filter'],list):
@@ -332,7 +355,7 @@ for erecipe in data['extra_display']:
         erecipe['product'] = p
         extra_display[p].append(erecipe)
 
-for srecipe in data['summonore_pill']:
+for srecipe in dataval['summonore_pill']:
     if isinstance(srecipe['filter'],list):
         out = srecipe['filter']
     elif isinstance(srecipe['filter'],dict):
@@ -344,7 +367,7 @@ for srecipe in data['summonore_pill']:
 
 del p
 
-for srecipe in data['sensor_natural']:
+for srecipe in dataval['sensor_natural']:
     if isinstance(srecipe['filter'],list):
         out = srecipe['filter']
     elif isinstance(srecipe['filter'],dict):
@@ -354,7 +377,7 @@ for srecipe in data['sensor_natural']:
     for p in out:
         sensor_natural.add(p)
 
-for srecipe in data['sensor_rare_resource']:
+for srecipe in dataval['sensor_rare_resource']:
     if isinstance(srecipe['filter'],list):
         out = srecipe['filter']
     elif isinstance(srecipe['filter'],dict):
@@ -369,5 +392,3 @@ del irecipe
 del crecipe
 del erecipe
 del srecipe
-
-del data

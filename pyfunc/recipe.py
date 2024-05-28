@@ -4,29 +4,41 @@ import glob
 import os
 from PIL import Image
 import pyfunc.gif as gif
-from typing import Any
+from typing import Any, TypeVar, Callable
+import typing
 from pyfunc.datafunc import tuple_max, tuple_min
-from pyfunc.lang import cfg, getarrowcoords
+from pyfunc.lang import cfg, cfgstr, getarrowcoords
 from pyfunc.smp import getsmpvalue
-from pyfunc.block import canweld, get, makeimage, bottomtypes, topbottomtypes, sidestypes, notoptypes, norotatetypes, twowaytypes, normalize, makeweldside
+from pyfunc.block import canweld, get, makeimage, bottomtypes, topbottomtypes, sidestypes, notoptypes, norotatetypes, twowaytypes, normalize, makeweldside, BlockDataIn, BlockData
 import itertools
 import logging
 from pyfunc.recipeprocess import heat, extract, inject, combine, extra_display, summonore_pill
+
+T1 = TypeVar('T1')
+T2 = TypeVar('T2')
+
+if hasattr(itertools,'batched'):
+    def batched(l:list[T1],n:int) -> typing.Iterable[list[T1]]:
+        return map(list,itertools.batched(l,n))
+else:
+    def batched(l:list[T1],n:int) -> typing.Iterable[list[T1]]:
+        return map(list,itertools.zip_longest(*[itertools.islice(l,i,None,n) for i in range(n)]))
 
 l = logging.getLogger()
 
 noweld = (makeweldside(False),) * 4
 fullweld = (makeweldside(True),) * 4
 
-def generates(grid,ratio,assertconnected=True) -> list[Image.Image]:
+def generates(grid1:list[list[BlockDataIn]],ratio:int,assertconnected:bool=True) -> list[Image.Image]:
     tags=[]
-    for y,row in enumerate(grid):
+    for y,row in enumerate(grid1):
         for x,block in enumerate(row):
             if isinstance(block, list): # If it's a list, it's a tag, which
                 tags.append([(x,y,normalize(t)) for t in block])
-                grid[y][x] = normalize(block[0]) # Actions
+                grid1[y][x] = normalize(block[0]) # Actions
             elif isinstance(block, str): # It's normal and needed to NORMALIZE
-                grid[y][x] = normalize(block) # Actions
+                grid1[y][x] = normalize(block) # Actions
+    grid:list[list[BlockData]] = typing.cast(list[list[BlockData]],grid1)
     # now have a list of tags and coordinates
     ims=[]
     indices=[0 for _ in tags]
@@ -47,13 +59,13 @@ def generates(grid,ratio,assertconnected=True) -> list[Image.Image]:
             break # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
     return ims
 
-def doublemap(f,ll):
+def doublemap(f:Callable[[T1],T2],ll:list[list[T1]]) -> list[list[T2]]:
     return [[f(x) for x in l] for l in ll]
 
-def isblock(b):
+def isblock(b:BlockData) -> bool:
     return b['type'] != 'air'
 
-def genimage(generated,assertconnected=True):
+def genimage(generated:list[list[BlockData]],assertconnected:bool=True) -> Image.Image:
     rotations=[]
     for y,row in enumerate(generated):
         for x,block in enumerate(row):
@@ -71,14 +83,14 @@ def genimage(generated,assertconnected=True):
                 rotations.append([(x,y,r) for r in [0,1]]) # don't need to check all ways
             else:
                 rotations.append([(x,y,r) for r in [0,2,1,3]])
-    def floodfill():
+    def floodfill() -> bool:
         filled=set([(0,0)])
         edgeblocks=[(0,0)] # the blocks that are welded to a filled block
         sideinfo=[ # do not change
-            ['right','left', +1,  0],
-            ['left','right', -1,  0],
-            ['bottom','top',  0, +1],
-            ['top','bottom',  0, -1],
+            ('right','left', +1,  0),
+            ('left','right', -1,  0),
+            ('bottom','top',  0, +1),
+            ('top','bottom',  0, -1),
         ]
         while len(edgeblocks)>0:
             newedgeblocks=[]
@@ -113,13 +125,13 @@ def genimage(generated,assertconnected=True):
                 break
                 
     ... 
-    gen = makeimage(generated) # Make Image
+    gen = makeimage(typing.cast(list[list[BlockDataIn]],generated)) # Make Image # the cast is to appease mypy
     return gen
 
 def getarrow(typ:str) -> Image.Image:
     icox, icoy = getarrowcoords()[typ]
     return Image.open(
-        cfg("localGame.texture.guidebookArrowFile")
+        cfgstr("localGame.texture.guidebookArrowFile")
     ).crop(
         (16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))
     ).resize(
@@ -145,7 +157,7 @@ arc_furnace=generates([[
     {"type":"arc_furnace","rotate":0,"weld":fullweld,"data":None}
 ]],ratio=4)[0]
 
-def generaterecipe(name) -> None:
+def generaterecipe(name:str) -> None:
     finimage = gif.gif(tuple(cfg("recipeSetting.recipeBackground")))
     results:list[dict] = []
     print('generating recipe for',name)
@@ -237,7 +249,7 @@ def generaterecipe(name) -> None:
     finimage.export(f"cache/recipe-{name}.gif")
 
 if __name__ == "__main__":
-    generaterecipe("galvanometer", apng=True)
+    generaterecipe("galvanometer")
     generaterecipe("pulp")
     # generaterecipe("air")
     # generaterecipe("destroyer")
