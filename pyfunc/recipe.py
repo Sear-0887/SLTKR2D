@@ -146,25 +146,27 @@ def getarrow(typ:str) -> Image.Image:
 
 # the parts that are always the same
 combiner=generates([[
-    {"type":"combiner","rotate":2,"weld":fullweld,"data":None}, 
-    {"type":"transistor","rotate":1,"weld":fullweld,"data":None}
+    {"type":"combiner","rotate":2,"weld":fullweld}, 
+    {"type":"transistor","rotate":1,"weld":fullweld}
 ]],ratio=4)[0]
 extractor=generates([[
-    {"type":"extractor","rotate":2,"weld":fullweld,"data":None}, 
-    {"type":"transistor","rotate":1,"weld":fullweld,"data":None}
+    {"type":"extractor","rotate":2,"weld":fullweld}, 
+    {"type":"transistor","rotate":1,"weld":fullweld}
 ]],ratio=4)[0]
 arc_furnace=generates([[
-    {"type":"arc_furnace","rotate":0,"weld":fullweld,"data":None}
+    {"type":"arc_furnace","rotate":0,"weld":fullweld}
 ]],ratio=4)[0]
 
 def generaterecipe(name:str) -> None:
-    finimage = gif.gif(tuple(cfg("recipeSetting.recipeBackground")))
+    bg = cfg("recipeSetting.recipeBackground")
+    assert isinstance(bg,list)
+    finimage = gif.gif(tuple(bg))
     results:list[dict] = []
     print('generating recipe for',name)
     if name in combine:
         crecipes = combine[name]
-        for i,recipe in enumerate(crecipes):
-            imgs=generates(recipe['grid'],ratio=4)
+        for i,crecipe in enumerate(crecipes):
+            imgs=generates(crecipe['grid'],ratio=4)
             _,h = gif.tuple_max((64*2, 0),*[img.size for img in imgs])
             anim = gif.gif((0,0,0)) # the color is ignored
             anim.addgifframes(
@@ -175,13 +177,13 @@ def generaterecipe(name:str) -> None:
                 combiner,
                 pos=(0, h)
             )
-            result=[{"type":name,"rotate":0,"weld":noweld,"data":None}]*recipe['amount']
-            img=generates([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
+            result=[typing.cast(BlockDataIn, {"type":name,"rotate":0,"weld":noweld})]*crecipe['amount']
+            img=generates(typing.cast(list[list[BlockDataIn]], [*itertools.batched(result,2)]),ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
             results.append({'anim':anim,'arrowsprite':'combiner','result':img})
     if name in extract:
         erecipes = extract[name]
-        for i,recipe in enumerate(erecipes):
-            imgs=generates([[recipe['ingredient']]],ratio=4)
+        for i,erecipe in enumerate(erecipes):
+            imgs=generates([[erecipe['ingredient']]],ratio=4)
             _,h = gif.tuple_max((64*2, 0),*[img.size for img in imgs])
             anim = gif.gif((0,0,0)) # the color is ignored
             anim.addgifframes(
@@ -192,19 +194,19 @@ def generaterecipe(name:str) -> None:
                 extractor,
                 pos=(0, h)
             )
-            result=[{"type":name,"rotate":0,"weld":noweld,"data":None}]*recipe['amount']
-            img=generates([*itertools.batched(result,2)],ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
+            result=[{"type":name,"rotate":0,"weld":noweld}]*erecipe['amount']
+            img=generates(typing.cast(list[list[BlockDataIn]], [*itertools.batched(result,2)]),ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
             results.append({'anim':anim,'arrowsprite':'extractor','result':img})
     if name in heat:
         print(name,'in heat')
         hrecipes = heat[name]
-        for i,recipe in enumerate(hrecipes):
-            row = [recipe['ingredient']]
+        for i,hrecipe in enumerate(hrecipes):
+            row = [hrecipe['ingredient']]
             furnacex = 0
-            if 'surrounding' in recipe:
+            if 'surrounding' in hrecipe:
                 # to the right and then to the left
-                count = recipe['surrounding']['minimum']
-                block = recipe['surrounding']['block']
+                count = hrecipe['surrounding']['minimum']
+                block = hrecipe['surrounding']['block']
                 if count >= 1:
                     row += [block]
                 if count >= 2:
@@ -241,10 +243,12 @@ def generaterecipe(name:str) -> None:
             getarrow(recipeimgs['arrowsprite']),
             pos=(maxdim[0]+64, y+h//2)
         )
+        marginy = cfg("recipeSetting.recipeMarginY")
+        assert isinstance(marginy, int)
         y += (
-            h +                                # the recipe height
-            64 +                               # the combiner
-            cfg("recipeSetting.recipeMarginY") # mandatory gap between recipes
+            h +     # the recipe height
+            64 +    # the combiner
+            marginy # mandatory gap between recipes
         )
     finimage.export(f"cache/recipe-{name}.gif")
 
