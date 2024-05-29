@@ -31,7 +31,7 @@ fullweld = (makeweldside(True),) * 4
 
 def generates(grid1:list[list[BlockDataIn]],ratio:int,weldall:bool=True,matchblocks:bool=False,assertconnected:bool=True) -> list[Image.Image]:
     tags=[]
-    grid:list[list[BlockData]] = typing.cast(list[list[BlockData]],grid1)
+    grid:list[list[BlockData]] = [[b for b in row] for row in grid1]
     for y,row in enumerate(grid1):
         for x,block in enumerate(row):
             if isinstance(block, list): # If it's a list, it's a tag, which
