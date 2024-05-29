@@ -86,8 +86,13 @@ def genimage(generated:list[list[BlockData]],assertconnected:bool=True) -> Image
             else:
                 rotations.append([(x,y,r) for r in [0,2,1,3]])
     def floodfill() -> bool:
-        filled=set([(0,0)])
-        edgeblocks=[(0,0)] # the blocks that are welded to a filled block
+        if sum(map(sum,doublemap(isblock,generated))) == 0: # only air
+            return True
+        x = 0
+        while get(generated,x,0)['type']=='air' and x < len(generated[0]):
+            x += 1
+        filled=set([(x,0)])
+        edgeblocks=[(x,0)] # the blocks that are welded to a filled block
         sideinfo=[ # do not change
             ('right','left', +1,  0),
             ('left','right', -1,  0),
