@@ -308,11 +308,15 @@ if __name__ == "__main__":
     # generaterecipe("galvanometer")
     # generaterecipe("prism")
     from pyfunc.assetload import blockinfos
-    for block in blockinfos.keys():
+    bad = []
+    for block in [*blockinfos.keys()]:
+        print(block)
         try:
             generaterecipe(block)
         except Exception as e:
             print(block,e)
-    for maderecipecache in glob.glob(f"cache/recipeframe-*.png"):
-        try: os.remove(maderecipecache)
-        except: pass
+            bad.append((block,e))
+    print(bad)
+    # for maderecipecache in glob.glob(f"cache/recipeframe-*.png"):
+        # try: os.remove(maderecipecache)
+        # except: pass
