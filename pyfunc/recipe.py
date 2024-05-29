@@ -29,16 +29,18 @@ l = logging.getLogger()
 noweld = (makeweldside(False),) * 4
 fullweld = (makeweldside(True),) * 4
 
-def generates(grid1:list[list[BlockDataIn]],ratio:int,assertconnected:bool=True) -> list[Image.Image]:
+def generates(grid1:list[list[BlockDataIn]],ratio:int,weldall:bool=True,matchblocks:bool=False,assertconnected:bool=True) -> list[Image.Image]:
     tags=[]
+    grid:list[list[BlockData]] = typing.cast(list[list[BlockData]],grid1)
     for y,row in enumerate(grid1):
         for x,block in enumerate(row):
             if isinstance(block, list): # If it's a list, it's a tag, which
                 tags.append([(x,y,normalize(t)) for t in block])
-                grid1[y][x] = normalize(block[0]) # Actions
+                grid[y][x] = normalize(block[0]) # Actions
             elif isinstance(block, str): # It's normal and needed to NORMALIZE
-                grid1[y][x] = normalize(block) # Actions
-    grid:list[list[BlockData]] = typing.cast(list[list[BlockData]],grid1)
+                grid[y][x] = normalize(block) # Actions
+            if not weldall:
+                grid[y][x]['weldablesides'] = noweld # type: ignore[index]
     # now have a list of tags and coordinates
     ims=[]
     indices=[0 for _ in tags]
