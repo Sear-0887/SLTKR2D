@@ -253,16 +253,22 @@ def generaterecipe(name:str) -> None:
     finimage.export(f"cache/recipe-{name}.gif")
 
 if __name__ == "__main__":
-    generaterecipe("galvanometer")
-    generaterecipe("pulp")
+    # generaterecipe("galvanometer")
+    # generaterecipe("pulp")
     # generaterecipe("air")
     # generaterecipe("destroyer")
-    generaterecipe("compressed_stone")
-    generaterecipe("inductor")
+    # generaterecipe("compressed_stone")
+    # generaterecipe("inductor")
     # generaterecipe("galvanometer")
     # generaterecipe("potentiometer")
     # generaterecipe("galvanometer")
     # generaterecipe("prism")
+    from pyfunc.assetload import blockinfos
+    for block in blockinfos.keys():
+        try:
+            generaterecipe(block)
+        except Exception as e:
+            print(block,e)
     for maderecipecache in glob.glob(f"cache/recipeframe-*.png"):
         try: os.remove(maderecipecache)
         except: pass
