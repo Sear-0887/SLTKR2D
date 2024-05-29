@@ -40,7 +40,7 @@ def generates(grid1:list[list[BlockDataIn]],ratio:int,weldall:bool=True,matchblo
             elif isinstance(block, str): # It's normal and needed to NORMALIZE
                 grid[y][x] = normalize(block) # Actions
             if not weldall:
-                grid[y][x]['weldablesides'] = noweld # type: ignore[index]
+                grid[y][x]['weldablesides'] = noweld
     # now have a list of tags and coordinates
     ims=[]
     indices=[0 for _ in tags]
@@ -220,7 +220,6 @@ def generaterecipe(name:str) -> None:
             img=generates(typing.cast(list[list[BlockDataIn]], [*itertools.batched(result,2)]),ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
             results.append({'anim':anim,'arrowsprite':'extractor','result':img})
     if name in heat:
-        print(name,'in heat')
         hrecipes = heat[name]
         for i,hrecipe in enumerate(hrecipes):
             row = [hrecipe['ingredient']]
@@ -250,8 +249,8 @@ def generaterecipe(name:str) -> None:
             img=generates([[name]],ratio=4)[0]
             results.append({'anim':anim,'arrowsprite':'arc_furnace','result':img})
     if name in extra_display:
-        print('extra_display',name)
         drecipes = extra_display[name]
+        print('extra_display',drecipes)
         for i,drecipe in enumerate(drecipes):
             print(name,drecipe)
             if len(drecipe['guidebook_page_whitelist']) != 0:
