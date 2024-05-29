@@ -75,6 +75,7 @@ def handlespecialblock(s:str) -> list[BlockDataIn]:
     try:
         return [assertblock(s)]
     except AssertionError:
+        print(s)
         if s.split()[0] in ['any','non_air']:
             nowater = False
             if 'not_water' in s:
@@ -183,7 +184,7 @@ dataschema = schema.Schema({
     }],
     'extra_display':[{
         'type':'extra_display',
-        'grid':schema.Or(schema.Use(fixemptygrid),[[blocktag]]),
+        'grid':schema.And(schema.Use(fixemptygrid),[[blocktag]]),
         'product':{
             'filter':blocktag,
             schema.Optional('amount',default = 1):num,
