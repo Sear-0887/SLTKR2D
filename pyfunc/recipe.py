@@ -167,6 +167,18 @@ arc_furnace=generates([[
     {"type":"arc_furnace","rotate":0,"weld":fullweld}
 ]],ratio=4)[0]
 
+itoarrow = {
+    0: 'blank',
+    1: 'injector',
+    2: 'natural',
+    3: 'mining',
+    4: 'spark',
+    5: 'arc_furnace',
+    6: 'combiner',
+    7: 'extractor',
+    8: 'extractor', # infinite
+}
+
 def generaterecipe(name:str) -> None:
     bg = cfg("recipeSetting.recipeBackground")
     assert isinstance(bg,list)
