@@ -221,7 +221,7 @@ class Image:
 			out.alpha_composite(pim, (int(x - pim.width / 2), int(y - pim.height / 2)))
 		return out
 
-class BlockData(typing.TypedDict):
+class BlockDataLoose(typing.TypedDict):
 	type:str
 	rotate:typing.NotRequired[int]
 	weld:typing.NotRequired[WeldSides]
@@ -233,7 +233,19 @@ class BlockData(typing.TypedDict):
 	sizex:typing.NotRequired[int]
 	sizey:typing.NotRequired[int]
 
-BlockDataIn: typing.TypeAlias = BlockData | str | tuple | list
+class BlockData(typing.TypedDict):
+	type:str
+	rotate:int
+	weld:WeldSides
+	data:typing.NotRequired[str]
+	offsetx:typing.NotRequired[int]
+	offsety:typing.NotRequired[int]
+	overlayoffsetx:typing.NotRequired[int]
+	overlayoffsety:typing.NotRequired[int]
+	sizex:typing.NotRequired[int]
+	sizey:typing.NotRequired[int]
+
+BlockDataIn: typing.TypeAlias = BlockDataLoose | str | tuple | list
 
 class BlockDesc(typing.TypedDict):
 	wired:bool
@@ -269,9 +281,13 @@ for name,texture in data.items():
 
 @functools.cache
 def getblockims(block:str) -> tuple[PIL.Image.Image,PIL.Image.Image | None]:
-	try:
-		normal = PIL.Image.open(os.path.join(cfgstr("localGame.texture.texturePathFolder"),blockpaths[block]['normal'])).convert('RGBA')
-	except FileNotFoundError:
+	if 'normal' in blockpaths[block]:
+		try:
+			print(block,blockpaths[block])
+			normal = PIL.Image.open(os.path.join(cfgstr("localGame.texture.texturePathFolder"),blockpaths[block]['normal'])).convert('RGBA')
+		except FileNotFoundError:
+			normal = None
+	else:
 		normal = None
 	return (
 		PIL.Image.open(os.path.join(cfgstr("localGame.texture.texturePathFolder"),blockpaths[block]['albedo'])).convert('RGBA'),
@@ -372,7 +388,7 @@ def _getblocktexture(block:str,offsetx:int,offsety:int,sizex:int,sizey:int) -> I
 	im1, im2 = getblockims(block)
 	return ImageBit((im1,im2),offsetx,offsety,offsetx+sizex,offsety+sizey,blockinfos[block]['id'])
 
-def getblocktexture(data:BlockData) -> ImageBit:
+def getblocktexture(data:BlockDataLoose) -> ImageBit:
 	block=data['type']
 	offsetx=data.get('offsetx',0) or 0
 	offsety=data.get('offsety',0) or 0
@@ -391,7 +407,7 @@ def drawblocktexture(image:ImageBit,weld:WeldSides) -> Image:
 def defaultblock(data:BlockData) -> Image:
 	welded=data['weld']
 	rotate=data['rotate']
-	image=getblocktexture(data)
+	image=getblocktexture(typing.cast(BlockDataLoose,data))
 	welded=rotatewelded(welded,rotate)
 	im=drawblocktexture(image,welded)
 	im=rotateblockib(im,rotate)
@@ -674,8 +690,8 @@ def makeimage(blocks:list[list[BlockDataIn]],autoweld:bool=True) -> PIL.Image.Im
 
 	newblocks=[[normalize("air") for _ in range(xsize)] for _ in range(ysize)]
 	for yi,line in enumerate(blocks):
-		for xi,block in enumerate(line):
-			block=normalize(block)
+		for xi,blockin in enumerate(line):
+			block=normalize(blockin)
 			newblocks[yi][xi]=block
 
 	im=Image()
