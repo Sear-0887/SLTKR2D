@@ -225,7 +225,7 @@ def generaterecipe(name:str) -> None:
                 if count >= 3:
                     raise ValueError('no support for 3 surrounding')
             imgs=generates([row],ratio=4,assertconnected=False)
-            _,h = gif.tuple_max((64*2, 0),*[img.size for img in imgs])
+            _,h = gif.tuple_max((64, 0),*[img.size for img in imgs])
             anim = gif.gif((0,0,0)) # the color is ignored
             anim.addgifframes(
                 imgs,
