@@ -237,6 +237,29 @@ def generaterecipe(name:str) -> None:
             )
             img=generates([[name]],ratio=4)[0]
             results.append({'anim':anim,'arrowsprite':'arc_furnace','result':img})
+    if name in extra_display:
+        print('extra_display',name)
+        drecipes = extra_display[name]
+        for i,drecipe in enumerate(drecipes):
+            print(name,drecipe)
+            if len(drecipe['guidebook_page_whitelist']) != 0:
+                if name not in drecipe['guidebook_page_whitelist']:
+                    break
+            if len(drecipe['guidebook_page_blacklist']) != 0:
+                if name in drecipe['guidebook_page_blacklist']:
+                    break
+            if 'entity' in drecipe:
+                raise ValueError('no support for extra_display entity')
+            imgs=generates(drecipe['grid'],weldall=drecipe['weldall'],assertconnected=not drecipe['weldall'],matchblocks=drecipe['match_filter_modulo'],ratio=4)
+            _,h = gif.tuple_max((64*2, 0),*[img.size for img in imgs])
+            anim = gif.gif((0,0,0)) # the color is ignored
+            anim.addgifframes(
+                imgs,
+                pos=(0, 0)
+            )
+            result=[typing.cast(BlockDataIn, {"type":name,"rotate":0,"weld":noweld})]*drecipe['amount']
+            img=generates(typing.cast(list[list[BlockDataIn]], [*itertools.batched(result,2)]),ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
+            results.append({'anim':anim,'arrowsprite':itoarrow[drecipe['arrow_sprite']],'result':img})
     maxdim = tuple_max((0, 0),*[recipeimgs['anim'].getsize() for recipeimgs in results])
     y = 0
     for recipeimgs in results:
