@@ -55,10 +55,13 @@ def generates(grid1:list[list[BlockDataIn]],ratio:int,weldall:bool=True,matchblo
                 indices[i]=0 # roll over
             x,y,b=tags[i][indices[i]]
             grid[y][x]=b
-            if indices[i]!=0: # didn't roll over
+            if indices[i]!=0 and not matchblocks: # didn't roll over
                 break
         else:
-            break # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
+            if not matchblocks:
+                break # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
+            if indices[0] == 0:
+                break
     return ims
 
 def doublemap(f:Callable[[T1],T2],ll:list[list[T1]]) -> list[list[T2]]:
