@@ -76,6 +76,10 @@ def handlespecialblock(s:str) -> list[BlockDataIn]:
         return [assertblock(s)]
     except AssertionError:
         if s.split()[0] in ['any','non_air']:
+            nowater = False
+            if 'not_water' in s:
+                s = s.replace('not_water','')
+                nowater = True
             typ,filtertype,filtervalue = s.split()
             assert filtertype in ['needs_attribute','needs_collision']
             if filtertype == 'needs_attribute':
@@ -84,6 +88,8 @@ def handlespecialblock(s:str) -> list[BlockDataIn]:
                 blocks = getblocksbycollision(filtervalue)
             if typ == 'non_air':
                 blocks = [b for b in blocks if b != 'air']
+            if nowater:
+                blocks = [b for b in blocks if b != 'water']
             return typing.cast(list[BlockDataIn],blocks) # list[str] can't auto cast to list[str | other stuff]
         raise ValueError(f'"{s}" is not a block')
 
