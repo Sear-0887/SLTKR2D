@@ -28,7 +28,9 @@
             "guidebookArrowFile": "gameAssets/textures/hud.png",
             "guidebookArrowCordFile": "gameAssets/recipe_arrow_cord.smp",
             "blockDefsFile": "gameAssets/blockdefs.cc",
-            "recipesFile": "gameAssets/recipes.smp"
+            "recipesFile": "gameAssets/recipes.smp",
+            "entitiesFile": "gameAssets/entities.smp",
+            "entityTexturePathFolder": "gameAssets/textures"
         }
     },
     "TOKENPATH": "cred/client.env",
