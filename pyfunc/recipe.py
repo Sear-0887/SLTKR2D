@@ -293,6 +293,8 @@ def generaterecipe(name:str) -> None:
     y = 0
     for recipeimgs in results:
         _,h = recipeimgs['anim'].getsize()
+        _,h2 = recipeimgs['result'].size
+        h = max(h, h2)
         finimage.addgif(
             recipeimgs['anim'],
             pos = (0, y),
