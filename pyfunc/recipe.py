@@ -304,7 +304,7 @@ def generaterecipe(name:str) -> None:
         )
         finimage.addimageframes(
             getarrow(recipeimgs['arrowsprite']),
-            pos=(maxdim[0]+64, y+h//2)
+            pos=(maxdim[0]+64, y+h//2-32)
         )
         marginy = cfg("recipeSetting.recipeMarginY")
         assert isinstance(marginy, int)
