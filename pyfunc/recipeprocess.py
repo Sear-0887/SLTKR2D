@@ -352,15 +352,23 @@ for erecipe in dataval['extra_display']:
     erecipe['amount'] = product['amount']
     if isinstance(product['filter'],list):
         out = product['filter']
-    elif isinstance(product['filter'],dict):
-        out = [product['filter']['type']]
     else:
         out = [product['filter']]
     del erecipe['type']
     for p in out:
+        if isinstance(p,dict):
+            idx = p['type']
+        else:
+            idx = p
+        if len(erecipe['guidebook_page_whitelist']) != 0:
+            if idx not in erecipe['guidebook_page_whitelist']:
+                continue
+        if len(erecipe['guidebook_page_blacklist']) != 0:
+            if idx in erecipe['guidebook_page_blacklist']:
+                continue
         erecipe = copy.deepcopy(erecipe)
         erecipe['product'] = p
-        extra_display[p].append(erecipe)
+        extra_display[idx].append(erecipe)
 
 for srecipe in dataval['summonore_pill']:
     if isinstance(srecipe['filter'],list):
