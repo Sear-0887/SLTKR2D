@@ -13,6 +13,7 @@ from pyfunc.block import canweld, get, makeimage, bottomtypes, topbottomtypes, s
 import itertools
 import logging
 from pyfunc.recipeprocess import heat, extract, inject, combine, extra_display, summonore_pill
+from pyfunc.assetload import entities
 
 T1 = TypeVar('T1')
 T2 = TypeVar('T2')
@@ -259,8 +260,6 @@ def generaterecipe(name:str) -> None:
         print('extra_display',drecipes)
         for i,drecipe in enumerate(drecipes):
             print(name,drecipe)
-            if 'entity' in drecipe:
-                raise ValueError('no support for extra_display entity')
             try:
                 imgs=generates(drecipe['grid'],weldall=drecipe['weldall'],assertconnected=not drecipe['weldall'],matchblocks=drecipe['match_filter_modulo'],ratio=4)
             except: # bad i need a specific
@@ -272,6 +271,16 @@ def generaterecipe(name:str) -> None:
                 imgs,
                 pos=(0, 0)
             )
+            if 'entity' in drecipe:
+                entity = drecipe['entity']
+                texpath = os.path.join(cfgstr('localGame.texture.entityTexturePathFolder'),entities[entity['type']]['texture'])
+                im = PIL.Image.open(texpath).convert('RGBA').crop((0,0,16,16)).resize((16 * 4, 16 * 4))
+                x, y = entity['position']
+                print('entity',texpath,x,y)
+                anim.addgifframes(
+                    [im],
+                    pos=(x * 16, y * 16)
+                )
             product = drecipe['product']
             print('product',name,product)
             if isinstance(product,list):
