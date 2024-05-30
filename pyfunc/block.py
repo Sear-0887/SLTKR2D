@@ -544,6 +544,16 @@ def counter(data:BlockData) -> Image:
 def wiresetting(data:BlockData) -> Image:
 	raise NotImplemented
 
+def sparkcatcherfilter(data:BlockData) -> BlockData:
+	if 'data' in data:
+		i = int(data['data'])
+		x = i % 8
+		y = i // 8
+		assert y >= 0 and y < 2
+		data['overlayoffsetx'] = 32 + x * 16
+		data['overlayoffsety'] = y * 16
+	return data
+
 blocktypes:collections.defaultdict[str,BlockDesc]=collections.defaultdict(blockdesc)
 
 for t in norotatetypes:
@@ -581,6 +591,9 @@ blocktypes['counter']['layers']=[wafer,wire,counter]
 blocktypes['wire_board']['layers']=[wafer,wire]
 blocktypes['wire']['layers']=[frame,wire]
 blocktypes['frame']['layers']=[frame]
+
+blocktypes['spark_catcher']['datafilters']=[sparkcatcherfilter]
+blocktypes['spark_catcher']['layers']=[defaultblock,overlay]
 
 # rotate an image of a block by rotate
 def rotateblockib(im:Image,rotate:int) -> Image:
