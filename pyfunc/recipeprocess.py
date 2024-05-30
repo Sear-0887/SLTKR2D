@@ -23,7 +23,7 @@ tags:dict[str,Tag]={}
 def fixemptygrid(g:str|list[list[BlockDataIn]]) -> list[list[BlockDataIn]]:
     if isinstance(g,str):
         if g == '':
-            return [[]]
+            return [['air']]
         else:
             raise ValueError('bad grid')
     return g
