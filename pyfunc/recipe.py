@@ -286,7 +286,7 @@ def generaterecipe(name:str) -> None:
             if isinstance(product,list):
                 # pick one
                 product = [p for p in product if isinstance(p,str) and p == name or p['type'] == name][0]
-            result=[typing.cast(BlockDataIn, product)]*drecipe['amount']
+            result=[{**normalize(product),'weld':noweld}]*drecipe['amount']
             img=generates(typing.cast(list[list[BlockDataIn]], [*itertools.batched(result,2)]),ratio=4,assertconnected=False)[0] # batched makes 2 columns automatically
             results.append({'anim':anim,'arrowsprite':itoarrow[drecipe['arrow_sprite']],'result':img})
     maxdim = tuple_max((0, 0),*[recipeimgs['anim'].getsize() for recipeimgs in results])
