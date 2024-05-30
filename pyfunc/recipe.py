@@ -278,7 +278,7 @@ def generaterecipe(name:str) -> None:
                 print('entity',texpath,x,y)
                 anim.addgifframes(
                     [im],
-                    pos=(x * 16, y * 16)
+                    pos=((x - 1) * 64, (y - 1) * 64)
                 )
             product = drecipe['product']
             print('product',name,product)
