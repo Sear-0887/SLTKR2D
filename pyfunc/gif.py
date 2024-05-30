@@ -83,10 +83,20 @@ class gif:
         
     def addgif(self, newgif:Self, pos:vec2=(0, 0)) -> Self: # ignore the background of newgif
         print(f"GIF adding gif at pos {pos}")
-        if len(self.framelist) < len(newgif.framelist):
-            for _ in range( len(newgif.framelist) - len(self.framelist) ):
-                self.addframe()
-        for i in range(len(newgif.framelist)):
+        if len(self.framelist) == 0:
+            self.addframe()
+        giflist = newgif.framelist
+        ogiflist=[*giflist]
+        oframelist=[*self.framelist]
+        while len(self.framelist) != len(giflist):
+            print(len(self.framelist),len(giflist))
+            if len(self.framelist) > len(giflist):
+                l.debug("Adding giflist")
+                giflist += [*ogiflist]
+            elif len(self.framelist) < len(giflist):
+                l.debug("Adding framelist")
+                self.framelist += [copygifframe(f) for f in oframelist]
+        for i in range(len(giflist)):
             gifframe, selfframe = newgif.framelist[i], self.framelist[i]
             if selfframe is None: return
             selfframe.addgifframe(gifframe, pos)
