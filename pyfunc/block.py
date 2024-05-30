@@ -665,11 +665,14 @@ def normalize(block:BlockDataIn) -> BlockData:
 	typ = typ.lower()
 	if typ == 'nic':
 		typ = 'air'
-	return {
+	out = {
 		"type":typ,
 		"rotate":rotate,
 		"weld":weld2,
 	}
+	if isinstance(block,dict):
+		out.update(block)
+	return out
 
 # get a block from a grid
 # if the coordinates are outside the grid, return air
