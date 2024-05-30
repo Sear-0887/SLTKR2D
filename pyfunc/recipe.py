@@ -265,7 +265,6 @@ def generaterecipe(name:str) -> None:
             except: # bad i need a specific
                 print('bad',drecipe['grid'])
             imgs=generates(drecipe['grid'],weldall=drecipe['weldall'],assertconnected=False,matchblocks=drecipe['match_filter_modulo'],ratio=4)
-            _,h = gif.tuple_max((64*2, 0),*[img.size for img in imgs])
             anim = gif.gif((0,0,0)) # the color is ignored
             anim.addgifframes(
                 imgs,
