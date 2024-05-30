@@ -31,16 +31,22 @@ fullweld = (makeweldside(True),) * 4
 
 def generates(grid1:list[list[BlockDataIn]],ratio:int,weldall:bool=True,matchblocks:bool=False,assertconnected:bool=True) -> list[Image.Image]:
     tags=[]
-    grid:list[list[BlockData]] = [[b for b in row] for row in grid1]
-    for y,row in enumerate(grid1):
-        for x,block in enumerate(row):
-            if isinstance(block, list): # If it's a list, it's a tag, which
-                tags.append([(x,y,normalize(t)) for t in block])
-                grid[y][x] = normalize(block[0]) # Actions
-            elif isinstance(block, str): # It's normal and needed to NORMALIZE
-                grid[y][x] = normalize(block) # Actions
-            if not weldall:
-                grid[y][x]['weldablesides'] = noweld
+    def normlist(block:BlockDataIn,x:int,y:int,weldall:bool) -> BlockData | list[BlockData]:
+        if isinstance(block, list): # If it's a list, it's a tag, which
+            tags.append([(x,y,normalize(t)) for t in block])
+            out = normalize(block[0]) # Actions
+        else: # It's normal and needed to NORMALIZE
+            out = normalize(block) # Actions
+        if not weldall:
+            out['weld'] = noweld
+        return out
+    grid:list[list[BlockData | list[BlockData]]] = [
+        [
+            normlist(b,x,y,weldall)
+            for x,b in 
+            enumerate(row)
+        ] for y,row in enumerate(grid1)
+    ]
     # now have a list of tags and coordinates
     ims=[]
     indices=[0 for _ in tags]
@@ -60,7 +66,7 @@ def generates(grid1:list[list[BlockDataIn]],ratio:int,weldall:bool=True,matchblo
         else:
             if not matchblocks:
                 break # all rolled over to 0 # back to the start again # but if you close your eyes, does it almost feel like we've been here before?
-            if indices[0] == 0:
+            elif indices[0] == 0:
                 break
     return ims
 
