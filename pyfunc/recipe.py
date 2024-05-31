@@ -81,7 +81,9 @@ def genimage(generated:list[list[BlockData]],assertconnected:bool=True) -> Image
     rotations=[]
     for y,row in enumerate(generated):
         for x,block in enumerate(row):
-            if block in norotatetypes:
+            if not assertconnected:
+                continue
+            elif block in norotatetypes:
                 continue
             elif block['type'] not in bottomtypes+topbottomtypes+sidestypes+notoptypes:
                 print(f'block {block["type"]} at {x},{y} welds on all sides, does not rotate')
