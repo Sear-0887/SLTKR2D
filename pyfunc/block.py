@@ -536,13 +536,13 @@ def wirecomponent(data:BlockData) -> BlockData:
 	return data
 
 def counterfilter(data:BlockData) -> BlockData:
-	raise NotImplemented
+	raise NotImplementedError('counterfilter')
 
 def counter(data:BlockData) -> Image:
-	raise NotImplemented
+	raise NotImplementedError('counter')
 
 def wiresetting(data:BlockData) -> Image:
-	raise NotImplemented
+	raise NotImplementedError('wiresetting')
 
 def sparkcatcherfilter(data:BlockData) -> BlockData:
 	if 'data' in data:
