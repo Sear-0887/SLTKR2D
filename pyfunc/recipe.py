@@ -38,6 +38,8 @@ def generates(grid1:list[list[BlockDataIn]],ratio:int,weldall:bool=True,matchblo
             out = normalize(block[0]) # Actions
         else: # It's normal and needed to NORMALIZE
             out = normalize(block) # Actions
+        if weldall:
+            out['weld'] = fullweld
         if not weldall:
             out['weld'] = noweld
         return out
