@@ -261,11 +261,7 @@ def generaterecipe(name:str) -> None:
         drecipes = extra_display[name]
         print('extra_display',drecipes)
         for i,drecipe in enumerate(drecipes):
-            print(name,drecipe)
-            try:
-                imgs=generates(drecipe['grid'],weldall=drecipe['weldall'],assertconnected=not drecipe['weldall'],matchblocks=drecipe['match_filter_modulo'],ratio=4)
-            except: # bad i need a specific
-                print('bad',drecipe['grid'])
+            print(name,drecipe,drecipe['weldall'])
             imgs=generates(drecipe['grid'],weldall=drecipe['weldall'],assertconnected=False,matchblocks=drecipe['match_filter_modulo'],ratio=4)
             anim = gif.gif((0,0,0)) # the color is ignored
             anim.addgifframes(
