@@ -427,6 +427,19 @@ def overlay(data:BlockData) -> Image:
 	im2=rotateoverlayib(im2,rotate)
 	return im2
 
+def overlay2(data:BlockData) -> Image:
+	rotate=data['rotate']
+	im=getblocktexture({
+		**data,
+		'offsetx':data.get('overlay2offsetx',0),
+		'offsety':data.get('overlay2offsety',0),
+		'sizex':16,
+		'sizey':16,
+	})
+	im2 = Image()
+	im2.addimagebit(ImageBit(im,0,0,16,16),0,0)
+	return im2
+
 def wafer(data:BlockData) -> Image:
 	return defaultblock({**data,'type':'wafer'})
 
@@ -524,9 +537,29 @@ def wirecomponent(data:BlockData) -> BlockData:
 			data['overlayoffsetx']=16 if bdata['outstate']=='on' else 0
 			data['data']=bdata['instate'] or 'off'
 		elif typ=="potentiometer": # the rest have a setting
-			pass
+			print('AAAAAAAAAAAAAAAAAAAAAAAAAAA',repr(data['data']))
+			bdata=re.fullmatch('(?P<power>[1-9]|1[0-5])(?P<instate>on|off)?(?P<state>on|off)',data['data'])
+			if bdata is None:
+				raise ValueError('bad value format')
+			power = int(bdata['power']) - 1
+			x = power % 8
+			y = power // 8
+			data['overlayoffsetx']=16 if bdata['state']=='on' else 0
+			data['overlay2offsetx'] = 16 * (x + 2)
+			data['overlay2offsety'] = 16 * y
+			data['data']=bdata['instate'] or 'off'
 		elif typ=="sensor":
-			pass
+			print('AAAAAAAAAAAAAAAAAAAAAAAAAAA',data['data'])
+			bdata=re.fullmatch('(?P<setting>[1-9]|1[0-4])(?P<state>on|off)?',data['data'])
+			if bdata is None:
+				raise ValueError('bad value format')
+			setting = int(bdata['setting'])
+			x = setting % 8
+			y = setting // 8
+			data['overlayoffsety']=16 if bdata['state']=='on' else 0
+			data['overlay2offsetx'] = 16 * (x + 1)
+			data['overlay2offsety'] = 16 * y
+			data['data']=bdata['state'] or 'off'
 		elif typ=="cascade":
 			# delay, in, out
 			bdata=re.fullmatch('(?P<delay>[1-7])(?P<instate>on|off)?(?P<state>on|off)',data['data'])
@@ -540,9 +573,6 @@ def counterfilter(data:BlockData) -> BlockData:
 
 def counter(data:BlockData) -> Image:
 	raise NotImplementedError('counter')
-
-def wiresetting(data:BlockData) -> Image:
-	raise NotImplementedError('wiresetting')
 
 def sparkcatcherfilter(data:BlockData) -> BlockData:
 	if 'data' in data:
@@ -582,8 +612,8 @@ for t in wiretypes:
 	blocktypes[t]['layers']=[frame,wire,wiretop]
 	blocktypes[t]['datafilters'].append(wirecomponent)
 
-for t in ["potentiometer","sensor"]:
-	blocktypes[t]['layers']=[frame,wire,wiretop,wiresetting]
+blocktypes['potentiometer']['layers'].append(overlay2)
+blocktypes['sensor']['layers'].append(overlay2)
 
 blocktypes['counter']['datafilters'].append(counterfilter)
 blocktypes['counter']['layers']=[wafer,wire,counter]
