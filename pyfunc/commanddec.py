@@ -42,7 +42,7 @@ async def ErrorHandler(name:str, e:BaseException, args:tuple[typing.Any], kwargs
         elif interaction is not None:
             await interaction.response.send_message(msg)
         else:
-            logging.error("something terrible has occurred! there's neither a context nor an interaction!")
+            logging.error("Something terrible has occurred! there's neither a context nor an interaction!")
     # handle the error e
     # from a function call f(ctx,*args,**kwargs)
     # print a message with cool colors to the console
@@ -50,13 +50,12 @@ async def ErrorHandler(name:str, e:BaseException, args:tuple[typing.Any], kwargs
     errortype = repr(type(e)).split("\'")[1] # <class '[KeyError]'>
     replacingerror = evl(f"{name}.error.{errortype}")
     if replacingerror:
-        l.info(f"Other Error Message found for {name}: {replacingerror}")
+        l.debug(f"Other Error Message found for {name}: {replacingerror}")
         expecterr = replacingerror
     assert isinstance(expecterr,str)
     try:
         l.debug(f"{e.args=}")
         eargs = e.args[0]
-        l.info(eargs)
         if isinstance(eargs, str):
             expecterr = expecterr.format(*args, e=eargs, **kwargs)
         elif isinstance(eargs, list):
@@ -91,31 +90,31 @@ f'''
     elif interaction is not None:
         guild = interaction.guild
         author = interaction.user
-        trigger = "<INTERACTION>"
+        trigger: nextcord.interactions.InteractionMessage = await interaction.original_message().clean_content
     else:
         guild = None
         author = None
         trigger = "<NONE!!!>"
-        logging.error("something terrible has occurred! there's neither a context nor an interaction!")
+        # Duped Error
 
     if author is not None:
         author_display_name = author.display_name
         author_global_name = author.global_name
         author_id = author.id
     else:
-        author_display_name = '<NO AUTHOR>'
-        author_global_name = '<NO AUTHOR>'
+        author_display_name = '<AUTHOR MISSING>'
+        author_global_name = '<AUTHOR MISSING>'
         author_id = 0
 
     if guild is not None:
         guild_name = guild.name
     else:
-        guild_name = '<NO GUILD>'
+        guild_name = '<GUILD MISSING>'
 
     excstrs = [str(e)]
     while (e.__context__ or e.__cause__) is not None:
         e2 = e.__context__ or e.__cause__
-        assert e2 is not None # seriously mypy?
+        assert e2 is not None # seriously mypy? eh.
         e = e2
         excstrs = [str(e),*excstrs]
 
@@ -198,7 +197,7 @@ def InteractionCogCommand_Local(name:str) -> typing.Callable[[CmdType],NCmdType]
     def trycmd(cmd:CmdType) -> CmdType:
         return decorator.decorate(cmd,_trycmd)
     def fixcmd(cmd:CmdType) -> NCmdType:
-        guild_ids = cfg("botInfo.localICCServer")
+        guild_ids: list = cfg("botInfo.localICCServer")
         assert isinstance(guild_ids,list)
         desc = evl(f"{name}.desc") or "*No Description.*"
         assert isinstance(desc,str)
