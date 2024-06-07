@@ -85,8 +85,7 @@ def apply_normalmap(albedo:PIL.Image.Image, normal:PIL.Image.Image | None, rotat
 	alpha:PIL.Image.Image = albedo.getchannel('A')
 	color:PIL.Image.Image = albedo.convert('RGB')
 	diffused:PIL.Image.Image = PIL.ImageChops.multiply(color, lightim)
-	out:PIL.Image.Image
-	out = diffused
+	out:PIL.Image.Image = diffused
 
 	if block_id in rimlights:
 		highlights:np.ndarray = calc_highlights(lightdir, normal_array, rimlights[block_id]);
@@ -515,13 +514,13 @@ def wirecomponent(data:BlockData) -> BlockData:
 	return data
 
 def counterfilter(data:BlockData) -> BlockData:
-	raise NotImplemented
+	raise NotImplementedError
 
 def counter(data:BlockData) -> Image:
-	raise NotImplemented
+	raise NotImplementedError
 
 def wiresetting(data:BlockData) -> Image:
-	raise NotImplemented
+	raise NotImplementedError
 
 blocktypes:collections.defaultdict[str,BlockDesc]=collections.defaultdict(blockdesc)
 

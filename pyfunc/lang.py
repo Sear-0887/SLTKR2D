@@ -14,7 +14,6 @@ import json
 from datetime import datetime
 import glob
 import re
-from dotenv import dotenv_values
 import collections
 from typing import Any, TextIO, TypedDict
 
@@ -129,8 +128,8 @@ def cfgstr(target:str) -> str:
     assert isinstance(base,str)
     return base
 
-def opencfg(target:str, *args:Any, **kwargs:Any) -> TextIO:
-    return open(cfgstr(target), *args, **kwargs)
+def opencfg(target:str, *args:Any, encoding:str|None="utf-8", **kwargs:Any) -> TextIO:
+    return open(cfgstr(target), *args, encoding=encoding, **kwargs)
 
 def cfg(target:str) -> int | str | list | dict:
     if config is None: loadconfig()
@@ -142,7 +141,7 @@ def cfg(target:str) -> int | str | list | dict:
     return base
 
 def loademoji() -> None:
-    with opencfg("infoPath.emojiInfoPath", encoding="utf-8") as f:
+    with opencfg("infoPath.emojiInfoPath") as f:
         global emojidict
         emojidict = json.load(f)
 
@@ -153,23 +152,23 @@ def replacemoji(tar:str) -> str:
     return tar
 
 def getdevs() -> None:
-    with opencfg("infoPath.devInfoPath", encoding="utf-8") as f:
+    with opencfg("infoPath.devInfoPath") as f:
         global devs
         devs = json.load(f)
         
 def getpresense() -> None:
-    with opencfg("infoPath.presenseInfoPath", encoding="utf-8") as f:
+    with opencfg("infoPath.presenseInfoPath") as f:
         global presensemsg
         presensemsg = json.load(f)
 
 def getkws() -> None: 
-    with opencfg("infoPath.kwInfoPath", encoding="utf-8") as f:
+    with opencfg("infoPath.kwInfoPath") as f:
         global keywords
         keywords = json.load(f)
 
 def getarrowcoords() -> dict[str, tuple[int, int]]:
     racord:dict[str, tuple[int, int]] = {}
-    with opencfg("localGame.texture.guidebookArrowCordFile", encoding="utf-8") as f:
+    with opencfg("localGame.texture.guidebookArrowCordFile") as f:
         data=getsmpvalue(f.read())
     assert isinstance(data,dict)
     for icon,xy in data.items():
