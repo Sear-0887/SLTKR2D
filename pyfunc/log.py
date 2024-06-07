@@ -1,7 +1,7 @@
 import yaml
 import logging
 import os
-from pyfunc.lang import opencfg
+from pyfunc.lang import opencfg, cfg
 import logging.config
 
 def LoggerInit() -> None:
