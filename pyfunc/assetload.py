@@ -22,7 +22,7 @@ modifiers={
 
 blockdefregex = 'BLOCK_DEF\\((?P<name>[a-z_]+),(?P<collision>collision::[a-z_]+(\\|collision::[a-z_]+)*),(?P<attr>atb::[a-z_]+(\\|atb::[a-z_]+)*),0b(?P<weld>\\d\\d\\d\\d),(?P<weldtime>\\d+)\\)'
 def getblockdefs() -> None:
-    with opencfg("localGame.texture.blockDefsFile", encoding="utf-8") as f:
+    with opencfg("localGame.texture.blockDefsFile") as f:
         data = f.read()
     for line in data.split('\n'):
         line = ''.join(line.split()) # remove spaces
@@ -48,7 +48,7 @@ def getblockdefs() -> None:
             blockinfos[name]['weldablesides'] = top,left,bottom,right
 
 def getblockids() -> None:
-    with opencfg("localGame.texture.blockIDFile", encoding="utf-8") as f:
+    with opencfg("localGame.texture.blockIDFile") as f:
         data=smp.getsmpvalue(f.read())
     assert isinstance(data,dict)
     for name,i in data.items():
@@ -57,7 +57,7 @@ def getblockids() -> None:
         idtoblock[int(i)] = name
 
 def geticoncoords() -> None:
-    with opencfg("localGame.texture.iconLocationFile", encoding="utf-8") as f:
+    with opencfg("localGame.texture.iconLocationFile") as f:
         data=smp.getsmpvalue(f.read())
     assert isinstance(data,dict)
     for icon,xy in data.items():
@@ -65,32 +65,32 @@ def geticoncoords() -> None:
         x,y=xy.split(',')
         blockinfos[icon]["iconcoord"] = (int(x), int(y))
 
-def substitutelocale(s:str) -> str:
+def substitutelocale(locale:str) -> str:
     # substitute locale entries into others
     # used in descriptions
     # a reference is {category name|mods}
     # mods is optional and is a string containing one or more of ^, s, or d
-    i=0 # the index to look for the next opening bracket at
-    while '{' in s[i:]:
-        i1=s.index('{',i)
-        i2=s.find('}',i1)
-        if i2==-1: # there is no closing bracket
+    lastob = 0 # the index to look for the next opening bracket at
+    while '{' in locale[lastob:]:
+        i_ob = locale.index('{',start=lastob)
+        i_cb = locale.find('}', start=i_ob)
+        if i_cb==-1: # there is no closing bracket
             break
-        p1=s[:i1]
-        p2=s[i1+1:i2]
-        p3=s[i2+1:]
-        i=i1+1
-        if '|' in p2:
-            p2,modifier=p2.split('|',maxsplit=1)
+        before=locale[:i_ob]
+        middle=locale[i_ob+1:i_cb]
+        after=locale[i_cb+1:]
+        lastob=i_ob+1
+        if '|' in middle:
+            middle,modifier=middle.split('|',maxsplit=1)
         else:
             modifier=''
-        key=tuple(part.strip() for part in p2.split())
+        key=tuple(part.strip() for part in middle.split())
         if key in locale:
             localized=locale[key]
             for mod in modifier:
                 localized=modifiers[mod](localized)
-            s=p1+localized+p3
-    return s
+            locale=before+localized+after
+    return locale
 
 def getlocale() -> None:
     # get locale entries from config.local_game.language_path
