@@ -58,10 +58,9 @@ class Block(commands.Cog):
                 #   block#weld     set welded sides
                 #   block#dirweld  set both
                 #   #block         no weld
+                #   any:data       data for block (setting / state)
                 # welded sides is 4x 0 or 1 in the order right bottom left top
                 # dir is eswn
-                # all block can have :data after it
-                # data is block specific
                 match=re.fullmatch('(?:(?:([^]#:]+)(?:#([eswn])?([01]{4})?)?)|#([^]]+))(?::([^]]+))?',b)
                 if match is None:
                     raise Exception(f'Invalid block: {b}')
@@ -86,19 +85,20 @@ class Block(commands.Cog):
         embed = nextcord.Embed()
         embed.title = f"{width//16}x{height//16} Image"
         embed.set_image(url="attachment://f.png")
-        iterdic = dict(sorted(blocklist.items(), key=lambda item: item[1], reverse=True))
-        materialist = ', '.join([f"{count} {block}" for block, count in iterdic.items()])
+
+        sortedblocks = sorted(blocklist.items(), key=lambda item: item[1], reverse=True)
+        materialist = ', '.join([f"{count} {block}" for block, count in sortedblocks if block != 'air']) # don't want to count air
         if len(materialist) <= 1024:
             embed.add_field(name="Material List", value=materialist)
-            await ctx.send(embed=embed, file=nextcord.File("cache/blocks.png", filename="f.png"))
+            await ctx.send(embed=embed, file=nextcord.File("cache/blocks.png", filename="image.png"))
         else:
-            with open("cache/materialist.txt", "w") as f:
+            with open("cache/materialist.txt", "w") as f: # of course, we're assuming that the list is less than 8mb ;)
                 f.write(materialist.replace(", ", ", \n"))
             embed.add_field(name="Material List", value="*Please Refer to `material_list.txt` for the material list.*")
             await ctx.send(
                 embed=embed, 
                 files=[
-                    nextcord.File("cache/blocks.png", filename="f.png"),
+                    nextcord.File("cache/blocks.png", filename="image.png"),
                     nextcord.File("cache/materialist.txt", filename="material_list.txt")
                 ]
             )
