@@ -9,7 +9,7 @@ vec2:TypeAlias = tuple[int,int]
 
 class gif_frame:
     def __init__(self, image:Image.Image | None=None) -> None:
-        self.images: list[tuple[Image.Image, tuple[int, int]]] = []
+        self.images: list[tuple[Image.Image, vec2]] = []
         if image is not None:
             self.addimage(image)
         
@@ -26,6 +26,13 @@ class gif_frame:
             copy.alpha_composite(i, pos)
         copy = copy.crop(copy.getbbox())
         return copy
+    
+    def getsize(self) -> vec2:
+        return tuple_max((0, 0),*[
+            (im.width + x, im.height + y)
+            for im,(x,y) in
+            self.images
+        ])
 
 def copygifframe(f:gif_frame) -> gif_frame:
     f2 = gif_frame()
@@ -76,10 +83,20 @@ class gif:
         
     def addgif(self, newgif:Self, pos:vec2=(0, 0)) -> Self: # ignore the background of newgif
         print(f"GIF adding gif at pos {pos}")
-        if len(self.framelist) < len(newgif.framelist):
-            for _ in range( len(newgif.framelist) - len(self.framelist) ):
-                self.addframe()
-        for i in range(len(newgif.framelist)):
+        if len(self.framelist) == 0:
+            self.addframe()
+        giflist = newgif.framelist
+        ogiflist=[*giflist]
+        oframelist=[*self.framelist]
+        while len(self.framelist) != len(giflist):
+            print(len(self.framelist),len(giflist))
+            if len(self.framelist) > len(giflist):
+                l.debug("Adding giflist")
+                giflist += [*ogiflist]
+            elif len(self.framelist) < len(giflist):
+                l.debug("Adding framelist")
+                self.framelist += [copygifframe(f) for f in oframelist]
+        for i in range(len(giflist)):
             gifframe, selfframe = newgif.framelist[i], self.framelist[i]
             if selfframe is None: return
             selfframe.addgifframe(gifframe, pos)
@@ -105,7 +122,11 @@ class gif:
             bge = Image.new("RGBA", im.size, self.defaultbg)
             bge.alpha_composite(im)
             framel.append(bge)
+        # for i,fi in enumerate(framel):
+        #     fi.save(pth+f'-{i}.png', format="PNG")
         framel[0].save(pth, format="GIF", save_all=True, append_images=framel[1:], loop=0, disposal=2, duration=duration)
         if apng:
             framel[0].save(pth.replace(".gif", ".apng"), save_all=True, append_images=framel[1:], loop=0, disposal=2, duration=duration)
     
+    def getsize(self) -> vec2:
+        return tuple_max((0, 0),*[f.getsize() for f in self.framelist])

@@ -12,6 +12,8 @@ blockinfos:dict[str, dict[str, Any]] = collections.defaultdict(dict)
 
 locale:dict[tuple[str, ...], str] = {}
 
+entities = {}
+
 modifiers={
     '^':capitalize,
     's':plural,
@@ -117,8 +119,15 @@ def getlocale() -> None:
     for tkey,s in locale.items():
         locale[tkey]=substitutelocale(s)
 
+def getentities() -> None:
+    with opencfg("localGame.texture.entitiesFile", encoding="utf-8") as f:
+        data=smp.getsmpvalue(f.read())
+    for name,entity in data.items():
+        entities[name]={'texture':entity['texture']}
+
 def assetinit() -> None:
     getblockids()
     getblockdefs()
     geticoncoords()
     getlocale()
+    getentities()
