@@ -42,7 +42,7 @@ class Block(commands.Cog):
 
     @CogCommand("image")
     async def image(self,ctx:commands.Context, *, build:str="[[16][20]][[16][16]]") -> None:
-        blocklist:dict[str, int] = collections.defaultdict(int)
+        blocklist:dict[str, int] = collections.defaultdict(int) # count of each type of block
         blocks:list[list[BlockDataIn]]=typing.cast(list[list[BlockDataIn]],smp.getsmpvalue(build))
         for y,row in enumerate(blocks):
             for x,b in enumerate(row):
