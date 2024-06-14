@@ -94,7 +94,6 @@ def apply_normalmap(albedo:PIL.Image.Image, normal:PIL.Image.Image | None, rotat
 	if block_id in rimlights:
 		highlights:np.ndarray = calc_highlights(lightdir, normal_array, rimlights[block_id]);
 		highlights = clamp(highlights)
-		highlights = highlights * 255
 		highlights = highlights.astype('uint8')
 		highlightsim:PIL.Image.Image = PIL.Image.fromarray(highlights)
 		out = PIL.ImageChops.add(out,highlightsim)
