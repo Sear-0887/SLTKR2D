@@ -38,7 +38,7 @@ class Block(commands.Cog):
 
             await ctx.send(file=nextcord.File("cache/blockim.png", filename="blockim.png"), embed=embed)
         else:
-            await self.block(ctx, str(random.choice([*idtoblock.keys()])))
+            await self.block(ctx, block = str(random.choice([*idtoblock.keys()])))
 
     @CogCommand("image")
     async def image(self,ctx:commands.Context, *, build:str="[[16][20]][[16][16]]") -> None:
@@ -84,7 +84,7 @@ class Block(commands.Cog):
         
         embed = nextcord.Embed()
         embed.title = f"{width//16}x{height//16} Image"
-        embed.set_image(url="attachment://f.png")
+        embed.set_image(url="attachment://image.png")
 
         sortedblocks = sorted(blocklist.items(), key=lambda item: item[1], reverse=True)
         materialist = ', '.join([f"{count} {block}" for block, count in sortedblocks if block != 'air']) # don't want to count air
