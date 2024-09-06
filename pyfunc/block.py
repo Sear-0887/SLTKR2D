@@ -17,6 +17,9 @@ rimlights:dict[int, np.ndarray] = {}
 
 vec3:typing.TypeAlias = tuple[float, float, float]
 
+def clamp(a:np.ndarray) -> np.ndarray:
+	return np.fmin(np.fmax(a, 0.0), 1.0) # overflow error
+
 def dot(normal:np.ndarray, light:vec3) -> np.ndarray:
 	return np.einsum('ijk,k->ij',normal,light)
 
@@ -38,7 +41,7 @@ def quarter_rotate(v:vec3, r:int) -> vec3:
 def calc_diffuse_ambient_light(lightdir:vec3, normal:np.ndarray) -> np.ndarray:
 	# calculate diffuse light
 	light_diffuse = diffuse(normal, lightdir)
-	return np.fmin(light_diffuse * 0.5 + 0.5, 1.0) # overflow error
+	return light_diffuse * 0.5 + 0.5
 
 def calc_highlights(lightdir:vec3, normal:np.ndarray, rimlight:np.ndarray) -> np.ndarray:
 	lightdir2 = (lightdir[0], lightdir[1], 0)
@@ -47,11 +50,11 @@ def calc_highlights(lightdir:vec3, normal:np.ndarray, rimlight:np.ndarray) -> np
 	highlights = np.empty((s0,s1,3))
 	for i in range(s0):
 		for j in range(s1):
-			pixel = rimlight[int(255 * (intensity[i, j] + 1) / 2)]
+			pixel = rimlight[int(255 * clamp((intensity[i, j] + 1) / 2))]
 			highlights[i, j] = tuple(c * 0.3 for c in pixel)
 	return highlights
 
-fullbright_lightdir = (-0.5, -1.0, 1.0)
+fullbright_lightdir = (-0.5, 1.0, 1.0)
 
 def apply_normalmap(albedo:PIL.Image.Image, normal:PIL.Image.Image | None, rotation:int, block_id:int, flip:bool) -> PIL.Image.Image:
 	# rotate the light so when the block is rotated back the light is in the right direction
@@ -78,6 +81,7 @@ def apply_normalmap(albedo:PIL.Image.Image, normal:PIL.Image.Image | None, rotat
 	light = calc_diffuse_ambient_light(lightdir, normal_array)
 	light = np.array([light, light, light])
 	light = np.moveaxis(light, 0, 2)
+	light = clamp(light)
 	light = light * 255
 	light = light.astype('uint8')
 	lightim:PIL.Image.Image = PIL.Image.fromarray(light)
@@ -89,6 +93,7 @@ def apply_normalmap(albedo:PIL.Image.Image, normal:PIL.Image.Image | None, rotat
 
 	if block_id in rimlights:
 		highlights:np.ndarray = calc_highlights(lightdir, normal_array, rimlights[block_id]);
+		highlights = clamp(highlights)
 		highlights = highlights * 255
 		highlights = highlights.astype('uint8')
 		highlightsim:PIL.Image.Image = PIL.Image.fromarray(highlights)
@@ -215,7 +220,7 @@ class Image:
 			out.alpha_composite(pim, (int(x - pim.width / 2), int(y - pim.height / 2)))
 		return out
 
-class BlockData(typing.TypedDict):
+class BlockDataLoose(typing.TypedDict):
 	type:str
 	rotate:typing.NotRequired[int]
 	weld:typing.NotRequired[WeldSides]
@@ -227,7 +232,19 @@ class BlockData(typing.TypedDict):
 	sizex:typing.NotRequired[int]
 	sizey:typing.NotRequired[int]
 
-BlockDataIn: typing.TypeAlias = BlockData | str | tuple | list
+class BlockData(typing.TypedDict):
+	type:str
+	rotate:int
+	weld:WeldSides
+	data:typing.NotRequired[str]
+	offsetx:typing.NotRequired[int]
+	offsety:typing.NotRequired[int]
+	overlayoffsetx:typing.NotRequired[int]
+	overlayoffsety:typing.NotRequired[int]
+	sizex:typing.NotRequired[int]
+	sizey:typing.NotRequired[int]
+
+BlockDataIn: typing.TypeAlias = BlockDataLoose | str | tuple | list
 
 class BlockDesc(typing.TypedDict):
 	wired:bool
@@ -263,9 +280,13 @@ for name,texture in data.items():
 
 @functools.cache
 def getblockims(block:str) -> tuple[PIL.Image.Image,PIL.Image.Image | None]:
-	try:
-		normal = PIL.Image.open(os.path.join(cfgstr("localGame.texture.texturePathFolder"),blockpaths[block]['normal'])).convert('RGBA')
-	except FileNotFoundError:
+	if 'normal' in blockpaths[block]:
+		try:
+			print(block,blockpaths[block])
+			normal = PIL.Image.open(os.path.join(cfgstr("localGame.texture.texturePathFolder"),blockpaths[block]['normal'])).convert('RGBA')
+		except FileNotFoundError:
+			normal = None
+	else:
 		normal = None
 	return (
 		PIL.Image.open(os.path.join(cfgstr("localGame.texture.texturePathFolder"),blockpaths[block]['albedo'])).convert('RGBA'),
@@ -366,7 +387,7 @@ def _getblocktexture(block:str,offsetx:int,offsety:int,sizex:int,sizey:int) -> I
 	im1, im2 = getblockims(block)
 	return ImageBit((im1,im2),offsetx,offsety,offsetx+sizex,offsety+sizey,blockinfos[block]['id'])
 
-def getblocktexture(data:BlockData) -> ImageBit:
+def getblocktexture(data:BlockDataLoose) -> ImageBit:
 	block=data['type']
 	offsetx=data.get('offsetx',0) or 0
 	offsety=data.get('offsety',0) or 0
@@ -385,7 +406,7 @@ def drawblocktexture(image:ImageBit,weld:WeldSides) -> Image:
 def defaultblock(data:BlockData) -> Image:
 	welded=data['weld']
 	rotate=data['rotate']
-	image=getblocktexture(data)
+	image=getblocktexture(typing.cast(BlockDataLoose,data))
 	welded=rotatewelded(welded,rotate)
 	im=drawblocktexture(image,welded)
 	im=rotateblockib(im,rotate)
@@ -403,6 +424,19 @@ def overlay(data:BlockData) -> Image:
 	im2 = Image()
 	im2.addimagebit(ImageBit(im,0,0,16,16),0,0)
 	im2=rotateoverlayib(im2,rotate)
+	return im2
+
+def overlay2(data:BlockData) -> Image:
+	rotate=data['rotate']
+	im=getblocktexture({
+		**data,
+		'offsetx':data.get('overlay2offsetx',0),
+		'offsety':data.get('overlay2offsety',0),
+		'sizex':16,
+		'sizey':16,
+	})
+	im2 = Image()
+	im2.addimagebit(ImageBit(im,0,0,16,16),0,0)
 	return im2
 
 def wafer(data:BlockData) -> Image:
@@ -502,9 +536,29 @@ def wirecomponent(data:BlockData) -> BlockData:
 			data['overlayoffsetx']=16 if bdata['outstate']=='on' else 0
 			data['data']=bdata['instate'] or 'off'
 		elif typ=="potentiometer": # the rest have a setting
-			pass
+			print('AAAAAAAAAAAAAAAAAAAAAAAAAAA',repr(data['data']))
+			bdata=re.fullmatch('(?P<power>[1-9]|1[0-5])(?P<instate>on|off)?(?P<state>on|off)',data['data'])
+			if bdata is None:
+				raise ValueError('bad value format')
+			power = int(bdata['power']) - 1
+			x = power % 8
+			y = power // 8
+			data['overlayoffsetx']=16 if bdata['state']=='on' else 0
+			data['overlay2offsetx'] = 16 * (x + 2)
+			data['overlay2offsety'] = 16 * y
+			data['data']=bdata['instate'] or 'off'
 		elif typ=="sensor":
-			pass
+			print('AAAAAAAAAAAAAAAAAAAAAAAAAAA',data['data'])
+			bdata=re.fullmatch('(?P<setting>[1-9]|1[0-4])(?P<state>on|off)?',data['data'])
+			if bdata is None:
+				raise ValueError('bad value format')
+			setting = int(bdata['setting'])
+			x = setting % 8
+			y = setting // 8
+			data['overlayoffsety']=16 if bdata['state']=='on' else 0
+			data['overlay2offsetx'] = 16 * (x + 1)
+			data['overlay2offsety'] = 16 * y
+			data['data']=bdata['state'] or 'off'
 		elif typ=="cascade":
 			# delay, in, out
 			bdata=re.fullmatch('(?P<delay>[1-7])(?P<instate>on|off)?(?P<state>on|off)',data['data'])
@@ -514,13 +568,20 @@ def wirecomponent(data:BlockData) -> BlockData:
 	return data
 
 def counterfilter(data:BlockData) -> BlockData:
-	raise NotImplementedError
+	raise NotImplementedError('counterfilter')
 
 def counter(data:BlockData) -> Image:
-	raise NotImplementedError
+	raise NotImplementedError('counter')
 
-def wiresetting(data:BlockData) -> Image:
-	raise NotImplementedError
+def sparkcatcherfilter(data:BlockData) -> BlockData:
+	if 'data' in data:
+		i = int(data['data'])
+		x = i % 8
+		y = i // 8
+		assert y >= 0 and y < 2
+		data['overlayoffsetx'] = 32 + x * 16
+		data['overlayoffsety'] = y * 16
+	return data
 
 blocktypes:collections.defaultdict[str,BlockDesc]=collections.defaultdict(blockdesc)
 
@@ -550,8 +611,8 @@ for t in wiretypes:
 	blocktypes[t]['layers']=[frame,wire,wiretop]
 	blocktypes[t]['datafilters'].append(wirecomponent)
 
-for t in ["potentiometer","sensor"]:
-	blocktypes[t]['layers']=[frame,wire,wiretop,wiresetting]
+blocktypes['potentiometer']['layers'].append(overlay2)
+blocktypes['sensor']['layers'].append(overlay2)
 
 blocktypes['counter']['datafilters'].append(counterfilter)
 blocktypes['counter']['layers']=[wafer,wire,counter]
@@ -559,6 +620,9 @@ blocktypes['counter']['layers']=[wafer,wire,counter]
 blocktypes['wire_board']['layers']=[wafer,wire]
 blocktypes['wire']['layers']=[frame,wire]
 blocktypes['frame']['layers']=[frame]
+
+blocktypes['spark_catcher']['datafilters']=[sparkcatcherfilter]
+blocktypes['spark_catcher']['layers']=[defaultblock,overlay]
 
 # rotate an image of a block by rotate
 def rotateblockib(im:Image,rotate:int) -> Image:
@@ -630,11 +694,14 @@ def normalize(block:BlockDataIn) -> BlockData:
 	typ = typ.lower()
 	if typ == 'nic':
 		typ = 'air'
-	return {
+	out = {
 		"type":typ,
 		"rotate":rotate,
 		"weld":weld2,
 	}
+	if isinstance(block,dict):
+		out.update(block)
+	return out
 
 # get a block from a grid
 # if the coordinates are outside the grid, return air
@@ -668,8 +735,8 @@ def makeimage(blocks:list[list[BlockDataIn]],autoweld:bool=True) -> PIL.Image.Im
 
 	newblocks=[[normalize("air") for _ in range(xsize)] for _ in range(ysize)]
 	for yi,line in enumerate(blocks):
-		for xi,block in enumerate(line):
-			block=normalize(block)
+		for xi,blockin in enumerate(line):
+			block=normalize(blockin)
 			newblocks[yi][xi]=block
 
 	im=Image()

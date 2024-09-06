@@ -8,7 +8,7 @@ from PIL import Image
 from nextcord.ext import commands
 from pyfunc.lang import cfgstr
 from pyfunc.commanddec import CogCommand
-from pyfunc.block import makeimage as blockmakeimage, BlockDataIn
+from pyfunc.block import makeimage as blockmakeimage, BlockDataIn, makeweldside
 import pyfunc.smp as smp
 from pyfunc.recipe import generaterecipe
 import typing
@@ -75,6 +75,7 @@ class Block(commands.Cog):
                     weld=[c=='1' for c in reversed(weldm)]
                 if b.isdigit():
                     b = idtoblock[int(b)]
+                weld = [makeweldside(s) for s in weld]
                 blocks[y][x] = typing.cast(BlockDataIn,{"type":b,"rotate":turn,"weld":weld,"data":bdata}) # just assume
                 blocklist[b] += 1
         im=blockmakeimage(blocks)

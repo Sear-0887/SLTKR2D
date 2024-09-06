@@ -23,7 +23,7 @@ tags:dict[str,Tag]={}
 def fixemptygrid(g:str|list[list[BlockDataIn]]) -> list[list[BlockDataIn]]:
     if isinstance(g,str):
         if g == '':
-            return [[]]
+            return [['air']]
         else:
             raise ValueError('bad grid')
     return g
@@ -75,7 +75,12 @@ def handlespecialblock(s:str) -> list[BlockDataIn]:
     try:
         return [assertblock(s)]
     except AssertionError:
+        print(s)
         if s.split()[0] in ['any','non_air']:
+            nowater = False
+            if 'not_water' in s:
+                s = s.replace('not_water','')
+                nowater = True
             typ,filtertype,filtervalue = s.split()
             assert filtertype in ['needs_attribute','needs_collision']
             if filtertype == 'needs_attribute':
@@ -84,6 +89,8 @@ def handlespecialblock(s:str) -> list[BlockDataIn]:
                 blocks = getblocksbycollision(filtervalue)
             if typ == 'non_air':
                 blocks = [b for b in blocks if b != 'air']
+            if nowater:
+                blocks = [b for b in blocks if b != 'water']
             return typing.cast(list[BlockDataIn],blocks) # list[str] can't auto cast to list[str | other stuff]
         raise ValueError(f'"{s}" is not a block')
 
@@ -177,7 +184,7 @@ dataschema = schema.Schema({
     }],
     'extra_display':[{
         'type':'extra_display',
-        'grid':schema.Or(schema.Use(fixemptygrid),[[blocktag]]),
+        'grid':schema.And(schema.Use(fixemptygrid),[[blocktag]]),
         'product':{
             'filter':blocktag,
             schema.Optional('amount',default = 1):num,
@@ -345,15 +352,23 @@ for erecipe in dataval['extra_display']:
     erecipe['amount'] = product['amount']
     if isinstance(product['filter'],list):
         out = product['filter']
-    elif isinstance(product['filter'],dict):
-        out = [product['filter']['type']]
     else:
         out = [product['filter']]
     del erecipe['type']
     for p in out:
+        if isinstance(p,dict):
+            idx = p['type']
+        else:
+            idx = p
+        if len(erecipe['guidebook_page_whitelist']) != 0:
+            if idx not in erecipe['guidebook_page_whitelist']:
+                continue
+        if len(erecipe['guidebook_page_blacklist']) != 0:
+            if idx in erecipe['guidebook_page_blacklist']:
+                continue
         erecipe = copy.deepcopy(erecipe)
         erecipe['product'] = p
-        extra_display[p].append(erecipe)
+        extra_display[idx].append(erecipe)
 
 for srecipe in dataval['summonore_pill']:
     if isinstance(srecipe['filter'],list):
