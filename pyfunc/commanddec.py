@@ -88,6 +88,8 @@ f'''
 {kwargs = }
 
 {GREEN}Expected Error: "{errorMessage}"
+STACK TRACE:
+{traceback.format_exc()}
 {RESET}{'-'*20}
 '''
     )
