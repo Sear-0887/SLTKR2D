@@ -467,7 +467,7 @@ def wiretop(data:BlockData) -> Image:
 
 def wire(data:BlockData) -> Image:
 	welded=data['weld']
-	if 'data' in data:
+	if 'data' in data and data['data'] is not None:
 		bdata=re.fullmatch('(?P<state>on|off)',data['data'])
 		if bdata is None:
 			raise ValueError('bad value format')
@@ -511,69 +511,89 @@ def wirecomponent(data:BlockData) -> BlockData:
 	if 'data' in data:
 		typ=data['type']
 		if typ in ["port","accelerometer","matcher","detector","toggler","trigger"]:
-			# instantaneous
-			# top off bottom on texture
-			bdata=re.fullmatch('(?P<state>on|off)',data['data'])
-			if bdata is None:
-				raise ValueError('bad value format')
-			data['overlayoffsety']=16 if bdata['state']=='on' else 0
-			data['data']=bdata['state'] or 'off'
+			if data['data'] is not None:
+				# instantaneous
+				# top off bottom on texture
+				bdata=re.fullmatch('(?P<state>on|off)',data['data'])
+				if bdata is None:
+					raise ValueError('bad value format')
+				data['overlayoffsety']=16 if bdata['state']=='on' else 0
+				data['data']=bdata['state'] or 'off'
+			else:
+				data['data'] = 'off'
 		elif typ=="capacitor":
-			# non instantaneous
-			# top off bottom on texture
-			bdata=re.fullmatch('(?P<instate>on|off)?(?P<state>on|off)',data['data'])
-			if bdata is None:
-				raise ValueError('bad value format')
-			data['overlayoffsety']=16 if bdata['state']=='on' else 0
-			data['data']=bdata['instate'] or 'off'
+			if data['data'] is not None:
+				# non instantaneous
+				# top off bottom on texture
+				bdata=re.fullmatch('(?P<instate>on|off)?(?P<state>on|off)',data['data'])
+				if bdata is None:
+					raise ValueError('bad value format')
+				data['overlayoffsety']=16 if bdata['state']=='on' else 0
+				data['data']=bdata['instate'] or 'off'
+			else:
+				data['data'] = 'off'
 		elif typ in ["diode","galvanometer","latch","transistor"]:
-			# column 1 off
-			# column 2 on
-			bdata=re.fullmatch('(?P<instate>on|off)?(?P<outstate>on|off)',data['data'])
-			if bdata is None:
-				raise ValueError('bad value format')
-			data['overlayoffsetx']=16 if bdata['outstate']=='on' else 0
-			data['data']=bdata['instate'] or 'off'
+			if data['data'] is not None:
+				# column 1 off
+				# column 2 on
+				bdata=re.fullmatch('(?P<instate>on|off)?(?P<outstate>on|off)',data['data'])
+				if bdata is None:
+					raise ValueError('bad value format')
+				data['overlayoffsetx']=16 if bdata['outstate']=='on' else 0
+				data['data']=bdata['instate'] or 'off'
+			else:
+				data['data'] = 'off'
 		elif typ=="potentiometer": # the rest have a setting
-			print('AAAAAAAAAAAAAAAAAAAAAAAAAAA',repr(data['data']))
-			bdata=re.fullmatch('(?P<power>[1-9]|1[0-5])(?P<instate>on|off)?(?P<state>on|off)',data['data'])
-			if bdata is None:
-				raise ValueError('bad value format')
-			power = int(bdata['power']) - 1
-			x = power % 8
-			y = power // 8
-			data['overlayoffsetx']=16 if bdata['state']=='on' else 0
-			data['overlay2offsetx'] = 16 * (x + 2)
-			data['overlay2offsety'] = 16 * y
-			data['data']=bdata['instate'] or 'off'
+			if data['data'] is not None:
+				print('AAAAAAAAAAAAAAAAAAAAAAAAAAA',repr(data['data']))
+				bdata=re.fullmatch('(?P<power>[1-9]|1[0-5])(?P<instate>on|off)?(?P<state>on|off)',data['data'])
+				if bdata is None:
+					raise ValueError('bad value format')
+				power = int(bdata['power']) - 1
+				x = power % 8
+				y = power // 8
+				data['overlayoffsetx']=16 if bdata['state']=='on' else 0
+				data['overlay2offsetx'] = 16 * (x + 2)
+				data['overlay2offsety'] = 16 * y
+				data['data']=bdata['instate'] or 'off'
+			else:
+				data['data'] = 'off'
 		elif typ=="sensor":
-			print('AAAAAAAAAAAAAAAAAAAAAAAAAAA',data['data'])
-			bdata=re.fullmatch('(?P<setting>[1-9]|1[0-4])(?P<state>on|off)?',data['data'])
-			if bdata is None:
-				raise ValueError('bad value format')
-			setting = int(bdata['setting'])
-			x = setting % 8
-			y = setting // 8
-			data['overlayoffsety']=16 if bdata['state']=='on' else 0
-			data['overlay2offsetx'] = 16 * (x + 1)
-			data['overlay2offsety'] = 16 * y
-			data['data']=bdata['state'] or 'off'
+			if data['data'] is not None:
+				print('AAAAAAAAAAAAAAAAAAAAAAAAAAA',data['data'])
+				bdata=re.fullmatch('(?P<setting>[1-9]|1[0-4])(?P<state>on|off)?',data['data'])
+				if bdata is None:
+					raise ValueError('bad value format')
+				setting = int(bdata['setting'])
+				x = setting % 8
+				y = setting // 8
+				data['overlayoffsety']=16 if bdata['state']=='on' else 0
+				data['overlay2offsetx'] = 16 * (x + 1)
+				data['overlay2offsety'] = 16 * y
+				data['data']=bdata['state'] or 'off'
+			else:
+				data['data'] = 'off'
 		elif typ=="cascade":
-			# delay, in, out
-			bdata=re.fullmatch('(?P<delay>[1-7])(?P<instate>on|off)?(?P<state>on|off)',data['data'])
-			if bdata is None:
-				raise ValueError('bad value format')
-			data['overlayoffsetx']=16*(2*(int(bdata['delay'])-1)+(bdata['state']=='on'))
+			if data['data'] is not None:
+				# delay, in, out
+				bdata=re.fullmatch('(?P<delay>[1-7])(?P<instate>on|off)?(?P<state>on|off)',data['data'])
+				if bdata is None:
+					raise ValueError('bad value format')
+				data['overlayoffsetx']=16*(2*(int(bdata['delay'])-1)+(bdata['state']=='on'))
+			else:
+				data['data'] = 'off'
 	return data
 
 def counterfilter(data:BlockData) -> BlockData:
-	raise NotImplementedError('counterfilter')
+	#raise NotImplementedError('counterfilter')
+	return data
 
 def counter(data:BlockData) -> Image:
-	raise NotImplementedError('counter')
+	#raise NotImplementedError('counter')
+	return Image()
 
 def sparkcatcherfilter(data:BlockData) -> BlockData:
-	if 'data' in data:
+	if 'data' in data and data['data'] is not None:
 		i = int(data['data'])
 		x = i % 8
 		y = i // 8
