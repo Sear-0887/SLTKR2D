@@ -1,6 +1,6 @@
 import collections
 import glob
-from pyfunc.assetload import blockinfos, idtoblock, locale
+from pyfunc.assetload import blockinfos, idtoblock, globaLocale
 import nextcord
 import random
 import re
@@ -30,10 +30,10 @@ class Block(commands.Cog):
             icox, icoy = binfo["iconcoord"]
             img = img.crop((16*icox, 16*icoy, 16*(icox+1), 16*(icoy+1))).resize((128, 128), Image.NEAREST)
             img.save("cache/blockim.png")
-            embed.title = locale[("BLOCK_TITLE",block)]
+            embed.title = globaLocale[("BLOCK_TITLE",block)]
             embed.add_field(name="Block name", value=block)
             embed.add_field(name="Block ID", value=binfo['id'])
-            embed.add_field(name="Block Tutorial", value=locale[("BLOCK_TUTORIAL",block)])
+            embed.add_field(name="Block Tutorial", value=globaLocale[("BLOCK_TUTORIAL",block)])
             embed.set_image(url="attachment://blockim.png")
 
             await ctx.send(file=nextcord.File("cache/blockim.png", filename="blockim.png"), embed=embed)

@@ -10,7 +10,7 @@ idtoblock:dict[int, str] = {}
 
 blockinfos:dict[str, dict[str, Any]] = collections.defaultdict(dict)
 
-locale:dict[tuple[str, ...], str] = {}
+globaLocale:dict[tuple[str, ...], str] = {}
 
 entities = {}
 
@@ -72,8 +72,8 @@ def substitutelocale(locale:str) -> str:
     # mods is optional and is a string containing one or more of ^, s, or d
     lastob = 0 # the index to look for the next opening bracket at
     while '{' in locale[lastob:]:
-        i_ob = locale.index('{',start=lastob)
-        i_cb = locale.find('}', start=i_ob)
+        i_ob = locale.index('{',lastob)
+        i_cb = locale.find('}', i_ob)
         if i_cb==-1: # there is no closing bracket
             break
         before=locale[:i_ob]
@@ -85,8 +85,8 @@ def substitutelocale(locale:str) -> str:
         else:
             modifier=''
         key=tuple(part.strip() for part in middle.split())
-        if key in locale:
-            localized=locale[key]
+        if key in globaLocale:
+            localized=globaLocale[key]
             for mod in modifier:
                 localized=modifiers[mod](localized)
             locale=before+localized+after
@@ -114,10 +114,10 @@ def getlocale() -> None:
                     key,value=line.split('=',maxsplit=1)
                     tkey=tuple(key.split())
                     value=value.strip()
-                    locale[tkey]=value
+                    globaLocale[tkey]=value
 
-    for tkey,s in locale.items():
-        locale[tkey]=substitutelocale(s)
+    for tkey,s in globaLocale.items():
+        globaLocale[tkey]=substitutelocale(s)
 
 def getentities() -> None:
     with opencfg("localGame.texture.entitiesFile", encoding="utf-8") as f:
