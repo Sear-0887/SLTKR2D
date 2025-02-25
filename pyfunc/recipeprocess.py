@@ -252,6 +252,7 @@ class CombineRecipe(typing.TypedDict):
 class ExtraDisplayRecipe(typing.TypedDict):
     grid:list[list[BlockDataIn | Tag]]
     amount:int
+    product:str
     arrow_sprite:int
     guidebook_page_blacklist:list[str] # don't put this on these pages, even if the recipe contains those blocks
     guidebook_page_whitelist:list[str] # put this on these pages, even if the recipe doesn't contain those blocks
