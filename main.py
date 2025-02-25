@@ -1,22 +1,24 @@
 import glob
 import nextcord
 import logging
-import os
 from pyfunc.log import LoggerInit
-import yaml
 import datetime
 import random
 from pyfunc.lang import botinit, devs
 from nextcord.ext import commands, tasks
-from pyfunc.lang import cfg, evl, phraser, phrasermodule
+from pyfunc.lang import cfg, evl, parseLangFiles, doesModuleLangExist
 from pyfunc.gettoken import getclientenv
 from pyfunc.commanddec import MainCommand
 from pyfunc.block import get
+
+# Loggers
 LoggerInit()
 l = logging.getLogger()
 l.info("Logging System Loaded!")
+
 botinit()
-from pyfunc.lang import presensemsg as presencemsg, keywords # has to be imported after botinit for reasons
+from pyfunc.lang import presenseMsgs as presenceMsgs, keywords # has to be imported after botinit for reasons
+
 # Intents
 intents = nextcord.Intents.default()
 intents.members = True
@@ -34,12 +36,12 @@ TimeOn: datetime.datetime = datetime.datetime.now()
 @MainCommand(bot, "reloadlocale")
 async def reloadlocal(ctx:commands.Context,module:str | None=None) -> None:
     if module is None:
-        phraser()
+        parseLangFiles()
         #for i in bot.commands:
         #    i.update()
         await ctx.send("Done.")
     else:
-        found=phrasermodule(module)
+        found=doesModuleLangExist(module)
         if found:
             await ctx.send("Done.")
         else:
@@ -55,15 +57,15 @@ class HelpButton(nextcord.ui.Button):
             s+=f"\n"
             s+=f"{cmd.description}"
             preparedlist.append(s)
-        sembed = nextcord.Embed()
-        sembed.title = evl("help.helplist.title")
+        sembed: nextcord.Embed = nextcord.Embed()
+        sembed.title = str(evl("help.helplist.title"))
         desc = evl("help.helplist.desc")
         assert isinstance(desc,str)
         sembed.description = desc.format("\n".join(preparedlist))
         await interaction.send(ephemeral=True, embed=sembed)
 
 # Get help texts for a command or display info about the bot
-@MainCommand(bot,"help")
+@MainCommand(bot, "help")
 async def help(ctx:commands.Context, cmdname:str | None=None) -> None:
 
     if not cmdname:
@@ -89,8 +91,8 @@ async def help(ctx:commands.Context, cmdname:str | None=None) -> None:
             cmd=cmds[cmdname]
             embed = nextcord.Embed()
             embed.title = cmd.name
-            embed.description = evl(f"{cmd.name}.desc")
-            embed.add_field(name="Syntax", value=evl(f"{cmd.name}.syntax"))
+            embed.description = str(evl(f"{cmd.name}.desc"))
+            embed.add_field(name="Syntax", value=str(evl(f"{cmd.name}.syntax")))
             embed.add_field(name="Aliases", value=",\n".join(cmd.aliases))
             embed.add_field(name="Cog", value='Main' if cmd.cog_name == None else cmd.cog_name)
             await ctx.send(embed=embed)
@@ -98,35 +100,34 @@ async def help(ctx:commands.Context, cmdname:str | None=None) -> None:
             raise KeyError("Couldn't find the command") # the decorator will handle it
 
 # check if the bot is up
-@MainCommand(bot,"ping")
-async def ping(ctx:commands.Context) -> None:
+@MainCommand(bot, "ping")
+async def ping(ctx: commands.context.Context) -> None:
     s=f"Pong! ({bot.latency*1000} ms)"
     l.info(s)
     await ctx.send(s)
 
 # represent sear's sanity
-@MainCommand(bot,"scream")
-async def scream(ctx:commands.Context, n:int=32) -> None:
-    await ctx.send("A"*n)
+@MainCommand(bot, "scream")
+async def scream(ctx: commands.Context, count:int = 32) -> None:
+    await ctx.send("A"*count)
     
 # represent sear's sanity... again?
-@MainCommand(bot,"wee")
-async def wee(ctx:commands.Context, e:int=32) -> None:
-    await ctx.send("W"+"e"*e)
+@MainCommand(bot, "wee")
+async def wee(ctx: commands.Context, count:int = 32) -> None:
+    await ctx.send("W" + "e" * count)
 
 # send a link
-@MainCommand(bot,"link")
-async def link(ctx:commands.Context, typ:str="r2d") -> None:
-    print(keywords)
+@MainCommand(bot, "link")
+async def link(ctx:commands.Context, typ:str = "r2d") -> None:
     for i in keywords:
         if typ in keywords[i]["kw"]:
             await ctx.send(f"`{i}` - {keywords[i]['link']}")
             return
     else:
-        raise KeyError('')
+        raise KeyError("")
 
 # credits to the developers
-@MainCommand(bot,'credit')
+@MainCommand(bot, "credit")
 async def credit(ctx:commands.Context) -> None:
     devstr = '\n'.join([f'### [{dev["name"]}]({dev["github_link"]}){dev["desc"]}' for dev in devs])
     devformat = evl("credit.display")
@@ -136,7 +137,7 @@ async def credit(ctx:commands.Context) -> None:
 # Presence Message Loop
 @tasks.loop(seconds=60)
 async def changepresence() -> None:
-    statuses: dict[str, list] = presencemsg # General whole Statuses
+    statuses: dict[str, list] = presenceMsgs # General whole Statuses
     categories: list[str] = list(statuses.keys()) # Keys
     weights: list[int] = [len(statuses[c]) for c in categories] # Weights of keys
     category: str = random.choices(categories,weights)[0] # Choosing a category
@@ -157,6 +158,7 @@ async def on_ready() -> None:
     assert bot.user is not None
     l.info(f"Display Name: {bot.user.display_name}")
     l.info(f"ID: {bot.user.id}.")
+    l.info(f"Use {prefixes}help for info.")
     global TimeOn
     TimeOn = datetime.datetime.now() # updating the real TimeOnline
     changepresence.start()
@@ -164,7 +166,7 @@ async def on_ready() -> None:
 
 # get the bot token
 token = getclientenv("TOKEN")
-
+assert isinstance(token, str)
 # load all cogs
 for cog_name in glob.glob("cog_*.py"):
     l.info(f"{cog_name} LOADED")

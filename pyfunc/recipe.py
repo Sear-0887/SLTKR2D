@@ -7,7 +7,7 @@ import pyfunc.gif as gif
 from typing import Any, TypeVar, Callable
 import typing
 from pyfunc.datafunc import tuple_max, tuple_min
-from pyfunc.lang import cfg, cfgstr, getarrowcoords
+from pyfunc.lang import cfg, cfgstr, getArrowCoords
 from pyfunc.smp import getsmpvalue
 from pyfunc.block import canweld, get, makeimage, bottomtypes, topbottomtypes, sidestypes, notoptypes, norotatetypes, twowaytypes, normalize, makeweldside, BlockDataIn, BlockData
 import itertools
@@ -150,7 +150,7 @@ def genimage(generated:list[list[BlockData]],assertconnected:bool=True) -> Image
     return gen
 
 def getarrow(typ:str) -> Image.Image:
-    icox, icoy = getarrowcoords()[typ]
+    icox, icoy = getArrowCoords()[typ]
     return Image.open(
         cfgstr("localGame.texture.guidebookArrowFile")
     ).crop(
@@ -193,7 +193,7 @@ itoarrow = {
 def generaterecipe(name:str) -> None:
     bg = cfg("recipeSetting.recipeBackground")
     assert isinstance(bg,list)
-    finimage = gif.gif(tuple(bg))
+    finimage = gif.GIF(tuple(bg))
     results:list[dict] = []
     print('generating recipe for',name)
     if name in combine:
@@ -201,12 +201,12 @@ def generaterecipe(name:str) -> None:
         for i,crecipe in enumerate(crecipes):
             imgs=generates(crecipe['grid'],ratio=4)
             _,h = gif.tuple_max((64*2, 0),*[img.size for img in imgs])
-            anim = gif.gif((0,0,0)) # the color is ignored
-            anim.addgifframes(
+            anim = gif.GIF((0,0,0)) # the color is ignored
+            anim.mergeImagesToFrames(
                 imgs,
                 pos=(0, 0)
             )
-            anim.addimageframes(
+            anim.addImageOnAllFrames(
                 combiner,
                 pos=(0, h)
             )
@@ -218,12 +218,12 @@ def generaterecipe(name:str) -> None:
         for i,erecipe in enumerate(erecipes):
             imgs=generates([[erecipe['ingredient']]],ratio=4)
             _,h = gif.tuple_max((64*2, 0),*[img.size for img in imgs])
-            anim = gif.gif((0,0,0)) # the color is ignored
-            anim.addgifframes(
+            anim = gif.GIF((0,0,0)) # the color is ignored
+            anim.mergeImagesToFrames(
                 imgs,
                 pos=(0, 0)
             )
-            anim.addimageframes(
+            anim.addImageOnAllFrames(
                 extractor,
                 pos=(0, h)
             )
@@ -248,12 +248,12 @@ def generaterecipe(name:str) -> None:
                     raise ValueError('no support for 3 surrounding')
             imgs=generates([row],ratio=4,assertconnected=False)
             _,h = gif.tuple_max((64, 0),*[img.size for img in imgs])
-            anim = gif.gif((0,0,0)) # the color is ignored
-            anim.addgifframes(
+            anim = gif.GIF((0,0,0)) # the color is ignored
+            anim.mergeImagesToFrames(
                 imgs,
                 pos=(0, 0)
             )
-            anim.addimageframes(
+            anim.addImageOnAllFrames(
                 arc_furnace,
                 pos=(furnacex, h)
             )
@@ -265,8 +265,8 @@ def generaterecipe(name:str) -> None:
         for i,drecipe in enumerate(drecipes):
             print(name,drecipe,drecipe['weldall'])
             imgs=generates(drecipe['grid'],weldall=drecipe['weldall'],assertconnected=False,matchblocks=drecipe['match_filter_modulo'],ratio=4)
-            anim = gif.gif((0,0,0)) # the color is ignored
-            anim.addgifframes(
+            anim = gif.GIF((0,0,0)) # the color is ignored
+            anim.mergeImagesToFrames(
                 imgs,
                 pos=(0, 0)
             )
@@ -276,7 +276,7 @@ def generaterecipe(name:str) -> None:
                 im = PIL.Image.open(texpath).convert('RGBA').crop((0,0,16,16)).resize((16 * 4, 16 * 4))
                 x, y = entity['position']
                 print('entity',texpath,x,y)
-                anim.addgifframes(
+                anim.mergeImagesToFrames(
                     [im],
                     pos=(x * 64, y * 64)
                 )
@@ -294,15 +294,15 @@ def generaterecipe(name:str) -> None:
         _,h = recipeimgs['anim'].getsize()
         _,h2 = recipeimgs['result'].size
         h = max(h, h2)
-        finimage.addgif(
+        finimage.mergeTwoGif(
             recipeimgs['anim'],
             pos = (0, y),
         )
-        finimage.addimageframes(
+        finimage.addImageOnAllFrames(
             recipeimgs['result'],
             pos=(maxdim[0]+64+64+64, y)
         )
-        finimage.addimageframes(
+        finimage.addImageOnAllFrames(
             getarrow(recipeimgs['arrowsprite']),
             pos=(maxdim[0]+64, y+h//2-32)
         )

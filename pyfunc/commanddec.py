@@ -4,39 +4,49 @@ import json
 import asyncio
 import nextcord
 from pyfunc.lang import cfg, evl
-from colorama import Fore, init
+from colorama import Fore, init as colorama_Init
 from nextcord.ext import commands
 import nextcord
 import traceback
 import logging 
 import typing
-init() # colorama's init(), not assetload's
+
+colorama_Init()
+
 RED = Fore.RED
 BLUE = Fore.BLUE
 GREEN = Fore.GREEN
 RESET = Fore.RESET
+
 l = logging.getLogger()
 
 class User(typing.TypedDict):
-    displayname:str
-    globalname:str | None
-    id:int
-    servername:str
+    displayname: str
+    globalname: str | None
+    id: int
+    servername: str
 
 class ErrorPacket(typing.TypedDict):
-    user:User
-    time:str
-    trigger:str
-    arg:list[str]
-    kwarg:dict[str,str]
-    errline:str
-    errname:str
-    excstr:str
+    user: User
+    time: str
+    trigger: str
+    arg: list[str]
+    kwarg: dict[str,str]
+    errline: str
+    errname: str
+    excstr: str
 
 Context:typing.TypeAlias = commands.context.Context
 
-async def ErrorHandler(name:str, e:BaseException, args:tuple[typing.Any], kwargs:dict[str,typing.Any], interaction:nextcord.Interaction | None=None, ctx:Context | None=None) -> None:
-    async def sendtoch(msg:str) -> None:
+async def ErrorHandler(
+        name: str, 
+        e: BaseException, 
+        args: tuple[typing.Any], 
+        kwargs: dict[str,typing.Any], 
+        interaction: nextcord.Interaction | None=None, 
+        ctx: Context | None = None
+    ) -> None:
+    async def sendToChannel(msg: str) -> None:
         if ctx is not None:
             await ctx.send(msg)
         elif interaction is not None:
@@ -46,22 +56,22 @@ async def ErrorHandler(name:str, e:BaseException, args:tuple[typing.Any], kwargs
     # handle the error e
     # from a function call f(ctx,*args,**kwargs)
     # print a message with cool colors to the console
-    expecterr = evl(f"{name}.error")
-    errortype = repr(type(e)).split("\'")[1] # <class '[KeyError]'>
-    replacingerror = evl(f"{name}.error.{errortype}")
-    if replacingerror:
-        l.debug(f"Other Error Message found for {name}: {replacingerror}")
-        expecterr = replacingerror
-    assert isinstance(expecterr,str)
+    errorMessage = evl(f"{name}.error")
+    errorType = repr(type(e)).split("\'")[1] # <class '[KeyError]'>
+    replacementErrorMsg = evl(f"{name}.error.{errorType}")
+    if replacementErrorMsg:
+        l.debug(f"Other Error Message found for {name}: {replacementErrorMsg}")
+        errorMessage = replacementErrorMsg
+    assert isinstance(errorMessage, str)
     try:
         l.debug(f"{e.args=}")
-        eargs = e.args[0]
-        if isinstance(eargs, str):
-            expecterr = expecterr.format(*args, e=eargs, **kwargs)
-        elif isinstance(eargs, list):
-            expecterr = expecterr.format(*args, *eargs, **kwargs)
-        elif type(eargs) == dict:
-            expecterr = expecterr.format(*args, **eargs, **kwargs)
+        errorArgs = e.args[0]
+        if isinstance(errorArgs, str):
+            errorMessage = errorMessage.format(*args, e=errorArgs, **kwargs)
+        elif isinstance(errorArgs, list):
+            errorMessage = errorMessage.format(*args, *errorArgs, **kwargs)
+        elif type(errorArgs) == dict:
+            errorMessage = errorMessage.format(*args, **errorArgs, **kwargs)
     except Exception as EX:
         l.error(f"Unknown Error Happened when tring to replace keyword: {EX}")
         pass
@@ -77,12 +87,12 @@ f'''
 {args = },
 {kwargs = }
 
-{GREEN}Expected Error: "{expecterr}"
+{GREEN}Expected Error: "{errorMessage}"
 {RESET}{'-'*20}
 '''
     )
-    await sendtoch(expecterr)
-    author:nextcord.user.User | nextcord.member.Member | None
+    await sendToChannel(errorMessage)
+    author: nextcord.user.User | nextcord.member.Member | None
     if ctx is not None:
         guild = ctx.guild
         author = ctx.author
@@ -118,7 +128,7 @@ f'''
         e = e2
         excstrs = [str(e),*excstrs]
 
-    errorpacket:ErrorPacket = {
+    errorPacket: ErrorPacket = {
         "user": {
             "displayname": author_display_name,
             "globalname": author_global_name,
@@ -134,30 +144,30 @@ f'''
         'excstr': '\n'.join(excstrs),
     }
     
-    errfilname = f"cache/log/error-{author_global_name}-{datetime.date.today():%d-%m-%Y}.json"
+    errorLogFilename = f"cache/log/error-{author_global_name}-{datetime.date.today():%d-%m-%Y}.json"
     try:
-        with open(errfilname, "r") as fil:
-            prev = json.load(fil)
+        with open(errorLogFilename, "r") as fil:
+            prevErrorPackets = json.load(fil)
     except:
-        prev = []
-    prev.append(errorpacket)
-    with open(errfilname, "w") as fil:
-        json.dump(prev, fil, indent=4)
+        prevErrorPackets = []
+    prevErrorPackets.append(errorPacket)
+    with open(errorLogFilename, "w") as fil:
+        json.dump(prevErrorPackets, fil, indent=4)
 
-CmdType:typing.TypeAlias = typing.Callable[...,typing.Coroutine]
-NCmdType:typing.TypeAlias = commands.core.Command
+CmdType: typing.TypeAlias = typing.Callable[...,typing.Coroutine]
+NCmdType: typing.TypeAlias = commands.core.Command
 
-def MainCommand(bot:commands.Bot,name:str) -> typing.Callable[[CmdType],NCmdType]:
+def MainCommand(bot: commands.Bot, name: str) -> typing.Callable[[CmdType],NCmdType]:
     # bot command
-    async def _trycmd(cmd:CmdType,ctx:commands.Context,*args:typing.Any,**kwargs:typing.Any) -> None:
+    async def _trycmd(cmd: CmdType, ctx: commands.Context, *args: typing.Any, **kwargs: typing.Any) -> None:
         try:
             await ctx.trigger_typing()
             await cmd(ctx,*args,**kwargs)
         except Exception as e:
             await ErrorHandler(name, e, args, kwargs, ctx=ctx)
-    def trycmd(cmd:CmdType) -> CmdType:
+    def trycmd(cmd: CmdType) -> CmdType:
         return decorator.decorate(cmd,_trycmd) # decorator preserves the signature of cmd
-    def fixcmd(cmd:CmdType) -> NCmdType:
+    def fixcmd(cmd: CmdType) -> NCmdType:
         return bot.command(
             name        =        name,
             description = evl(f"{name}.desc") or "*No Description Found.*",
@@ -165,18 +175,24 @@ def MainCommand(bot:commands.Bot,name:str) -> typing.Callable[[CmdType],NCmdType
         )( trycmd(cmd) )
     return fixcmd
 
-def CogCommand(name:str) -> typing.Callable[[CmdType],NCmdType]:
+def CogCommand(name: str) -> typing.Callable[[CmdType],NCmdType]:
     # cog command
     # command gets a self argument as well
-    async def _trycmd(cmd:CmdType, self:commands.Cog, ctx:commands.Context ,*args:typing.Any,**kwargs:typing.Any) -> None:
+    async def _trycmd(
+            cmd: CmdType, 
+            self: commands.Cog, 
+            ctx: commands.Context,
+            *args: typing.Any,
+            **kwargs: typing.Any
+        ) -> None:
         try:
             await ctx.trigger_typing()
-            await cmd(self, ctx,*args,**kwargs)
+            await cmd(self, ctx, *args, **kwargs)
         except Exception as e:
             await ErrorHandler(name, e, args, kwargs, ctx=ctx)
-    def trycmd(cmd:CmdType) -> CmdType:
+    def trycmd(cmd: CmdType) -> CmdType:
         return decorator.decorate(cmd,_trycmd)
-    def fixcmd(cmd:CmdType) -> NCmdType:
+    def fixcmd(cmd: CmdType) -> NCmdType:
         return commands.command(
             name        =        name,
             description = evl(f"{name}.desc") or "*No Description Found.*",
@@ -187,17 +203,22 @@ def CogCommand(name:str) -> typing.Callable[[CmdType],NCmdType]:
 def InteractionCogCommand_Local(name:str) -> typing.Callable[[CmdType],NCmdType]:
     # interaction cog command
     # command gets a self argument as well
-    async def _trycmd(cmd:CmdType, self:commands.Cog, interaction: nextcord.Interaction ,*args:typing.Any,**kwargs:typing.Any) -> None:
+    async def _trycmd(
+        cmd: CmdType, 
+        self: commands.Cog, 
+        interaction: nextcord.Interaction,
+        *args: typing.Any,
+        **kwargs: typing.Any
+    ) -> None:
         try:
             await cmd(self, interaction, *args,**kwargs)
-            
         except Exception as e:
             await ErrorHandler(name, e, args, kwargs, interaction=interaction)
             return
-    def trycmd(cmd:CmdType) -> CmdType:
+    def trycmd(cmd: CmdType) -> CmdType:
         return decorator.decorate(cmd,_trycmd)
-    def fixcmd(cmd:CmdType) -> NCmdType:
-        guild_ids: list = cfg("botInfo.localICCServer")
+    def fixcmd(cmd: CmdType) -> NCmdType:
+        guild_ids = cfg("botInfo.localICCServer")
         assert isinstance(guild_ids,list)
         desc = evl(f"{name}.desc") or "*No Description.*"
         assert isinstance(desc,str)

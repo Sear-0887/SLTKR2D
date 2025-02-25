@@ -3,7 +3,7 @@ import collections
 import pyfunc.smp as smp
 import glob
 from pyfunc.datafunc import capitalize, plural, past
-from pyfunc.lang import opencfg, cfg
+from pyfunc.lang import openCfgPath, cfg
 from typing import Any, cast
 
 idtoblock:dict[int, str] = {}
@@ -22,7 +22,7 @@ modifiers={
 
 blockdefregex = 'BLOCK_DEF\\((?P<name>[a-z_]+),(?P<collision>collision::[a-z_]+(\\|collision::[a-z_]+)*),(?P<attr>atb::[a-z_]+(\\|atb::[a-z_]+)*),0b(?P<weld>\\d\\d\\d\\d),(?P<weldtime>\\d+)\\)'
 def getblockdefs() -> None:
-    with opencfg("localGame.texture.blockDefsFile") as f:
+    with openCfgPath("localGame.texture.blockDefsFile") as f:
         data = f.read()
     for line in data.split('\n'):
         line = ''.join(line.split()) # remove spaces
@@ -48,7 +48,7 @@ def getblockdefs() -> None:
             blockinfos[name]['weldablesides'] = top,left,bottom,right
 
 def getblockids() -> None:
-    with opencfg("localGame.texture.blockIDFile") as f:
+    with openCfgPath("localGame.texture.blockIDFile") as f:
         data=smp.getsmpvalue(f.read())
     assert isinstance(data,dict)
     for name,i in data.items():
@@ -57,7 +57,7 @@ def getblockids() -> None:
         idtoblock[int(i)] = name
 
 def geticoncoords() -> None:
-    with opencfg("localGame.texture.iconLocationFile") as f:
+    with openCfgPath("localGame.texture.iconLocationFile") as f:
         data=smp.getsmpvalue(f.read())
     assert isinstance(data,dict)
     for icon,xy in data.items():
@@ -120,7 +120,7 @@ def getlocale() -> None:
         globaLocale[tkey]=substitutelocale(s)
 
 def getentities() -> None:
-    with opencfg("localGame.texture.entitiesFile", encoding="utf-8") as f:
+    with openCfgPath("localGame.texture.entitiesFile", encoding="utf-8") as f:
         data=smp.getsmpvalue(f.read())
     for name,entity in data.items():
         entities[name]={'texture':entity['texture']}

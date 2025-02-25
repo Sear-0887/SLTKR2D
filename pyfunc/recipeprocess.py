@@ -1,7 +1,7 @@
 import pyfunc.smp as smp
 import collections
 import copy
-from pyfunc.lang import opencfg
+from pyfunc.lang import openCfgPath
 from pyfunc.assetload import blockinfos
 from pyfunc.block import BlockDataIn
 import typing
@@ -280,7 +280,7 @@ summonore_pill:set[str] = set()
 sensor_natural:set[str] = set()
 sensor_rare_resource:set[str] = set()
 
-with opencfg('localGame.texture.recipesFile') as f:
+with openCfgPath('localGame.texture.recipesFile') as f:
     rawdata = smp.getsmpvalue(f.read())
 
 assert isinstance(rawdata,list)
