@@ -4,7 +4,7 @@ import pyfunc.smp as smp
 import glob
 from pyfunc.datafunc import capitalize, plural, past
 from pyfunc.lang import openCfgPath, cfg
-from typing import Any, cast
+from typing import Any, cast, TypedDict
 
 idtoblock:dict[int, str] = {}
 
@@ -12,7 +12,10 @@ blockinfos:dict[str, dict[str, Any]] = collections.defaultdict(dict)
 
 globaLocale:dict[tuple[str, ...], str] = {}
 
-entities = {}
+class EntityData(TypedDict):
+    texture: str
+
+entities:dict[str, EntityData] = {}
 
 modifiers={
     '^':capitalize,
@@ -122,8 +125,12 @@ def getlocale() -> None:
 def getentities() -> None:
     with openCfgPath("localGame.texture.entitiesFile") as f:
         data=smp.getsmpvalue(f.read())
+    assert isinstance(data, dict)
     for name,entity in data.items():
-        entities[name]={'texture':entity['texture']}
+        assert isinstance(entity, dict)
+        texturePath = entity['texture']
+        assert isinstance(texturePath, str)
+        entities[name]={'texture':texturePath}
 
 def assetinit() -> None:
     getblockids()
