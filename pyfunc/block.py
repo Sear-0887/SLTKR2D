@@ -229,6 +229,8 @@ class BlockDataLoose(typing.TypedDict):
 	offsety:typing.NotRequired[int]
 	overlayoffsetx:typing.NotRequired[int]
 	overlayoffsety:typing.NotRequired[int]
+	overlay2offsetx:typing.NotRequired[int]
+	overlay2offsety:typing.NotRequired[int]
 	sizex:typing.NotRequired[int]
 	sizey:typing.NotRequired[int]
 
@@ -241,6 +243,8 @@ class BlockData(typing.TypedDict):
 	offsety:typing.NotRequired[int]
 	overlayoffsetx:typing.NotRequired[int]
 	overlayoffsety:typing.NotRequired[int]
+	overlay2offsetx:typing.NotRequired[int]
+	overlay2offsety:typing.NotRequired[int]
 	sizex:typing.NotRequired[int]
 	sizey:typing.NotRequired[int]
 
@@ -694,7 +698,7 @@ def normalize(block:BlockDataIn) -> BlockData:
 	typ = typ.lower()
 	if typ == 'nic':
 		typ = 'air'
-	out = {
+	out:BlockData = {
 		"type":typ,
 		"rotate":rotate,
 		"weld":weld2,
