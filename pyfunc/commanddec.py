@@ -100,7 +100,7 @@ f'''
     elif interaction is not None:
         guild = interaction.guild
         author = interaction.user
-        trigger: nextcord.interactions.InteractionMessage = await interaction.original_message().clean_content
+        trigger = (await interaction.original_message()).clean_content
     else:
         guild = None
         author = None
