@@ -120,7 +120,7 @@ def getlocale() -> None:
         globaLocale[tkey]=substitutelocale(s)
 
 def getentities() -> None:
-    with openCfgPath("localGame.texture.entitiesFile", encoding="utf-8") as f:
+    with openCfgPath("localGame.texture.entitiesFile") as f:
         data=smp.getsmpvalue(f.read())
     for name,entity in data.items():
         entities[name]={'texture':entity['texture']}

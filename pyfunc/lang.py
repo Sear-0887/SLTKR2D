@@ -133,9 +133,9 @@ def cfgstr(target:str) -> str:
     assert isinstance(base,str)
     return base
 
-def openCfgPath(target: str, mode:str = 'r', encoding:str|None = "utf-8", **kwargs: Any) -> TextIO:
-    path = cfgstr(target)
-    fileObj: TextIO = open(path, mode, encoding=encoding, **kwargs)
+def openCfgPath(cfgkey: str) -> TextIO:
+    path = cfgstr(cfgkey)
+    fileObj: TextIO = open(path)
     return fileObj
 
 def cfg(target:str) -> int | str | list | dict:
