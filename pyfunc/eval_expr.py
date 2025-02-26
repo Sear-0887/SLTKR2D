@@ -340,16 +340,8 @@ def stringifyexpr(expression:ValueToken) -> str:
   # convert an expr from evaluate to a string, so evaluate on that string will probably give back the same expr
   if expression[0] == NUM or expression[0] == SYM:
     return str(expression[1])
+  assert expression[0] == EXPR
   if expression[1]=='(':
-    expression = typing.cast(
-      tuple[
-        typing.Literal["EXPR"],
-        typing.Literal['('],
-        'ValueToken',
-        'ValueToken'
-      ],
-      expression
-    ) # idk how to restrict the type without cast
     return f'{expression[2]}({stringifyexpr(expression[3])})'
   assert expression[1] != '('
   if len(expression) == 3: # (EXPR,Uop/Pop,arg)

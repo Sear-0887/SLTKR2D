@@ -75,8 +75,8 @@ class Block(commands.Cog):
                     weld=[c=='1' for c in reversed(weldm)]
                 if b.isdigit():
                     b = idtoblock[int(b)]
-                weld = [makeweldside(s) for s in weld]
-                blocks[y][x] = typing.cast(BlockDataIn,{"type":b,"rotate":turn,"weld":weld,"data":bdata}) # just assume
+                weld2 = [makeweldside(s) for s in weld]
+                blocks[y][x] = typing.cast(BlockDataIn,{"type":b,"rotate":turn,"weld":weld2,"data":bdata}) # just assume
                 blocklist[b] += 1
         im=blockmakeimage(blocks)
         width, height = im.size

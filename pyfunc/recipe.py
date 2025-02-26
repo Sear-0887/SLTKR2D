@@ -32,7 +32,7 @@ fullweld = (makeweldside(True),) * 4
 
 def generates(grid1:list[list[BlockDataIn]],ratio:int,weldall:bool=True,matchblocks:bool=False,assertconnected:bool=True) -> list[Image.Image]:
     tags=[]
-    def normlist(block:BlockDataIn,x:int,y:int,weldall:bool) -> BlockData | list[BlockData]:
+    def normlist(block:BlockDataIn,x:int,y:int,weldall:bool) -> BlockData:
         if isinstance(block, list): # If it's a list, it's a tag, which
             tags.append([(x,y,normalize(t)) for t in block])
             out = normalize(block[0]) # Actions
@@ -43,7 +43,7 @@ def generates(grid1:list[list[BlockDataIn]],ratio:int,weldall:bool=True,matchblo
         if not weldall:
             out['weld'] = noweld
         return out
-    grid:list[list[BlockData | list[BlockData]]] = [
+    grid:list[list[BlockData]] = [
         [
             normlist(b,x,y,weldall)
             for x,b in 

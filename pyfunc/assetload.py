@@ -4,7 +4,7 @@ import pyfunc.smp as smp
 import glob
 from pyfunc.datafunc import capitalize, plural, past
 from pyfunc.lang import openCfgPath, cfg
-from typing import Any, cast
+from typing import Any, cast, TypedDict
 
 idtoblock:dict[int, str] = {}
 
@@ -12,7 +12,10 @@ blockinfos:dict[str, dict[str, Any]] = collections.defaultdict(dict)
 
 globaLocale:dict[tuple[str, ...], str] = {}
 
-entities = {}
+class EntityData(TypedDict):
+    texture: str
+
+entities:dict[str, EntityData] = {}
 
 modifiers={
     '^':capitalize,
@@ -29,14 +32,10 @@ def getblockdefs() -> None:
         match = re.match(blockdefregex,line)
         if match is not None:
             name = match['name']
-            collision1 = match['collision']
-            collision2 = collision1.split('|')
-            collision3 = [re.fullmatch('collision::(?P<name>[a-z_]+)',c) for c in collision2]
+            collision3 = [re.fullmatch('collision::(?P<name>[a-z_]+)',c) for c in match['collision'].split('|')]
             assert all(c is not None for c in collision3)
             collision = [c['name'] for c in cast(list[re.Match[str]],collision3)]
-            attr1 = match['attr']
-            attr2 = attr1.split('|')
-            attr3 = [re.fullmatch('atb::(?P<name>[a-z_]+)',a) for a in attr2]
+            attr3 = [re.fullmatch('atb::(?P<name>[a-z_]+)',a) for a in match['attr'].split('|')]
             assert all(a is not None for a in attr3)
             attr = [a['name'] for a in cast(list[re.Match[str]],attr3)]
             weld = match['weld']
@@ -120,10 +119,14 @@ def getlocale() -> None:
         globaLocale[tkey]=substitutelocale(s)
 
 def getentities() -> None:
-    with openCfgPath("localGame.texture.entitiesFile", encoding="utf-8") as f:
+    with openCfgPath("localGame.texture.entitiesFile") as f:
         data=smp.getsmpvalue(f.read())
+    assert isinstance(data, dict)
     for name,entity in data.items():
-        entities[name]={'texture':entity['texture']}
+        assert isinstance(entity, dict)
+        texturePath = entity['texture']
+        assert isinstance(texturePath, str)
+        entities[name]={'texture':texturePath}
 
 def assetinit() -> None:
     getblockids()

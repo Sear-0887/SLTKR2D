@@ -17,8 +17,8 @@ class GifFrame:
     def addImage(self, image: Image.Image, pos: vec2 = (0, 0)) -> None:
         self.imagesData.append((image, pos))
 
-    def addImagesFromFrame(self, frame: Self, start: vec2 = (0, 0)) -> None:
-        for frame, (x, y) in frame.imagesData:
+    def addImagesFromGifFrame(self, gifframe: Self, start: vec2 = (0, 0)) -> None:
+        for frame, (x, y) in gifframe.imagesData:
             self.addImage(frame, (x + start[0],y + start[1]))
     
     def export(self) -> Image.Image:
@@ -37,7 +37,7 @@ class GifFrame:
 
 def copyGifFrame(f: GifFrame) -> GifFrame: # This will duplicate the frame
     copy = GifFrame()
-    copy.addImagesFromFrame(f)
+    copy.addImagesFromGifFrame(f)
     return copy
 
 class GIF:
@@ -107,7 +107,7 @@ class GIF:
         for i in range(len(gifList)):
             gifFrame, selfFrame = newgif.frames[i], self.frames[i]
             if selfFrame is None: return
-            selfFrame.addImagesFromFrame(gifFrame, pos)
+            selfFrame.addImagesFromGifFrame(gifFrame, pos)
         return self
             
         
